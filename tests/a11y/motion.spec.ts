@@ -1,4 +1,10 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+/** Navigate and wait for hydration so interactions never race the client bundle under `next dev`. */
+async function gotoHydrated(page: Page, path: string): Promise<void> {
+  await page.goto(path);
+  await page.waitForLoadState("networkidle");
+}
 
 // Computed transition-duration is serialised in seconds by Chromium ("0.15s", "0.00001s").
 const toMilliseconds = (value: string): number => {
@@ -7,7 +13,7 @@ const toMilliseconds = (value: string): number => {
 };
 
 const buttonTransitionDuration = async (page: import("@playwright/test").Page) => {
-  await page.goto("/primitives");
+  await gotoHydrated(page, "/primitives");
   const button = page.getByRole("button", { name: "Primary" });
   return button.evaluate((el) => getComputedStyle(el).transitionDuration);
 };
