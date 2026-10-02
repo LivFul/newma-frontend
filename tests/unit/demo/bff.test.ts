@@ -78,7 +78,10 @@ describe("withSession", () => {
     });
     const response = await failing(bffRequest("/x"));
     expect(response.status).toBe(502);
-    expect(await response.text()).not.toContain("secret-in-message");
+    expect(await response.json()).toEqual({
+      code: "upstream_error",
+      message: "The demo backend is unavailable",
+    });
     expect(spy).toHaveBeenCalled();
   });
 });

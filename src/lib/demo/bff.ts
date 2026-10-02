@@ -73,15 +73,29 @@ export function sameOriginGuard(req: NextRequest): NextResponse | undefined {
   return errorJson(403, "cross_site_request", "Cross-site requests are not accepted.");
 }
 
+// Backend `details` reach the browser only for codes whose details are safe to render.
+const DETAILS_ALLOWLIST: ReadonlySet<string> = new Set([
+  "job_terminal",
+  "validation_error",
+  "idempotency_conflict",
+]);
+const UPSTREAM_UNAVAILABLE = "The demo backend is unavailable";
+
+function upstreamError(error: unknown): NextResponse {
+  // Full error server-side (no request headers are ever attached to these errors).
+  console.error("demo BFF upstream failure", error);
+  return errorJson(502, "upstream_error", UPSTREAM_UNAVAILABLE);
+}
+
 function mapError(error: unknown, secure: boolean): NextResponse {
   if (error instanceof BffError) return errorJson(error.status, error.code, error.message);
-  if (error instanceof DemoApiError) {
-    const body: ErrorBody = { code: error.code, message: error.message, details: error.details };
-    const response = noStore(body, { status: error.status });
-    return error.isInvalidSession ? clearSessionCookie(response, secure) : response;
-  }
-  console.error("demo BFF upstream failure", error);
-  return errorJson(502, "upstream_error", "The demo API could not be reached.");
+  if (!(error instanceof DemoApiError) || error.status >= 500) return upstreamError(error);
+  const base = { code: error.code, message: error.message };
+  const body: ErrorBody = DETAILS_ALLOWLIST.has(error.code)
+    ? { ...base, details: error.details }
+    : base;
+  const response = noStore(body, { status: error.status });
+  return error.isInvalidSession ? clearSessionCookie(response, secure) : response;
 }
 
 /** Resolves the HttpOnly session cookie and maps backend session errors to a cookie-clearing 401. */
