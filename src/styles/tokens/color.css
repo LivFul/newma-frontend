@@ -7,7 +7,8 @@
   --color-fg-muted: #b7bfd1;
   --color-accent: #7cc4ff;
   --color-accent-fg: #06111f;
-  --color-border: #2a334d;
+  --color-border: #2a334d; /* dividers */
+  --color-border-strong: #6b7694; /* interactive outlines, e.g. secondary Button */
   --color-danger: #ff8f8f;
   --color-danger-fg: #2a0909;
   --color-warning: #ffd27a;

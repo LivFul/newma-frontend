@@ -22,7 +22,15 @@ describe("design tokens", () => {
       bg: string;
       min: number;
     }[];
-    expect(pairs.length).toBeGreaterThanOrEqual(8);
+    const fgTokens = Object.keys(vars).filter((k) => /^--color-.+-fg$/.test(k));
+    expect(fgTokens.length).toBeGreaterThan(0);
+    for (const fg of fgTokens) {
+      const base = fg.replace(/-fg$/, "");
+      expect(
+        pairs.some((p) => p.fg === fg && p.bg === base),
+        `${fg} needs a pair on ${base}`,
+      ).toBe(true);
+    }
     for (const p of pairs) {
       expect(vars[p.fg], p.fg).toBeDefined();
       expect(vars[p.bg], p.bg).toBeDefined();

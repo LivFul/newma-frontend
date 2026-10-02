@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "../styles/tokens/index.css";
 
+:root {
+  color-scheme: dark;
+}
 body {
   background: var(--color-bg);
   color: var(--color-fg);
@@ -9,4 +12,6 @@ body {
 :focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
+  /* Two-tone ring: the inner halo keeps the ring visible on accent and warning surfaces. */
+  box-shadow: 0 0 0 2px var(--color-bg);
 }

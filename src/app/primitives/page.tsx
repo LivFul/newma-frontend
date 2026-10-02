@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function PrimitivesPage() {
   return (
-    <main className="mx-auto max-w-3xl space-y-8 p-8">
+    <main id="main" tabIndex={-1} className="mx-auto max-w-3xl space-y-8 p-8">
       <h1 className="text-3xl font-semibold">Primitives</h1>
       <section aria-labelledby="buttons">
         <h2 id="buttons" className="text-xl">
