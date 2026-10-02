@@ -35,7 +35,7 @@ export function withIdempotencyKey<T extends Record<string, unknown>>(
   body: T,
 ): (T & { idempotency_key: string }) | undefined {
   const key = body.idempotency_key;
-  if (key === undefined) return { ...body, idempotency_key: crypto.randomUUID() };
+  if (key === undefined || key === null) return { ...body, idempotency_key: crypto.randomUUID() };
   return isIdempotencyKey(key) ? { ...body, idempotency_key: key } : undefined;
 }
 
