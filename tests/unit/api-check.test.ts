@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from "node:child_process";
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
@@ -8,7 +8,7 @@ import { ApiCheckError, runApiCheck } from "../../scripts/api-check.mjs";
 const repo = path.resolve(__dirname, "../..");
 const script = path.join(repo, "scripts/api-check.mjs");
 
-function sandbox(): string {
+function sandbox({ git = true }: { git?: boolean } = {}): string {
   const dir = mkdtempSync(path.join(tmpdir(), "apicheck-"));
   mkdirSync(path.join(dir, "api"), { recursive: true });
   mkdirSync(path.join(dir, "src/lib/api/generated"), { recursive: true });
@@ -17,11 +17,27 @@ function sandbox(): string {
     path.join(repo, "src/lib/api/generated/schema.d.ts"),
     path.join(dir, "src/lib/api/generated/schema.d.ts"),
   );
+  if (!git) return dir;
   execFileSync("git", ["init", "-q"], { cwd: dir });
   execFileSync("git", ["add", "-A"], { cwd: dir });
   execFileSync("git", ["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "init"], {
     cwd: dir,
   });
+  return dir;
+}
+
+/** Turn a sandbox into a tiny TypeScript project (repo node_modules linked) with one type error. */
+function withTypeError(dir: string): string {
+  symlinkSync(path.join(repo, "node_modules"), path.join(dir, "node_modules"));
+  writeFileSync(path.join(dir, "package.json"), JSON.stringify({ name: "sandbox", private: true }));
+  writeFileSync(
+    path.join(dir, "tsconfig.json"),
+    JSON.stringify({
+      compilerOptions: { strict: true, noEmit: true, skipLibCheck: true, types: [] },
+      include: ["src/**/*.ts"],
+    }),
+  );
+  writeFileSync(path.join(dir, "src/bad.ts"), "export const n: number = 'not a number';\n");
   return dir;
 }
 
@@ -63,16 +79,16 @@ describe("api:check", () => {
 });
 
 describe("runApiCheck (in-process)", () => {
-  const specText = () => {
-    const lock = JSON.parse(readFileSync(path.join(repo, "api/openapi.lock"), "utf8"));
-    return readFileSync(path.resolve(repo, lock.source), "utf8");
-  };
-  const writeLock = (dir: string, patch: Record<string, string>) => {
-    const lockFile = path.join(dir, "api/openapi.lock");
-    const lock = JSON.parse(readFileSync(lockFile, "utf8"));
-    writeFileSync(lockFile, JSON.stringify({ ...lock, ...patch }));
-  };
+  const readLock = (dir: string) =>
+    JSON.parse(readFileSync(path.join(dir, "api/openapi.lock"), "utf8"));
+  const specText = () => readFileSync(path.resolve(repo, readLock(repo).source), "utf8");
+  const writeLock = (dir: string, patch: Record<string, string>) =>
+    writeFileSync(
+      path.join(dir, "api/openapi.lock"),
+      JSON.stringify({ ...readLock(dir), ...patch }),
+    );
   const args = new Set(["--no-typecheck"]);
+  const asFetch = (impl: () => Promise<Response>) => vi.fn(impl) as unknown as typeof fetch;
 
   it("returns a summary on a pristine sandbox", async () => {
     await expect(runApiCheck({ cwd: sandbox(), repoRoot: repo, args })).resolves.toMatch(
@@ -90,37 +106,54 @@ describe("runApiCheck (in-process)", () => {
     writeLock(dir, { source: "does-not-exist.yaml" });
     await expect(runApiCheck({ cwd: dir, repoRoot: repo, args })).rejects.toThrow(/spec not found/);
   });
-  it("fetches an http source and refreshes the lock hash with --update", async () => {
+  it("rejects a spec without info.version", async () => {
+    const dir = sandbox();
+    writeFileSync(path.join(dir, "bad.yaml"), "openapi: 3.1.0\ninfo:\n  title: no version\n");
+    writeLock(dir, { source: "bad.yaml" });
+    await expect(runApiCheck({ cwd: dir, repoRoot: dir, args })).rejects.toThrow(/info\.version/);
+  });
+  it("--update rewrites both sha256 and version from the spec", async () => {
+    const dir = sandbox();
+    writeLock(dir, { version: "9.9.9", sha256: "" });
+    await runApiCheck({ cwd: dir, repoRoot: repo, args: new Set(["--update", "--no-typecheck"]) });
+    const lock = readLock(dir);
+    expect(lock.version).toBe("0.1.0-demo");
+    expect(lock.sha256).toBe(readLock(repo).sha256);
+  });
+  it("fetches an http source with a timeout signal", async () => {
     const dir = sandbox();
     writeLock(dir, { source: "https://contract.example/openapi.yaml", sha256: "" });
-    const fetchImpl = vi.fn(async () => new Response(specText(), { status: 200 }));
+    const fetchImpl = asFetch(async () => new Response(specText(), { status: 200 }));
     await runApiCheck({
       cwd: dir,
       repoRoot: repo,
       args: new Set(["--update", "--no-typecheck"]),
-      fetchImpl: fetchImpl as unknown as typeof fetch,
+      fetchImpl,
     });
-    expect(fetchImpl).toHaveBeenCalledWith("https://contract.example/openapi.yaml");
-    const lock = JSON.parse(readFileSync(path.join(dir, "api/openapi.lock"), "utf8"));
-    expect(lock.sha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(fetchImpl).toHaveBeenCalledWith(
+      "https://contract.example/openapi.yaml",
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    );
+    expect(readLock(dir).sha256).toMatch(/^[0-9a-f]{64}$/);
   });
   it("rejects when the http source is not ok", async () => {
     const dir = sandbox();
     writeLock(dir, { source: "https://contract.example/openapi.yaml" });
-    const fetchImpl = vi.fn(async () => new Response("nope", { status: 500 }));
-    await expect(
-      runApiCheck({
-        cwd: dir,
-        repoRoot: repo,
-        args,
-        fetchImpl: fetchImpl as unknown as typeof fetch,
-      }),
-    ).rejects.toThrow(/-> 500/);
+    const fetchImpl = asFetch(async () => new Response("nope", { status: 500 }));
+    await expect(runApiCheck({ cwd: dir, repoRoot: repo, args, fetchImpl })).rejects.toThrow(
+      /-> 500/,
+    );
   });
-  it("reports a type error as an api:check failure", async () => {
-    const dir = sandbox();
-    await expect(
-      runApiCheck({ cwd: dir, repoRoot: repo, args: new Set(["--only-typecheck"]) }),
-    ).rejects.toThrow(/typecheck failed/);
+  it("rejects a cwd that is not a git checkout", async () => {
+    const dir = sandbox({ git: false });
+    await expect(runApiCheck({ cwd: dir, repoRoot: repo, args })).rejects.toThrow(
+      /not a git repository/,
+    );
+  });
+  it("reports a real type error as an api:check failure", async () => {
+    const dir = withTypeError(sandbox());
+    await expect(runApiCheck({ cwd: dir, repoRoot: repo, args: new Set() })).rejects.toThrow(
+      /typecheck failed/,
+    );
   });
 });
