@@ -2,24 +2,36 @@
 import { Tooltip as RadixTooltip } from "radix-ui";
 import type { ReactNode } from "react";
 
-const TOOLTIP_DELAY_MS = 200;
 const TOOLTIP_SIDE_OFFSET = 6;
 
-export function Tooltip({ content, children }: { content: string; children: ReactNode }) {
+/**
+ * App-level tooltip context. Rendered once in `src/app/providers.tsx` (mounted by the root
+ * layout); Radix exposes no way to detect a missing provider, so every `Tooltip` must sit
+ * under it — tests wrap their render in `<TooltipProvider>`.
+ */
+export const TooltipProvider = RadixTooltip.Provider;
+
+export type TooltipProps = {
+  /** Short hint only. Tooltips never carry essential information: put that in visible text
+   *  or a `VisuallyHidden` element, because touch users and some AT never see a tooltip. */
+  content: string;
+  /** Must be a single focusable control (e.g. `Button`) so keyboard users can open it. */
+  children: ReactNode;
+};
+
+export function Tooltip({ content, children }: TooltipProps) {
   return (
-    <RadixTooltip.Provider delayDuration={TOOLTIP_DELAY_MS}>
-      <RadixTooltip.Root>
-        <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
-        <RadixTooltip.Portal>
-          <RadixTooltip.Content
-            sideOffset={TOOLTIP_SIDE_OFFSET}
-            className="rounded-sm bg-fg px-2 py-1 text-xs text-bg"
-          >
-            {content}
-            <RadixTooltip.Arrow className="fill-fg" />
-          </RadixTooltip.Content>
-        </RadixTooltip.Portal>
-      </RadixTooltip.Root>
-    </RadixTooltip.Provider>
+    <RadixTooltip.Root>
+      <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
+      <RadixTooltip.Portal>
+        <RadixTooltip.Content
+          sideOffset={TOOLTIP_SIDE_OFFSET}
+          className="z-50 max-w-xs rounded-sm bg-fg px-2 py-1 text-xs text-bg"
+        >
+          {content}
+          <RadixTooltip.Arrow className="fill-fg" />
+        </RadixTooltip.Content>
+      </RadixTooltip.Portal>
+    </RadixTooltip.Root>
   );
 }

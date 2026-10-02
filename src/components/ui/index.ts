@@ -14,5 +14,5 @@ export {
   DialogTrigger,
   type DialogContentProps,
 } from "./dialog";
-export { Tooltip } from "./tooltip";
+export { Tooltip, TooltipProvider, type TooltipProps } from "./tooltip";
 export { VisuallyHidden } from "./visually-hidden";
