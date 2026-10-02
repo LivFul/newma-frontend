@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 // Contract check (IP §5.6): verify the pinned spec hash, regenerate the typed client, fail on drift.
 // Usage: node scripts/api-check.mjs [--update] [--no-typecheck]
+// API_CHECK_SPEC_SOURCE overrides where the spec is fetched from (CI points it at the deployed
+// API's /openapi.yaml); the lock's pinned version and sha256 are still enforced against it.
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -52,7 +54,7 @@ export async function generateClient(spec, lock) {
 }
 
 /** In --update mode the validated spec rewrites the lock; otherwise the lock must match it. */
-function resolveLock({ lock, lockPath, sha, version, update }) {
+function resolveLock({ lock, lockPath, source, sha, version, update }) {
   if (update) {
     const next = { ...lock, version, sha256: sha };
     writeFileSync(lockPath, JSON.stringify(next, null, 2) + "\n");
@@ -60,7 +62,7 @@ function resolveLock({ lock, lockPath, sha, version, update }) {
   }
   if (sha !== lock.sha256) {
     fail(
-      `sha256 mismatch for ${lock.source}: lock ${lock.sha256} vs spec ${sha}. ` +
+      `sha256 mismatch for ${source}: lock ${lock.sha256} vs spec ${sha}. ` +
         "Run pnpm api:update after reviewing the contract change.",
     );
   }
@@ -93,14 +95,16 @@ export async function runApiCheck({
   repoRoot = process.env.API_CHECK_REPO_ROOT ?? cwd,
   args = new Set(),
   fetchImpl = fetch,
+  env = process.env,
 } = {}) {
   const update = args.has("--update");
   const lockPath = path.join(cwd, LOCK_PATH);
   const lock = JSON.parse(readFileSync(lockPath, "utf8"));
-  const spec = await loadSpec(lock.source, repoRoot, fetchImpl);
+  const source = env.API_CHECK_SPEC_SOURCE || lock.source;
+  const spec = await loadSpec(source, repoRoot, fetchImpl);
   const version = specVersion(spec);
   const sha = sha256(spec);
-  const resolved = resolveLock({ lock, lockPath, sha, version, update });
+  const resolved = resolveLock({ lock, lockPath, source, sha, version, update });
 
   writeFileSync(path.join(cwd, OUT_PATH), await generateClient(spec, resolved));
   if (generatedDiff(cwd).trim() && !update) {

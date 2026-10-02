@@ -157,3 +157,36 @@ describe("runApiCheck (in-process)", () => {
     );
   });
 });
+
+describe("API_CHECK_SPEC_SOURCE override", () => {
+  const readLock = (dir: string) =>
+    JSON.parse(readFileSync(path.join(dir, "api/openapi.lock"), "utf8"));
+  const specText = () => readFileSync(path.resolve(repo, readLock(repo).source), "utf8");
+  const args = new Set(["--no-typecheck"]);
+  const runWithSource = (dir: string, source: string) =>
+    runApiCheck({ cwd: dir, repoRoot: repo, args, env: { API_CHECK_SPEC_SOURCE: source } });
+
+  it("passes when the override points at a copy of the pinned spec", async () => {
+    const dir = sandbox();
+    writeFileSync(path.join(dir, "remote.yaml"), specText());
+    await expect(runWithSource(dir, path.join(dir, "remote.yaml"))).resolves.toMatch(
+      /api:check: ok/,
+    );
+  });
+  it("still enforces the pinned sha against a tampered override", async () => {
+    const dir = sandbox();
+    writeFileSync(path.join(dir, "remote.yaml"), specText() + "\n# tampered\n");
+    await expect(runWithSource(dir, path.join(dir, "remote.yaml"))).rejects.toThrow(
+      /sha256 mismatch/,
+    );
+  });
+  it("names the override source in the mismatch message", async () => {
+    const dir = sandbox();
+    writeFileSync(path.join(dir, "remote.yaml"), specText() + "\n# tampered\n");
+    await expect(runWithSource(dir, path.join(dir, "remote.yaml"))).rejects.toThrow(/remote\.yaml/);
+  });
+  it("falls back to the lock source when the override is empty", async () => {
+    const dir = sandbox();
+    await expect(runWithSource(dir, "")).resolves.toMatch(/api:check: ok/);
+  });
+});
