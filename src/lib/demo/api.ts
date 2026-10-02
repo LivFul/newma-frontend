@@ -1,6 +1,7 @@
 import "server-only";
 import type { paths } from "@/lib/api/generated/schema";
 import { createApiClient, type ApiClient } from "@/lib/api/server";
+import type { ContractPath } from "./contract-paths";
 import type { DemoErrorEnvelope } from "./types";
 
 // Server-only access to the Railway API (D-09/D-10). `demoFetch` is a thin wrapper whose paths are
@@ -9,7 +10,7 @@ import type { DemoErrorEnvelope } from "./types";
 type TemplatePath<P extends string> = P extends `${infer Head}{${string}}${infer Tail}`
   ? `${Head}${string}${TemplatePath<Tail>}`
   : P;
-export type DemoPath = TemplatePath<keyof paths & string>;
+export type DemoPath = TemplatePath<keyof paths & string> | ContractPath;
 export type { DemoErrorEnvelope };
 
 const INVALID_SESSION_CODES: ReadonlySet<string> = new Set(["invalid_session", "session_expired"]);
@@ -53,6 +54,8 @@ export type DemoFetchInit = Readonly<{
   method?: "GET" | "POST" | "DELETE";
   body?: unknown;
   sessionId?: string;
+  /** Query parameters; undefined values are omitted. Values are URL-encoded here. */
+  query?: Readonly<Record<string, string | undefined>>;
 }>;
 
 export type DemoFetchResult<T> = Readonly<{
@@ -78,12 +81,20 @@ async function parseError(response: Response): Promise<DemoErrorEnvelope> {
     : fallback;
 }
 
+function queryString(query: DemoFetchInit["query"]): string {
+  if (!query) return "";
+  const entries = Object.entries(query).filter(
+    (entry): entry is [string, string] => entry[1] !== undefined,
+  );
+  return entries.length === 0 ? "" : `?${new URLSearchParams(entries).toString()}`;
+}
+
 export async function demoFetch<T = unknown>(
   path: DemoPath,
   init: DemoFetchInit = {},
 ): Promise<DemoFetchResult<T>> {
   const { baseUrl, serviceToken } = readDemoEnv();
-  const url = `${baseUrl.replace(/\/$/, "")}${path}`;
+  const url = `${baseUrl.replace(/\/$/, "")}${path}${queryString(init.query)}`;
   const response = await fetch(url, {
     method: init.method ?? "GET",
     headers: buildHeaders(serviceToken, init),

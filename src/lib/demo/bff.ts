@@ -77,10 +77,21 @@ export function sameOriginGuard(req: NextRequest): NextResponse | undefined {
 }
 
 // Backend `details` reach the browser only for codes whose details are safe to render.
+// P3 additions follow the shared contract's "forwarded with details" list.
 const DETAILS_ALLOWLIST: ReadonlySet<string> = new Set([
   "job_terminal",
   "validation_error",
   "idempotency_conflict",
+  "persona_forbidden",
+  "invalid_cursor",
+  "source_not_cleared",
+  "claim_quarantined",
+  "claim_not_approved",
+  "gate_requirements_missing",
+  "gate_not_decidable",
+  "evidence_package_stale",
+  "reconciliation_hold",
+  "retraining_not_authorized",
 ]);
 const UPSTREAM_UNAVAILABLE = "The demo backend is unavailable";
 

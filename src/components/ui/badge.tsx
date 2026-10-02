@@ -26,7 +26,8 @@ export function Badge({ className, tone, ...props }: BadgeProps) {
   return <span className={cn(badgeVariants({ tone }), className)} {...props} />;
 }
 
-// Gate/job status vocabulary; alignment with PRD §3.3 state names is tracked in PROGRESS.md.
+// GateStatus (P3 contract; PRD §3.3 / RM §2.6): NOT_STARTED PENDING PASS FAIL HOLD INVALIDATED.
+// A-P0-F13 resolved: the badge vocabulary is exactly the gate status enum.
 const STATUS_TONE = {
   PASS: "success",
   HOLD: "warning",

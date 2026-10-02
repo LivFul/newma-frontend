@@ -16,3 +16,6 @@ export {
 } from "./dialog";
 export { Tooltip, TooltipProvider, type TooltipProps } from "./tooltip";
 export { VisuallyHidden } from "./visually-hidden";
+export { JsonView, type JsonViewProps } from "./json-view";
+export { SyntheticBadge } from "./synthetic-badge";
+export { Withheld } from "./withheld";
