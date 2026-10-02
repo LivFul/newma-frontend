@@ -1,9 +1,10 @@
+import type { components } from "@/lib/api/generated/schema";
 import type { PersonaId } from "@/lib/personas";
 
-/** GET /v1/demo/sessions/current (P2 contract). Never includes the session id. */
-export type DemoSession = Readonly<{
-  persona: PersonaId;
-  tenant_id: string;
-  expires_at: string;
-  created_at: string;
-}>;
+type Schemas = components["schemas"];
+
+/** GET /v1/demo/sessions/current. The contract types persona as string; we narrow to PersonaId. */
+export type DemoSession = Omit<Schemas["SessionCurrent"], "persona"> & { persona: PersonaId };
+export type SessionCreated = Omit<Schemas["SessionCreated"], "persona"> & { persona: PersonaId };
+export type ResetResult = Schemas["ResetResult"];
+export type DemoErrorEnvelope = Schemas["ErrorResponse"];

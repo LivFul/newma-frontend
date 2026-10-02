@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { isPersonaId, type PersonaId } from "@/lib/personas";
+import { isPersonaId } from "@/lib/personas";
 import { demoFetch } from "@/lib/demo/api";
 import {
   clearSessionCookie,
@@ -10,13 +10,7 @@ import {
   withSession,
 } from "@/lib/demo/bff";
 import { sessionCookieName, sessionCookieOptions } from "@/lib/demo/session";
-
-type CreatedSession = Readonly<{
-  session_id: string;
-  persona: PersonaId;
-  tenant_id: string;
-  expires_at: string;
-}>;
+import type { SessionCreated } from "@/lib/demo/types";
 
 const FALLBACK_MAX_AGE_SECONDS = 8 * 60 * 60;
 const FORM_CONTENT_TYPE = "application/x-www-form-urlencoded";
@@ -48,7 +42,7 @@ export const POST = withDemo(async (req, secure) => {
   const form = isFormPost(req);
   const persona = await readPersona(req, form);
   if (!isPersonaId(persona)) return invalidPersona(req, form);
-  const { data } = await demoFetch<CreatedSession>("/v1/demo/sessions", {
+  const { data } = await demoFetch<SessionCreated>("/v1/demo/sessions", {
     method: "POST",
     body: { persona },
   });

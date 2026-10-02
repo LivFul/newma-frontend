@@ -1,10 +1,16 @@
 import "server-only";
+import type { paths } from "@/lib/api/generated/schema";
 import { createApiClient, type ApiClient } from "@/lib/api/server";
+import type { DemoErrorEnvelope } from "./types";
 
-// Server-only access to the Railway API (D-09/D-10). `demoFetch` is the typed wrapper the BFF uses
-// until the backend P2 spec is re-exported into the generated `paths` (plan P2, Task 7).
+// Server-only access to the Railway API (D-09/D-10). `demoFetch` is a thin wrapper whose paths are
+// the generated contract's; `{job_id}` templates accept a concrete id.
 
-export type DemoErrorEnvelope = Readonly<{ code: string; message: string; details?: unknown }>;
+type TemplatePath<P extends string> = P extends `${infer Head}{${string}}${infer Tail}`
+  ? `${Head}${string}${TemplatePath<Tail>}`
+  : P;
+export type DemoPath = TemplatePath<keyof paths & string>;
+export type { DemoErrorEnvelope };
 
 const INVALID_SESSION_CODES: ReadonlySet<string> = new Set(["invalid_session", "session_expired"]);
 
@@ -73,7 +79,7 @@ async function parseError(response: Response): Promise<DemoErrorEnvelope> {
 }
 
 export async function demoFetch<T = unknown>(
-  path: string,
+  path: DemoPath,
   init: DemoFetchInit = {},
 ): Promise<DemoFetchResult<T>> {
   const { baseUrl, serviceToken } = readDemoEnv();

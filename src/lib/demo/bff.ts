@@ -1,12 +1,13 @@
 import "server-only";
 import { type NextRequest, NextResponse } from "next/server";
 import { DemoApiError } from "./api";
+import type { DemoErrorEnvelope } from "./types";
 import { isDemoMode } from "./mode";
 import { isSecureRequest, readSessionId, sessionCookieName } from "./session";
 
 // Shared plumbing for the BFF route handlers under src/app/api/demo/ (D-09, D-10).
 
-export type ErrorBody = Readonly<{ code: string; message: string; details?: unknown }>;
+export type ErrorBody = DemoErrorEnvelope;
 
 export function noStore(body: unknown, init: ResponseInit = {}): NextResponse {
   const response = NextResponse.json(body, init);

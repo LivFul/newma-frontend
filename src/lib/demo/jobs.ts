@@ -1,6 +1,14 @@
+import type { components } from "@/lib/api/generated/schema";
+
 // Job vocabulary shared by the BFF handlers, the polling hook and the jobs pages (RM §1.5 states).
-export const JOB_KINDS = ["screening", "admet"] as const;
-export type JobKind = (typeof JOB_KINDS)[number];
+// Types come from the generated P2 contract; the runtime arrays are checked against its enums in
+// tests/unit/demo/contract.test.ts.
+export type Job = components["schemas"]["JobRead"];
+export type JobRequest = components["schemas"]["JobCreate"];
+export type JobKind = Job["kind"];
+export type JobState = Job["state"];
+
+export const JOB_KINDS = ["screening", "admet"] as const satisfies readonly JobKind[];
 
 export const JOB_STATES = [
   "QUEUED",
@@ -10,38 +18,13 @@ export const JOB_STATES = [
   "FAILED",
   "CANCELLED",
   "HELD",
-] as const;
-export type JobState = (typeof JOB_STATES)[number];
+] as const satisfies readonly JobState[];
 
 export const TERMINAL_STATES: ReadonlySet<JobState> = new Set(["SUCCEEDED", "FAILED", "CANCELLED"]);
 
 export function isTerminal(state: JobState): boolean {
   return TERMINAL_STATES.has(state);
 }
-
-export type Job = Readonly<{
-  id: string;
-  kind: JobKind;
-  state: JobState;
-  progress: number;
-  attempts: number;
-  max_attempts: number;
-  result: unknown;
-  error: unknown;
-  cost_credits: number;
-  budget_credits: number | null;
-  created_at: string;
-  updated_at: string;
-  started_at: string | null;
-  finished_at: string | null;
-}>;
-
-export type JobRequest = Readonly<{
-  kind: JobKind;
-  payload: Record<string, unknown>;
-  idempotency_key: string;
-  budget_credits?: number;
-}>;
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -54,6 +37,6 @@ export function parseJobRequest(body: unknown): JobRequest | undefined {
   if (!isRecord(payload)) return undefined;
   if (typeof idempotency_key !== "string" || idempotency_key.length === 0) return undefined;
   if (budget_credits !== undefined && typeof budget_credits !== "number") return undefined;
-  const base = { kind: kind as JobKind, payload, idempotency_key };
+  const base: JobRequest = { kind: kind as JobKind, payload, idempotency_key };
   return budget_credits === undefined ? base : { ...base, budget_credits };
 }
