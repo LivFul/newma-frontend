@@ -1,6 +1,8 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { type Job, isTerminal } from "./jobs";
+import { EXPIRED_ROUTE } from "./routes";
 
 // Client polling against the BFF (D-10). Every 2 s until a terminal state; aborts on unmount.
 export const DEFAULT_POLL_INTERVAL_MS = 2000;
@@ -15,8 +17,12 @@ export type JobPollingState = Readonly<{
 
 type PollOutcome =
   | Readonly<{ kind: "job"; job: Job }>
-  | Readonly<{ kind: "error"; error: PollingError; fatal: boolean }>
+  | Readonly<{ kind: "error"; error: PollingError; fatal: boolean; expired: boolean }>
   | Readonly<{ kind: "aborted" }>;
+
+// 5xx, request timeout and rate limiting may heal by waiting; other 4xx will not.
+const RETRYABLE_STATUSES: ReadonlySet<number> = new Set([408, 429]);
+const isRetryable = (status: number) => status >= 500 || RETRYABLE_STATUSES.has(status);
 
 const NETWORK_ERROR: PollingError = { code: "network_error", message: "Network error; retrying." };
 
@@ -34,12 +40,16 @@ async function pollOnce(id: string, signal: AbortSignal): Promise<PollOutcome> {
       signal,
     });
     if (response.ok) return { kind: "job", job: (await response.json()) as Job };
-    // 401/404 will not heal by waiting; 5xx may.
-    return { kind: "error", error: await readError(response), fatal: response.status < 500 };
+    return {
+      kind: "error",
+      error: await readError(response),
+      fatal: !isRetryable(response.status),
+      expired: response.status === 401,
+    };
   } catch (error) {
     if (signal.aborted) return { kind: "aborted" };
     void error;
-    return { kind: "error", error: NETWORK_ERROR, fatal: false };
+    return { kind: "error", error: NETWORK_ERROR, fatal: false, expired: false };
   }
 }
 
@@ -60,6 +70,7 @@ export function useJobPolling(
   { intervalMs = DEFAULT_POLL_INTERVAL_MS }: { intervalMs?: number } = {},
 ): JobPollingState {
   // State is keyed by job id so a new id resets during render rather than inside the effect.
+  const router = useRouter();
   const [tracked, setTracked] = useState<Tracked>({ id, state: INITIAL });
   if (tracked.id !== id) setTracked({ id, state: INITIAL });
   const setState = (update: (previous: JobPollingState) => JobPollingState) =>
@@ -77,6 +88,7 @@ export function useJobPolling(
       if (controller.signal.aborted) return;
       const next = applyOutcome(INITIAL, outcome);
       setState((previous) => applyOutcome(previous, outcome));
+      if (outcome.kind === "error" && outcome.expired) router.push(EXPIRED_ROUTE);
       schedule(next.isPolling);
     };
     void run();
@@ -85,7 +97,7 @@ export function useJobPolling(
       controller.abort();
       if (timer) clearTimeout(timer);
     };
-  }, [id, intervalMs]);
+  }, [id, intervalMs, router]);
 
   return tracked.id === id ? tracked.state : INITIAL;
 }

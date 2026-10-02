@@ -1,14 +1,12 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui";
-import { demoFetch } from "@/lib/demo/api";
 import type { Job } from "@/lib/demo/jobs";
-import { requireSessionId } from "@/lib/demo/current-session";
+import { requireSessionFetch } from "@/lib/demo/current-session";
 import { JobStateBadge } from "./_components/job-state-badge";
 import { StartJobForm } from "./_components/start-job-form";
 
 async function listJobs(): Promise<readonly Job[]> {
-  const sessionId = await requireSessionId();
-  const { data } = await demoFetch<{ items: Job[] }>("/v1/jobs", { sessionId });
+  const { data } = await requireSessionFetch<{ items: Job[] }>("/v1/jobs");
   return data?.items ?? [];
 }
 

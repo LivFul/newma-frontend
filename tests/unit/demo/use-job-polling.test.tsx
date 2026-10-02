@@ -1,6 +1,11 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useJobPolling } from "@/lib/demo/use-job-polling";
+
+// Next's router object is referentially stable across renders; the mock must be too.
+const push = vi.fn();
+const router = { push };
+vi.mock("next/navigation", () => ({ useRouter: () => router }));
 import type { Job } from "@/lib/demo/jobs";
 
 const job = (state: Job["state"], progress: number): Job => ({
@@ -55,6 +60,7 @@ describe("useJobPolling", () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
+    push.mockReset();
   });
 
   it("fetches at once, then every 2000 ms, and stops on a terminal state", async () => {
@@ -107,12 +113,40 @@ describe("useJobPolling", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("reports an error envelope and stops when the BFF answers 401", async () => {
+  it("treats 401 as an expired session: stops and navigates to the expired route", async () => {
     armPolling([Response.json({ code: "session_expired", message: "gone" }, { status: 401 })]);
     const { result } = renderHook(() => useJobPolling("job-1"));
     await flush();
     expect(result.current.error).toEqual({ code: "session_expired", message: "gone" });
     expect(result.current.isPolling).toBe(false);
+    expect(push).toHaveBeenCalledWith("/api/demo/sessions/expired");
+  });
+
+  it.each([408, 429])("keeps polling after a retryable %s", async (status) => {
+    const fetchMock = armPolling([
+      Response.json({ code: "slow", message: "retry" }, { status }),
+      job("RUNNING", 0.3),
+    ]);
+    const { result } = renderHook(() => useJobPolling("job-1"));
+    await flush();
+    expect(result.current.isPolling).toBe(true);
+    expect(result.current.error?.code).toBe("slow");
+    await tick(2000);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(result.current.job?.progress).toBe(0.3);
+    expect(result.current.error).toBeUndefined();
+  });
+
+  it("stops on a non-retryable 4xx such as 404", async () => {
+    const fetchMock = armPolling([
+      Response.json({ code: "not_found", message: "x" }, { status: 404 }),
+    ]);
+    const { result } = renderHook(() => useJobPolling("job-1"));
+    await flush();
+    expect(result.current.isPolling).toBe(false);
+    await tick(4000);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(push).not.toHaveBeenCalledWith("/api/demo/sessions/expired");
   });
 
   it("keeps polling through a transient network failure", async () => {

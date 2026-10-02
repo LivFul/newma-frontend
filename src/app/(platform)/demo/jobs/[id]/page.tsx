@@ -1,15 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { DemoApiError, demoFetch } from "@/lib/demo/api";
+import { DemoApiError } from "@/lib/demo/api";
 import { isSafeId } from "@/lib/demo/bff";
 import type { Job } from "@/lib/demo/jobs";
-import { requireSessionId } from "@/lib/demo/current-session";
+import { requireSessionFetch } from "@/lib/demo/current-session";
 import { JobProgress } from "../_components/job-progress";
 
 async function loadJob(id: string): Promise<Job | undefined> {
-  const sessionId = await requireSessionId();
   try {
-    const { data } = await demoFetch<Job>(`/v1/jobs/${id}`, { sessionId });
+    const { data } = await requireSessionFetch<Job>(`/v1/jobs/${id}`);
     return data;
   } catch (error) {
     if (error instanceof DemoApiError && error.status === 404) return undefined;
