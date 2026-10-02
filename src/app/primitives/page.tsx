@@ -4,6 +4,7 @@ import {
   Button,
   StatusBadge,
   Dialog,
+  DialogClose,
   DialogContent,
   DialogTrigger,
   Tooltip,
@@ -50,7 +51,9 @@ export default function PrimitivesPage() {
             <Button variant="secondary">Open dialog</Button>
           </DialogTrigger>
           <DialogContent title="Example dialog" description="Demo step-up confirmation pattern.">
-            <Button>Confirm</Button>
+            <DialogClose asChild>
+              <Button>Confirm</Button>
+            </DialogClose>
           </DialogContent>
         </Dialog>
       </section>
