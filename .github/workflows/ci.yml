@@ -11,6 +11,9 @@ permissions:
 jobs:
   checks:
     runs-on: ubuntu-latest
+    env:
+      # Unit tests and api:check read the deployed spec; the lock's sha is still enforced against it.
+      API_CHECK_SPEC_SOURCE: ${{ vars.NEWMA_OPENAPI_URL }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
@@ -21,9 +24,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint && pnpm typecheck && pnpm format:check && pnpm test:coverage
       - name: Contract check against the deployed API spec
-        if: vars.NEWMA_OPENAPI_URL != ''
-        env:
-          API_CHECK_SPEC_SOURCE: ${{ vars.NEWMA_OPENAPI_URL }}
         run: pnpm api:check
       - run: bash scripts/check-demo-isolation.sh
       - run: pnpm build
