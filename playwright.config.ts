@@ -4,6 +4,8 @@ import { defineConfig, devices } from "@playwright/test";
 const port = process.env.PORT ?? "3000";
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${port}`;
 const WEB_SERVER_TIMEOUT_MS = 120_000;
+// next dev compiles on demand and shares the CPU with everything else on a laptop; CI hits a built preview.
+const TEST_TIMEOUT_MS = process.env.CI ? 30_000 : 60_000;
 // Vercel Authentication blocks previews unless every request carries the bypass header (P1 review focus 1).
 const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
 const extraHTTPHeaders: Record<string, string> = bypass
@@ -14,6 +16,7 @@ export default defineConfig({
   testDir: "tests",
   testMatch: ["e2e/**/*.spec.ts", "a11y/**/*.spec.ts"],
   fullyParallel: true,
+  timeout: TEST_TIMEOUT_MS,
   retries: process.env.CI ? 2 : 0,
   reporter: [["list"], ["html", { open: "never" }]],
   use: { baseURL, trace: "on-first-retry", extraHTTPHeaders },
