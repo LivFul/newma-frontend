@@ -189,7 +189,10 @@ export interface components {
         JobCreate: {
             /** Budget Credits */
             budget_credits?: number | null;
-            /** Idempotency Key */
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
             idempotency_key: string;
             /**
              * Kind
@@ -750,6 +753,15 @@ export interface operations {
             };
             /** @description Missing or invalid service token or session */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Same idempotency key, different body */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
