@@ -90,6 +90,14 @@ function typecheck(cwd) {
   }
 }
 
+/**
+ * @param {object} [options]
+ * @param {string} [options.cwd]
+ * @param {string} [options.repoRoot]
+ * @param {Set<string>} [options.args]
+ * @param {typeof fetch} [options.fetchImpl]
+ * @param {{ API_CHECK_SPEC_SOURCE?: string }} [options.env]
+ */
 export async function runApiCheck({
   cwd = process.cwd(),
   repoRoot = process.env.API_CHECK_REPO_ROOT ?? cwd,

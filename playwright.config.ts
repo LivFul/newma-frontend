@@ -4,6 +4,11 @@ import { defineConfig, devices } from "@playwright/test";
 const port = process.env.PORT ?? "3000";
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${port}`;
 const WEB_SERVER_TIMEOUT_MS = 120_000;
+// Vercel Authentication blocks previews unless every request carries the bypass header (P1 review focus 1).
+const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+const extraHTTPHeaders: Record<string, string> = bypass
+  ? { "x-vercel-protection-bypass": bypass, "x-vercel-set-bypass-cookie": "true" }
+  : {};
 
 export default defineConfig({
   testDir: "tests",
@@ -11,7 +16,7 @@ export default defineConfig({
   fullyParallel: true,
   retries: process.env.CI ? 2 : 0,
   reporter: [["list"], ["html", { open: "never" }]],
-  use: { baseURL, trace: "on-first-retry" },
+  use: { baseURL, trace: "on-first-retry", extraHTTPHeaders },
   projects: [
     { name: "desktop-chromium", use: { ...devices["Desktop Chrome"] } },
     { name: "mobile-chromium", use: { ...devices["Pixel 7"] } },
@@ -20,7 +25,8 @@ export default defineConfig({
     ? undefined
     : {
         command: `pnpm dev --port ${port}`,
-        url: baseURL,
+        // Probe the heaviest route so next dev compiles it before the parallel workers start.
+        url: `${baseURL}/primitives`,
         reuseExistingServer: !process.env.CI,
         timeout: WEB_SERVER_TIMEOUT_MS,
       },
