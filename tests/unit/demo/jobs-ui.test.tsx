@@ -8,7 +8,9 @@ import { expectNoAxeViolations } from "../ui/axe";
 
 const push = vi.fn();
 const refresh = vi.fn();
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push, refresh }) }));
+// Next's router is referentially stable; the mock must be too or effects keyed on it re-run.
+const router = { push, refresh };
+vi.mock("next/navigation", () => ({ useRouter: () => router }));
 
 const job = (overrides: Partial<Job> = {}): Job => ({
   id: "job-1",
@@ -72,7 +74,7 @@ describe("JobProgress", () => {
     expect(screen.getByText("Simulated workflow engine")).toBeInTheDocument();
     expect(screen.getByText("Simulated compute")).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Retried 1 time");
-    expect(screen.getByRole("button", { name: "Cancel job" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Cancel job" })).not.toHaveAttribute("aria-disabled");
     await expectNoAxeViolations(container);
   });
 
@@ -85,20 +87,61 @@ describe("JobProgress", () => {
     await waitFor(() =>
       expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "100"),
     );
-    expect(screen.getByRole("button", { name: "Cancel job" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Cancel job" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
-  it("posts the cancel through the BFF and refreshes", async () => {
-    const fetchMock = vi.fn(async () => Response.json(job()));
+  it("posts the cancel through the BFF, then refetches the job once and shows the new state", async () => {
+    // The backend reports CANCELLED only once the cancel has been posted.
+    let cancelled = false;
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      if (init?.method === "POST") cancelled = true;
+      return Response.json(job(cancelled ? { state: "CANCELLED" } : {}));
+    });
     vi.stubGlobal("fetch", fetchMock);
     render(<JobProgress id="job-1" initial={job()} />);
-    fireEvent.click(screen.getByRole("button", { name: "Cancel job" }));
-    await waitFor(() => expect(refresh).toHaveBeenCalled());
+    const button = screen.getByRole("button", { name: "Cancel job" });
+    button.focus();
+    fireEvent.click(button);
+    await waitFor(() =>
+      expect(screen.getByTestId("job-state")).toHaveAttribute("data-state", "CANCELLED"),
+    );
     const calls = fetchMock.mock.calls as unknown as [string, RequestInit | undefined][];
+    const cancelIndex = calls.findIndex(
+      ([url, init]) => url === "/api/demo/jobs/job-1/cancel" && init?.method === "POST",
+    );
+    expect(cancelIndex).toBeGreaterThanOrEqual(0);
     expect(
-      calls.some(([url, init]) => url === "/api/demo/jobs/job-1/cancel" && init?.method === "POST"),
-    ).toBe(true);
+      calls.slice(cancelIndex + 1).filter(([url]) => url === "/api/demo/jobs/job-1"),
+    ).toHaveLength(1);
+    expect(refresh).not.toHaveBeenCalled();
+    // The focused control is never hard-disabled, so focus survives the state change.
+    expect(button).toHaveAttribute("aria-disabled", "true");
+    expect(button).not.toBeDisabled();
+    expect(document.activeElement).toBe(button);
+  });
+
+  it("marks the cancel button aria-busy while the request is in flight", async () => {
+    let release: (value: Response) => void = () => {};
+    const pending = new Promise<Response>((resolve) => {
+      release = resolve;
+    });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_url: string, init?: RequestInit) =>
+        init?.method === "POST" ? pending : Response.json(job()),
+      ),
+    );
+    render(<JobProgress id="job-1" initial={job()} />);
+    const button = screen.getByRole("button", { name: "Cancel job" });
+    fireEvent.click(button);
+    await waitFor(() => expect(button).toHaveAttribute("aria-busy", "true"));
+    expect(button).not.toBeDisabled();
+    release(Response.json(job({ state: "CANCELLED" })));
+    await waitFor(() => expect(button).not.toHaveAttribute("aria-busy"), { timeout: 3000 });
   });
 });
 

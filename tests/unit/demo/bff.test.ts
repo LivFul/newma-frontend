@@ -25,6 +25,12 @@ describe("demoGuard", () => {
 });
 
 describe("noStore", () => {
+  it("answers 204 with no body when given undefined", async () => {
+    const response = noStore(undefined);
+    expect(response.status).toBe(204);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(await response.text()).toBe("");
+  });
   it("serialises JSON with Cache-Control: no-store and the given status", async () => {
     const response = noStore({ a: 1 }, { status: 201 });
     expect(response.status).toBe(201);

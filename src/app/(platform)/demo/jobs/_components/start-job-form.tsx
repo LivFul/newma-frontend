@@ -13,6 +13,7 @@ export function StartJobForm() {
   const [pending, startTransition] = useTransition();
 
   const start = () => {
+    if (pending) return;
     setError(undefined);
     const request: JobRequest = {
       kind: "screening",
@@ -52,7 +53,7 @@ export function StartJobForm() {
         />
         Inject one retried failure
       </label>
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" aria-busy={pending || undefined}>
         Start simulated screening
       </Button>
       {error ? (

@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { DEMO_BANNER_TEXT, DemoBanner } from "@/app/(platform)/demo/_components/demo-banner";
 import { DemoHeader } from "@/app/(platform)/demo/_components/demo-header";
 import { PersonaSwitcher } from "@/app/(platform)/demo/_components/persona-switcher";
+import { ResetButton } from "@/app/(platform)/demo/_components/reset-button";
 import { SignOutButton } from "@/app/(platform)/demo/_components/sign-out-button";
 import { PERSONAS } from "@/lib/personas";
 import { expectNoAxeViolations } from "../ui/axe";
@@ -90,5 +91,31 @@ describe("SignOutButton", () => {
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe("/api/demo/sessions");
     expect(init.method).toBe("DELETE");
+  });
+});
+
+describe("ResetButton", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    refresh.mockReset();
+  });
+
+  it("clears a previous error when the dialog is reopened and refreshes after a successful reset", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(Response.json({ code: "x", message: "y" }, { status: 500 }))
+      .mockResolvedValueOnce(Response.json({ tenant_id: "t", counts: {} }));
+    vi.stubGlobal("fetch", fetchMock);
+    render(<ResetButton />);
+    fireEvent.click(screen.getByRole("button", { name: "Reset demo data" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Reset" }));
+    await screen.findByRole("alert");
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    fireEvent.click(screen.getByRole("button", { name: "Reset demo data" }));
+    await screen.findByRole("dialog");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+    await waitFor(() => expect(refresh).toHaveBeenCalledTimes(1));
   });
 });

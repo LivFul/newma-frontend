@@ -8,7 +8,8 @@ export function SignOutButton() {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>();
 
-  const signOut = () =>
+  const signOut = () => {
+    if (pending) return;
     startTransition(async () => {
       const response = await fetch("/api/demo/sessions", { method: "DELETE" }).catch(
         () => undefined,
@@ -19,10 +20,11 @@ export function SignOutButton() {
       }
       router.push("/access");
     });
+  };
 
   return (
     <div className="flex flex-col gap-1">
-      <Button variant="ghost" size="sm" onClick={signOut} disabled={pending}>
+      <Button variant="ghost" size="sm" onClick={signOut} aria-busy={pending || undefined}>
         Sign out
       </Button>
       {error ? (

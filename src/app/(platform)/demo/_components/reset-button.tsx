@@ -9,7 +9,13 @@ export function ResetButton() {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>();
 
-  const reset = () =>
+  const onOpenChange = (next: boolean) => {
+    if (next) setError(undefined);
+    setOpen(next);
+  };
+
+  const reset = () => {
+    if (pending) return;
     startTransition(async () => {
       const response = await fetch("/api/demo/reset", { method: "POST" }).catch(() => undefined);
       if (!response?.ok) {
@@ -19,9 +25,10 @@ export function ResetButton() {
       setOpen(false);
       router.refresh();
     });
+  };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button variant="secondary" size="sm">
           Reset demo data
@@ -40,7 +47,7 @@ export function ResetButton() {
           <DialogClose asChild>
             <Button variant="ghost">Cancel</Button>
           </DialogClose>
-          <Button variant="danger" onClick={reset} disabled={pending}>
+          <Button variant="danger" onClick={reset} aria-busy={pending || undefined}>
             Reset
           </Button>
         </div>

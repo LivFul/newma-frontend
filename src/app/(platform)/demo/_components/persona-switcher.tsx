@@ -34,7 +34,7 @@ export function PersonaSwitcher({ persona }: { persona: PersonaId }) {
       <select
         id={id}
         value={persona}
-        disabled={pending}
+        aria-busy={pending || undefined}
         onChange={(event) => switchTo(event.target.value as PersonaId)}
         className="min-h-10 rounded-md border border-border-strong bg-bg-elevated px-3 text-fg"
       >

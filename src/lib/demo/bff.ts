@@ -22,7 +22,10 @@ export class BffError extends Error {
 }
 
 export function noStore(body: unknown, init: ResponseInit = {}): NextResponse {
-  const response = NextResponse.json(body, init);
+  const response =
+    body === undefined
+      ? new NextResponse(null, { ...init, status: 204 })
+      : NextResponse.json(body, init);
   response.headers.set("Cache-Control", "no-store");
   return response;
 }

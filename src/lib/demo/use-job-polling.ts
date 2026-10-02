@@ -15,6 +15,8 @@ export type JobPollingState = Readonly<{
   isPolling: boolean;
 }>;
 
+export type JobPolling = JobPollingState & Readonly<{ refetch: () => Promise<void> }>;
+
 type PollOutcome =
   | Readonly<{ kind: "job"; job: Job }>
   | Readonly<{ kind: "error"; error: PollingError; fatal: boolean; expired: boolean }>
@@ -68,7 +70,7 @@ function applyOutcome(state: JobPollingState, outcome: PollOutcome): JobPollingS
 export function useJobPolling(
   id: string,
   { intervalMs = DEFAULT_POLL_INTERVAL_MS }: { intervalMs?: number } = {},
-): JobPollingState {
+): JobPolling {
   // State is keyed by job id so a new id resets during render rather than inside the effect.
   const router = useRouter();
   const [tracked, setTracked] = useState<Tracked>({ id, state: INITIAL });
@@ -99,5 +101,11 @@ export function useJobPolling(
     };
   }, [id, intervalMs, router]);
 
-  return tracked.id === id ? tracked.state : INITIAL;
+  // One immediate poll outside the schedule, e.g. right after a cancel.
+  const refetch = async () => {
+    const outcome = await pollOnce(id, new AbortController().signal);
+    setState((previous) => applyOutcome(previous, outcome));
+  };
+
+  return { ...(tracked.id === id ? tracked.state : INITIAL), refetch };
 }

@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Badge, Button } from "@/components/ui";
 import { type Job, isTerminal } from "@/lib/demo/jobs";
@@ -8,11 +7,15 @@ import { JobStateBadge } from "./job-state-badge";
 
 const PERCENT = 100;
 
-function CancelButton({ job }: { job: Job }) {
-  const router = useRouter();
+type CancelProps = { job: Job; onCancelled: () => Promise<void> };
+
+// aria-busy / aria-disabled rather than `disabled`: a disabled control drops keyboard focus.
+function CancelButton({ job, onCancelled }: CancelProps) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>();
-  const cancel = () =>
+  const inactive = pending || isTerminal(job.state);
+  const cancel = () => {
+    if (inactive) return;
     startTransition(async () => {
       const response = await fetch(`/api/demo/jobs/${encodeURIComponent(job.id)}/cancel`, {
         method: "POST",
@@ -21,15 +24,17 @@ function CancelButton({ job }: { job: Job }) {
         setError("Could not cancel the job.");
         return;
       }
-      router.refresh();
+      await onCancelled();
     });
+  };
   return (
     <div className="flex items-center gap-3">
       <Button
         variant="danger"
         size="sm"
         onClick={cancel}
-        disabled={pending || isTerminal(job.state)}
+        aria-busy={pending || undefined}
+        aria-disabled={inactive || undefined}
       >
         Cancel job
       </Button>
@@ -43,7 +48,7 @@ function CancelButton({ job }: { job: Job }) {
 }
 
 export function JobProgress({ id, initial }: { id: string; initial?: Job }) {
-  const { job: polled, error, isPolling } = useJobPolling(id);
+  const { job: polled, error, isPolling, refetch } = useJobPolling(id);
   const job = polled ?? initial;
   if (!job) {
     return error ? <p role="alert">{error.message}</p> : <p aria-live="polite">Loading job…</p>;
@@ -81,7 +86,7 @@ export function JobProgress({ id, initial }: { id: string; initial?: Job }) {
           {error.message}
         </p>
       ) : null}
-      <CancelButton job={job} />
+      <CancelButton job={job} onCancelled={refetch} />
     </div>
   );
 }
