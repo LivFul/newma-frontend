@@ -29,7 +29,7 @@ describe("lighthouserc", () => {
   it("targets LHCI_URL and starts no server when it is set", () => {
     const url =
       "https://preview.example/?x-vercel-protection-bypass=t&x-vercel-set-bypass-cookie=true";
-    const { collect, upload } = loadConfig(url);
+    const { collect } = loadConfig(url);
     expect(collect.url).toEqual([url]);
     expect(collect).not.toHaveProperty("startServerCommand");
     expect(collect).not.toHaveProperty("startServerReadyPattern");

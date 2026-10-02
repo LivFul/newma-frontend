@@ -29,3 +29,4 @@ jobs:
         run: pnpm api:check
       - run: bash scripts/check-demo-isolation.sh
       - run: pnpm build
+      - run: pnpm bundle:check

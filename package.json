@@ -18,7 +18,8 @@
     "lhci": "lhci autorun",
     "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test:coverage && pnpm api:check && bash scripts/check-demo-isolation.sh",
     "api:check": "node scripts/api-check.mjs",
-    "api:update": "node scripts/api-check.mjs --update"
+    "api:update": "node scripts/api-check.mjs --update",
+    "bundle:check": "node scripts/check-client-bundle.mjs"
   },
   "dependencies": {
     "@sentry/nextjs": "^11.2.0",
