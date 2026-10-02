@@ -7,8 +7,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Liveness and readiness probe */
-        get: operations["healthz_healthz_get"];
+        /** Liveness probe */
+        get: operations["getHealth"];
         put?: never;
         post?: never;
         delete?: never;
@@ -23,8 +23,11 @@ export interface components {
     schemas: {
         /** HealthResponse */
         HealthResponse: {
-            /** Status */
-            status: string;
+            /**
+             * Status
+             * @constant
+             */
+            status: "ok";
             /** Version */
             version: string;
         };
@@ -37,7 +40,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    healthz_healthz_get: {
+    getHealth: {
         parameters: {
             query?: never;
             header?: never;
