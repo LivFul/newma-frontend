@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../support/test";
 
 test("home responds 200 with the NEWMA heading, main landmark and skip link first in tab order", async ({
   page,
