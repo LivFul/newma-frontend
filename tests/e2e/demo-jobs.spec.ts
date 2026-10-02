@@ -3,7 +3,9 @@ import { needsBackend, signIn } from "../support/demo";
 
 const TERMINAL_TIMEOUT_MS = 120_000;
 const TERMINAL_STATES = ["SUCCEEDED", "FAILED", "CANCELLED"];
-const ONE_SHOT_BOUND_MS = 15_000;
+// A one-shot proxy answers within one poll interval; a streaming one would hold the socket open.
+const ONE_SHOT_BOUND_MS = 5_000;
+const POLL_URL = /\/api\/demo\/jobs\/[^/]+$/;
 
 const valueNow = async (page: import("@playwright/test").Page) =>
   Number(
@@ -19,10 +21,12 @@ test.describe("demo jobs", { tag: "@needs-backend" }, () => {
     test.setTimeout(TERMINAL_TIMEOUT_MS + 30_000);
     await signIn(page, "scientist");
     await page.goto("/demo/jobs");
+    // Register the listener before the click that triggers navigation and the first poll.
+    const firstPoll = page.waitForResponse((r) => POLL_URL.test(r.url()));
     await page.getByRole("button", { name: "Start simulated screening" }).click();
     await page.waitForURL(/\/demo\/jobs\/[^/]+$/);
 
-    const poll = await page.waitForResponse((r) => /\/api\/demo\/jobs\/[^/]+$/.test(r.url()));
+    const poll = await firstPoll;
     expect(poll.headers()["cache-control"]).toBe("no-store");
     expect(poll.status()).toBe(200);
 
@@ -56,13 +60,16 @@ test.describe("demo jobs", { tag: "@needs-backend" }, () => {
   test("the polling proxy responds at once (no streaming)", async ({ page }) => {
     await signIn(page, "scientist");
     await page.goto("/demo/jobs");
+    const firstPoll = page.waitForResponse((r) => POLL_URL.test(r.url()));
     await page.getByRole("button", { name: "Start simulated screening" }).click();
     await page.waitForURL(/\/demo\/jobs\/[^/]+$/);
-    // A streaming proxy would hold the response open for the job's lifetime (minutes); a one-shot
-    // proxy finishes within one poll interval plus dev-server overhead.
-    const started = Date.now();
-    const poll = await page.waitForResponse((r) => /\/api\/demo\/jobs\/[^/]+$/.test(r.url()));
+    // Measure from the request leaving the browser to the body being fully received.
+    const poll = await firstPoll;
+    const started = poll.request().timing().startTime;
     await poll.finished();
-    expect(Date.now() - started).toBeLessThan(ONE_SHOT_BOUND_MS);
+    const responseEnd = poll.request().timing().responseEnd;
+    expect(responseEnd).toBeGreaterThan(0);
+    expect(responseEnd - started).toBeLessThan(ONE_SHOT_BOUND_MS);
+    expect(await poll.body()).not.toHaveLength(0);
   });
 });

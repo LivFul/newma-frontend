@@ -18,8 +18,7 @@ export const PERSONA_LABELS = {
 
 export type PersonaId = keyof typeof PERSONA_LABELS;
 
-export const DEMO_BANNER_TEXT =
-  "Demo with synthetic data. Not evidence of scientific performance, deployment or compliance (PRD front matter).";
+export { DEMO_BANNER_TEXT } from "../../src/lib/demo/banner";
 
 export const needsBackend = () =>
   test.skip(!process.env.DEMO_E2E, "Set DEMO_E2E=1 with a local API behind the BFF to run.");

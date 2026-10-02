@@ -1,8 +1,8 @@
 import { Badge } from "@/components/ui";
+import { DEMO_BANNER_TEXT } from "@/lib/demo/banner";
 
-// Verbatim from PROGRESS.md §3.1; shown on every /demo/* page by the demo layout.
-export const DEMO_BANNER_TEXT =
-  "Demo with synthetic data. Not evidence of scientific performance, deployment or compliance (PRD front matter).";
+// Shown on every /demo/* page by the demo layout.
+export { DEMO_BANNER_TEXT };
 
 export function DemoBanner() {
   return (
