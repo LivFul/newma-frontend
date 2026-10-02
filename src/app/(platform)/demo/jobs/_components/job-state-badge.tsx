@@ -14,7 +14,7 @@ const STATE_TONE = {
 
 export function JobStateBadge({ state }: { state: JobState }) {
   return (
-    <Badge tone={STATE_TONE[state]} data-state={state}>
+    <Badge tone={STATE_TONE[state]} data-state={state} data-testid="job-state">
       <VisuallyHidden>State: </VisuallyHidden>
       {state}
     </Badge>

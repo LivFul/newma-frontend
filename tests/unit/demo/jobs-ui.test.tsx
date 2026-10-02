@@ -47,7 +47,9 @@ describe("job vocabulary", () => {
 describe("JobStateBadge", () => {
   it.each(JOB_STATES)("renders %s with hidden context", (state) => {
     const { unmount } = render(<JobStateBadge state={state} />);
-    expect(screen.getByText(state).closest("span")).toHaveTextContent(`State: ${state}`);
+    const badge = screen.getByTestId("job-state");
+    expect(badge).toHaveTextContent(`State: ${state}`);
+    expect(badge).toHaveAttribute("data-state", state);
     unmount();
   });
 });

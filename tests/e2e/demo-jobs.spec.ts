@@ -3,6 +3,7 @@ import { needsBackend, signIn } from "../support/demo";
 
 const TERMINAL_TIMEOUT_MS = 120_000;
 const TERMINAL_STATES = ["SUCCEEDED", "FAILED", "CANCELLED"];
+const ONE_SHOT_BOUND_MS = 15_000;
 
 const valueNow = async (page: import("@playwright/test").Page) =>
   Number(
@@ -25,10 +26,14 @@ test.describe("demo jobs", { tag: "@needs-backend" }, () => {
     expect(poll.headers()["cache-control"]).toBe("no-store");
     expect(poll.status()).toBe(200);
 
+    // Progress must grow between polls unless the simulated run already finished while next dev
+    // compiled the page.
     const first = await valueNow(page);
-    await expect.poll(() => valueNow(page), { timeout: 30_000 }).toBeGreaterThan(first);
+    if (first < 100) {
+      await expect.poll(() => valueNow(page), { timeout: 30_000 }).toBeGreaterThan(first);
+    }
 
-    const badge = page.locator("[data-state]");
+    const badge = page.getByTestId("job-state");
     await expect
       .poll(async () => badge.getAttribute("data-state"), { timeout: TERMINAL_TIMEOUT_MS })
       .toMatch(new RegExp(TERMINAL_STATES.join("|")));
@@ -53,9 +58,11 @@ test.describe("demo jobs", { tag: "@needs-backend" }, () => {
     await page.goto("/demo/jobs");
     await page.getByRole("button", { name: "Start simulated screening" }).click();
     await page.waitForURL(/\/demo\/jobs\/[^/]+$/);
+    // A streaming proxy would hold the response open for the job's lifetime (minutes); a one-shot
+    // proxy finishes within one poll interval plus dev-server overhead.
     const started = Date.now();
     const poll = await page.waitForResponse((r) => /\/api\/demo\/jobs\/[^/]+$/.test(r.url()));
     await poll.finished();
-    expect(Date.now() - started).toBeLessThan(5_000);
+    expect(Date.now() - started).toBeLessThan(ONE_SHOT_BOUND_MS);
   });
 });
