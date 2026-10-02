@@ -6,11 +6,11 @@ permissions:
 jobs:
   e2e:
     # Previews only: never run against Production, and only once the deployment has succeeded.
-    if: github.event.deployment_status.state == 'success' && github.event.deployment_status.environment == 'Preview'
+    if: github.event.deployment_status.state == 'success' && startsWith(github.event.deployment_status.environment, 'Preview')
     runs-on: ubuntu-latest
+    # The bypass secret is scoped to the steps that talk to the preview, never to pnpm install.
     env:
       PLAYWRIGHT_BASE_URL: ${{ github.event.deployment_status.environment_url }}
-      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
@@ -25,7 +25,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
+        env:
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
       - run: pnpm test:a11y
+        env:
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
       - name: Lighthouse CI
         env:
           # Lighthouse cannot set headers, so the bypass travels as query parameters and sets a cookie.
