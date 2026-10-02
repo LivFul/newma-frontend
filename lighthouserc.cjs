@@ -1,15 +1,20 @@
 // lighthouserc.cjs — budgets from prompt §3.6 / sprint plan §5 row D-07.
-// Runs against a production build; port 3100 avoids the busy default port on dev machines.
+// Locally it builds and serves on port 3100 (the default port is busy on dev machines). In CI,
+// LHCI_URL points at the Vercel preview (with the protection-bypass query parameters, because
+// Lighthouse cannot set headers) and no local server is started.
 const PORT = 3100;
-const url = process.env.LHCI_URL ?? `http://localhost:${PORT}/`;
+const remoteUrl = process.env.LHCI_URL;
+const localServer = {
+  startServerCommand: `pnpm build && pnpm start --port ${PORT}`,
+  startServerReadyPattern: "Ready",
+};
 module.exports = {
   ci: {
     collect: {
-      url: [url],
+      url: [remoteUrl ?? `http://localhost:${PORT}/`],
       numberOfRuns: 3,
-      startServerCommand: `pnpm build && pnpm start --port ${PORT}`,
-      startServerReadyPattern: "Ready",
       settings: { preset: "desktop" },
+      ...(remoteUrl ? {} : localServer),
     },
     assert: {
       assertions: {
