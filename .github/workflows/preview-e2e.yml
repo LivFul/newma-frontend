@@ -6,32 +6,40 @@ permissions:
 jobs:
   e2e:
     # Previews only: never run against Production, and only once the deployment has succeeded.
-    if: github.event.deployment_status.state == 'success' && github.event.deployment_status.environment == 'Preview'
+    if: github.event.deployment_status.state == 'success' && startsWith(github.event.deployment_status.environment, 'Preview')
     runs-on: ubuntu-latest
+    # The bypass secret is scoped to the steps that talk to the preview, never to pnpm install.
     env:
       PLAYWRIGHT_BASE_URL: ${{ github.event.deployment_status.environment_url }}
-      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           ref: ${{ github.event.deployment.sha }}
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 12
-      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 26
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
+        env:
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
       - run: pnpm test:a11y
+        env:
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
       - name: Lighthouse CI
         env:
           # Lighthouse cannot set headers, so the bypass travels as query parameters and sets a cookie.
           LHCI_URL: ${{ github.event.deployment_status.environment_url }}/?x-vercel-protection-bypass=${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}&x-vercel-set-bypass-cookie=true
         run: pnpm exec lhci autorun
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: lighthouse-report
+          path: .lighthouseci
+          retention-days: 7
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
           name: playwright-report

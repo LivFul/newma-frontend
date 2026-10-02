@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // Contract check (IP §5.6): verify the pinned spec hash, regenerate the typed client, fail on drift.
 // Usage: node scripts/api-check.mjs [--update] [--no-typecheck]
-// API_CHECK_SPEC_SOURCE overrides where the spec is fetched from (CI points it at the deployed
-// API's /openapi.yaml); the lock's pinned version and sha256 are still enforced against it.
+// The lock's `source` is the canonical deployed spec URL. API_CHECK_SPEC_SOURCE overrides where the
+// spec is read from (local dev: ../newma-backend/docs/openapi.yaml; CI: vars.NEWMA_OPENAPI_URL);
+// the lock's pinned version and sha256 are enforced against whichever source is used.
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -119,7 +120,7 @@ export async function runApiCheck({
     fail("generated client is stale; run pnpm api:update and commit src/lib/api/generated");
   }
   if (!args.has("--no-typecheck")) typecheck(cwd);
-  return `api:check: ok (api-v${resolved.version}, sha256 ${sha.slice(0, SHA_PREVIEW_LENGTH)}…)`;
+  return `api:check: ok (api-v${resolved.version}, source ${source}, sha256 ${sha.slice(0, SHA_PREVIEW_LENGTH)}…)`;
 }
 
 async function main() {

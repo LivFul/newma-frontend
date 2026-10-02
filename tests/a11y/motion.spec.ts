@@ -1,4 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { expect, test } from "../support/test";
 
 /** Navigate and wait for hydration so interactions never race the client bundle under `next dev`. */
 async function gotoHydrated(page: Page, path: string): Promise<void> {
