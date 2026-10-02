@@ -9,10 +9,16 @@ import type { DemoSession } from "./types";
 // that clears it before landing on /access?reason=expired (assumption A-P2-F03; review focus 3).
 export const EXPIRED_ROUTE = "/api/demo/sessions/expired";
 
-export async function requireSession(): Promise<DemoSession> {
+/** The session id from the HttpOnly cookie, or a redirect to /access. Never reaches the client. */
+export async function requireSessionId(): Promise<string> {
   const [cookieStore, headerStore] = await Promise.all([cookies(), headers()]);
   const sessionId = readSessionId(cookieStore, isSecureRequest(headerStore));
   if (!sessionId) redirect("/access");
+  return sessionId;
+}
+
+export async function requireSession(): Promise<DemoSession> {
+  const sessionId = await requireSessionId();
   try {
     const { data } = await demoFetch<DemoSession>("/v1/demo/sessions/current", { sessionId });
     if (!data) throw new DemoApiError(502, { code: "upstream_error", message: "No session body." });
