@@ -102,6 +102,18 @@ describe("WithdrawDialog", () => {
     expect(refresh).toHaveBeenCalled();
   });
 
+  it("clears the reason and error when closed and reopened", async () => {
+    const user = userEvent.setup();
+    render(<WithdrawDialog record={record("valid")} allowed />);
+    await user.click(screen.getByRole("button", { name: /Withdraw consent/ }));
+    await user.click(screen.getByRole("button", { name: "Confirm withdrawal" }));
+    await user.type(screen.getByLabelText("Reason"), "draft");
+    await user.click(screen.getByRole("button", { name: "Close" }));
+    await user.click(screen.getByRole("button", { name: /Withdraw consent/ }));
+    expect(screen.getByLabelText("Reason")).toHaveValue("");
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
   it("is disabled with a notice for other personas", () => {
     render(<WithdrawDialog record={record("valid")} allowed={false} />);
     expect(screen.getByRole("button", { name: /Withdraw consent/ })).toHaveAttribute(
@@ -180,6 +192,9 @@ describe("PolicyEvaluator", () => {
       asset_id: "s-r-1",
     });
     expect(await screen.findByTestId("policy-decision")).toHaveTextContent("allow");
+    expect(screen.getByRole("status")).toContainElement(screen.getByTestId("policy-decision"));
     expect(refresh).toHaveBeenCalled();
+    await user.selectOptions(screen.getByLabelText("Purpose"), "commercial");
+    expect(screen.queryByTestId("policy-decision")).toBeNull();
   });
 });

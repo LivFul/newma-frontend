@@ -75,15 +75,18 @@ export function usePolling<T>(
   isTerminal: (data: T) => boolean,
   { intervalMs = DEFAULT_POLL_INTERVAL_MS }: { intervalMs?: number } = {},
 ): Polling<T> {
+  // `isTerminal` must be a stable (module-level) predicate: it is not an effect dependency.
   // State is keyed by url so a new url resets during render rather than inside the effect.
   const router = useRouter();
   const [tracked, setTracked] = useState<Tracked<T>>({ url, state: initial(url) });
   if (tracked.url !== url) setTracked({ url, state: initial(url) });
-  const update = (outcome: PollOutcome<T>) =>
-    setTracked((previous) => ({
-      url: previous.url,
-      state: applyOutcome(previous.state, outcome, isTerminal),
-    }));
+  // An outcome only lands on the url it was fetched for (a refetch may outlive a url change).
+  const update = (target: string, outcome: PollOutcome<T>) =>
+    setTracked((previous) =>
+      previous.url === target
+        ? { url: previous.url, state: applyOutcome(previous.state, outcome, isTerminal) }
+        : previous,
+    );
 
   useEffect(() => {
     if (url === undefined) return undefined;
@@ -92,7 +95,7 @@ export function usePolling<T>(
     const run = async () => {
       const outcome = await pollOnce<T>(url, controller.signal);
       if (controller.signal.aborted) return;
-      update(outcome);
+      update(url, outcome);
       if (outcome.kind === "error" && outcome.expired) router.push(EXPIRED_ROUTE);
       const next = applyOutcome(initial<T>(url), outcome, isTerminal);
       if (next.isPolling && !controller.signal.aborted) timer = setTimeout(run, intervalMs);
@@ -108,7 +111,7 @@ export function usePolling<T>(
 
   const refetch = async () => {
     if (url === undefined) return;
-    update(await pollOnce<T>(url, new AbortController().signal));
+    update(url, await pollOnce<T>(url, new AbortController().signal));
   };
 
   return { ...(tracked.url === url ? tracked.state : initial<T>(url)), refetch };

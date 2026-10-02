@@ -7,6 +7,8 @@ import type { RightsRecord, WithdrawResult } from "@/lib/demo/types";
 import { ErrorNotice } from "../../_components/error-notice";
 import { TextField } from "../../_components/fields";
 
+export const REGISTRY_HEADING_ID = "registry-heading";
+
 type Props = Readonly<{ record: RightsRecord; allowed: boolean }>;
 
 const REASON_REQUIRED: ClientError = { code: "validation_error", message: "A reason is required." };
@@ -28,6 +30,14 @@ export function WithdrawDialog({ record, allowed }: Props) {
     );
   }
 
+  const onOpenChange = (next: boolean) => {
+    setOpen(next);
+    if (!next) {
+      setReason("");
+      setError(undefined);
+    }
+  };
+
   const submit = () => {
     if (pending) return;
     if (reason.trim().length === 0) return setError(REASON_REQUIRED);
@@ -37,13 +47,15 @@ export function WithdrawDialog({ record, allowed }: Props) {
         { reason: reason.trim() },
       );
       if (!result.ok) return setError(result.error);
-      setOpen(false);
+      onOpenChange(false);
+      // The row's trigger unmounts once the record is withdrawn: land focus on the registry.
+      document.getElementById(REGISTRY_HEADING_ID)?.focus();
       router.refresh();
     });
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button variant="danger" size="sm" aria-label={name}>
           Withdraw consent

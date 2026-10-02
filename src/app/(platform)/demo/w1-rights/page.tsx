@@ -8,6 +8,7 @@ import { WorkflowHeader } from "../_components/workflow-header";
 import { CacheEntries } from "./_components/cache-entries";
 import { PolicyEvaluator } from "./_components/policy-evaluator";
 import { RightsTable } from "./_components/rights-table";
+import { REGISTRY_HEADING_ID } from "./_components/withdraw-dialog";
 
 // Every read is no-store (demoFetch) and the layout is force-dynamic, so router.refresh() after a
 // withdrawal re-reads the registry and the cache (Review Focus 1). The evaluator is keyed on the
@@ -29,8 +30,8 @@ export default async function RightsPage() {
         Fictional rights and consent records decide every purpose-bound use. Decisions are allow,
         hold or deny, each with recorded reasons.
       </WorkflowHeader>
-      <section aria-labelledby="registry-heading" className="space-y-3">
-        <h2 id="registry-heading" className="text-xl font-semibold">
+      <section aria-labelledby={REGISTRY_HEADING_ID} className="space-y-3">
+        <h2 id={REGISTRY_HEADING_ID} tabIndex={-1} className="text-xl font-semibold">
           Rights registry
         </h2>
         <ErrorNotice error={records.error} />

@@ -43,6 +43,12 @@ export function PolicyEvaluator({ records, tenantId, persona }: Props) {
   const [error, setError] = useState<ClientError | undefined>();
   const [pending, startTransition] = useTransition();
 
+  // A decision belongs to the inputs it was evaluated for: changing any input clears it.
+  const changed = (set: (value: string) => void) => (value: string) => {
+    setDecision(undefined);
+    set(value);
+  };
+
   const evaluate = () => {
     const separator = asset.indexOf(":");
     const assetType = asset.slice(0, separator);
@@ -81,18 +87,18 @@ export function PolicyEvaluator({ records, tenantId, persona }: Props) {
             <dd>{personaLabel(persona)}</dd>
           </div>
         </dl>
-        <SelectField label="Asset" value={asset} options={assets} onChange={setAsset} />
+        <SelectField label="Asset" value={asset} options={assets} onChange={changed(setAsset)} />
         <SelectField
           label="Purpose"
           value={purpose}
           options={options(PURPOSES)}
-          onChange={(v) => setPurpose(v as Purpose)}
+          onChange={changed((v) => setPurpose(v as Purpose))}
         />
         <SelectField
           label="Action"
           value={action}
           options={options(POLICY_ACTIONS)}
-          onChange={(v) => setAction(v as PolicyAction)}
+          onChange={changed((v) => setAction(v as PolicyAction))}
         />
         <div className="flex items-end">
           <Button type="submit" aria-busy={pending || undefined}>
@@ -101,7 +107,9 @@ export function PolicyEvaluator({ records, tenantId, persona }: Props) {
         </div>
       </form>
       <ErrorNotice error={error} />
-      {decision ? <DecisionCard decision={decision} /> : null}
+      <div role="status" aria-live="polite">
+        {decision ? <DecisionCard decision={decision} /> : null}
+      </div>
     </div>
   );
 }
