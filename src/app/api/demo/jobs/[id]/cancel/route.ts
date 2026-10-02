@@ -7,9 +7,10 @@ type Context = { params: Promise<{ id: string }> };
 
 /** POST: cancel a job; a 409 job_terminal envelope passes through. */
 export async function POST(req: NextRequest, { params }: Context) {
-  const { id } = await params;
-  if (!isSafeId(id)) return errorJson(400, "invalid_job_id", "Invalid job id.");
+  // Guards first: a disabled demo or missing session answers 404/401 whatever the id looks like.
   return withSession(async ({ sessionId }) => {
+    const { id } = await params;
+    if (!isSafeId(id)) return errorJson(400, "invalid_job_id", "Invalid job id.");
     const { data } = await demoFetch<Job>(`/v1/jobs/${id}/cancel`, { method: "POST", sessionId });
     return noStore(data);
   })(req);

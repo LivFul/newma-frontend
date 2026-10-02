@@ -56,6 +56,14 @@ describe("GET /api/demo/jobs/[id]", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("answers 404 (demo off) and 401 (no cookie) before validating the id", async () => {
+    armBff([], false);
+    expect((await POLL(bffRequest("/api/demo/jobs/x"), ctx("../x"))).status).toBe(404);
+    armBff([]);
+    const response = await POLL(bffRequest("/api/demo/jobs/x", { cookie: false }), ctx("../x"));
+    expect(response.status).toBe(401);
+  });
+
   it("clears the cookie on an expired session", async () => {
     armBff([envelope("session_expired", 401)]);
     const response = await POLL(bffRequest("/api/demo/jobs/job-1"), ctx("job-1"));
@@ -172,6 +180,17 @@ describe("POST /api/demo/jobs/[id]/cancel", () => {
     expect(sentUrl(fetchMock)).toBe("https://api.example/v1/jobs/job-1/cancel");
     expect(fetchMock.mock.calls[0][1].method).toBe("POST");
     expect((await response.json()).state).toBe("CANCELLED");
+  });
+
+  it("answers 404 (demo off) and 401 (no cookie) before validating the id", async () => {
+    armBff([], false);
+    const off = await CANCEL(bffRequest("/x", { method: "POST" }), ctx("../x"));
+    expect(off.status).toBe(404);
+    armBff([]);
+    const anon = await CANCEL(bffRequest("/x", { method: "POST", cookie: false }), ctx("../x"));
+    expect(anon.status).toBe(401);
+    const bad = await CANCEL(bffRequest("/x", { method: "POST" }), ctx("../x"));
+    expect(bad.status).toBe(400);
   });
 
   it("passes a 409 job_terminal envelope through", async () => {
