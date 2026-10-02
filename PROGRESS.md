@@ -294,6 +294,7 @@ Resolved by `pnpm install` on 2026-10-02 (create-next-app defaults accepted).
 | A-P2-F04 | Dashboard workflow titles for W1–W10 (`src/lib/demo/workflows.ts`) are agent placeholders built from the plan's hints (W1 rights view, W3 screening sequence, W9 quotas, W10 custodian view); ids and the P3/P5 split are from the plan. | Sprint plan §3.2 names are not in either repo. Replace at CP-2/P3. | P2 plan Task 4 |
 | A-P2-F05 | `demoFetch` (`src/lib/demo/api.ts`) is a thin `fetch` wrapper whose path type is derived from the generated `paths`, with response/request types from `components["schemas"]`; `demoApi()` still exposes the `openapi-fetch` client. | Lets the BFF forward the backend status, headers (`Idempotent-Replayed`) and error envelope unchanged, which the generic client hides. | P2 plan Task 7 |
 | A-P2-F06 | The `@needs-backend` Playwright specs are skipped unless `DEMO_E2E=1`; the local run used API port 8010 (8000 is taken on the dev machine) with env passed on the command line, not `.env.local`. | Keeps `pnpm test:e2e` green without a backend; README documents the recipe by names only. | P2 plan Task 6 |
+| A-P2-F07 | `/access` is always renderable (the product's sign-in entry, sprint plan §3.1) and never imports demo code; when the demo is off, the BFF answers a form post with 303 `/access?reason=disabled` ("Demo sign-in is not enabled on this deployment.") and a fetch with 404. | Reading `NEXT_PUBLIC_DEMO_MODE` in `/access` would break the isolation rule; the BFF already knows. | P2 review round (React/security) |
 | A-P1-F07 | Lighthouse on previews asserts `categories:seo` as `warn` plus error-level `document-title`, `meta-description`, `http-status-code`, `link-text`, `crawlable-anchors`, `viewport`, `font-size`, `hreflang`, `canonical`; locally/production (`LHCI_URL` unset) `categories:seo >= 0.95` stays an error. Production Lighthouse SEO is verified in P4 against the production URL. | PR #1 preview run: Vercel previews send `X-Robots-Tag: noindex`, so `is-crawlable` fails and caps SEO at 0.6 while performance and accessibility passed. | Prompt §3.6 Lighthouse budget |
 | A-P1-F08 | `api/openapi.lock.source` is the canonical deployed spec `https://demo-api-demo-605b.up.railway.app/openapi.yaml` (sha verified identical to the sibling checkout); local dev sets `API_CHECK_SPEC_SOURCE=../newma-backend/docs/openapi.yaml` (README); CI sets it job-wide from `vars.NEWMA_OPENAPI_URL`. `tests/unit/api-check.test.ts` resolves the spec via the override, else the sibling file, else skips the cases that need the real spec (never fetching the network itself); `api:check` prints the source it used. | PR #1 `checks` run: every api-check unit test failed because the sibling path does not exist on the runner. Supersedes A-P0-F06 and refines A-P1-05. | IP §5.6 |
 
@@ -317,6 +318,15 @@ Resolved by `pnpm install` on 2026-10-02 (create-next-app defaults accepted).
 
 Plan deviations introduced by round 1 are recorded as A-P0-F08…F14 above; `docs/plans/p0.md` is left as written.
 
+### P2
+
+| Round | Reviewer                | Verdict | Outcome                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----- | ----------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1     | `ecc:react-reviewer`    | Warning | fixed (expired-session handling through `requireSessionFetch` and the polling hook with 408/429 retryable; `requireSession` in React `cache()`; `aria-busy` instead of `disabled` on focused controls; one refetch after cancel; reset-dialog error cleared on reopen; `role="list"` on the persona grid; `/access?reason=disabled` message, A-P2-F07)                                                                                                |
+| 1     | `ecc:security-reviewer` | Warning | fixed (same-origin guard on every non-GET BFF handler via `Sec-Fetch-Site`/`Origin`, 415 without `application/json`; backend `details` only for `job_terminal`/`validation_error`/`idempotency_conflict`, every 5xx → generic `upstream_error`; expired route confirms the 401 with the backend and ignores cross-site navigations; https forced in production/Vercel; relative 303 `Location`s; guards before id validation; sign-out always clears) |
+
+Deferred to P6 (see Open items): per-IP session-creation cap and global active-session cap at the BFF; body-size limits on `req.json()`/`req.formData()`.
+
 ## Open items
 
 Deferred LOW findings from the P0 re-review (fix with the first demo code in P2):
@@ -331,6 +341,11 @@ Deferred from review round 1 (one line each; not implemented in P0):
 - Link tokens with underline styling — P4 (homepage copy).
 - Unit coverage for `src/app/**` (pages, layout, providers) — P4.
 - ~~`next.config.ts` security headers — P1 (deploy).~~ Done in P1 (commit 5cba2b7): `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options: DENY`, `Permissions-Policy` on `/:path*`, asserted by `tests/unit/next-config.test.ts`. CSP deliberately deferred to P4 (hero/analytics origins).
+
+Deferred from the P2 review round to P6 (BFF hardening):
+
+- Per-IP session-creation cap and a global active-session cap at `POST /api/demo/sessions` (the backend already bounds tenants; the BFF has no rate limiting yet).
+- Body-size limits on `req.json()` / `req.formData()` in the BFF handlers (the backend enforces payload ≤16 KB and depth ≤4; the BFF forwards unchecked).
 
 ## Claim register
 
