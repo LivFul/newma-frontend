@@ -252,6 +252,21 @@ Resolved by `pnpm install` on 2026-10-02 (create-next-app defaults accepted).
 | prettier                                         | 3.9.9                   |
 | @sentry/nextjs                                   | 11.2.0                  |
 
+### P2 exit evidence (live, 2026-10-02)
+
+Production `https://newma-frontend.vercel.app` (commit 1299d18) against Railway `demo` (backend ce350e5, contract sha c06d1cd6…):
+
+- `/access` 200; form sign-in `POST /api/demo/sessions` → 303 `Location: /demo`; cookie `__Host-newma_demo_sid` with `Secure; HttpOnly; SameSite=lax; Path=/`, no Domain.
+- `/demo` 200; verbatim demo banner rendered once in the DOM (`<aside role="note">`), second copy only in the RSC payload.
+- `/api/demo/me` 200 with `Cache-Control: no-store`, no `session_id` in the body.
+- Cross-site `POST /api/demo/reset` → 403 (same-origin guard); `DELETE /api/demo/sessions` → 204.
+- Railway: demo-api ×2, sim-worker, purge cron all SUCCESS on ce350e5; backend CI green incl. `verify-demo` (health, contract hash, authenticated Schemathesis).
+- Frontend PR #2: CI `checks`, preview E2E (Playwright + axe + Lighthouse) green; `@needs-backend` specs 18/18 locally against backend `main`.
+
+### Sequencing decision (user, 2026-10-02)
+
+Asked whether to build the homepage (P4) before the W1–W6 workflows (P3). User answer (verbatim): "Keep plan order (P3 then P4)". Homepage copy review stays at CP-2.
+
 ## Checkpoint log
 
 | CP-n | Date       | Question asked (verbatim)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | User answer (verbatim)                                                                                                                                                                                                                               | Actions unlocked                                                                                                                                                                                                                                                                                                                                                                                      |
