@@ -1,7 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { expectNoAxeViolations } from "./axe";
 
 describe("Button", () => {
@@ -20,10 +22,31 @@ describe("Button", () => {
     );
     expect(screen.getByRole("link", { name: "Access" })).toHaveAttribute("href", "/access");
   });
-  it("applies variant classes without mutating props", () => {
-    const props = { variant: "danger" as const };
-    render(<Button {...props}>Delete</Button>);
+  it("applies the variant classes", () => {
+    render(<Button variant="danger">Delete</Button>);
     expect(screen.getByRole("button")).toHaveClass("bg-danger");
-    expect(props).toEqual({ variant: "danger" });
+  });
+  it("exposes buttonVariants for non-button elements", () => {
+    expect(buttonVariants({ variant: "danger" })).toContain("bg-danger");
+    expect(buttonVariants()).toContain("bg-accent");
+  });
+  it("uses a strong border on secondary and merges away the transparent base border", () => {
+    render(<Button variant="secondary">Secondary</Button>);
+    const button = screen.getByRole("button");
+    expect(button).toHaveClass("border", "border-border-strong");
+    expect(button).not.toHaveClass("border-transparent");
+  });
+  it("sizes with min-height and padding and styles aria-disabled like disabled", () => {
+    render(<Button aria-disabled="true">Pending</Button>);
+    const button = screen.getByRole("button");
+    expect(button).toHaveClass("min-h-10", "aria-disabled:opacity-50", "disabled:opacity-50");
+    expect(button.className.split(" ")).not.toContain("h-10");
+  });
+  it("is usable from server components (no client directive)", () => {
+    const source = readFileSync(
+      path.resolve(__dirname, "../../../src/components/ui/button.tsx"),
+      "utf8",
+    );
+    expect(source).not.toMatch(/^"use client";/m);
   });
 });
