@@ -1,0 +1,17 @@
+/* Dark-first palette. Every pair in contrast-pairs.json is verified by tests/unit/tokens.test.ts. */
+:root {
+  --color-bg: #0b1020;
+  --color-bg-elevated: #141a2e;
+  --color-fg: #f3f5f9;
+  --color-fg-muted: #b7bfd1;
+  --color-accent: #7cc4ff;
+  --color-accent-fg: #06111f;
+  --color-border: #2a334d;
+  --color-danger: #ff8f8f;
+  --color-danger-fg: #2a0909;
+  --color-warning: #ffd27a;
+  --color-warning-fg: #2b1d00;
+  --color-success: #8fe3b4;
+  --color-success-fg: #04210f;
+  --color-focus: #ffd27a;
+}

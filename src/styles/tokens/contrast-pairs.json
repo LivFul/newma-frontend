@@ -1,0 +1,12 @@
+[
+  { "fg": "--color-fg", "bg": "--color-bg", "min": 4.5 },
+  { "fg": "--color-fg", "bg": "--color-bg-elevated", "min": 4.5 },
+  { "fg": "--color-fg-muted", "bg": "--color-bg", "min": 4.5 },
+  { "fg": "--color-fg-muted", "bg": "--color-bg-elevated", "min": 4.5 },
+  { "fg": "--color-accent", "bg": "--color-bg", "min": 4.5 },
+  { "fg": "--color-accent-fg", "bg": "--color-accent", "min": 4.5 },
+  { "fg": "--color-danger-fg", "bg": "--color-danger", "min": 4.5 },
+  { "fg": "--color-warning-fg", "bg": "--color-warning", "min": 4.5 },
+  { "fg": "--color-success-fg", "bg": "--color-success", "min": 4.5 },
+  { "fg": "--color-focus", "bg": "--color-bg", "min": 3 }
+]
