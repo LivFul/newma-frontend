@@ -9,6 +9,7 @@ const SESSIONS_ACTION = "/api/demo/sessions";
 const REASON_MESSAGES: Readonly<Record<string, string>> = {
   expired: "Your demo session has expired. Pick a persona to start a new one.",
   invalid: "That persona was not recognised. Pick one of the personas below.",
+  disabled: "Demo sign-in is not enabled on this deployment.",
 };
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -50,7 +51,8 @@ export default async function AccessPage({ searchParams }: { searchParams: Searc
           {message}
         </p>
       ) : null}
-      <ul className="grid list-none gap-3 p-0 sm:grid-cols-2" aria-label="Personas">
+      {/* role="list" restores list semantics that list-style: none removes in some browsers. */}
+      <ul role="list" className="grid list-none gap-3 p-0 sm:grid-cols-2">
         {PERSONAS.map((persona) => (
           <li key={persona.id}>
             <PersonaForm persona={persona} />

@@ -41,6 +41,21 @@ describe("/access", () => {
     expect(screen.getByRole("status")).toHaveTextContent(/not recognised/i);
   });
 
+  it("explains that demo sign-in is disabled on this deployment", async () => {
+    await renderPage({ reason: "disabled" });
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Demo sign-in is not enabled on this deployment",
+    );
+  });
+
+  it("exposes the persona grid as a list without an aria-label workaround", async () => {
+    const { container } = await renderPage();
+    const list = screen.getByRole("list");
+    expect(list).toHaveAttribute("role", "list");
+    expect(list).not.toHaveAttribute("aria-label");
+    expect(container.querySelectorAll('[role="listitem"], li')).toHaveLength(PERSONAS.length);
+  });
+
   it("ignores unknown reasons", async () => {
     await renderPage({ reason: "<script>" });
     expect(screen.queryByRole("status")).not.toBeInTheDocument();

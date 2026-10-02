@@ -10,6 +10,7 @@ import {
   withDemo,
   withSession,
 } from "@/lib/demo/bff";
+import { isDemoMode } from "@/lib/demo/mode";
 import { sessionCookieName, sessionCookieOptions } from "@/lib/demo/session";
 import type { SessionCreated } from "@/lib/demo/types";
 
@@ -38,8 +39,7 @@ function invalidPersona(form: boolean): NextResponse {
     : errorJson(400, "invalid_persona", "Unknown persona.");
 }
 
-/** POST: create a demo session. Form posts (from /access) get a 303 to /demo; JSON gets 201. */
-export const POST = withDemo(async (req, secure) => {
+const createSession = withDemo(async (req, secure) => {
   const form = isFormPost(req);
   const persona = await readPersona(req, form);
   if (!isPersonaId(persona)) return invalidPersona(form);
@@ -58,15 +58,30 @@ export const POST = withDemo(async (req, secure) => {
   return response;
 });
 
+/**
+ * POST: create a demo session. Form posts (from /access) get a 303 to /demo; JSON gets 201.
+ * With the demo switched off a form post goes back to /access with an explanation (A-P2-F07);
+ * fetch callers keep the 404 from withDemo.
+ */
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  if (!isDemoMode() && isFormPost(req)) return seeOther("/access?reason=disabled");
+  return createSession(req);
+}
+
 const signedOut = (secure: boolean) =>
   clearSessionCookie(new NextResponse(null, { status: 204 }), secure);
 
 const revoke = withSession(async ({ sessionId, secure }) => {
-  await demoFetch("/v1/demo/sessions/current", { method: "DELETE", sessionId });
+  try {
+    await demoFetch("/v1/demo/sessions/current", { method: "DELETE", sessionId });
+  } catch (error) {
+    // The browser-side session ends regardless; the backend row expires on its own.
+    console.error("demo sign-out: backend DELETE failed", error);
+  }
   return signedOut(secure);
 });
 
-/** DELETE: sign out. Always clears the cookie; a backend 401 or missing cookie is still a 204. */
+/** DELETE: sign out. Always clears the cookie; a backend failure or missing cookie is still a 204. */
 export const DELETE = withDemo(async (req, secure) => {
   const response = await revoke(req);
   return response.status === 401 ? signedOut(secure) : response;

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { DELETE, POST } from "@/app/api/demo/sessions/route";
 import { POST as SWITCH } from "@/app/api/demo/sessions/persona/route";
 import { GET as ME } from "@/app/api/demo/me/route";
@@ -182,6 +182,16 @@ describe("DELETE /api/demo/sessions", () => {
     const response = await DELETE(bffRequest("/api/demo/sessions", { method: "DELETE" }));
     expect(response.status).toBe(204);
     expect(setCookieHeader(response)).toMatch(/^newma_demo_sid=;.*Max-Age=0/);
+  });
+
+  it("still clears the cookie and answers 204 when the backend DELETE fails, logging the error", async () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    armBff([envelope("db_down", 503)]);
+    const response = await DELETE(bffRequest("/api/demo/sessions", { method: "DELETE" }));
+    expect(response.status).toBe(204);
+    expect(setCookieHeader(response)).toMatch(/^newma_demo_sid=;.*Max-Age=0/);
+    expect(spy).toHaveBeenCalled();
+    spy.mockRestore();
   });
 
   it("answers 204 without calling the backend when there is no cookie", async () => {
