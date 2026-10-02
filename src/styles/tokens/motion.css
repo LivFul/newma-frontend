@@ -1,14 +1,27 @@
-:root {
+@theme {
   --motion-duration-fast: 150ms;
   --motion-duration-base: 250ms;
   --motion-duration-slow: 450ms;
   --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --motion-ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+  /* Tailwind transition-* utilities consume the tokens. */
+  --default-transition-duration: var(--motion-duration-fast);
+  --default-transition-timing-function: var(--motion-ease-standard);
 }
+/* Outside @theme: runtime override, not a theme declaration. */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --motion-duration-fast: 0ms;
     --motion-duration-base: 0ms;
     --motion-duration-slow: 0ms;
+  }
+  /* Safety net for any animation or transition that bypasses the tokens. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

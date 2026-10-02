@@ -1,5 +1,6 @@
-/* Dark-first palette. Every pair in contrast-pairs.json is verified by tests/unit/tokens.test.ts. */
-:root {
+/* Dark-first palette. Every pair in contrast-pairs.json is verified by tests/unit/tokens.test.ts.
+   Declared inside @theme so Tailwind emits the variables and the colour utilities. */
+@theme {
   --color-bg: #0b1020;
   --color-bg-elevated: #141a2e;
   --color-fg: #f3f5f9;

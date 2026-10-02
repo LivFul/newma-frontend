@@ -1,25 +1,6 @@
 @import "tailwindcss";
 @import "../styles/tokens/index.css";
 
-@theme inline {
-  --color-bg: var(--color-bg);
-  --color-bg-elevated: var(--color-bg-elevated);
-  --color-fg: var(--color-fg);
-  --color-fg-muted: var(--color-fg-muted);
-  --color-accent: var(--color-accent);
-  --color-accent-fg: var(--color-accent-fg);
-  --color-border: var(--color-border);
-  --color-danger: var(--color-danger);
-  --color-danger-fg: var(--color-danger-fg);
-  --color-warning: var(--color-warning);
-  --color-warning-fg: var(--color-warning-fg);
-  --color-success: var(--color-success);
-  --color-success-fg: var(--color-success-fg);
-  --color-focus: var(--color-focus);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
-}
-
 body {
   background: var(--color-bg);
   color: var(--color-fg);
