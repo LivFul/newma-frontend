@@ -1,3 +1,4 @@
+import "server-only";
 import createClient, { type Client } from "openapi-fetch";
 import type { paths } from "@/lib/api/generated/schema";
 
