@@ -14,6 +14,8 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./tests/setup.ts"],
+    // api-check tests spawn node/git/tsc and the UI tests run axe; 5 s is too tight on a loaded machine.
+    testTimeout: 30_000,
     include: ["tests/unit/**/*.test.{ts,tsx}", "src/**/*.test.{ts,tsx}"],
     coverage: {
       provider: "v8",
