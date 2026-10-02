@@ -12,7 +12,7 @@ export default defineConfig({
     include: ["tests/unit/**/*.test.{ts,tsx}", "src/**/*.test.{ts,tsx}"],
     coverage: {
       provider: "v8",
-      include: ["src/components/ui/**", "src/lib/**", "scripts/**"],
+      include: ["src/components/ui/**", "src/lib/**", "scripts/**/*.{js,mjs,ts}"],
       exclude: ["src/lib/api/generated/**"],
       thresholds: { lines: 80, functions: 80, branches: 70, statements: 80 },
     },

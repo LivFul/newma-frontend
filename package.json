@@ -14,7 +14,9 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "test:a11y": "playwright test tests/a11y"
+    "test:a11y": "playwright test tests/a11y",
+    "lhci": "lhci autorun",
+    "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test:coverage && bash scripts/check-demo-isolation.sh"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -27,6 +29,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
+    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^7.0.1",
