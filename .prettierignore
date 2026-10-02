@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+coverage
+playwright-report
+test-results
+.lighthouseci
+pnpm-lock.yaml
+graft
+src/lib/api/generated
+next-env.d.ts

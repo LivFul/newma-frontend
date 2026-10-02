@@ -24,25 +24,25 @@ Document root: `/Users/daniel/Library/CloudStorage/OneDrive-LivFul/In_SilicoDD/N
 
 Read these in Phase P0, once, in full:
 
-| Order | File (relative to document root) | Lines |
-|---|---|---|
-| 1 | `outputs/implementation-plan/NEWMA_Demo_Sprint_Plan.md` | all (271) |
-| 2 | `outputs/implementation-plan/NEWMA_Implementation_Plan.md` | L1–25 (source abbreviations and reading conventions) |
-| 3 | same | L320–381 (§5.3 environments, §5.4 auth flow, §5.5 secrets, §5.6 CI/CD contract workflow) |
-| 4 | same | L420–523 (§6.1 frontend tree, §6.2 backend tree, §6.3 stack, §6.4 hero) |
+| Order | File (relative to document root)                           | Lines                                                                                    |
+| ----- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| 1     | `outputs/implementation-plan/NEWMA_Demo_Sprint_Plan.md`    | all (271)                                                                                |
+| 2     | `outputs/implementation-plan/NEWMA_Implementation_Plan.md` | L1–25 (source abbreviations and reading conventions)                                     |
+| 3     | same                                                       | L320–381 (§5.3 environments, §5.4 auth flow, §5.5 secrets, §5.6 CI/CD contract workflow) |
+| 4     | same                                                       | L420–523 (§6.1 frontend tree, §6.2 backend tree, §6.3 stack, §6.4 hero)                  |
 
 Read these on demand, only when the active phase card cites them:
 
-| Abbrev. | File (relative to document root) | Cited for |
-|---|---|---|
-| TA | `outputs/NEWMA_Technology_Architecture.md` | §1–4 workflow definitions and state names |
-| ARCH | `outputs/newma-architecture/NEWMA_Technological_Architecture.md` | §2A–F component boundaries, §3 Nagoya/CBD |
-| PRD | `outputs/newma-prd/NEWMA_PRD_v1.0.md` | §2 personas, §3.2–3.5 features, §6.2 failure paths, ABS/IS/LAB/ENT requirement IDs |
-| RM | `outputs/product-development-plan/Product_Development_Roadmap_and_Technical_Execution_Plan.md` | §1.4 ingestion stages, §1.5 API surface, §2.6 H0–L1 evidence stages |
-| WP | `outputs/newma-technical-white-paper/NEWMA_Technical_White_Paper.md` | §3.6 settlement |
-| BC | `outputs/ethnobotanical-business-case/Business_Case.md` | App. B1 claim register; §1.1–1.2 About copy source |
-| OSS | `outputs/newma-open-source-research/recommendations.md` | tool choices |
-| NUM | `NEWMA_Canonical_Numbers_Sheet_DRAFT.xlsx` | **Do not use any figure from it.** DRAFT only. |
+| Abbrev. | File (relative to document root)                                                               | Cited for                                                                          |
+| ------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| TA      | `outputs/NEWMA_Technology_Architecture.md`                                                     | §1–4 workflow definitions and state names                                          |
+| ARCH    | `outputs/newma-architecture/NEWMA_Technological_Architecture.md`                               | §2A–F component boundaries, §3 Nagoya/CBD                                          |
+| PRD     | `outputs/newma-prd/NEWMA_PRD_v1.0.md`                                                          | §2 personas, §3.2–3.5 features, §6.2 failure paths, ABS/IS/LAB/ENT requirement IDs |
+| RM      | `outputs/product-development-plan/Product_Development_Roadmap_and_Technical_Execution_Plan.md` | §1.4 ingestion stages, §1.5 API surface, §2.6 H0–L1 evidence stages                |
+| WP      | `outputs/newma-technical-white-paper/NEWMA_Technical_White_Paper.md`                           | §3.6 settlement                                                                    |
+| BC      | `outputs/ethnobotanical-business-case/Business_Case.md`                                        | App. B1 claim register; §1.1–1.2 About copy source                                 |
+| OSS     | `outputs/newma-open-source-research/recommendations.md`                                        | tool choices                                                                       |
+| NUM     | `NEWMA_Canonical_Numbers_Sheet_DRAFT.xlsx`                                                     | **Do not use any figure from it.** DRAFT only.                                     |
 
 Reading rules:
 
@@ -57,15 +57,15 @@ These survive every compaction. Violating any of them fails the sprint.
 
 ### 3.1 Labelling (sprint plan §1.2, verbatim)
 
-| Real platform component | In the demo | Label shown in UI |
-|---|---|---|
-| Hermes Agent Harness + K-Dense-AI skills (ARCH §2B) | **Scripted agent**: deterministic responses keyed to the demo scenario; no LLM calls | "Simulated agent" |
-| Temporal durable workflows (ARCH §2B) | Postgres-backed job table plus a simulation worker that drives the same state machines | "Simulated workflow engine" |
-| HPC screening (AutoDock Vina) and MD (ARCH §2C) | Timed progress, pre-computed synthetic scores, injected failures and retries | "Simulated compute" |
-| eLabFTW (ARCH §2D) | **Mock ELN** module behind the same adapter interface (REST-v2-shaped payloads) | "Mock ELN" |
-| Keycloak IAM (IP C-13) | **Persona sign-in**: pick a role, receive a demo session. No passwords. | "Demo sign-in" |
-| AWS KMS signing (IP C-10) | Ed25519 **demo key** held in Railway variables; signatures verifiable in-app | "Demo signature, not production key" |
-| Optional DLT, ZKP and anchoring (TA §4) | Simulated verification and anchoring receipts | "Optional, simulated" |
+| Real platform component                             | In the demo                                                                            | Label shown in UI                    |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------ |
+| Hermes Agent Harness + K-Dense-AI skills (ARCH §2B) | **Scripted agent**: deterministic responses keyed to the demo scenario; no LLM calls   | "Simulated agent"                    |
+| Temporal durable workflows (ARCH §2B)               | Postgres-backed job table plus a simulation worker that drives the same state machines | "Simulated workflow engine"          |
+| HPC screening (AutoDock Vina) and MD (ARCH §2C)     | Timed progress, pre-computed synthetic scores, injected failures and retries           | "Simulated compute"                  |
+| eLabFTW (ARCH §2D)                                  | **Mock ELN** module behind the same adapter interface (REST-v2-shaped payloads)        | "Mock ELN"                           |
+| Keycloak IAM (IP C-13)                              | **Persona sign-in**: pick a role, receive a demo session. No passwords.                | "Demo sign-in"                       |
+| AWS KMS signing (IP C-10)                           | Ed25519 **demo key** held in Railway variables; signatures verifiable in-app           | "Demo signature, not production key" |
+| Optional DLT, ZKP and anchoring (TA §4)             | Simulated verification and anchoring receipts                                          | "Optional, simulated"                |
 
 A **persistent banner** on every `/demo/*` page reads, verbatim:
 
@@ -74,7 +74,7 @@ A **persistent banner** on every `/demo/*` page reads, verbatim:
 ### 3.2 Synthetic data only (sprint plan §4.5; IP A-07, A-12, C-17, C-23)
 
 - Every seeded record carries `synthetic: true`.
-- Taxa, targets, beneficiaries and organisations are fictional and carry "fictional" in their display name (e.g. *Exemplaria viridis* — fictional; "Community Cooperative A — fictional"; "Target-α").
+- Taxa, targets, beneficiaries and organisations are fictional and carry "fictional" in their display name (e.g. _Exemplaria viridis_ — fictional; "Community Cooperative A — fictional"; "Target-α").
 - Every score, activity or prediction is invented and labelled "Synthetic" in the UI.
 - Monetary values use the unit "demo credits", never a currency.
 - No percentage, royalty split or financial figure from NUM. Settlement rules are illustrative and labelled so.
@@ -113,15 +113,15 @@ The homepage items (D-02..D-07) and W1–W6 are **never cut**.
 
 ### 3.6 Budgets
 
-| Budget | Value | Where enforced |
-|---|---|---|
-| Hero JS | ≤80 KB gzip | bundle analysis step in CI |
-| CWV | LCP ≤2.5 s, INP ≤200 ms, CLS ≤0.1 | Lighthouse CI on preview |
-| Lighthouse | Performance ≥90, Accessibility 100, SEO ≥95 | Lighthouse CI on preview |
-| axe | zero serious issues | `@axe-core/playwright` in E2E |
-| Custodian view (W10) | ≤200 KB page weight | Playwright resource-size assertion |
-| W3 full sequence | ≤3 min at demo speed | Playwright timing assertion |
-| Guided tour | 12–15 min, no dead ends | manual run logged in PROGRESS.md |
+| Budget               | Value                                       | Where enforced                     |
+| -------------------- | ------------------------------------------- | ---------------------------------- |
+| Hero JS              | ≤80 KB gzip                                 | bundle analysis step in CI         |
+| CWV                  | LCP ≤2.5 s, INP ≤200 ms, CLS ≤0.1           | Lighthouse CI on preview           |
+| Lighthouse           | Performance ≥90, Accessibility 100, SEO ≥95 | Lighthouse CI on preview           |
+| axe                  | zero serious issues                         | `@axe-core/playwright` in E2E      |
+| Custodian view (W10) | ≤200 KB page weight                         | Playwright resource-size assertion |
+| W3 full sequence     | ≤3 min at demo speed                        | Playwright timing assertion        |
+| Guided tour          | 12–15 min, no dead ends                     | manual run logged in PROGRESS.md   |
 
 ### 3.7 Engineering rules (user's standing rules)
 
@@ -188,52 +188,52 @@ Also create in P0: `newma-backend/docs/runbooks/DEMO_RUNBOOK.md` with headings D
 
 ## Phase status
 
-| D-item | Phase | Status | Evidence |
-|---|---|---|---|
-| D-01 (local half) | P0 | in-progress | — |
-| D-01 (remote half) | P1 | not-started | — |
-| D-02 | P0 | in-progress | — |
-| D-03 | P4 | not-started | — |
-| D-04 | P4 | not-started | — |
-| D-05 | P4 | not-started | — |
-| D-06 (claim-register stub) | P0 | in-progress | — |
-| D-06 (copy + register) | P4 | not-started | — |
-| D-07 | P4 | not-started | — |
-| D-08 (schema + seed half) | P0 | in-progress | — |
-| D-08 (cloning, reset, purge) | P2 | not-started | — |
-| D-09 | P2 | not-started | — |
-| D-10 | P2 | not-started | — |
-| D-11 | P3 | not-started | — |
-| D-12 | P3 | not-started | — |
-| D-13 | P3 | not-started | — |
-| D-14 | P3 | not-started | — |
-| D-15 | P3 | not-started | — |
-| D-16 | P3 | not-started | — |
-| D-17 | P5 | not-started | — |
-| D-18 | P5 | not-started | — |
-| D-19 | P5 | not-started | — |
-| D-20 | P5 | not-started | — |
-| D-21 | P6 | not-started | — |
-| D-22 | P6 | not-started | — |
+| D-item                       | Phase | Status      | Evidence |
+| ---------------------------- | ----- | ----------- | -------- |
+| D-01 (local half)            | P0    | in-progress | —        |
+| D-01 (remote half)           | P1    | not-started | —        |
+| D-02                         | P0    | in-progress | —        |
+| D-03                         | P4    | not-started | —        |
+| D-04                         | P4    | not-started | —        |
+| D-05                         | P4    | not-started | —        |
+| D-06 (claim-register stub)   | P0    | in-progress | —        |
+| D-06 (copy + register)       | P4    | not-started | —        |
+| D-07                         | P4    | not-started | —        |
+| D-08 (schema + seed half)    | P0    | in-progress | —        |
+| D-08 (cloning, reset, purge) | P2    | not-started | —        |
+| D-09                         | P2    | not-started | —        |
+| D-10                         | P2    | not-started | —        |
+| D-11                         | P3    | not-started | —        |
+| D-12                         | P3    | not-started | —        |
+| D-13                         | P3    | not-started | —        |
+| D-14                         | P3    | not-started | —        |
+| D-15                         | P3    | not-started | —        |
+| D-16                         | P3    | not-started | —        |
+| D-17                         | P5    | not-started | —        |
+| D-18                         | P5    | not-started | —        |
+| D-19                         | P5    | not-started | —        |
+| D-20                         | P5    | not-started | —        |
+| D-21                         | P6    | not-started | —        |
+| D-22                         | P6    | not-started | —        |
 
 ## Checkpoint log
 
 | CP-n | Date | Question asked (verbatim) | User answer (verbatim) | Actions unlocked |
-|---|---|---|---|---|
-| — | — | — | — | — |
+| ---- | ---- | ------------------------- | ---------------------- | ---------------- |
+| —    | —    | —                         | —                      | —                |
 
 ## Assumption register
 
-| # | `[Agent assumption]` | Reason | Fills |
-|---|---|---|---|
+| #       | `[Agent assumption]`                                                                                                             | Reason                                                         | Fills       |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ----------- |
 | A-P0-01 | Repo parent is `/Users/daniel/Dev/Newma` (same directory as `~/dev/newma/` on this case-insensitive filesystem; inode verified). | Session started there; prompt §6.1 default. Confirmed at CP-0. | Prompt §6.1 |
 
 ## Claim register
 
 Every user-visible number, name, label or capability claim in homepage copy or demo UI, with its source (`document § section`) or the word `synthetic`. Signed by VP Product at CP-2 and CP-4 (DoD 4).
 
-| # | Surface | Claim / string | Source or `synthetic` | Status |
-|---|---|---|---|---|
-| C-01 | every `/demo/*` page | "Demo with synthetic data. Not evidence of scientific performance, deployment or compliance (PRD front matter)." | sprint plan §1.2 (verbatim) | pending sign-off |
-| C-02 | demo UI | "Simulated agent", "Simulated workflow engine", "Simulated compute", "Mock ELN", "Demo sign-in", "Demo signature, not production key", "Optional, simulated" | sprint plan §1.2 labelling table | pending sign-off |
-| C-03 | seed data | all taxa, targets, beneficiaries, organisations, scores, activities, predictions, credits | synthetic | pending sign-off |
+| #    | Surface              | Claim / string                                                                                                                                               | Source or `synthetic`            | Status           |
+| ---- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------- | ---------------- |
+| C-01 | every `/demo/*` page | "Demo with synthetic data. Not evidence of scientific performance, deployment or compliance (PRD front matter)."                                             | sprint plan §1.2 (verbatim)      | pending sign-off |
+| C-02 | demo UI              | "Simulated agent", "Simulated workflow engine", "Simulated compute", "Mock ELN", "Demo sign-in", "Demo signature, not production key", "Optional, simulated" | sprint plan §1.2 labelling table | pending sign-off |
+| C-03 | seed data            | all taxa, targets, beneficiaries, organisations, scores, activities, predictions, credits                                                                    | synthetic                        | pending sign-off |
