@@ -1,0 +1,5 @@
+{
+  "version": "0.1.0-demo",
+  "sha256": "55c1d3f149c8f98aadf823486b21977cf30a37d15af617c6128d5c8e22f8de5b",
+  "source": "../newma-backend/docs/openapi.yaml"
+}
