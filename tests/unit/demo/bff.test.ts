@@ -1,6 +1,14 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { NextResponse } from "next/server";
-import { clearSessionCookie, demoGuard, noStore, withSession } from "@/lib/demo/bff";
+import {
+  clearSessionCookie,
+  demoGuard,
+  noStore,
+  readJson,
+  seeOther,
+  withDemo,
+  withSession,
+} from "@/lib/demo/bff";
 import { DemoApiError } from "@/lib/demo/api";
 import { armBff, bffRequest, disarmBff, setCookieHeader } from "./bff-helpers";
 
@@ -72,5 +80,80 @@ describe("withSession", () => {
     expect(response.status).toBe(502);
     expect(await response.text()).not.toContain("secret-in-message");
     expect(spy).toHaveBeenCalled();
+  });
+});
+
+describe("same-origin guard", () => {
+  afterEach(disarmBff);
+  const ok = async () => noStore({ ok: true });
+
+  it.each(["same-origin", "none"])("allows a non-GET with Sec-Fetch-Site %s", async (site) => {
+    armBff([]);
+    const response = await withSession(ok)(bffRequest("/x", { method: "POST", fetchSite: site }));
+    expect(response.status).toBe(200);
+  });
+  it("allows a non-GET without Sec-Fetch-Site when Origin matches the request origin", async () => {
+    armBff([]);
+    const response = await withDemo(ok)(
+      bffRequest("/x", { method: "POST", fetchSite: null, origin: "http://localhost:3100" }),
+    );
+    expect(response.status).toBe(200);
+  });
+  it("matches Origin against the forwarded host and proto", async () => {
+    armBff([]);
+    const req = bffRequest("/x", {
+      method: "POST",
+      fetchSite: null,
+      origin: "https://app.example",
+    });
+    req.headers.set("x-forwarded-host", "app.example");
+    req.headers.set("x-forwarded-proto", "https");
+    expect((await withDemo(ok)(req)).status).toBe(200);
+  });
+  it.each([
+    { fetchSite: "cross-site", origin: "http://localhost:3100" },
+    { fetchSite: "same-site", origin: "http://localhost:3100" },
+    { fetchSite: null, origin: "https://evil.example" },
+    { fetchSite: null, origin: null },
+  ])("rejects %j with 403 cross_site_request", async (opts) => {
+    armBff([]);
+    const handler = vi.fn(ok);
+    const response = await withSession(handler)(bffRequest("/x", { method: "POST", ...opts }));
+    expect(response.status).toBe(403);
+    expect((await response.json()).code).toBe("cross_site_request");
+    expect(handler).not.toHaveBeenCalled();
+  });
+  it("never applies to GET", async () => {
+    armBff([]);
+    const response = await withSession(ok)(bffRequest("/x", { fetchSite: "cross-site" }));
+    expect(response.status).toBe(200);
+  });
+});
+
+describe("readJson", () => {
+  afterEach(disarmBff);
+  it("returns the parsed body for application/json (with parameters)", async () => {
+    armBff([]);
+    const req = bffRequest("/x", {
+      method: "POST",
+      json: { a: 1 },
+      contentType: "application/json; charset=utf-8",
+    });
+    await expect(readJson(req)).resolves.toEqual({ a: 1 });
+  });
+  it("maps a missing or wrong Content-Type to 415 inside the wrappers", async () => {
+    armBff([]);
+    const handler = withDemo(async (req) => noStore(await readJson(req)));
+    const response = await handler(bffRequest("/x", { method: "POST", contentType: "text/plain" }));
+    expect(response.status).toBe(415);
+    expect((await response.json()).code).toBe("unsupported_media_type");
+  });
+});
+
+describe("seeOther", () => {
+  it("answers 303 with a relative Location", () => {
+    const response = seeOther("/access?reason=expired");
+    expect(response.status).toBe(303);
+    expect(response.headers.get("location")).toBe("/access?reason=expired");
   });
 });

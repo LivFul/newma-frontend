@@ -34,6 +34,11 @@ export type RequestOptions = Readonly<{
   cookie?: boolean;
   json?: unknown;
   form?: Record<string, string>;
+  /** Sec-Fetch-Site value; defaults to same-origin for non-GET requests. `null` omits it. */
+  fetchSite?: string | null;
+  /** Origin header; `null` omits it. */
+  origin?: string | null;
+  contentType?: string;
 }>;
 
 export function bffRequest(path: string, options: RequestOptions = {}): NextRequest {
@@ -44,13 +49,19 @@ export function bffRequest(path: string, options: RequestOptions = {}): NextRequ
   }
   if (options.json !== undefined) headers.set("content-type", "application/json");
   if (options.form) headers.set("content-type", "application/x-www-form-urlencoded");
+  if (options.contentType) headers.set("content-type", options.contentType);
+  const method = options.method ?? "GET";
+  const fetchSite =
+    options.fetchSite === undefined && method !== "GET" ? "same-origin" : options.fetchSite;
+  if (fetchSite) headers.set("sec-fetch-site", fetchSite);
+  if (options.origin) headers.set("origin", options.origin);
   const body = options.form
     ? new URLSearchParams(options.form).toString()
     : options.json !== undefined
       ? JSON.stringify(options.json)
       : undefined;
   return new NextRequest(`http://localhost:3100${path}`, {
-    method: options.method ?? "GET",
+    method,
     headers,
     body,
   });

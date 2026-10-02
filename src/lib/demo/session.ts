@@ -24,8 +24,20 @@ export function sessionCookieOptions(secure: boolean, maxAgeSeconds: number): Se
   return { httpOnly: true, secure, sameSite: "lax", path: "/", maxAge: maxAgeSeconds };
 }
 
-export function isSecureRequest(headers: Headers): boolean {
-  return headers.get("x-forwarded-proto") === "https";
+/** Production and every Vercel environment are https; locally trust the proxy header or the URL. */
+export function isSecureRequest(headers: Headers, url?: string): boolean {
+  if (process.env.NODE_ENV === "production" || process.env.VERCEL_ENV) return true;
+  const forwarded = headers.get("x-forwarded-proto");
+  if (forwarded) return forwarded === "https";
+  return url ? new URL(url).protocol === "https:" : false;
+}
+
+/** The origin the browser sees, derived from the proxy headers when present. */
+export function requestOrigin(headers: Headers, url: string): string {
+  const parsed = new URL(url);
+  const host = headers.get("x-forwarded-host") ?? parsed.host;
+  const proto = headers.get("x-forwarded-proto") ?? parsed.protocol.replace(/:$/, "");
+  return `${proto}://${host}`;
 }
 
 export function readSessionId(cookieStore: CookieReader, secure: boolean): string | undefined {

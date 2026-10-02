@@ -9,7 +9,7 @@ describe("GET /api/demo/sessions/expired", () => {
     const fetchMock = armBff([]);
     const response = await GET(bffRequest("/api/demo/sessions/expired", { https: true }));
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe("http://localhost:3100/access?reason=expired");
+    expect(response.headers.get("location")).toBe("/access?reason=expired");
     expect(setCookieHeader(response)).toMatch(/^__Host-newma_demo_sid=;.*Max-Age=0/);
     expect(fetchMock).not.toHaveBeenCalled();
   });

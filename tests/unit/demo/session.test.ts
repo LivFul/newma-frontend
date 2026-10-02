@@ -4,6 +4,7 @@ import {
   SESSION_COOKIE_DEV,
   isSecureRequest,
   readSessionId,
+  requestOrigin,
   sessionCookieName,
   sessionCookieOptions,
 } from "@/lib/demo/session";
@@ -32,10 +33,32 @@ describe("sessionCookieOptions", () => {
 });
 
 describe("isSecureRequest", () => {
-  it("reads x-forwarded-proto", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("reads x-forwarded-proto, then the URL protocol", () => {
     expect(isSecureRequest(new Headers({ "x-forwarded-proto": "https" }))).toBe(true);
     expect(isSecureRequest(new Headers({ "x-forwarded-proto": "http" }))).toBe(false);
+    expect(isSecureRequest(new Headers(), "https://app.example/x")).toBe(true);
+    expect(isSecureRequest(new Headers(), "http://localhost:3100/x")).toBe(false);
     expect(isSecureRequest(new Headers())).toBe(false);
+  });
+  it("forces secure in production or on Vercel regardless of headers", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    expect(isSecureRequest(new Headers({ "x-forwarded-proto": "http" }))).toBe(true);
+    vi.unstubAllEnvs();
+    vi.stubEnv("VERCEL_ENV", "preview");
+    expect(isSecureRequest(new Headers(), "http://localhost/x")).toBe(true);
+  });
+});
+
+describe("requestOrigin", () => {
+  it("prefers forwarded host and proto, else the URL origin", () => {
+    const headers = new Headers({
+      "x-forwarded-host": "app.example",
+      "x-forwarded-proto": "https",
+    });
+    expect(requestOrigin(headers, "http://localhost:3100/api")).toBe("https://app.example");
+    expect(requestOrigin(new Headers(), "http://localhost:3100/api")).toBe("http://localhost:3100");
   });
 });
 

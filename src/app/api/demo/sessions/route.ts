@@ -6,6 +6,7 @@ import {
   errorJson,
   noStore,
   readJson,
+  seeOther,
   withDemo,
   withSession,
 } from "@/lib/demo/bff";
@@ -31,9 +32,9 @@ function maxAgeFrom(expiresAt: string): number {
   return Number.isFinite(seconds) && seconds > 0 ? seconds : FALLBACK_MAX_AGE_SECONDS;
 }
 
-function invalidPersona(req: NextRequest, form: boolean): NextResponse {
+function invalidPersona(form: boolean): NextResponse {
   return form
-    ? NextResponse.redirect(new URL("/access?reason=invalid", req.url), 303)
+    ? seeOther("/access?reason=invalid")
     : errorJson(400, "invalid_persona", "Unknown persona.");
 }
 
@@ -41,16 +42,14 @@ function invalidPersona(req: NextRequest, form: boolean): NextResponse {
 export const POST = withDemo(async (req, secure) => {
   const form = isFormPost(req);
   const persona = await readPersona(req, form);
-  if (!isPersonaId(persona)) return invalidPersona(req, form);
+  if (!isPersonaId(persona)) return invalidPersona(form);
   const { data } = await demoFetch<SessionCreated>("/v1/demo/sessions", {
     method: "POST",
     body: { persona },
   });
   if (!data) return errorJson(502, "upstream_error", "The demo API returned no session.");
   const { session_id, ...publicSession } = data;
-  const response = form
-    ? NextResponse.redirect(new URL("/demo", req.url), 303)
-    : noStore(publicSession, { status: 201 });
+  const response = form ? seeOther("/demo") : noStore(publicSession, { status: 201 });
   response.cookies.set(
     sessionCookieName(secure),
     session_id,

@@ -92,8 +92,36 @@ describe("POST /api/demo/sessions", () => {
       }),
     );
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe("http://localhost:3100/demo");
+    expect(response.headers.get("location")).toBe("/demo");
     expect(setCookieHeader(response)).toMatch(/^newma_demo_sid=new-sid;/);
+  });
+
+  it("accepts the form post from /access as same-origin without an Origin header", async () => {
+    armBff([created()]);
+    const response = await POST(
+      bffRequest("/api/demo/sessions", {
+        method: "POST",
+        cookie: false,
+        form: { persona: "scientist" },
+        fetchSite: "same-origin",
+        origin: null,
+      }),
+    );
+    expect(response.status).toBe(303);
+  });
+
+  it("rejects a cross-site form post with 403 before touching the backend", async () => {
+    const fetchMock = armBff([]);
+    const response = await POST(
+      bffRequest("/api/demo/sessions", {
+        method: "POST",
+        cookie: false,
+        form: { persona: "scientist" },
+        fetchSite: "cross-site",
+      }),
+    );
+    expect(response.status).toBe(403);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("rejects an unknown persona: 400 for JSON, 303 to /access?reason=invalid for forms", async () => {
@@ -107,7 +135,7 @@ describe("POST /api/demo/sessions", () => {
       bffRequest("/api/demo/sessions", { method: "POST", form: { persona: "root" } }),
     );
     expect(form.status).toBe(303);
-    expect(form.headers.get("location")).toBe("http://localhost:3100/access?reason=invalid");
+    expect(form.headers.get("location")).toBe("/access?reason=invalid");
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

@@ -3,14 +3,33 @@ import { type NextRequest, NextResponse } from "next/server";
 import { DemoApiError } from "./api";
 import type { DemoErrorEnvelope } from "./types";
 import { isDemoMode } from "./mode";
-import { isSecureRequest, readSessionId, sessionCookieName } from "./session";
+import { isSecureRequest, readSessionId, requestOrigin, sessionCookieName } from "./session";
 
 // Shared plumbing for the BFF route handlers under src/app/api/demo/ (D-09, D-10).
 
 export type ErrorBody = DemoErrorEnvelope;
 
+/** A request the BFF rejects before reaching the backend; mapped to its status by the wrappers. */
+export class BffError extends Error {
+  constructor(
+    readonly status: number,
+    readonly code: string,
+    message: string,
+  ) {
+    super(message);
+    this.name = "BffError";
+  }
+}
+
 export function noStore(body: unknown, init: ResponseInit = {}): NextResponse {
   const response = NextResponse.json(body, init);
+  response.headers.set("Cache-Control", "no-store");
+  return response;
+}
+
+/** 303 with a relative Location: the browser resolves it against the origin it is on. */
+export function seeOther(path: `/${string}`): NextResponse {
+  const response = new NextResponse(null, { status: 303, headers: { Location: path } });
   response.headers.set("Cache-Control", "no-store");
   return response;
 }
@@ -39,7 +58,23 @@ export type SessionContext = Readonly<{ req: NextRequest; sessionId: string; sec
 
 export type SessionHandler = (ctx: SessionContext) => Promise<NextResponse>;
 
+const SAME_ORIGIN_FETCH_SITES: ReadonlySet<string> = new Set(["same-origin", "none"]);
+
+/**
+ * Non-GET requests must come from this origin: Sec-Fetch-Site same-origin/none, or an Origin
+ * header equal to the request origin (SameSite=Lax alone does not stop a top-level cross-site POST).
+ */
+export function sameOriginGuard(req: NextRequest): NextResponse | undefined {
+  if (req.method === "GET" || req.method === "HEAD") return undefined;
+  const fetchSite = req.headers.get("sec-fetch-site");
+  if (fetchSite && SAME_ORIGIN_FETCH_SITES.has(fetchSite)) return undefined;
+  const origin = req.headers.get("origin");
+  if (!fetchSite && origin && origin === requestOrigin(req.headers, req.url)) return undefined;
+  return errorJson(403, "cross_site_request", "Cross-site requests are not accepted.");
+}
+
 function mapError(error: unknown, secure: boolean): NextResponse {
+  if (error instanceof BffError) return errorJson(error.status, error.code, error.message);
   if (error instanceof DemoApiError) {
     const body: ErrorBody = { code: error.code, message: error.message, details: error.details };
     const response = noStore(body, { status: error.status });
@@ -52,9 +87,9 @@ function mapError(error: unknown, secure: boolean): NextResponse {
 /** Resolves the HttpOnly session cookie and maps backend session errors to a cookie-clearing 401. */
 export function withSession(handler: SessionHandler) {
   return async (req: NextRequest): Promise<NextResponse> => {
-    const off = demoGuard();
+    const off = demoGuard() ?? sameOriginGuard(req);
     if (off) return off;
-    const secure = isSecureRequest(req.headers);
+    const secure = isSecureRequest(req.headers, req.url);
     const sessionId = readSessionId(req.cookies, secure);
     if (!sessionId) return errorJson(401, "no_session", "Sign in at /access first.");
     try {
@@ -68,9 +103,9 @@ export function withSession(handler: SessionHandler) {
 /** Like withSession but for handlers that need no session (session creation). */
 export function withDemo(handler: (req: NextRequest, secure: boolean) => Promise<NextResponse>) {
   return async (req: NextRequest): Promise<NextResponse> => {
-    const off = demoGuard();
+    const off = demoGuard() ?? sameOriginGuard(req);
     if (off) return off;
-    const secure = isSecureRequest(req.headers);
+    const secure = isSecureRequest(req.headers, req.url);
     try {
       return await handler(req, secure);
     } catch (error) {
@@ -85,6 +120,13 @@ export function isSafeId(value: string): boolean {
   return SAFE_ID.test(value);
 }
 
+const JSON_CONTENT_TYPE = /^application\/json(\s*;|$)/i;
+
+/** Parses a JSON body; a missing or different Content-Type is a 415 before any parsing. */
 export async function readJson(req: NextRequest): Promise<unknown> {
+  const contentType = req.headers.get("content-type") ?? "";
+  if (!JSON_CONTENT_TYPE.test(contentType)) {
+    throw new BffError(415, "unsupported_media_type", "Send application/json.");
+  }
   return req.json().catch(() => undefined);
 }
