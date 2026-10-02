@@ -24,9 +24,13 @@ function thirdPartyOrigin(): Promise<{
 }
 
 test.describe("Vercel protection bypass", () => {
-  test.skip(!secret, "runs only when VERCEL_AUTOMATION_BYPASS_SECRET is set");
-
+  // Against an https preview the browser blocks the fetch to the plain-http 127.0.0.1 test server
+  // (mixed content), so this runs only locally; tests/unit/bypass-headers.test.ts is the CI guarantee.
   test("is sent to the app origin but never to third parties", async ({ page, baseURL }) => {
+    test.skip(
+      !secret || new URL(baseURL ?? "").protocol !== "http:",
+      "bypass stripping is verified locally against a plain-http origin",
+    );
     const thirdParty = await thirdPartyOrigin();
     try {
       const appRequest = page.waitForRequest(`${baseURL}/`);
