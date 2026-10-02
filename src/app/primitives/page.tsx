@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import {
   Badge,
   Button,
+  StatusBadge,
   Dialog,
   DialogContent,
   DialogTrigger,
   Tooltip,
-  VisuallyHidden,
 } from "@/components/ui";
 
 export const metadata: Metadata = {
@@ -33,11 +33,12 @@ export default function PrimitivesPage() {
         <h2 id="badges" className="text-xl">
           Badges
         </h2>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Badge>Neutral</Badge>
           <Badge tone="warning">Synthetic</Badge>
-          <Badge tone="success">PASS</Badge>
-          <Badge tone="danger">HOLD</Badge>
+          <StatusBadge status="PASS" />
+          <StatusBadge status="HOLD" />
+          <StatusBadge status="NOT_STARTED" />
         </div>
       </section>
       <section aria-labelledby="dialog">
@@ -61,7 +62,6 @@ export default function PrimitivesPage() {
           <Button variant="ghost">Hover or focus me</Button>
         </Tooltip>
       </section>
-      <VisuallyHidden>End of primitives gallery</VisuallyHidden>
     </main>
   );
 }

@@ -1,4 +1,11 @@
-export { Badge, badgeVariants, type BadgeProps } from "./badge";
+export {
+  Badge,
+  StatusBadge,
+  badgeVariants,
+  type BadgeProps,
+  type Status,
+  type StatusBadgeProps,
+} from "./badge";
 export { Button, buttonVariants, type ButtonProps } from "./button";
 export {
   Dialog,
