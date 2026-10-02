@@ -175,11 +175,6 @@ export interface components {
             /** Message */
             message: string;
         };
-        /** HTTPValidationError */
-        HTTPValidationError: {
-            /** Detail */
-            detail?: components["schemas"]["ValidationError"][];
-        };
         /** HealthResponse */
         HealthResponse: {
             /**
@@ -346,19 +341,6 @@ export interface components {
              */
             tenant_id: string;
         };
-        /** ValidationError */
-        ValidationError: {
-            /** Context */
-            ctx?: Record<string, never>;
-            /** Input */
-            input?: unknown;
-            /** Location */
-            loc: (string | number)[];
-            /** Message */
-            msg: string;
-            /** Error Type */
-            type: string;
-        };
     };
     responses: never;
     parameters: never;
@@ -406,8 +388,8 @@ export interface operations {
                     "application/json": components["schemas"]["DemoKeys"];
                 };
             };
-            /** @description Malformed request body */
-            400: {
+            /** @description Missing or invalid service token or session */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -415,8 +397,8 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Missing or invalid service token */
-            401: {
+            /** @description Request validation failed */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -438,8 +420,8 @@ export interface operations {
     demo_reset: {
         parameters: {
             query?: never;
-            header: {
-                "X-Demo-Session": string;
+            header?: {
+                "X-Demo-Session"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -455,15 +437,6 @@ export interface operations {
                     "application/json": components["schemas"]["ResetResult"];
                 };
             };
-            /** @description Malformed request body */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
             /** @description Invalid or expired session */
             401: {
                 headers: {
@@ -473,13 +446,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Service token or tenant resolver not configured */
@@ -515,16 +488,7 @@ export interface operations {
                     "application/json": components["schemas"]["SessionCreated"];
                 };
             };
-            /** @description Malformed request body */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Missing or invalid service token */
+            /** @description Missing or invalid service token or session */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -533,13 +497,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Service token or tenant resolver not configured */
@@ -556,8 +520,8 @@ export interface operations {
     demo_current_session: {
         parameters: {
             query?: never;
-            header: {
-                "X-Demo-Session": string;
+            header?: {
+                "X-Demo-Session"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -573,15 +537,6 @@ export interface operations {
                     "application/json": components["schemas"]["SessionCurrent"];
                 };
             };
-            /** @description Malformed request body */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
             /** @description Invalid or expired session */
             401: {
                 headers: {
@@ -591,13 +546,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Service token or tenant resolver not configured */
@@ -614,8 +569,8 @@ export interface operations {
     demo_sign_out: {
         parameters: {
             query?: never;
-            header: {
-                "X-Demo-Session": string;
+            header?: {
+                "X-Demo-Session"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -629,15 +584,6 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Malformed request body */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
             /** @description Invalid or expired session */
             401: {
                 headers: {
@@ -647,13 +593,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Service token or tenant resolver not configured */
@@ -670,8 +616,8 @@ export interface operations {
     demo_switch_persona: {
         parameters: {
             query?: never;
-            header: {
-                "X-Demo-Session": string;
+            header?: {
+                "X-Demo-Session"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -691,15 +637,6 @@ export interface operations {
                     "application/json": components["schemas"]["SessionCurrent"];
                 };
             };
-            /** @description Malformed request body */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
             /** @description Invalid or expired session */
             401: {
                 headers: {
@@ -709,13 +646,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Service token or tenant resolver not configured */
@@ -732,8 +669,8 @@ export interface operations {
     jobs_list_jobs: {
         parameters: {
             query?: never;
-            header: {
-                "X-Demo-Session": string;
+            header?: {
+                "X-Demo-Session"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -749,16 +686,7 @@ export interface operations {
                     "application/json": components["schemas"]["JobList"];
                 };
             };
-            /** @description Malformed request body */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Missing or invalid service token */
+            /** @description Missing or invalid service token or session */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -767,13 +695,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Service token or tenant resolver not configured */
@@ -790,8 +718,8 @@ export interface operations {
     jobs_create_job: {
         parameters: {
             query?: never;
-            header: {
-                "X-Demo-Session": string;
+            header?: {
+                "X-Demo-Session"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -820,16 +748,7 @@ export interface operations {
                     "application/json": components["schemas"]["JobRead"];
                 };
             };
-            /** @description Malformed request body */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Missing or invalid service token */
+            /** @description Missing or invalid service token or session */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -838,13 +757,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Service token or tenant resolver not configured */
@@ -861,8 +780,8 @@ export interface operations {
     jobs_get_job: {
         parameters: {
             query?: never;
-            header: {
-                "X-Demo-Session": string;
+            header?: {
+                "X-Demo-Session"?: string | null;
             };
             path: {
                 job_id: string;
@@ -880,16 +799,7 @@ export interface operations {
                     "application/json": components["schemas"]["JobRead"];
                 };
             };
-            /** @description Malformed request body */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Missing or invalid service token */
+            /** @description Missing or invalid service token or session */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -907,13 +817,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Service token or tenant resolver not configured */
@@ -930,8 +840,8 @@ export interface operations {
     jobs_cancel_job: {
         parameters: {
             query?: never;
-            header: {
-                "X-Demo-Session": string;
+            header?: {
+                "X-Demo-Session"?: string | null;
             };
             path: {
                 job_id: string;
@@ -949,16 +859,7 @@ export interface operations {
                     "application/json": components["schemas"]["JobRead"];
                 };
             };
-            /** @description Malformed request body */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Missing or invalid service token */
+            /** @description Missing or invalid service token or session */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -985,13 +886,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Service token or tenant resolver not configured */
