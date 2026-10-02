@@ -50,6 +50,5 @@ coverage/
 .lighthouseci/
 .env.local
 
-# graft index caches (cards stay committed)
-graft/.cache/
-graft/.graph/
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/
