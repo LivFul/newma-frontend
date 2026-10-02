@@ -188,33 +188,60 @@ Also create in P0: `newma-backend/docs/runbooks/DEMO_RUNBOOK.md` with headings D
 
 ## Phase status
 
-| D-item                       | Phase | Status      | Evidence |
-| ---------------------------- | ----- | ----------- | -------- |
-| D-01 (local half)            | P0    | in-progress | —        |
-| D-01 (remote half)           | P1    | not-started | —        |
-| D-02                         | P0    | in-progress | —        |
-| D-03                         | P4    | not-started | —        |
-| D-04                         | P4    | not-started | —        |
-| D-05                         | P4    | not-started | —        |
-| D-06 (claim-register stub)   | P0    | in-progress | —        |
-| D-06 (copy + register)       | P4    | not-started | —        |
-| D-07                         | P4    | not-started | —        |
-| D-08 (schema + seed half)    | P0    | in-progress | —        |
-| D-08 (cloning, reset, purge) | P2    | not-started | —        |
-| D-09                         | P2    | not-started | —        |
-| D-10                         | P2    | not-started | —        |
-| D-11                         | P3    | not-started | —        |
-| D-12                         | P3    | not-started | —        |
-| D-13                         | P3    | not-started | —        |
-| D-14                         | P3    | not-started | —        |
-| D-15                         | P3    | not-started | —        |
-| D-16                         | P3    | not-started | —        |
-| D-17                         | P5    | not-started | —        |
-| D-18                         | P5    | not-started | —        |
-| D-19                         | P5    | not-started | —        |
-| D-20                         | P5    | not-started | —        |
-| D-21                         | P6    | not-started | —        |
-| D-22                         | P6    | not-started | —        |
+| D-item                       | Phase | Status      | Evidence                                                                                                                                                                                                                                  |
+| ---------------------------- | ----- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D-01 (local half)            | P0    | done        | `pnpm check` green (lint, typecheck, prettier, vitest coverage, api:check, isolation guard); `tests/unit/api-check.test.ts`, `tests/unit/api-client.test.ts`, `tests/unit/demo-isolation.test.ts`; commit 8677bc7                         |
+| D-01 (remote half)           | P1    | not-started | —                                                                                                                                                                                                                                         |
+| D-02                         | P0    | done        | `tests/unit/tokens.test.ts` (all 10 token pairs ≥4.5:1 or ≥3:1 focus; reduced-motion zeros durations), `tests/unit/ui/*.test.tsx` (axe-clean primitives), `tests/a11y/primitives.spec.ts` (zero axe violations, both Playwright projects) |
+| D-03                         | P4    | not-started | —                                                                                                                                                                                                                                         |
+| D-04                         | P4    | not-started | —                                                                                                                                                                                                                                         |
+| D-05                         | P4    | not-started | —                                                                                                                                                                                                                                         |
+| D-06 (claim-register stub)   | P0    | in-progress | —                                                                                                                                                                                                                                         |
+| D-06 (copy + register)       | P4    | not-started | —                                                                                                                                                                                                                                         |
+| D-07                         | P4    | not-started | —                                                                                                                                                                                                                                         |
+| D-08 (schema + seed half)    | P0    | in-progress | —                                                                                                                                                                                                                                         |
+| D-08 (cloning, reset, purge) | P2    | not-started | —                                                                                                                                                                                                                                         |
+| D-09                         | P2    | not-started | —                                                                                                                                                                                                                                         |
+| D-10                         | P2    | not-started | —                                                                                                                                                                                                                                         |
+| D-11                         | P3    | not-started | —                                                                                                                                                                                                                                         |
+| D-12                         | P3    | not-started | —                                                                                                                                                                                                                                         |
+| D-13                         | P3    | not-started | —                                                                                                                                                                                                                                         |
+| D-14                         | P3    | not-started | —                                                                                                                                                                                                                                         |
+| D-15                         | P3    | not-started | —                                                                                                                                                                                                                                         |
+| D-16                         | P3    | not-started | —                                                                                                                                                                                                                                         |
+| D-17                         | P5    | not-started | —                                                                                                                                                                                                                                         |
+| D-18                         | P5    | not-started | —                                                                                                                                                                                                                                         |
+| D-19                         | P5    | not-started | —                                                                                                                                                                                                                                         |
+| D-20                         | P5    | not-started | —                                                                                                                                                                                                                                         |
+| D-21                         | P6    | not-started | —                                                                                                                                                                                                                                         |
+| D-22                         | P6    | not-started | —                                                                                                                                                                                                                                         |
+
+## Stack versions
+
+Resolved by `pnpm install` on 2026-10-02 (create-next-app defaults accepted).
+
+| Package                                          | Version                 |
+| ------------------------------------------------ | ----------------------- |
+| node                                             | 26.9.0                  |
+| pnpm                                             | 12.8.1                  |
+| next                                             | 16.3.8                  |
+| react / react-dom                                | 19.2.8                  |
+| typescript                                       | 5.9.3                   |
+| tailwindcss / @tailwindcss/postcss               | 4.3.3                   |
+| radix-ui                                         | 1.6.7                   |
+| class-variance-authority / clsx / tailwind-merge | 0.7.1 / 2.1.1 / 3.7.0   |
+| openapi-typescript                               | 7.13.0                  |
+| openapi-fetch                                    | 0.17.0                  |
+| vitest / @vitest/coverage-v8                     | 5.0.3                   |
+| @vitejs/plugin-react                             | 6.1.1                   |
+| @testing-library/react / jest-dom / user-event   | 16.3.3 / 7.0.1 / 14.6.7 |
+| jsdom                                            | 30.1.1                  |
+| axe-core                                         | 4.13.0                  |
+| @playwright/test                                 | 1.63.0                  |
+| @axe-core/playwright                             | 4.13.0                  |
+| @lhci/cli                                        | 0.15.1                  |
+| eslint / eslint-config-next                      | 9.39.5 / 16.3.8         |
+| prettier                                         | 3.9.9                   |
 
 ## Checkpoint log
 
@@ -224,9 +251,16 @@ Also create in P0: `newma-backend/docs/runbooks/DEMO_RUNBOOK.md` with headings D
 
 ## Assumption register
 
-| #       | `[Agent assumption]`                                                                                                             | Reason                                                         | Fills       |
-| ------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ----------- |
-| A-P0-01 | Repo parent is `/Users/daniel/Dev/Newma` (same directory as `~/dev/newma/` on this case-insensitive filesystem; inode verified). | Session started there; prompt §6.1 default. Confirmed at CP-0. | Prompt §6.1 |
+| #        | `[Agent assumption]`                                                                                                             | Reason                                                                                                                                                                                                                                  | Fills                                           |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| A-P0-01  | Repo parent is `/Users/daniel/Dev/Newma` (same directory as `~/dev/newma/` on this case-insensitive filesystem; inode verified). | Session started there; prompt §6.1 default. Confirmed at CP-0.                                                                                                                                                                          | Prompt §6.1                                     |
+| A-P0-F01 | Dark-first colour token palette chosen by the agent.                                                                             | No brand palette exists in any source document; hex values were picked so every pair in `src/styles/tokens/contrast-pairs.json` passes WCAG 4.5:1 (focus ring 3:1), verified by `tests/unit/tokens.test.ts`. CP-2 may replace it.       | Sprint plan §5 row D-02                         |
+| A-P0-F02 | `/primitives` route kept as a `noindex` gallery page for browser axe scans.                                                      | Playwright + axe need a real rendered page; metadata sets `robots: { index: false, follow: false }`.                                                                                                                                    | Sprint plan §5 row D-02; prompt §3.6 axe budget |
+| A-P0-F03 | Tailwind v4 CSS-first tokens: `@theme inline` maps utilities onto unlayered `:root` custom properties in `src/styles/tokens/`.   | IP §6.3 names Tailwind; v4 has no JS config, and unlayered token declarations win the cascade over the layered theme.                                                                                                                   | IP §6.3                                         |
+| A-P0-F04 | Playwright dev-server port is configurable via `PORT` (default 3000); local runs use `PORT=3100`.                                | Port 3000 on the dev machine is held by an unrelated Docker container; with `reuseExistingServer` Playwright would otherwise test the wrong app. `PLAYWRIGHT_BASE_URL` targets previews in P1+.                                         | Sprint plan §5 row D-01 (local tooling)         |
+| A-P0-F05 | Component-level axe helper (`tests/unit/ui/axe.ts`) disables `color-contrast` and `region`.                                      | jsdom has no layout engine, and `region` is a page-level landmark rule meaningless for a bare component; both rules run for real in Chromium via `tests/a11y/primitives.spec.ts`.                                                       | Prompt §3.6 axe budget                          |
+| A-P0-F06 | `api/openapi.lock.source` is the relative path `../newma-backend/docs/openapi.yaml` in P0.                                       | The sibling checkout is the only contract source before the `api-v0.1.0-demo` tag is published; it becomes a URL in P1. The spec version is read with a same-line regex on `version:`; a YAML parser replaces it if the contract grows. | IP §5.6                                         |
+| A-P0-F07 | `scripts/api-check.mjs` is an importable module (`runApiCheck`) with a direct-run `main`.                                        | Vitest 5 reports every `coverage.include` file, so a child-process-only script would count as 0%; in-process tests keep `scripts/**` above the 80% threshold while the CLI tests from the plan remain.                                  | Prompt §3.7 coverage ≥80%                       |
 
 ## Claim register
 

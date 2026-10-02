@@ -4,8 +4,8 @@ import { createApiClient } from "@/lib/api/client";
 describe("createApiClient", () => {
   afterEach(() => vi.restoreAllMocks());
   it("sends service token and session headers to the base URL", async () => {
-    const fetchMock = vi.fn(
-      async (_input: RequestInfo | URL) =>
+    const fetchMock = vi.fn<(input: RequestInfo | URL) => Promise<Response>>(
+      async () =>
         new Response(JSON.stringify({ status: "ok", version: "0.1.0-demo" }), {
           status: 200,
           headers: { "content-type": "application/json" },
