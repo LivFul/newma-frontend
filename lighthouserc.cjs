@@ -1,7 +1,8 @@
 // lighthouserc.cjs — budgets from prompt §3.6 / sprint plan §5 row D-07.
 // Locally it builds and serves on port 3100 (the default port is busy on dev machines). In CI,
 // LHCI_URL points at the Vercel preview (with the protection-bypass query parameters, because
-// Lighthouse cannot set headers) and no local server is started.
+// Lighthouse cannot set headers) and no local server is started. The CI report stays on the filesystem
+// (uploaded as a workflow artifact) because a public report URL would embed the bypass token.
 const PORT = 3100;
 const remoteUrl = process.env.LHCI_URL;
 const localServer = {
@@ -26,6 +27,8 @@ module.exports = {
         "total-byte-weight": ["warn", { maxNumericValue: 1_000_000 }],
       },
     },
-    upload: { target: "temporary-public-storage" },
+    upload: remoteUrl
+      ? { target: "filesystem", outputDir: ".lighthouseci" }
+      : { target: "temporary-public-storage" },
   },
 };
