@@ -63,13 +63,13 @@ test.describe("demo jobs", { tag: "@needs-backend" }, () => {
     const firstPoll = page.waitForResponse((r) => POLL_URL.test(r.url()));
     await page.getByRole("button", { name: "Start simulated screening" }).click();
     await page.waitForURL(/\/demo\/jobs\/[^/]+$/);
-    // Measure from the request leaving the browser to the body being fully received.
+    // Playwright's timing().responseEnd is milliseconds relative to the request start (startTime
+    // is an epoch timestamp, so never subtract the two): the body must be fully received quickly.
     const poll = await firstPoll;
-    const started = poll.request().timing().startTime;
     await poll.finished();
     const responseEnd = poll.request().timing().responseEnd;
     expect(responseEnd).toBeGreaterThan(0);
-    expect(responseEnd - started).toBeLessThan(ONE_SHOT_BOUND_MS);
+    expect(responseEnd).toBeLessThan(ONE_SHOT_BOUND_MS);
     expect(await poll.body()).not.toHaveLength(0);
   });
 });
