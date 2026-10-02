@@ -1,0 +1,88 @@
+import { type NextRequest, NextResponse } from "next/server";
+import { isPersonaId } from "@/lib/personas";
+import { demoFetch } from "@/lib/demo/api";
+import {
+  clearSessionCookie,
+  errorJson,
+  noStore,
+  readJson,
+  seeOther,
+  withDemo,
+  withSession,
+} from "@/lib/demo/bff";
+import { isDemoMode } from "@/lib/demo/mode";
+import { sessionCookieName, sessionCookieOptions } from "@/lib/demo/session";
+import type { SessionCreated } from "@/lib/demo/types";
+
+const FALLBACK_MAX_AGE_SECONDS = 8 * 60 * 60;
+const FORM_CONTENT_TYPE = "application/x-www-form-urlencoded";
+
+const isFormPost = (req: NextRequest) =>
+  (req.headers.get("content-type") ?? "").startsWith(FORM_CONTENT_TYPE);
+
+async function readPersona(req: NextRequest, form: boolean): Promise<unknown> {
+  if (form) return (await req.formData()).get("persona");
+  const body = await readJson(req);
+  return typeof body === "object" && body !== null
+    ? (body as { persona?: unknown }).persona
+    : undefined;
+}
+
+function maxAgeFrom(expiresAt: string): number {
+  const seconds = Math.floor((Date.parse(expiresAt) - Date.now()) / 1000);
+  return Number.isFinite(seconds) && seconds > 0 ? seconds : FALLBACK_MAX_AGE_SECONDS;
+}
+
+function invalidPersona(form: boolean): NextResponse {
+  return form
+    ? seeOther("/access?reason=invalid")
+    : errorJson(400, "invalid_persona", "Unknown persona.");
+}
+
+const createSession = withDemo(async (req, secure) => {
+  const form = isFormPost(req);
+  const persona = await readPersona(req, form);
+  if (!isPersonaId(persona)) return invalidPersona(form);
+  const { data } = await demoFetch<SessionCreated>("/v1/demo/sessions", {
+    method: "POST",
+    body: { persona },
+  });
+  if (!data) return errorJson(502, "upstream_error", "The demo API returned no session.");
+  const { session_id, ...publicSession } = data;
+  const response = form ? seeOther("/demo") : noStore(publicSession, { status: 201 });
+  response.cookies.set(
+    sessionCookieName(secure),
+    session_id,
+    sessionCookieOptions(secure, maxAgeFrom(data.expires_at)),
+  );
+  return response;
+});
+
+/**
+ * POST: create a demo session. Form posts (from /access) get a 303 to /demo; JSON gets 201.
+ * With the demo switched off a form post goes back to /access with an explanation (A-P2-F07);
+ * fetch callers keep the 404 from withDemo.
+ */
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  if (!isDemoMode() && isFormPost(req)) return seeOther("/access?reason=disabled");
+  return createSession(req);
+}
+
+const signedOut = (secure: boolean) =>
+  clearSessionCookie(new NextResponse(null, { status: 204 }), secure);
+
+const revoke = withSession(async ({ sessionId, secure }) => {
+  try {
+    await demoFetch("/v1/demo/sessions/current", { method: "DELETE", sessionId });
+  } catch (error) {
+    // The browser-side session ends regardless; the backend row expires on its own.
+    console.error("demo sign-out: backend DELETE failed", error);
+  }
+  return signedOut(secure);
+});
+
+/** DELETE: sign out. Always clears the cookie; a backend failure or missing cookie is still a 204. */
+export const DELETE = withDemo(async (req, secure) => {
+  const response = await revoke(req);
+  return response.status === 401 ? signedOut(secure) : response;
+});
