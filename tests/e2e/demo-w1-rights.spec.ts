@@ -6,6 +6,7 @@ import {
   expectNoAxeViolations,
   needsBackend,
   signIn,
+  switchPersona,
 } from "../support/demo";
 
 const ROUTE = "/demo/w1-rights";
@@ -87,5 +88,50 @@ test.describe("W1 rights and policy", { tag: "@needs-backend" }, () => {
       .click();
     await expect(page.getByRole("dialog")).toBeVisible();
     await expectNoAxeViolations(page);
+  });
+
+  test("w1 grievance indicator and queue", async ({ page, baseURL }) => {
+    await signIn(page, "community_liaison");
+    await page.goto(ROUTE);
+    // A fresh tenant: no indicator and an empty queue.
+    await expect(page.getByTestId("grievance-indicator").first()).toHaveText("None");
+    await expect(page.getByText("No grievances in the queue.")).toBeVisible();
+
+    const records = (await (await page.request.get("/api/demo/rights/records")).json()) as {
+      items: { id: string; status: string; subject_display_name: string }[];
+    };
+    const record = records.items.find((r) => r.status === "valid") ?? records.items[0];
+    const raised = await page.request.post("/api/demo/grievances", {
+      headers: { origin: baseURL ?? "" },
+      form: {
+        rights_record_id: record.id,
+        category: "obligation_not_met",
+        description: "The promised annual report did not arrive.",
+        idempotency_key: `e2e-w1-${Date.now()}`,
+      },
+      maxRedirects: 0,
+    });
+    expect(raised.status()).toBe(303);
+
+    await switchPersona(page, "data_steward");
+    await page.goto(ROUTE);
+    const row = page
+      .getByTestId("rights-row-valid")
+      .filter({ hasText: record.subject_display_name });
+    await expect(row.getByTestId("grievance-indicator")).toHaveText("1 open");
+    const queued = page.getByTestId("grievance-row");
+    await expect(queued).toHaveCount(1);
+    await expect(queued).toContainText("Open");
+    await queued.getByRole("button", { name: /Acknowledge/ }).click();
+    await expect(queued).toContainText("Acknowledged", { timeout: SLOW_MS });
+    await expect(row.getByTestId("grievance-indicator")).toHaveText("None", { timeout: SLOW_MS });
+
+    // Persona check: a partner sees the notice and a forced list request is refused.
+    await switchPersona(page, "partner");
+    await page.goto(ROUTE);
+    await expect(page.getByText(/Only .*Data steward.* can do this/).first()).toBeVisible();
+    const forced = await page.request.get("/api/demo/grievances");
+    expect(forced.status()).toBe(403);
+    expect((await forced.json()).code).toBe("persona_forbidden");
   });
 });

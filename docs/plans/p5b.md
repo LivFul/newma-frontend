@@ -165,7 +165,7 @@ Tests: pickers keep documented keys and drop everything else (table test over th
 
 **Files:** `src/app/(platform)/demo/w1-rights/_components/rights-table.tsx` (new "Grievances" column: `open_grievance_count` as text, for example "2 open", "None"), `_components/grievance-queue.tsx` (server table: record, category, status, raised, description; client `AcknowledgeButton` for `data_steward`, `useAction`, `router.refresh()`), `w1-rights/page.tsx` (a "Grievance queue" section; the list is requested only when `canAct(persona, "view_grievances")`, other personas get a short notice); tests `tests/unit/demo/{rights-table-grievances,grievance-queue}.test.tsx`; the P3 W1 specs stay green and `tests/e2e/demo-w1-rights.spec.ts` gains `w1 grievance indicator and queue` (a fresh tenant shows no indicator and an empty queue; a grievance raised through `page.request` as `community_liaison` shows the indicator and the queue row for `data_steward`, who acknowledges it; `partner` sees the queue notice and a forced list request returns 403).
 
-- [ ] Commit: `feat(demo): W1 rights registry shows grievance indicators and a queue with acknowledgement`
+- [x] Commit: `feat(demo): W1 rights registry shows grievance indicators and a queue with acknowledgement`
 
 ### Task 6: W10 BFF form handler, page, grievance form and specs
 
