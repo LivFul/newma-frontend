@@ -107,3 +107,37 @@ describe("P3 contract — D-13 (W3)", () => {
     }
   });
 });
+
+describe("P3 contract — D-14 (W4)", () => {
+  it("pins the W4 paths and drops the hand-written block", () => {
+    for (const p of [
+      "/v1/candidates",
+      "/v1/candidates/{candidate_id}/gates",
+      "/v1/candidates/{candidate_id}/evidence-packages",
+      "/v1/candidates/{candidate_id}/evidence-packages/diff",
+      "/v1/gates/{gate_id}/decisions",
+    ]) {
+      expect(schema).toContain(`"${p}": {`);
+    }
+    expect(contractPaths).not.toMatch(/W4Paths/);
+  });
+
+  it("derives W4 types from the generated schema", () => {
+    for (const name of [
+      "CandidateOut",
+      "GateTracker",
+      "GateOut",
+      "GateDecisionOut",
+      "GateDecisionRequest",
+      "EvidenceDiffOut",
+      "EvidencePackageSummary",
+    ]) {
+      expect(types).toContain(`Schemas["${name}"]`);
+    }
+  });
+
+  it("keeps the gate vocabularies equal to the schema enums", async () => {
+    const { GATE_STAGES } = await import("@/lib/demo/types");
+    expect([...GATE_STAGES]).toEqual(enumOf("GateOut", "stage"));
+  });
+});

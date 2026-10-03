@@ -21,7 +21,7 @@ const gate = (stage: Gate["stage"], status: Gate["status"], over: Partial<Gate> 
   status,
   missing_requirements: [],
   checks: [],
-  rationale: null,
+  rationale: "",
   evidence_package_version: null,
   decided_at: null,
   signature: null,

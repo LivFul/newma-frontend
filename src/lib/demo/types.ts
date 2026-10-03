@@ -91,81 +91,26 @@ export type Hypothesis = Schemas["HypothesisOut"];
 export type WorkPackageProposal = Schemas["WorkPackageProposal"];
 export type AgentQueryRequest = Schemas["AgentQueryCreate"];
 
-export const GATE_STAGES = ["H0", "H1", "H2", "H3", "L1", "L2", "D"] as const;
-export type GateStage = (typeof GATE_STAGES)[number];
-export type GateStatus = "NOT_STARTED" | "PENDING" | "PASS" | "FAIL" | "HOLD" | "INVALIDATED";
-
-export type Candidate = Readonly<{
-  id: string;
-  compound_id: string;
-  display_id: string;
-  rank: number;
-  current_stage: GateStage;
-  last_reviewed_update_at: string | null;
-}>;
-
-export type Gate = Readonly<{
-  id: string;
-  stage: GateStage;
-  status: GateStatus;
-  missing_requirements: readonly string[];
-  checks: readonly Readonly<{ code: string; passed: boolean; message: string }>[];
-  rationale: string | null;
-  evidence_package_version: number | null;
-  decided_at: string | null;
-  signature: string | null;
-  kid: string | null;
-}>;
-
-export type CandidateGates = Readonly<{
-  candidate_id: string;
-  current_stage: GateStage;
-  can_advance_to: GateStage | null;
-  gates: readonly Gate[];
-}>;
-
-export type GateDecisionValue = "pass" | "fail" | "hold";
-
-export type GateDecisionRequest = Readonly<{
-  decision: GateDecisionValue;
-  rationale: string;
-  evidence_package_version: number;
-  confirm_candidate_display_id: string;
-  idempotency_key: string;
-}>;
-
-export type GateDecision = Readonly<{
-  id: string;
-  gate_id: string;
-  candidate_id: string;
-  stage: GateStage;
-  decision: GateDecisionValue;
-  status_after: GateStatus;
-  rationale: string;
-  evidence_package_version: number;
-  manifest: unknown;
-  manifest_sha256: string;
-  signature: string;
-  kid: string;
-  signature_label: string;
-  event_id: string;
-  decided_at: string;
-}>;
-
-export type EvidencePackage = Readonly<{
-  version: number;
-  stage: GateStage;
-  created_at: string;
-  content_sha256: string;
-}>;
-
-export type EvidenceDiff = Readonly<{
-  from_version: number;
-  to_version: number;
-  added: readonly Readonly<{ path: string; value: unknown }>[];
-  removed: readonly Readonly<{ path: string; value: unknown }>[];
-  changed: readonly Readonly<{ path: string; before: unknown; after: unknown }>[];
-}>;
+// W4 (D-14): generated from the pinned contract.
+export const GATE_STAGES = [
+  "H0",
+  "H1",
+  "H2",
+  "H3",
+  "L1",
+  "L2",
+  "D",
+] as const satisfies readonly Schemas["GateOut"]["stage"][];
+export type GateStage = Schemas["GateOut"]["stage"];
+export type GateStatus = Schemas["GateOut"]["status"];
+export type Candidate = Schemas["CandidateOut"];
+export type Gate = Schemas["GateOut"];
+export type CandidateGates = Schemas["GateTracker"];
+export type GateDecisionValue = Schemas["GateDecisionRequest"]["decision"];
+export type GateDecisionRequest = Schemas["GateDecisionRequest"];
+export type GateDecision = Schemas["GateDecisionOut"];
+export type EvidencePackage = Schemas["EvidencePackageSummary"];
+export type EvidenceDiff = Schemas["EvidenceDiffOut"];
 
 export const ENTITY_TYPES = [
   "rights_record",
