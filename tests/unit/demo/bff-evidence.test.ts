@@ -17,6 +17,14 @@ describe("W2 evidence BFF", () => {
     expect(sentHeaders(fetchMock).get("x-demo-session")).toBe(SID);
   });
 
+  it("accepts a long opaque cursor (backend keys reach ~2 KB) but not a huge one", async () => {
+    const fetchMock = armBff([Response.json({ items: [], next_cursor: null })]);
+    const long = "a".repeat(2200);
+    expect((await TAXA(bffRequest(`/api/demo/taxa?cursor=${long}`))).status).toBe(200);
+    expect(sentUrl(fetchMock)).toContain(long);
+    expect((await TAXA(bffRequest(`/api/demo/taxa?cursor=${"a".repeat(4097)}`))).status).toBe(422);
+  });
+
   it("lists compounds without a query", async () => {
     const fetchMock = armBff([Response.json({ items: [], next_cursor: null })]);
     await COMPOUNDS(bffRequest("/api/demo/compounds"));

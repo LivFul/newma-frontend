@@ -57,6 +57,57 @@ describe("W1 rights BFF", () => {
     expect(sentBody(fetchMock)).toEqual(forwarded);
   });
 
+  const validRecord = {
+    subject_type: "taxon",
+    subject_id: RID,
+    authority: "Community Cooperative A — fictional",
+    permitted_uses: ["research"],
+    restrictions: ["no_commercial_use"],
+    jurisdiction: "XX",
+    valid_from: "2026-01-01",
+  };
+
+  it.each([
+    ["an over-long authority", { authority: "a".repeat(201) }],
+    ["an over-long jurisdiction", { jurisdiction: "j".repeat(65) }],
+    ["too many restrictions", { restrictions: Array.from({ length: 21 }, (_, i) => `r${i}`) }],
+    ["an over-long restriction", { restrictions: ["r".repeat(121)] }],
+    ["duplicate permitted uses", { permitted_uses: ["research", "research"] }],
+    ["an empty permitted_uses", { permitted_uses: [] }],
+    ["valid_from that is not an ISO date", { valid_from: "01/01/2026" }],
+    ["valid_from that is not a real date", { valid_from: "2026-02-31" }],
+    ["valid_until that is not an ISO date", { valid_until: "soon" }],
+    ["an over-long PIC reference", { pic_reference: "p".repeat(81) }],
+  ])("rejects %s", async (_label, patch) => {
+    const fetchMock = armBff([]);
+    const response = await CREATE(
+      bffRequest("/x", { method: "POST", json: { ...validRecord, ...patch } }),
+    );
+    expect(response.status).toBe(422);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("accepts a valid_until ISO date and null-free optional references", async () => {
+    const fetchMock = armBff([Response.json({ id: "r" }, { status: 201 })]);
+    const body = { ...validRecord, valid_until: "2027-12-31", pic_reference: "PIC-DEMO-1" };
+    expect((await CREATE(bffRequest("/x", { method: "POST", json: body }))).status).toBe(201);
+    expect(sentBody(fetchMock)).toEqual(body);
+  });
+
+  it("caps the withdrawal reason and the evaluation jurisdiction", async () => {
+    const fetchMock = armBff([]);
+    const long = await WITHDRAW(
+      bffRequest("/x", { method: "POST", json: { reason: "r".repeat(2001) } }),
+      ctx(RID),
+    );
+    expect(long.status).toBe(422);
+    const jurisdiction = await EVALUATE(
+      bffRequest("/x", { method: "POST", json: { ...evaluation, jurisdiction: "j".repeat(65) } }),
+    );
+    expect(jurisdiction.status).toBe(422);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("rejects a record with an unknown purpose", async () => {
     const fetchMock = armBff([]);
     const response = await CREATE(

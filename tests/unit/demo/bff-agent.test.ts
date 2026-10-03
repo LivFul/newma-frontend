@@ -39,6 +39,8 @@ describe("W3 agent BFF", () => {
     { ...request, target_id: "../x" },
     { ...request, budget_credits: -1 },
     { ...request, budget_credits: "60" },
+    { ...request, budget_credits: 1_000_001 },
+    { ...request, target_id: "Target-alpha" },
     { ...request, idempotency_key: "bad key" },
   ])("rejects %j", async (body) => {
     const fetchMock = armBff([]);

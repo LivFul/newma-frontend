@@ -254,6 +254,7 @@ describe("isCursor", () => {
     const { isCursor } = await import("@/lib/demo/parse-curation");
     expect(isCursor("eyJrIjoiYSJ9")).toBe(true);
     expect(isCursor("a b")).toBe(false);
-    expect(isCursor("x".repeat(513))).toBe(false);
+    expect(isCursor("x".repeat(2200))).toBe(true);
+    expect(isCursor("x".repeat(4097))).toBe(false);
   });
 });

@@ -14,6 +14,25 @@ export const isFiniteNumber = (value: unknown): value is number =>
 export const isPositiveInt = (value: unknown): value is number =>
   Number.isSafeInteger(value) && (value as number) >= 1;
 
+/** A real calendar date in YYYY-MM-DD form. */
+export function isIsoDate(value: unknown): value is string {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value);
+}
+
+export const isBoundedString = (value: unknown, max: number): value is string =>
+  isNonEmptyString(value) && value.length <= max;
+
+export const isBoundedStringArray = (
+  value: unknown,
+  maxItems: number,
+  maxLength: number,
+): value is string[] =>
+  Array.isArray(value) &&
+  value.length <= maxItems &&
+  value.every((v) => isBoundedString(v, maxLength));
+
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const isUuid = (value: unknown): value is string =>
   typeof value === "string" && UUID.test(value);

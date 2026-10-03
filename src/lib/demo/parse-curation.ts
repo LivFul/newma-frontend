@@ -2,7 +2,8 @@ import { isEvidenceLabel } from "@/lib/evidence";
 import { isNonEmptyString, isRecord, isUuid, oneOf, withIdempotencyKey } from "./guards";
 
 // W2 query and body guards at the BFF boundary; undefined means "reject with 422".
-const CURSOR = /^[A-Za-z0-9_-]{1,512}$/;
+// Backend cursors are unpadded base64url of {k, id}; k can be up to 400 characters of UTF-8.
+const CURSOR = /^[A-Za-z0-9_-]{1,4096}$/;
 const LIMIT = /^(?:[1-9]|[1-9][0-9]|100)$/;
 const isClaimStatus = oneOf([
   "pending_review",
