@@ -53,7 +53,7 @@ export default async function ProvenancePage({ searchParams }: { searchParams: S
         timeline, recompute the hash in your browser and verify the demo signature.
       </WorkflowHeader>
       <ErrorNotice error={rights.error ?? candidates.error} />
-      {type || id ? (
+      {type && id ? (
         <p role="alert" className="text-sm text-danger">
           Choose a known entity type and a valid id.
         </p>

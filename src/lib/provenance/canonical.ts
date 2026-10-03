@@ -9,7 +9,8 @@
 // - Numbers: safe integers print as digits; every other finite number prints as Python repr
 //   (shortest round-trip digits; exponent form when exp < -4 or exp >= 16, e.g. 1e+21, 1e-05).
 //   JSON numbers lose the int/float distinction in JS, so an integral float such as 2.0 from
-//   the backend prints as "2" here (the backend keeps integral values as ints in manifests).
+//   the backend prints as "2" here, and an int beyond ±(2^53−1) prints as a float; the backend
+//   keeps manifest integers within the JS-safe range (vectors.json "integers" note).
 
 export class CanonicalJsonError extends Error {
   constructor(message: string) {
@@ -45,6 +46,8 @@ export function pythonFloatRepr(value: number): string {
 
 function canonicalNumber(value: number): string {
   if (!Number.isFinite(value)) throw new CanonicalJsonError("Non-finite number.");
+  // Python ints are never -0, so -0 can only be the float -0.0.
+  if (Object.is(value, -0)) return "-0.0";
   return Number.isSafeInteger(value) ? String(value) : pythonFloatRepr(value);
 }
 
@@ -60,24 +63,37 @@ export function compareCodePoints(a: string, b: string): number {
   return left.length - right.length;
 }
 
-function canonicalObject(value: Record<string, unknown>): string {
+// Manifests are shallow; the cap only stops hostile input from overflowing the stack.
+export const MAX_DEPTH = 64;
+
+function canonicalObject(value: Record<string, unknown>, depth: number): string {
   const keys = Object.keys(value).sort(compareCodePoints);
-  const members = keys.map((key) => `${canonicalString(key)}:${canonicalJson(value[key])}`);
+  const members = keys.map(
+    (key) => `${canonicalString(key)}:${canonicalAt(value[key], depth + 1)}`,
+  );
   return `{${members.join(",")}}`;
 }
 
-export function canonicalJson(value: unknown): string {
+const isPlainObject = (value: object): boolean => {
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+};
+
+function canonicalAt(value: unknown, depth: number): string {
+  if (depth > MAX_DEPTH) throw new CanonicalJsonError(`Nesting deeper than ${MAX_DEPTH}.`);
   if (value === null) return "null";
   if (value === true) return "true";
   if (value === false) return "false";
   if (typeof value === "string") return canonicalString(value);
   if (typeof value === "number") return canonicalNumber(value);
-  if (Array.isArray(value)) return `[${value.map((item) => canonicalJson(item)).join(",")}]`;
-  if (typeof value === "object" && Object.getPrototypeOf(value) === Object.prototype) {
-    return canonicalObject(value as Record<string, unknown>);
-  }
-  if (typeof value === "object" && Object.getPrototypeOf(value) === null) {
-    return canonicalObject(value as Record<string, unknown>);
+  if (Array.isArray(value))
+    return `[${value.map((item) => canonicalAt(item, depth + 1)).join(",")}]`;
+  if (typeof value === "object" && isPlainObject(value)) {
+    return canonicalObject(value as Record<string, unknown>, depth);
   }
   throw new CanonicalJsonError(`Cannot canonicalise a value of type ${typeof value}.`);
+}
+
+export function canonicalJson(value: unknown): string {
+  return canonicalAt(value, 0);
 }

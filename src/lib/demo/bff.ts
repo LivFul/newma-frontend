@@ -144,6 +144,8 @@ export function withDemo(handler: (req: NextRequest, secure: boolean) => Promise
 
 export { isSafeId } from "./safe-id";
 
+// Demo request bodies are small forms and manifests; anything larger is refused before parsing.
+const MAX_JSON_BYTES = 256 * 1024;
 const JSON_CONTENT_TYPE = /^application\/json(\s*;|$)/i;
 
 /** Parses a JSON body; a missing or different Content-Type is a 415 before any parsing. */
@@ -152,5 +154,13 @@ export async function readJson(req: NextRequest): Promise<unknown> {
   if (!JSON_CONTENT_TYPE.test(contentType)) {
     throw new BffError(415, "unsupported_media_type", "Send application/json.");
   }
-  return req.json().catch(() => undefined);
+  const text = await req.text().catch(() => "");
+  if (new TextEncoder().encode(text).length > MAX_JSON_BYTES) {
+    throw new BffError(413, "payload_too_large", "The request body is too large.");
+  }
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return undefined;
+  }
 }

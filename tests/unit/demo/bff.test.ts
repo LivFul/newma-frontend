@@ -166,3 +166,15 @@ describe("seeOther", () => {
     expect(response.headers.get("location")).toBe("/access?reason=expired");
   });
 });
+
+describe("readJson size cap", () => {
+  afterEach(disarmBff);
+  it("refuses a body over 256 KiB with 413", async () => {
+    armBff([]);
+    const handler = withSession(async ({ req }) => noStore(await readJson(req)));
+    const big = { blob: "x".repeat(300 * 1024) };
+    const response = await handler(bffRequest("/x", { method: "POST", json: big }));
+    expect(response.status).toBe(413);
+    expect((await response.json()).code).toBe("payload_too_large");
+  });
+});

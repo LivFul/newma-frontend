@@ -61,6 +61,15 @@ describe("canonicalJson rules", () => {
     expect(() => canonicalJson({ ["\uDC00"]: 1 })).toThrow(CanonicalJsonError);
   });
 
+  it("prints negative zero as Python float -0.0 (a Python int is never -0)", () => {
+    expect(canonicalJson(-0)).toBe("-0.0");
+  });
+
+  it("rejects nesting deeper than the cap (no stack overflow on hostile input)", () => {
+    const deep = Array.from({ length: 200 }).reduce<unknown>((inner) => ({ a: inner }), 1);
+    expect(() => canonicalJson(deep)).toThrow(CanonicalJsonError);
+  });
+
   it("does not mutate its input", () => {
     const input = Object.freeze({ b: Object.freeze([2, 1]), a: 1 });
     expect(canonicalJson(input)).toBe('{"a":1,"b":[2,1]}');
