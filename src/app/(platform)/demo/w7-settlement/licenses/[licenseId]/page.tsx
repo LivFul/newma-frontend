@@ -76,7 +76,7 @@ export default async function LicensePage({ params }: { params: Params }) {
           Non-monetary benefits
         </h2>
         <ErrorNotice error={benefits.error} />
-        <BenefitTracker items={benefits.data?.items ?? []} />
+        <BenefitTracker items={benefits.data?.items ?? []} persona={session.persona} />
       </section>
       <section aria-labelledby="events-heading" className="space-y-3">
         <h2 id="events-heading" className="text-xl font-semibold">

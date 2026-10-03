@@ -2,6 +2,8 @@ import { requireSession } from "@/lib/demo/current-session";
 import { canAct } from "@/lib/demo/persona-actions";
 import { load } from "@/lib/demo/server-data";
 import type {
+  Beneficiary,
+  BenefitItem,
   Items,
   License,
   LicenseOptions,
@@ -13,6 +15,8 @@ import { PersonaForbiddenNotice } from "../_components/persona-forbidden-notice"
 import { SimulatedLabel } from "../_components/simulated-label";
 import { WorkflowHeader } from "../_components/workflow-header";
 import { AnchorNotice } from "./_components/anchor-notice";
+import { BeneficiaryView } from "./_components/beneficiary-view";
+import { BenefitTracker } from "./_components/benefit-tracker";
 import { LicenseList } from "./_components/license-list";
 import { LicenseRequestForm } from "./_components/license-request-form";
 import { OutageToggle } from "./_components/outage-toggle";
@@ -22,11 +26,13 @@ const OUTAGE_OFF: OutageState = { active: false, label: "Optional, simulated", u
 
 export default async function SettlementOverviewPage() {
   const session = await requireSession();
-  const [options, licenses, settlements, outage] = await Promise.all([
+  const [options, licenses, settlements, outage, benefits, beneficiaries] = await Promise.all([
     load<LicenseOptions>("/v1/licenses/options"),
     load<Items<License>>("/v1/licenses"),
     load<Items<SettlementSummary>>("/v1/settlements"),
     load<OutageState>("/v1/demo/anchoring/outage"),
+    load<Items<BenefitItem>>("/v1/benefits"),
+    load<Items<Beneficiary>>("/v1/beneficiaries"),
   ]);
   const allowed = canAct(session.persona, "request_license");
   return (
@@ -45,7 +51,16 @@ export default async function SettlementOverviewPage() {
         illustrative split in demo credits, two different approvers authorise it, and a signed
         commitment can be verified in W6.
       </WorkflowHeader>
-      <ErrorNotice error={options.error ?? licenses.error ?? settlements.error ?? outage.error} />
+      <ErrorNotice
+        error={
+          options.error ??
+          licenses.error ??
+          settlements.error ??
+          outage.error ??
+          benefits.error ??
+          beneficiaries.error
+        }
+      />
       <section aria-labelledby="request-heading" className="space-y-3">
         <h2 id="request-heading" className="text-xl font-semibold">
           Request a license
@@ -66,6 +81,18 @@ export default async function SettlementOverviewPage() {
           Settlements
         </h2>
         <SettlementList settlements={settlements.data?.items ?? []} />
+      </section>
+      <section aria-labelledby="benefits-heading" className="space-y-3">
+        <h2 id="benefits-heading" className="text-xl font-semibold">
+          Non-monetary benefits
+        </h2>
+        <BenefitTracker items={benefits.data?.items ?? []} persona={session.persona} />
+      </section>
+      <section aria-labelledby="beneficiaries-heading" className="space-y-3">
+        <h2 id="beneficiaries-heading" className="text-xl font-semibold">
+          Beneficiaries
+        </h2>
+        <BeneficiaryView beneficiaries={beneficiaries.data?.items ?? []} />
       </section>
       <section aria-labelledby="anchoring-heading" className="space-y-3">
         <h2 id="anchoring-heading" className="text-xl font-semibold">

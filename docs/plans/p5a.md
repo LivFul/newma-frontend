@@ -217,9 +217,9 @@ TDD steps:
 
 TDD steps:
 
-- [ ] Failing Vitest first: tracker status progression, buttons per persona, `benefit_state_conflict` message, beneficiary totals formatting and empty state, W6 event page renders the workbench for a fixture and 404s on an unsafe id.
-- [ ] Implement.
-- [ ] Commit: `feat(demo): W7 non-monetary benefit tracker, beneficiary view and W6 single-event verification page`
+- [x] Failing Vitest first: tracker status progression, buttons per persona, `benefit_state_conflict` message, beneficiary totals formatting and empty state, W6 event page renders the workbench for a fixture and 404s on an unsafe id.
+- [x] Implement.
+- [x] Commit: `feat(demo): W7 non-monetary benefit tracker, beneficiary view and W6 single-event verification page`
 
 ### Task 8: Playwright specs (`@needs-backend`), a11y and banner
 

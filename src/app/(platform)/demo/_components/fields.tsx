@@ -41,7 +41,7 @@ type TextFieldProps = Readonly<{
   value: string;
   onChange: (value: string) => void;
   multiline?: boolean;
-  type?: "text" | "number";
+  type?: "text" | "number" | "date";
   hint?: ReactNode;
   autoComplete?: string;
 }>;
