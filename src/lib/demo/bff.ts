@@ -142,11 +142,7 @@ export function withDemo(handler: (req: NextRequest, secure: boolean) => Promise
   };
 }
 
-const SAFE_ID = /^[A-Za-z0-9_-]{1,128}$/;
-
-export function isSafeId(value: string): boolean {
-  return SAFE_ID.test(value);
-}
+export { isSafeId } from "./safe-id";
 
 const JSON_CONTENT_TYPE = /^application\/json(\s*;|$)/i;
 
