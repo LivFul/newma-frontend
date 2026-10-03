@@ -84,6 +84,9 @@ test("WCAG 2.4.11: no keyboard-focused element is hidden under the sticky header
     const state = await page.evaluate(() => {
       const el = document.activeElement;
       if (!el || el === document.body || el.tagName === "NEXTJS-PORTAL") return null;
+      // Only the site's own landmarks are measured: a deployment toolbar or other injected widget
+      // (Vercel previews add one) can take focus at the end of the tab order and is not ours.
+      if (!el.closest("[data-site-header], main, footer")) return "foreign";
       return {
         inHeader: el.closest("[data-site-header]") !== null,
         isSkip: el.textContent === "Skip to content",
@@ -91,6 +94,7 @@ test("WCAG 2.4.11: no keyboard-focused element is hidden under the sticky header
       };
     });
     if (!state) break; // Tab left the page content (browser UI, or the dev overlay in `next dev`).
+    if (state === "foreign") continue;
     if (state.inHeader || state.isSkip) continue;
     expect(state.top).toBeGreaterThanOrEqual(headerHeight - 1);
     checked += 1;
@@ -170,6 +174,9 @@ test("WCAG 2.4.11: Shift+Tab back up the page never leaves focus under the stick
     const state = await page.evaluate(() => {
       const el = document.activeElement;
       if (!el || el === document.body || el.tagName === "NEXTJS-PORTAL") return null;
+      // Only the site's own landmarks are measured: a deployment toolbar or other injected widget
+      // (Vercel previews add one) can take focus at the end of the tab order and is not ours.
+      if (!el.closest("[data-site-header], main, footer")) return "foreign";
       return {
         inHeader: el.closest("[data-site-header]") !== null,
         isSkip: el.textContent === "Skip to content",
@@ -177,6 +184,7 @@ test("WCAG 2.4.11: Shift+Tab back up the page never leaves focus under the stick
       };
     });
     if (!state) break;
+    if (state === "foreign") continue;
     if (state.inHeader || state.isSkip) continue;
     expect(state.top).toBeGreaterThanOrEqual(headerHeight - 1);
     checked += 1;
