@@ -59,102 +59,17 @@ export type PolicyRequest = Schemas["PolicyEvaluateRequest"];
 export type PolicyDecision = Schemas["PolicyDecisionOut"];
 export type WithdrawResult = Schemas["WithdrawResult"];
 
-export type EvidenceRef = Readonly<{
-  label: EvidenceLabel;
-  claim_id: string | null;
-  source_ref: string | null;
-}>;
-
-export type Taxon = Readonly<{
-  id: string;
-  display_name: string;
-  accepted_name: string;
-  synonyms: readonly string[];
-  verification_status: string;
-  evidence: readonly EvidenceRef[];
-  withheld_fields: readonly string[];
-  synthetic: boolean;
-}>;
-
-export type ConstituentRelationship =
-  | "reported_in_taxon"
-  | "detected_in_sample"
-  | "tentatively_annotated"
-  | "isolated_structure_confirmed";
-
-export type Compound = Readonly<{
-  id: string;
-  display_id: string;
-  identity_status: ConstituentRelationship;
-  stereochemistry_status: "defined" | "ambiguous";
-  quarantined: boolean;
-  evidence: readonly EvidenceRef[];
-  withheld_fields: readonly string[];
-  synthetic: boolean;
-}>;
-
-export type Observation = Readonly<{
-  id: string;
-  compound_id: string | null;
-  target_id: string;
-  endpoint: string;
-  value: number | null;
-  units: string;
-  qualifier: string;
-  concentration_um: number | null;
-  replicate_index: number;
-  run_status: string;
-  evidence_label: EvidenceLabel;
-  out_of_domain: boolean;
-  revision: number;
-  superseded: boolean;
-  withheld_fields: readonly string[];
-  synthetic: boolean;
-}>;
-
-export type SourceRecord = Readonly<{
-  id: string;
-  title: string;
-  source_type: string;
-  source_ref: string;
-  clearance_status: "cleared" | "uncleared";
-  rights_record_id: string | null;
-  synthetic: boolean;
-}>;
-
-export type ClaimStatus = "pending_review" | "quarantined" | "approved" | "rejected" | "released";
-
-export type Claim = Readonly<{
-  id: string;
-  source_record_id: string;
-  subject_type: string;
-  subject_id: string;
-  statement_synthetic: string;
-  source_location: string;
-  extraction_method: string;
-  evidence_label: EvidenceLabel;
-  confidence: number;
-  status: ClaimStatus;
-  quarantine_reason: string | null;
-  reviewer_persona: string | null;
-  reviewed_at: string | null;
-  release_id: string | null;
-}>;
-
-export type IngestionRun = Readonly<{
-  id: string;
-  source_record_id: string;
-  policy_decision_id: string;
-  claims: readonly Claim[];
-}>;
-
-export type CuratedRelease = Readonly<{
-  id: string;
-  version: number;
-  claim_ids: readonly string[];
-  manifest_sha256: string;
-  event_id: string;
-}>;
+// W2 (D-12): generated from the pinned contract.
+export type EvidenceRef = Schemas["EvidenceRefOut"];
+export type Taxon = Schemas["TaxonOut"];
+export type ConstituentRelationship = Schemas["CompoundOut"]["identity_status"];
+export type Compound = Schemas["CompoundOut"];
+export type Observation = Schemas["ObservationOut"];
+export type SourceRecord = Schemas["SourceRecordOut"];
+export type ClaimStatus = Schemas["ClaimOut"]["status"];
+export type Claim = Schemas["ClaimOut"];
+export type IngestionRun = Schemas["IngestionRunOut"];
+export type CuratedRelease = Schemas["ReleaseOut"];
 
 export type AgentStepKey =
   | "qualified_procedure"

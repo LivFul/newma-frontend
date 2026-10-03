@@ -55,3 +55,36 @@ describe("P3 contract — D-11 (W1)", () => {
     expect([...SUBJECT_TYPES]).toEqual(enumOf("RightsRecordCreate", "subject_type"));
   });
 });
+
+describe("P3 contract — D-12 (W2)", () => {
+  it("pins the W2 paths and drops the hand-written block", () => {
+    for (const p of [
+      "/v1/taxa",
+      "/v1/compounds",
+      "/v1/observations",
+      "/v1/curation/source-records",
+      "/v1/ingestion/runs",
+      "/v1/curation/queue",
+      "/v1/curation/claims/{claim_id}/decisions",
+      "/v1/curation/releases",
+    ]) {
+      expect(schema).toContain(`"${p}": {`);
+    }
+    expect(contractPaths).not.toMatch(/W2Paths/);
+  });
+
+  it("derives W2 types from the generated schema", () => {
+    for (const name of [
+      "TaxonOut",
+      "CompoundOut",
+      "ObservationOut",
+      "EvidenceRefOut",
+      "SourceRecordOut",
+      "ClaimOut",
+      "IngestionRunOut",
+      "ReleaseOut",
+    ]) {
+      expect(types).toContain(`Schemas["${name}"]`);
+    }
+  });
+});
