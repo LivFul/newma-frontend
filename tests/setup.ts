@@ -10,3 +10,18 @@ class ResizeObserverStub implements ResizeObserver {
 if (typeof globalThis.ResizeObserver === "undefined") {
   globalThis.ResizeObserver = ResizeObserverStub;
 }
+
+// jsdom has no matchMedia; the hero loader reads prefers-reduced-motion. Tests that care stub it.
+if (typeof window !== "undefined" && typeof window.matchMedia === "undefined") {
+  window.matchMedia = (query: string): MediaQueryList =>
+    ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    }) as MediaQueryList;
+}
