@@ -1,6 +1,7 @@
 import "server-only";
 import { type NextRequest, NextResponse } from "next/server";
 import { DemoApiError } from "./api";
+import { pickDetails } from "./error-details";
 import type { DemoErrorEnvelope } from "./types";
 import { isDemoMode } from "./mode";
 import { isSecureRequest, readSessionId, requestOrigin, sessionCookieName } from "./session";
@@ -76,23 +77,7 @@ export function sameOriginGuard(req: NextRequest): NextResponse | undefined {
   return errorJson(403, "cross_site_request", "Cross-site requests are not accepted.");
 }
 
-// Backend `details` reach the browser only for codes whose details are safe to render.
-// P3 additions follow the shared contract's "forwarded with details" list.
-const DETAILS_ALLOWLIST: ReadonlySet<string> = new Set([
-  "job_terminal",
-  "validation_error",
-  "idempotency_conflict",
-  "persona_forbidden",
-  "invalid_cursor",
-  "source_not_cleared",
-  "claim_quarantined",
-  "claim_not_approved",
-  "gate_requirements_missing",
-  "gate_not_decidable",
-  "evidence_package_stale",
-  "reconciliation_hold",
-  "retraining_not_authorized",
-]);
+// Backend `details` reach the browser only through the per-code pickers in error-details.ts.
 const UPSTREAM_UNAVAILABLE = "The demo backend is unavailable";
 
 function upstreamError(error: unknown): NextResponse {
@@ -105,9 +90,8 @@ function mapError(error: unknown, secure: boolean): NextResponse {
   if (error instanceof BffError) return errorJson(error.status, error.code, error.message);
   if (!(error instanceof DemoApiError) || error.status >= 500) return upstreamError(error);
   const base = { code: error.code, message: error.message };
-  const body: ErrorBody = DETAILS_ALLOWLIST.has(error.code)
-    ? { ...base, details: error.details }
-    : base;
+  const details = pickDetails(error.code, error.details);
+  const body: ErrorBody = details === undefined ? base : { ...base, details };
   const response = noStore(body, { status: error.status });
   return error.isInvalidSession ? clearSessionCookie(response, secure) : response;
 }

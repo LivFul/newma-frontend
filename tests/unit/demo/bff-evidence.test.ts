@@ -47,7 +47,7 @@ describe("W2 evidence BFF", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("passes a backend invalid_cursor with its details", async () => {
+  it("passes a backend invalid_cursor without its details", async () => {
     armBff([
       Response.json(
         { code: "invalid_cursor", message: "Bad cursor.", details: { cursor: "x" } },
@@ -56,10 +56,6 @@ describe("W2 evidence BFF", () => {
     ]);
     const response = await TAXA(bffRequest("/api/demo/taxa?cursor=abc"));
     expect(response.status).toBe(422);
-    expect(await response.json()).toEqual({
-      code: "invalid_cursor",
-      message: "Bad cursor.",
-      details: { cursor: "x" },
-    });
+    expect(await response.json()).toEqual({ code: "invalid_cursor", message: "Bad cursor." });
   });
 });
