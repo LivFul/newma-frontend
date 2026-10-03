@@ -9,7 +9,7 @@ export function EvidenceApprovalDialog({ settlementId }: { settlementId: string 
       trigger="Approve evidence"
       title="Approve evidence"
       description="Confirms the recorded receipts are complete enough to reconcile."
-      submitLabel="Approve evidence"
+      submitLabel="Confirm evidence approval"
       endpoint={`/api/demo/settlements/${encodeURIComponent(settlementId)}/evidence-approval`}
       initial={{ rationale: "" }}
       toBody={(draft, key) => ({ ...draft, idempotency_key: key })}

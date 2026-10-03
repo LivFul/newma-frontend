@@ -111,18 +111,16 @@ describe("BenefitTracker", () => {
   it("renders benefit_state_conflict with the current state", async () => {
     vi.stubGlobal(
       "fetch",
-      vi
-        .fn()
-        .mockResolvedValue(
-          Response.json(
-            {
-              code: "benefit_state_conflict",
-              message: "Conflict.",
-              details: { state: "delivered" },
-            },
-            { status: 409 },
-          ),
+      vi.fn().mockResolvedValue(
+        Response.json(
+          {
+            code: "benefit_state_conflict",
+            message: "Conflict.",
+            details: { state: "delivered" },
+          },
+          { status: 409 },
         ),
+      ),
     );
     const user = userEvent.setup();
     render(<BenefitTracker items={[item()]} persona="community_liaison" />);
