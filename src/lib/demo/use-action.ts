@@ -15,6 +15,9 @@ export function useAction(): Action {
     setBusy(true);
     try {
       await fn();
+    } catch (error) {
+      // Actions report failures through their own state; this only keeps the rejection handled.
+      console.error("demo action failed", error);
     } finally {
       running.current = false;
       setBusy(false);

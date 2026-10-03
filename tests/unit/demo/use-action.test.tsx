@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { useAction } from "@/lib/demo/use-action";
 
 describe("useAction", () => {
@@ -35,15 +35,18 @@ describe("useAction", () => {
     expect(calls).toBe(2);
   });
 
-  it("clears busy when the action throws", async () => {
+  it("catches a throwing action (no unhandled rejection), logs it and clears busy", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
     const { result } = renderHook(() => useAction());
     await act(async () => {
-      await result.current
-        .run(async () => {
+      await expect(
+        result.current.run(async () => {
           throw new Error("boom");
-        })
-        .catch(() => undefined);
+        }),
+      ).resolves.toBeUndefined();
     });
     expect(result.current.busy).toBe(false);
+    expect(error).toHaveBeenCalled();
+    error.mockRestore();
   });
 });
