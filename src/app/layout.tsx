@@ -3,7 +3,6 @@ import "./globals.css";
 import { HOME_META } from "@/content/home/copy";
 import { BACKGROUND_HEX } from "@/lib/brand";
 import { siteUrl } from "@/lib/site";
-import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -23,7 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
-        <Providers>{children}</Providers>
+        {children}
       </body>
     </html>
   );

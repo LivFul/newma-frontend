@@ -1,5 +1,5 @@
 "use client";
-import { Dialog as RadixDialog } from "radix-ui";
+import * as RadixDialog from "radix-ui/dialog";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 

@@ -115,7 +115,7 @@ Frontend-only assumptions (copy into `PROGRESS.md` with the shared ones):
 
 Tests: pickers keep documented keys and drop everything else (table test over the five codes plus a hostile extra key); `parseExportRequest` rejects a recipient without "fictional", a 41st path and an unknown purpose; `FieldDisclosure` renders "withheld" and the reason for a withheld row even when the fixture carries a `value` (Review Focus 2); the dashboard lists W8–W10 as links with the new names; status texts contain words as well as symbols.
 
-- [ ] Commit: `feat(demo): P5b shared plumbing, disclosure and status components, dashboard entries for W8–W10`
+- [x] Commit: `feat(demo): P5b shared plumbing, disclosure and status components, dashboard entries for W8–W10`
 
 ## D-18 — W8 partner portal and controlled export
 
@@ -131,8 +131,8 @@ Tests: pickers keep documented keys and drop everything else (table test over th
 - failure `w8 export after consent withdrawn is denied with reasons`: as `partner` issue an export; read the governing record id from `policy.rights_record_ids` in `/api/demo/assets/<id>/evidence`; switch to `community_liaison` and withdraw that record (the helper from `tests/support/w4.ts` for forced POSTs); switch back to `partner`: the register shows the earlier export as "suspended" without a body, a new export attempt shows the refusal card with reason `consent_withdrawn` and no new register row; the pack still renders with rights-gated rows "withheld". Persona check: `tenant_admin` sees the form disabled; `scientist` sees the persona notice and a forced POST returns 403 `persona_forbidden`.
 - axe scan of the page (pack, result and refusal states).
 
-- [ ] Commit: `feat(demo): W8 partner evidence pack and controlled export with withheld fields, refusal reasons and export register`
-- [ ] `pnpm api:update` when the D-18 W8 spec lands; commit `chore(api): refresh pinned contract (D-18 W8)`
+- [x] Commit: `feat(demo): W8 partner evidence pack and controlled export with withheld fields, refusal reasons and export register`
+- [x] `pnpm api:update` when the D-18 W8 spec lands; commit `chore(api): refresh pinned contract (D-18 W8)`
 
 ## D-18 — W9 campaign charter and quotas
 
@@ -148,8 +148,8 @@ Tests: pickers keep documented keys and drop everything else (table test over th
 - failure `w9 quota exhausted refuses the job with a documented code`: set the quota to the current committed value (reason required) → remaining 0 → the job probe shows `quota_exhausted` with the numbers and no job appears in the usage list → raise the quota → the same probe now creates a job and the usage shows it as reserved. Persona check: `scientist` sees both forms disabled and a forced `PUT` returns 403 `persona_forbidden`.
 - axe scan.
 
-- [ ] Commit: `feat(demo): W9 campaign charter with protocol versions, credit quota panel and quota-refusal probe`
-- [ ] `pnpm api:update` (D-18 W9); commit `chore(api): refresh pinned contract (D-18 W9)`
+- [x] Commit: `feat(demo): W9 campaign charter with protocol versions, credit quota panel and quota-refusal probe`
+- [x] `pnpm api:update` (D-18 W9); commit `chore(api): refresh pinned contract (D-18 W9)`
 
 ## D-19 — W10 custodian view
 
@@ -157,7 +157,7 @@ Tests: pickers keep documented keys and drop everything else (table test over th
 
 **Files:** `tests/support/weight.ts` (`measureFirstLoad(page, url) -> {total, requests: {url, type, bytes}[]}` through a CDP session: `Network.enable`, cache disabled, sum `encodedDataLength` from `Network.loadingFinished` for every request including the document; `W10_WEIGHT_BUDGET_BYTES = 200 * 1024`; `assertLight(requests)` rejects Font and non-SVG Image resources), `tests/unit/support/weight.test.ts` (pure summing and `assertLight` on fixtures), `scripts/` untouched. Build with `pnpm build`, serve with `pnpm start` on port 3100, sign in and record the first-load bytes of `/demo/w1-rights` and of a throwaway server-rendered stub at `/demo/w10-custodian` (title and one table, no client components) with and without `NEXT_PUBLIC_SENTRY_DSN`; write the three numbers in the commit body. If the stub alone is over budget, apply the levers of A-P5B-16 in order (lazy-load the reset dialog's content with `next/dynamic` on first open; skip the browser Sentry SDK when the path is `/demo/w10-custodian`; a lighter header for this route) before building anything else, each with its own unit test.
 
-- [ ] Commit: `test(demo): first-load weight measurement helper and W10 baseline`
+- [x] Commit: `test(demo): first-load weight measurement helper and W10 baseline`
 
 ### Task 5: W1 grievance indicator, queue and acknowledgement (additive; a D-19 task)
 
@@ -165,7 +165,7 @@ Tests: pickers keep documented keys and drop everything else (table test over th
 
 **Files:** `src/app/(platform)/demo/w1-rights/_components/rights-table.tsx` (new "Grievances" column: `open_grievance_count` as text, for example "2 open", "None"), `_components/grievance-queue.tsx` (server table: record, category, status, raised, description; client `AcknowledgeButton` for `data_steward`, `useAction`, `router.refresh()`), `w1-rights/page.tsx` (a "Grievance queue" section; the list is requested only when `canAct(persona, "view_grievances")`, other personas get a short notice); tests `tests/unit/demo/{rights-table-grievances,grievance-queue}.test.tsx`; the P3 W1 specs stay green and `tests/e2e/demo-w1-rights.spec.ts` gains `w1 grievance indicator and queue` (a fresh tenant shows no indicator and an empty queue; a grievance raised through `page.request` as `community_liaison` shows the indicator and the queue row for `data_steward`, who acknowledges it; `partner` sees the queue notice and a forced list request returns 403).
 
-- [ ] Commit: `feat(demo): W1 rights registry shows grievance indicators and a queue with acknowledgement`
+- [x] Commit: `feat(demo): W1 rights registry shows grievance indicators and a queue with acknowledgement`
 
 ### Task 6: W10 BFF form handler, page, grievance form and specs
 
@@ -183,8 +183,8 @@ Tests: pickers keep documented keys and drop everything else (table test over th
 
 **Manual pass `docs/A11Y_MANUAL_PASS_W10.md`** (same style as `docs/A11Y_MANUAL_PASS.md`): keyboard only; VoiceOver in Safari then Chrome (landmarks, headings, table navigation of the obligations, the `<details>` forms, the status and alert regions); 200% zoom and 320 px reflow; Slow 3G throttle (A-P5B-F03); reading-level read-through of every string; "no information by colour alone". The controller logs each line in `PROGRESS.md` under "Manual accessibility log (P5)".
 
-- [ ] Commit: `feat(demo): W10 low-bandwidth custodian view with plain-language agreements, obligation status and no-JS grievance form`
-- [ ] `pnpm api:update` (D-19); commit `chore(api): refresh pinned contract (D-19)`
+- [x] Commit: `feat(demo): W10 low-bandwidth custodian view with plain-language agreements, obligation status and no-JS grievance form`
+- [x] `pnpm api:update` (D-19); commit `chore(api): refresh pinned contract (D-19)`
 
 ### Task 7: Phase gate before the tour
 
@@ -230,7 +230,7 @@ Tests (Vitest): `steps.test.ts` (ids unique and ordered; every persona valid; ev
 **Manual timed run (controller, at the end of P5; logged in `PROGRESS.md` under "Guided tour timed run (P5)" using `docs/DEMO_TOUR_RUN.md`):** on the preview or production URL at the server default speed (4×), a person follows the tour from step 1 to 16 with a clock, notes every moment the next action was unclear or blocked, and records the total (target 12–15 minutes, no dead ends). Failing the range or finding a dead end reopens this task.
 
 - [ ] Commit: `feat(demo): guided tour with persistent panel, persona switch, reset and demo-speed control`
-- [ ] `pnpm api:update` (D-20); commit `chore(api): refresh pinned contract (D-20)`
+- [x] `pnpm api:update` (D-20); commit `chore(api): refresh pinned contract (D-20)`
 
 ### Task 9: Phase exit, axe sweep, PROGRESS
 

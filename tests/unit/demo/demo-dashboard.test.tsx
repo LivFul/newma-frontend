@@ -34,7 +34,7 @@ describe("/demo dashboard", () => {
     }
     const linked = WORKFLOWS.filter((w) => w.href !== undefined).length;
     expect(screen.getAllByText("Available")).toHaveLength(linked);
-    expect(screen.getAllByText("Arrives in P5")).toHaveLength(WORKFLOWS.length - linked);
+    expect(screen.queryAllByText("Arrives in P5")).toHaveLength(WORKFLOWS.length - linked);
     expect(screen.getByRole("link", { name: /Licensing & benefit settlement/ })).toHaveAttribute(
       "href",
       "/demo/w7-settlement",
@@ -47,7 +47,10 @@ describe("/demo dashboard", () => {
       "href",
       "/demo/w6-provenance",
     );
-    expect(screen.queryByRole("link", { name: /Custodian view/ })).toBeNull();
+    expect(screen.getByRole("link", { name: /Custodian view/ })).toHaveAttribute(
+      "href",
+      "/demo/w10-custodian",
+    );
     expect(screen.getByRole("link", { name: /simulated jobs/i })).toHaveAttribute(
       "href",
       "/demo/jobs",

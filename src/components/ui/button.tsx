@@ -1,6 +1,6 @@
 // No "use client": Slot from radix-ui carries its own directive, so buttonVariants is
 // callable from server components and Button renders in either tree.
-import { Slot } from "radix-ui";
+import * as Slot from "radix-ui/slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { forwardRef, type ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/cn";

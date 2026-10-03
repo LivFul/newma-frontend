@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Badge } from "@/components/ui";
+import { Badge } from "@/components/ui/badge";
 import type { DemoSession } from "@/lib/demo/types";
 import { personaLabel } from "@/lib/personas";
 import { PersonaSwitcher } from "./persona-switcher";

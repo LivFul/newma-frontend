@@ -14,7 +14,10 @@ export const WORKFLOW_ROUTES = [
   "/demo/w7-settlement",
 ] as const;
 
-export const DEMO_ROUTES = ["/demo", "/demo/jobs", ...WORKFLOW_ROUTES] as const;
+// P5b workflow pages (W8-W10); the guided tour route joins DEMO_ROUTES with the tour itself.
+export const P5B_ROUTES = ["/demo/w8-partner", "/demo/w9-campaign", "/demo/w10-custodian"] as const;
+
+export const DEMO_ROUTES = ["/demo", "/demo/jobs", ...WORKFLOW_ROUTES, ...P5B_ROUTES] as const;
 
 export const PERSONA_LABELS = {
   community_liaison: "Community liaison",

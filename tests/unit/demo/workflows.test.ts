@@ -14,10 +14,12 @@ describe("workflow index (A-P3-21)", () => {
     ]);
   });
 
-  it("keeps every workflow without a page as a P5 placeholder", () => {
-    const placeholders = WORKFLOWS.filter((w) => w.href === undefined);
-    expect(placeholders.length).toBeGreaterThan(0);
-    expect(placeholders.every((w) => w.phase === "P5")).toBe(true);
-    expect(WORKFLOWS.slice(7).map((w) => w.id)).toEqual(["W8", "W9", "W10"]);
+  it("links every workflow W8–W10 to its page and leaves no P5 placeholder", () => {
+    expect(WORKFLOWS.slice(7).map((w) => [w.id, w.href])).toEqual([
+      ["W8", "/demo/w8-partner"],
+      ["W9", "/demo/w9-campaign"],
+      ["W10", "/demo/w10-custodian"],
+    ]);
+    expect(WORKFLOWS.filter((w) => w.href === undefined)).toEqual([]);
   });
 });

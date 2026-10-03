@@ -1,38 +1,10 @@
+import { P5B_PICKERS } from "./error-details-p5b";
 import { isFiniteNumber, isRecord, isStringArray } from "./guards";
+import { type Picker, isString, pickReasons, pickRecord } from "./pick-details";
 
 // Backend `details` reach the browser only through these per-code pickers: documented keys with
 // the expected types, nothing else (no echoed input, no future debug fields). A shape mismatch
 // drops the details; the code and message still pass.
-type Picker = (details: unknown) => unknown;
-
-const isString = (value: unknown): value is string => typeof value === "string";
-
-function pickRecord(details: unknown, keys: Readonly<Record<string, (v: unknown) => boolean>>) {
-  if (!isRecord(details)) return undefined;
-  const picked: Record<string, unknown> = {};
-  for (const [key, valid] of Object.entries(keys)) {
-    if (!valid(details[key])) return undefined;
-    picked[key] = details[key];
-  }
-  return picked;
-}
-
-function pickReasons(value: unknown): unknown[] | undefined {
-  if (!Array.isArray(value)) return undefined;
-  const reasons: unknown[] = [];
-  for (const item of value) {
-    if (!isRecord(item) || !isString(item.code)) return undefined;
-    reasons.push({
-      code: item.code,
-      ...(isString(item.message) ? { message: item.message } : {}),
-      ...(isString(item.remediation) || item.remediation === null
-        ? { remediation: item.remediation }
-        : {}),
-    });
-  }
-  return reasons;
-}
-
 function pickValidation(details: unknown): unknown[] | undefined {
   if (!Array.isArray(details)) return undefined;
   const entries: unknown[] = [];
@@ -61,6 +33,7 @@ function pickPolicyDecision(d: unknown): unknown {
 }
 
 const PICKERS: Readonly<Record<string, Picker>> = {
+  ...P5B_PICKERS,
   persona_forbidden: (d) => pickRecord(d, { persona: isString, allowed: isStringArray }),
   gate_requirements_missing: (d) =>
     pickRecord(d, { stage: isString, missing_requirements: isStringArray }),
