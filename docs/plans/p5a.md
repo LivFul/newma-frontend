@@ -205,9 +205,9 @@ TDD steps:
 
 TDD steps:
 
-- [ ] Failing Vitest first: calculation table renders served order, labels and the broken-fixture alert; no "%" anywhere; held amount outside the total; approvals panel at 0, 1 and 2 approvals; second click of the same persona disabled; double submit one key; conflict codes render; ledger empty text; commitment card fields and link; anchor panel for the three statuses; `useSettlementPolling` stops on `anchored`/`not_requested` and on unmount (fake timers).
-- [ ] Implement.
-- [ ] Commit: `feat(demo): W7 calculation, dual approval, distribution ledger, signed commitment and anchoring status`
+- [x] Failing Vitest first: calculation table renders served order, labels and the broken-fixture alert; no "%" anywhere; held amount outside the total; approvals panel at 0, 1 and 2 approvals; second click of the same persona disabled; double submit one key; conflict codes render; ledger empty text; commitment card fields and link; anchor panel for the three statuses; `useSettlementPolling` stops on `anchored`/`not_requested` and on unmount (fake timers).
+- [x] Implement.
+- [x] Commit: `feat(demo): W7 calculation, dual approval, distribution ledger, signed commitment and anchoring status`
 
 ### Task 7: Benefit tracker, beneficiary view and the W6 event page
 

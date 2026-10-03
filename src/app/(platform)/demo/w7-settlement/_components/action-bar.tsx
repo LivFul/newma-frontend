@@ -3,6 +3,7 @@ import { canAct } from "@/lib/demo/persona-actions";
 import type { PersonaId } from "@/lib/personas";
 import { PersonaForbiddenNotice } from "../../_components/persona-forbidden-notice";
 import { ActionButton } from "./action-button";
+import { AuditDialog } from "./audit-dialog";
 import { DisputeDialog } from "./dispute-dialog";
 import { EvidenceApprovalDialog } from "./evidence-approval-dialog";
 import { ResolveDialog } from "./resolve-dialog";
@@ -40,6 +41,19 @@ export function ActionBar({ settlement, persona }: Props) {
       {finance && has("resolve") ? (
         <ResolveDialog settlementId={settlement.id} receipts={settlement.receipts} />
       ) : null}
+      {finance && has("reconcile") ? (
+        <ActionButton
+          label="Reconcile receipts"
+          endpoint={`/api/demo/settlements/${id}/reconcile`}
+        />
+      ) : null}
+      {finance && has("distribute") ? (
+        <ActionButton
+          label="Distribute (demo credits)"
+          endpoint={`/api/demo/settlements/${id}/distribution`}
+        />
+      ) : null}
+      {finance && has("audit") ? <AuditDialog settlementId={settlement.id} /> : null}
       {!finance && financeActions.length > 0 ? (
         <PersonaForbiddenNotice allowed={["finance"]} />
       ) : null}
