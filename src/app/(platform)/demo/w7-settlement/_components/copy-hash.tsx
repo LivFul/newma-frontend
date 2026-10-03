@@ -10,7 +10,9 @@ type Props = Readonly<{ value: string; label: string }>;
 export function CopyHash({ value, label }: Props) {
   const [copied, setCopied] = useState(false);
   const copy = () => {
-    void navigator.clipboard
+    const clipboard = typeof navigator === "undefined" ? undefined : navigator.clipboard;
+    if (!clipboard) return setCopied(false);
+    clipboard
       .writeText(value)
       .then(() => setCopied(true))
       .catch(() => setCopied(false));

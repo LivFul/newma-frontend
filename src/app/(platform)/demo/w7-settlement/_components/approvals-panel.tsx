@@ -7,6 +7,14 @@ import { ApproveDialog } from "./approve-dialog";
 
 type Props = Readonly<{ settlement: Settlement; persona: PersonaId }>;
 
+// The backend state, not a count of approvals, says the distribution is authorised.
+const AUTHORISED_STATES: ReadonlySet<string> = new Set([
+  "distribution_authorized",
+  "funded",
+  "paid",
+  "audited",
+]);
+
 const label = (persona: string) => (isPersonaId(persona) ? personaLabel(persona) : persona);
 
 function progressText(count: number, required: number): string {
@@ -30,7 +38,7 @@ function blockedReason({ settlement, persona }: Props): string | undefined {
 export function ApprovalsPanel({ settlement, persona }: Props) {
   const { items, required, eligible_personas: eligible } = settlement.approvals;
   const open = settlement.next_actions.includes("approve_distribution");
-  const authorised = items.length >= required;
+  const authorised = AUTHORISED_STATES.has(settlement.state);
   const calculation = settlement.calculation;
   return (
     <div className="space-y-3">

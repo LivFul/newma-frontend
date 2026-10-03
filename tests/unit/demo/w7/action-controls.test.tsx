@@ -189,3 +189,18 @@ describe("ActionDialog", () => {
     expect(screen.getByText("Finance has already approved this calculation.")).toBeInTheDocument();
   });
 });
+
+describe("review fixes", () => {
+  it("keeps the key after success so a click before the refresh replays", async () => {
+    const fetchMock = vi.fn().mockImplementation(async () => Response.json({ id: "s1" }));
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<ActionButton label="Go" endpoint="/e" />);
+    await user.click(screen.getByRole("button", { name: "Go" }));
+    await waitFor(() => expect(refresh).toHaveBeenCalledTimes(1));
+    await user.click(screen.getByRole("button", { name: "Go" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(keyOf(fetchMock, 1)).toBe(keyOf(fetchMock, 0));
+    expect(screen.getByRole("status")).toHaveTextContent("Done: Go");
+  });
+});

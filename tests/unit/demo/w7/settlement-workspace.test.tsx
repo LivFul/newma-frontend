@@ -317,3 +317,15 @@ describe("DisputeDialog and ResolveDialog (A14, A15)", () => {
     expect(screen.getByText("No receipt is disputed.")).toBeInTheDocument();
   });
 });
+
+describe("StateStepper completion is not colour-only", () => {
+  it("prints completed steps in text", () => {
+    render(<StateStepper state="approved" />);
+    const items = within(screen.getByRole("list", { name: "Settlement states" })).getAllByRole(
+      "listitem",
+    );
+    expect(items[0]).toHaveTextContent("(completed)");
+    expect(items[1]).toHaveTextContent("(completed)");
+    expect(items[2]).not.toHaveTextContent("(completed)");
+  });
+});

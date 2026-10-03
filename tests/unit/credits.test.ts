@@ -46,3 +46,10 @@ describe("checkConservation sums the displayed integers (Review Focus 1)", () =>
     expect(checkConservation(calc).conserved).toBe(false);
   });
 });
+
+describe("checkConservation edge cases", () => {
+  it("treats a negative line as broken", () => {
+    const calc = { distributable_demo_credits: 5, lines: [line(10), line(-5)] };
+    expect(checkConservation(calc).conserved).toBe(false);
+  });
+});

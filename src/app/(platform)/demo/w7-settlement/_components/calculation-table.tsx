@@ -38,8 +38,9 @@ export function ConservationStatus({
       role="alert"
       className="rounded-md border border-danger px-3 py-2 text-sm"
     >
-      Not conserved: the lines sum to {formatCredits(total)} but {formatCredits(distributable)} is
-      distributable.
+      Not conserved: the lines sum to{" "}
+      {Number.isSafeInteger(total) ? formatCredits(total) : "an unusable total"} but{" "}
+      {formatCredits(distributable)} is distributable.
     </p>
   );
 }

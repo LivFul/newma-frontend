@@ -21,8 +21,9 @@ export function checkConservation(calculation: CalculationLike): Conservation {
   let total = 0;
   let integers = true;
   for (const { amount_demo_credits: amount } of calculation.lines) {
-    if (!Number.isSafeInteger(amount)) integers = false;
+    if (!Number.isSafeInteger(amount) || amount < 0) integers = false;
     total += amount;
   }
+  integers = integers && Number.isSafeInteger(total);
   return { conserved: integers && total === calculation.distributable_demo_credits, total };
 }

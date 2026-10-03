@@ -189,6 +189,16 @@ describe("ApprovalsPanel (Review Focus 2)", () => {
     expect(screen.queryByRole("button", { name: "Approve distribution" })).toBeNull();
   });
 
+  it("takes authorised from the backend state, not from the approval count", () => {
+    render(
+      <ApprovalsPanel
+        settlement={reconciled([approval("finance"), approval("tenant_admin")])}
+        persona="finance"
+      />,
+    );
+    expect(screen.queryByText("Distribution authorised")).toBeNull();
+  });
+
   it("offers no approval before reconciliation or while disputed", () => {
     render(
       <ApprovalsPanel

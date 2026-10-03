@@ -108,6 +108,17 @@ describe("/demo/w7-settlement overview", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("upstream_error");
   });
 
+  it("does not invent an outage state when its read fails", async () => {
+    load.mockImplementation(async (path: string) =>
+      path === "/v1/demo/anchoring/outage"
+        ? { error: { code: "upstream_error", message: "down" } }
+        : { data: path === "/v1/licenses/options" ? options() : { items: [] } },
+    );
+    render(await W7Overview());
+    expect(screen.queryByRole("switch")).toBeNull();
+    expect(screen.getByText(/Outage state unknown/)).toBeInTheDocument();
+  });
+
   it("says when there is nothing yet", async () => {
     load.mockImplementation(async (path: string) => ({
       data: path === "/v1/licenses/options" ? options() : { items: [] },

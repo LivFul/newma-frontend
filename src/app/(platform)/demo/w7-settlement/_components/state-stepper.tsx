@@ -21,7 +21,7 @@ const ITEM =
 export function StateStepper({ state }: { state: SettlementState }) {
   const index = (MACHINE as readonly string[]).indexOf(state);
   return (
-    <nav aria-label="Settlement progress" className="space-y-2">
+    <div role="group" aria-label="Settlement progress" className="space-y-2">
       <ol aria-label="Settlement states" className="flex flex-wrap gap-2">
         {MACHINE.map((step, i) => (
           <li
@@ -31,7 +31,9 @@ export function StateStepper({ state }: { state: SettlementState }) {
             aria-current={step === state ? "step" : undefined}
             className={ITEM}
           >
+            {i < index ? <span aria-hidden="true">✓ </span> : null}
             <span>{humanize(step)}</span>
+            {i < index ? <span className="sr-only"> (completed)</span> : null}
             {step === state ? <span className="sr-only"> (current state)</span> : null}
           </li>
         ))}
@@ -49,6 +51,6 @@ export function StateStepper({ state }: { state: SettlementState }) {
           </li>
         ))}
       </ol>
-    </nav>
+    </div>
   );
 }

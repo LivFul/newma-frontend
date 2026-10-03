@@ -55,7 +55,7 @@ export function LicenseRequestForm({ options, allowed }: Props) {
         idempotency_key: key,
       });
       if (!result.ok) return setError(result.error);
-      reset();
+      // The key is kept: a click while navigation is pending replays instead of creating a second license.
       router.push(`/demo/w7-settlement/licenses/${encodeURIComponent(result.data.id)}`);
     });
   };

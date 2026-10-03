@@ -66,7 +66,6 @@ export function RecordReceiptForm({
         },
       );
       if (result.ok) {
-        reset();
         setReference("");
         setAmount("");
         return router.refresh();

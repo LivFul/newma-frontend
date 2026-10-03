@@ -5,9 +5,9 @@ import type {
   Beneficiary,
   BenefitItem,
   Items,
+  OutageState,
   License,
   LicenseOptions,
-  OutageState,
   SettlementSummary,
 } from "@/lib/demo/types";
 import { ErrorNotice } from "../_components/error-notice";
@@ -21,8 +21,6 @@ import { LicenseList } from "./_components/license-list";
 import { LicenseRequestForm } from "./_components/license-request-form";
 import { OutageToggle } from "./_components/outage-toggle";
 import { SettlementList } from "./_components/settlement-list";
-
-const OUTAGE_OFF: OutageState = { active: false, label: "Optional, simulated", updated_at: null };
 
 export default async function SettlementOverviewPage() {
   const session = await requireSession();
@@ -51,16 +49,9 @@ export default async function SettlementOverviewPage() {
         illustrative split in demo credits, two different approvers authorise it, and a signed
         commitment can be verified in W6.
       </WorkflowHeader>
-      <ErrorNotice
-        error={
-          options.error ??
-          licenses.error ??
-          settlements.error ??
-          outage.error ??
-          benefits.error ??
-          beneficiaries.error
-        }
-      />
+      {[options, licenses, settlements, outage, benefits, beneficiaries].map((read, index) => (
+        <ErrorNotice key={index} error={read.error} />
+      ))}
       <section aria-labelledby="request-heading" className="space-y-3">
         <h2 id="request-heading" className="text-xl font-semibold">
           Request a license
@@ -99,7 +90,11 @@ export default async function SettlementOverviewPage() {
           Anchoring
         </h2>
         <AnchorNotice />
-        <OutageToggle initial={outage.data ?? OUTAGE_OFF} />
+        {outage.data ? (
+          <OutageToggle initial={outage.data} />
+        ) : (
+          <p className="text-sm text-fg-muted">Outage state unknown: the read failed.</p>
+        )}
       </section>
     </>
   );

@@ -72,6 +72,9 @@ export function ReceiptsTable({ receipts, totals, highlightId }: Props) {
                 >
                   <td className="py-1 pr-3 font-mono">
                     <span className={struck}>{receipt.external_ref}</span>
+                    {receipt.id === highlightId ? (
+                      <span className="sr-only"> (original of the rejected duplicate)</span>
+                    ) : null}
                   </td>
                   <td className="py-1 pr-3">
                     <span className={struck}>{formatCredits(receipt.amount_demo_credits)}</span>

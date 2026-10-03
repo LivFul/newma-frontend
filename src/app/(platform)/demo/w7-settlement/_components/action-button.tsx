@@ -36,17 +36,20 @@ export function ActionButton({
   testId,
 }: Props) {
   const router = useRouter();
-  const { key, reset } = useStableKey();
+  const { key } = useStableKey();
   const [error, setError] = useState<ClientError | undefined>();
+  const [done, setDone] = useState(false);
   const { busy, run } = useAction();
 
   const click = () => {
     if (busy) return;
     setError(undefined);
+    setDone(false);
     void run(async () => {
       const result = await postJson<unknown>(endpoint, { ...body, idempotency_key: key });
       if (!result.ok) return setError(result.error);
-      reset();
+      // The key is kept after success: a click before the refresh lands is a replay, not a second act.
+      setDone(true);
       if (onDone) onDone(result.data);
       else router.refresh();
     });
@@ -60,12 +63,16 @@ export function ActionButton({
           onClick={click}
           disabled={disabledReason !== undefined}
           aria-busy={busy || undefined}
+          aria-disabled={busy || undefined}
           data-testid={testId}
         >
           {label}
         </Button>
         {disabledReason ? <span className="text-sm text-fg-muted">{disabledReason}</span> : null}
       </div>
+      <p role="status" className="sr-only">
+        {busy ? `Working: ${label}` : done ? `Done: ${label}` : ""}
+      </p>
       <W7ErrorNotice error={error} />
       {error && extraError ? extraError(error) : null}
     </div>
