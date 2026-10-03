@@ -34,17 +34,16 @@ only); the sprint plan is cited for the demo labels. Status values: `draft` (age
 BC contains no LivFul mission or vision statement (IP C-23), so these three are re-voiced from the
 sources below. Publishing paraphrases of the internal business case is a CP-2 approval item.
 
-- **Mission** (C-26) re-voices PRD §1.1: "NEWMA will enable research teams to turn authorized
-  ethnobotanical knowledge and authenticated botanical materials into reproducible, experimentally
-  supported discovery decisions, while preserving source attribution, confidentiality, and
-  enforceable benefit obligations."
-- **Vision** (C-27) condenses BC §1.2: "First, a rights-aware evidence system connects botanical
-  knowledge to authenticated materials and curated structures. Second, scientist-supervised
-  computation prioritizes tractable experiments. Third, an assay feedback loop records confirmed
-  activity, failures and development liabilities, improving future prioritization where training
-  permissions allow. Services and software share this infrastructure."
+- **Mission** (C-26) re-voices the vision paragraph of PRD §1.1 (first sentence: enabling research
+  teams to turn authorized knowledge and authenticated materials into reproducible, experimentally
+  supported decisions while preserving attribution, confidentiality and benefit obligations).
+- **Vision** (C-27) condenses BC §1.2 (the three delivery capabilities and the shared infrastructure).
 - **Approach** (C-28) lists the same three capabilities, one sentence each, and adds a note that
   they are design goals, in line with the claim discipline of BC Appendix B1.
+
+The exact source sentences are deliberately not quoted here: this repository is public and the
+sources are internal. They are available to the reviewer in the document set named in `PROGRESS.md`
+section 2 (reading list), and are checked against the three lines above at CP-2.
 
 ## Component pages
 

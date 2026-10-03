@@ -35,3 +35,5 @@ jobs:
       - run: bash scripts/check-demo-isolation.sh
       - run: pnpm build
       - run: pnpm bundle:check
+      - name: Hero JS budget (80 KiB gzip)
+        run: pnpm hero:check

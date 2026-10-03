@@ -22,7 +22,9 @@
     "bundle:check": "node scripts/check-client-bundle.mjs",
     "vectors:sync": "node scripts/sync-canonical-vectors.mjs --write",
     "vectors:check": "node scripts/sync-canonical-vectors.mjs --check",
-    "claims:check": "node scripts/check-claims.mjs"
+    "claims:check": "node scripts/check-claims.mjs",
+    "hero:check": "node scripts/check-hero-bundle.mjs",
+    "lhci:mobile": "lhci autorun --config=lighthouserc.mobile.cjs"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",

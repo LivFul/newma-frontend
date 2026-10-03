@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@vercel/analytics/next", () => ({ Analytics: () => <div data-testid="va" /> }));
 
-import { AnalyticsMount } from "@/components/site/analytics-mount";
+import { AnalyticsMount, beforeSend } from "@/components/site/analytics-mount";
 
 function setWebdriver(value: boolean) {
   Object.defineProperty(navigator, "webdriver", { value, configurable: true });
@@ -28,5 +28,23 @@ describe("AnalyticsMount", () => {
     setWebdriver(false);
     const { getByTestId } = render(<AnalyticsMount />);
     expect(getByTestId("va")).toBeInTheDocument();
+  });
+});
+
+describe("beforeSend", () => {
+  it("strips the query string and hash from reported URLs", () => {
+    const sent = beforeSend({
+      type: "pageview",
+      url: "https://newma.example/ecosystem/wet-lab?x=1#top",
+    });
+    expect(sent).toEqual({ type: "pageview", url: "https://newma.example/ecosystem/wet-lab" });
+  });
+  it("drops events from the demo and the sign-in page, whatever the host", () => {
+    for (const path of ["/demo", "/demo/w3-agent?s=1", "/access", "/access?reason=expired"]) {
+      expect(beforeSend({ type: "event", url: `https://newma.example${path}` }), path).toBeNull();
+    }
+  });
+  it("keeps site paths that merely start with the same letters", () => {
+    expect(beforeSend({ type: "event", url: "https://newma.example/accessible" })).not.toBeNull();
   });
 });

@@ -28,11 +28,14 @@ jobs:
       - run: pnpm test:a11y
         env:
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
-      - name: Lighthouse CI
+      - name: Lighthouse CI (desktop and mobile)
         env:
           # Lighthouse cannot set headers, so the bypass travels as query parameters and sets a cookie.
-          LHCI_URL: ${{ github.event.deployment_status.environment_url }}/?x-vercel-protection-bypass=${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}&x-vercel-set-bypass-cookie=true
-        run: pnpm exec lhci autorun
+          LHCI_BASE_URL: ${{ github.event.deployment_status.environment_url }}
+          LHCI_QUERY: ?x-vercel-protection-bypass=${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}&x-vercel-set-bypass-cookie=true
+        run: |
+          pnpm exec lhci autorun
+          pnpm exec lhci autorun --config=lighthouserc.mobile.cjs
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:

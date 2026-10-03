@@ -21,7 +21,7 @@ export const PRIVACY: LegalDocument = Object.freeze({
       block("legal.privacy.analytics.heading", "Analytics"),
       block(
         "legal.privacy.analytics.text",
-        "This site uses Vercel Web Analytics, which is cookieless. It counts two interactions: a click on Access NEWMA and the opening of a component page. The events carry no identifiers beyond the name of the component.",
+        "This site uses Vercel Web Analytics, which is cookieless. It records page views and two interactions: a click on Access NEWMA and the opening of a component page. It sets no cookies and keeps no persistent identifier, and the interaction events carry nothing beyond the name of the component.",
         ["C-51"],
       ),
     ),
