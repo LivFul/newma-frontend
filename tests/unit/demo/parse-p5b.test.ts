@@ -296,14 +296,57 @@ describe("W10 grievance bodies", () => {
 
 describe("parseConfigUpdate (demo speed)", () => {
   it("accepts 1-10 or null", () => {
-    expect(parseConfigUpdate({ speed_factor: 4, extra: 1 })).toEqual({ speed_factor: 4 });
+    expect(parseConfigUpdate({ speed_factor: 4 })).toEqual({ speed_factor: 4 });
+    expect(parseConfigUpdate({ speed_factor: 4.0 })).toEqual({ speed_factor: 4 });
+    expect(parseConfigUpdate({ speed_factor: 7.5 })).toEqual({ speed_factor: 7.5 });
     expect(parseConfigUpdate({ speed_factor: null })).toEqual({ speed_factor: null });
     expect(parseConfigUpdate({ speed_factor: 1 })).toBeDefined();
     expect(parseConfigUpdate({ speed_factor: 10 })).toBeDefined();
   });
 
-  it.each([0, 11, -1, "4", Number.NaN, undefined])("rejects %s", (bad) => {
+  it.each([
+    0,
+    11,
+    -1,
+    -0,
+    0.99,
+    10.01,
+    "4",
+    "",
+    true,
+    false,
+    [4],
+    {},
+    Number.NaN,
+    Number.POSITIVE_INFINITY,
+    Number.NEGATIVE_INFINITY,
+    Number.MAX_VALUE,
+    1e999,
+    undefined,
+  ])("rejects %s", (bad) => {
     expect(parseConfigUpdate({ speed_factor: bad })).toBeUndefined();
+  });
+
+  it("rejects what the backend refuses: extra keys, a missing key, non-objects", () => {
+    expect(parseConfigUpdate({ speed_factor: 4, extra: 1 })).toBeUndefined();
+    expect(parseConfigUpdate({ speed_factor: null, tenant_id: "x" })).toBeUndefined();
+    expect(parseConfigUpdate({})).toBeUndefined();
+    expect(parseConfigUpdate({ other: 4 })).toBeUndefined();
+    expect(parseConfigUpdate(JSON.parse('{"__proto__":{"speed_factor":5}}'))).toBeUndefined();
+    expect(parseConfigUpdate(JSON.parse('{"speed_factor":1e999}'))).toBeUndefined();
+    expect(parseConfigUpdate(JSON.parse('{"speed_factor":-0}'))).toBeUndefined();
+    for (const bad of [null, undefined, 4, "4", true, [], [{ speed_factor: 4 }]]) {
+      expect(parseConfigUpdate(bad)).toBeUndefined();
+    }
+  });
+
+  it("accepts the whole closed interval and forwards exactly the validated value", () => {
+    for (const value of [1, 1.5, 2, 10]) {
+      expect(parseConfigUpdate(JSON.parse(`{"speed_factor":${value}}`))).toEqual({
+        speed_factor: value,
+      });
+    }
+    expect(parseConfigUpdate(JSON.parse('{"speed_factor":1e1}'))).toEqual({ speed_factor: 10 });
   });
 });
 

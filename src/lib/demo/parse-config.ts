@@ -5,7 +5,12 @@ export const MIN_SPEED = 1;
 export const MAX_SPEED = 10;
 
 export function parseConfigUpdate(body: unknown): { speed_factor: number | null } | undefined {
+  // Parity with the backend `SpeedRequest` (extra="forbid", required key, strict number 1-10 or
+  // null): anything the backend would refuse is refused here, and the forwarded body is exactly
+  // the validated value, so the two validators cannot differ.
   if (!isRecord(body)) return undefined;
+  const keys = Object.keys(body);
+  if (keys.length !== 1 || keys[0] !== "speed_factor") return undefined;
   const { speed_factor } = body;
   if (speed_factor === null) return { speed_factor: null };
   return typeof speed_factor === "number" &&

@@ -48,6 +48,11 @@ export function markDone(state: TourState, id: TourStepId): TourState {
   return freeze({ ...state, done });
 }
 
+export function unmarkDone(state: TourState, id: TourStepId): TourState {
+  if (!state.done.includes(id)) return state;
+  return freeze({ ...state, done: state.done.filter((stepId) => stepId !== id) });
+}
+
 export const isComplete = (state: TourState): boolean => state.done.length === TOUR_STEP_IDS.length;
 
 /** "Reset demo" inside the tour: the same tenant, back at step one with nothing done. */

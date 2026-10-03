@@ -7,6 +7,7 @@ import {
   goTo,
   isComplete,
   markDone,
+  unmarkDone,
   parseState,
   resetTour,
   serializeState,
@@ -49,6 +50,12 @@ describe("tour state (A-P5B-18)", () => {
     expect(two.done).toEqual(["w1-evaluate", "w1-acknowledge"]);
     expect(markDone(two, "w1-evaluate")).toEqual(two);
     expect(two.current).toBe(3);
+  });
+
+  it("unmarks a done step and leaves others alone", () => {
+    const state = markDone(markDone(startTour(TENANT, NOW), "home"), "w1-evaluate");
+    expect(unmarkDone(state, "home").done).toEqual(["w1-evaluate"]);
+    expect(unmarkDone(state, "w9-quota")).toBe(state);
   });
 
   it("completes when every step is done", () => {

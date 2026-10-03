@@ -8,7 +8,7 @@ export function StepList() {
       <h2 id="steps-heading" className="text-xl font-semibold">
         The steps
       </h2>
-      <ol aria-label="Tour steps" className="space-y-2 pl-6">
+      <ol aria-label="Tour steps" className="list-decimal space-y-2 pl-6">
         {TOUR_STEPS.map((step) => (
           <li key={step.id}>
             <span className="font-medium">{step.title}</span>{" "}

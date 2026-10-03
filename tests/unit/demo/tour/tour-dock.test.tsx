@@ -18,7 +18,12 @@ vi.mock("@/app/(platform)/demo/_components/tour-panel", async (importOriginal) =
 const TENANT = "tenant-abc";
 const stored = (state = startTour(TENANT)) => writeRaw(serializeState(state));
 const dock = (persona: "scientist" | "scientific_approver" = "scientist") =>
-  render(<TourDock tenantId={TENANT} persona={persona} />);
+  render(
+    <>
+      <TourDock tenantId={TENANT} persona={persona} />
+      <main id="main" tabIndex={-1} />
+    </>,
+  );
 
 describe("TourDock", () => {
   beforeEach(() => {
@@ -34,7 +39,7 @@ describe("TourDock", () => {
 
   it("renders nothing and loads no panel code while no tour is active", () => {
     const { container } = dock();
-    expect(container).toBeEmptyDOMElement();
+    expect(container.querySelector("aside")).toBeNull();
     expect(panelLoaded).not.toHaveBeenCalled();
   });
 
@@ -57,7 +62,10 @@ describe("TourDock", () => {
     stored();
     dock();
     const region = await screen.findByRole("complementary", { name: "Guided tour" });
-    expect(within(region).getByRole("button", { name: "Previous" })).toBeDisabled();
+    expect(within(region).getByRole("button", { name: "Previous" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
     fireEvent.click(within(region).getByRole("button", { name: "Next" }));
     await waitFor(() => expect(region).toHaveTextContent("step 2 of 16"));
     fireEvent.click(within(region).getByRole("button", { name: "Previous" }));
@@ -68,11 +76,11 @@ describe("TourDock", () => {
 
   it("offers Finish tour instead of Next on the last step and ends the tour", async () => {
     stored(goTo(startTour(TENANT), 15));
-    const { container } = dock();
+    dock();
     const region = await screen.findByRole("complementary", { name: "Guided tour" });
     expect(within(region).queryByRole("button", { name: "Next" })).not.toBeInTheDocument();
     fireEvent.click(within(region).getByRole("button", { name: "Finish tour" }));
-    await waitFor(() => expect(container).toBeEmptyDOMElement());
+    await waitFor(() => expect(screen.queryByRole("complementary")).not.toBeInTheDocument());
     expect(window.sessionStorage.getItem(TOUR_STORAGE_KEY)).toBeNull();
   });
 
@@ -86,13 +94,13 @@ describe("TourDock", () => {
       "aria-expanded",
       "true",
     );
-    expect(within(region).getByRole("heading", { name: new RegExp(step.title) })).toBeVisible();
+    expect(within(region).getByRole("group", { name: new RegExp(step.title) })).toBeVisible();
     expect(within(region).getByText("Control to try")).toBeInTheDocument();
     expect(within(region).getByText(step.tryIt)).toBeInTheDocument();
     expect(within(region).getByText("Expected outcome")).toBeInTheDocument();
     expect(within(region).getByText(step.expected)).toBeInTheDocument();
     expect(within(region).getByText("Scientific approver", { selector: "dd" })).toBeInTheDocument();
-    const list = within(region).getByRole("list", { name: "Tour steps" });
+    const list = within(region).getByRole("list", { name: "Jump to a tour step" });
     expect(within(list).getAllByRole("listitem")).toHaveLength(16);
     expect(within(list).getAllByRole("button", { current: "step" })).toHaveLength(1);
     expect(within(list).getAllByText("Done")).toHaveLength(1);
@@ -115,11 +123,19 @@ describe("TourDock", () => {
     dock();
     const region = await screen.findByRole("complementary", { name: "Guided tour" });
     fireEvent.click(within(region).getByRole("button", { name: "Expand" }));
-    fireEvent.click(within(region).getByRole("button", { name: "Mark step done" }));
+    const mark = within(region).getByRole("button", { name: "Mark step done" });
+    expect(mark).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(mark);
     await waitFor(() => expect(within(region).getAllByText("Done")).toHaveLength(1));
-    expect(JSON.parse(window.sessionStorage.getItem(TOUR_STORAGE_KEY) ?? "null").done).toEqual([
-      "home",
-    ]);
+    expect(within(region).getByRole("button", { name: "Mark step done" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(within(region).getByText("Step done")).toBeInTheDocument();
+    // A second press unmarks, and the button keeps focus throughout.
+    fireEvent.click(within(region).getByRole("button", { name: "Mark step done" }));
+    await waitFor(() => expect(within(region).queryByText("Step done")).not.toBeInTheDocument());
+    expect(JSON.parse(window.sessionStorage.getItem(TOUR_STORAGE_KEY) ?? "null").done).toEqual([]);
   });
 
   it("uses a plain link for the homepage step and a client link inside the demo", async () => {
@@ -156,6 +172,13 @@ describe("TourDock", () => {
     fireEvent.click(within(region).getByRole("button", { name: "Expand" }));
     fireEvent.click(within(region).getByRole("button", { name: "Switch to Scientific approver" }));
     await waitFor(() => expect(refresh).toHaveBeenCalledTimes(1));
+    expect(within(region).getByRole("group", { name: /Step 7/ })).toBeInTheDocument();
+    expect(document.getElementById(within(region).getByText(/^Step 7:/).id)).toHaveFocus();
+    expect(
+      within(region)
+        .getAllByRole("status")
+        .some((node) => node.textContent === "Now acting as Scientific approver."),
+    ).toBe(true);
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe("/api/demo/sessions/persona");
     expect(init.body).toBe(JSON.stringify({ persona: "scientific_approver" }));
@@ -174,6 +197,9 @@ describe("TourDock", () => {
     fireEvent.click(within(region).getByRole("button", { name: "Switch to Scientific approver" }));
     expect(await within(region).findByRole("alert")).toHaveTextContent("Could not switch persona");
     expect(refresh).not.toHaveBeenCalled();
+    expect(
+      within(region).getByRole("button", { name: "Switch to Scientific approver" }),
+    ).toHaveFocus();
     fireEvent.click(within(region).getByRole("button", { name: "Switch to Scientific approver" }));
     await waitFor(() => expect(refresh).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(within(region).queryByRole("alert")).not.toBeInTheDocument());
@@ -188,7 +214,7 @@ describe("TourDock", () => {
     dock();
     const region = await screen.findByRole("complementary", { name: "Guided tour" });
     fireEvent.click(within(region).getByRole("button", { name: "Expand" }));
-    fireEvent.click(within(region).getByRole("button", { name: "Reset demo" }));
+    fireEvent.click(within(region).getByRole("button", { name: "Reset demo data" }));
     fireEvent.click(await screen.findByRole("button", { name: "Reset" }));
     await waitFor(() => expect(region).toHaveTextContent("step 1 of 16"));
     expect(JSON.parse(window.sessionStorage.getItem(TOUR_STORAGE_KEY) ?? "null")).toMatchObject({
@@ -199,11 +225,12 @@ describe("TourDock", () => {
 
   it("End tour removes the stored progress and the dock", async () => {
     stored();
-    const { container } = dock();
+    dock();
     const region = await screen.findByRole("complementary", { name: "Guided tour" });
     fireEvent.click(within(region).getByRole("button", { name: "Expand" }));
     fireEvent.click(within(region).getByRole("button", { name: "End tour" }));
-    await waitFor(() => expect(container).toBeEmptyDOMElement());
+    await waitFor(() => expect(screen.queryByRole("complementary")).not.toBeInTheDocument());
+    expect(document.getElementById("main")).toHaveFocus();
     expect(window.sessionStorage.getItem(TOUR_STORAGE_KEY)).toBeNull();
   });
 
@@ -213,7 +240,11 @@ describe("TourDock", () => {
     dock();
     const region = await screen.findByRole("complementary", { name: "Guided tour" });
     fireEvent.click(within(region).getByRole("button", { name: "Expand" }));
-    expect(within(region).getByRole("status")).toHaveTextContent("Tour complete");
+    expect(
+      within(region)
+        .getAllByRole("status")
+        .some((node) => /Tour complete/.test(node.textContent ?? "")),
+    ).toBe(true);
     await act(async () => {});
   });
 

@@ -84,7 +84,7 @@ test.describe("Guided tour", { tag: "@needs-backend" }, () => {
 
     const after = await expandDock(page);
     await after.getByRole("button", { name: "Mark step done" }).click();
-    await after.getByRole("button", { name: "Reset demo", exact: true }).click();
+    await after.getByRole("button", { name: "Reset demo data", exact: true }).click();
     await page.getByRole("dialog").getByRole("button", { name: "Reset", exact: true }).click();
     await expect(page.getByRole("dialog")).toBeHidden();
     await expect(dock(page)).toContainText(`step 1 of ${TOTAL}`);
@@ -107,7 +107,7 @@ test.describe("Guided tour", { tag: "@needs-backend" }, () => {
     }
     await runStep(page, 3, ctx);
     const region = await expandDock(page);
-    await region.getByRole("button", { name: "Reset demo", exact: true }).click();
+    await region.getByRole("button", { name: "Reset demo data", exact: true }).click();
     await page.getByRole("dialog").getByRole("button", { name: "Reset", exact: true }).click();
     await expect(page.getByRole("dialog")).toBeHidden();
     await expect(dock(page)).toContainText(`step 1 of ${TOTAL}`);
@@ -191,7 +191,7 @@ test.describe("Guided tour", { tag: "@needs-backend" }, () => {
     await page.getByRole("button", { name: "Start tour" }).click();
     await expandDock(page);
     await expectNoAxeViolations(page);
-    await page.getByRole("button", { name: "Reset demo", exact: true }).click();
+    await dock(page).getByRole("button", { name: "Reset demo data", exact: true }).click();
     await expect(page.getByRole("dialog")).toBeVisible();
     await expectNoAxeViolations(page);
   });

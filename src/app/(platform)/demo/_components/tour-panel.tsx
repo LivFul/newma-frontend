@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { TOUR_STEPS } from "@/lib/demo/tour/steps";
-import { goTo, isComplete, markDone, resetTour } from "@/lib/demo/tour/state";
+import { goTo, isComplete, markDone, resetTour, unmarkDone } from "@/lib/demo/tour/state";
 import type { TourState } from "@/lib/demo/tour/state";
 import type { UseTour } from "@/lib/demo/tour/use-tour";
 import type { PersonaId } from "@/lib/personas";
@@ -15,29 +15,45 @@ const LAST = TOUR_STEPS.length - 1;
 
 function StepList({ state, onGo }: Readonly<{ state: TourState; onGo: (index: number) => void }>) {
   return (
-    <ol aria-label="Tour steps" className="grid list-none gap-1 p-0 text-sm sm:grid-cols-2">
+    <ol
+      role="list"
+      aria-label="Jump to a tour step"
+      className="grid list-none gap-1 p-0 text-sm sm:grid-cols-2"
+    >
       {TOUR_STEPS.map((step, index) => (
-        <li key={step.id} className="flex items-center justify-between gap-2">
+        <li key={step.id}>
           <button
             type="button"
             aria-current={index === state.current ? "step" : undefined}
             onClick={() => onGo(index)}
-            className="min-h-8 text-left underline-offset-4 hover:underline aria-[current=step]:font-semibold"
+            className="min-h-8 w-full border-l-4 border-transparent pl-2 text-left underline-offset-4 hover:underline aria-[current=step]:border-accent aria-[current=step]:font-semibold"
           >
             {index + 1}. {step.title}
+            {state.done.includes(step.id) ? (
+              <span className="ml-2 text-xs font-medium">Done</span>
+            ) : null}
           </button>
-          {state.done.includes(step.id) ? <span className="text-xs font-medium">Done</span> : null}
         </li>
       ))}
     </ol>
   );
 }
 
+/** Ending the tour unmounts the panel: focus moves to the page's main region, not to <body>. */
+function endTour(tour: UseTour): void {
+  tour.end();
+  document.getElementById("main")?.focus();
+}
+
 /** The expanded tour panel; loaded lazily by TourDock (see tour-dock.tsx). */
 export default function TourPanel({ tour, state, persona }: Props) {
   const [expanded, setExpanded] = useState(false);
   const step = TOUR_STEPS[state.current]!;
-  const go = (index: number) => tour.update((s) => goTo(s, index));
+  const complete = isComplete(state);
+  // aria-disabled, not disabled: a pressed Previous must not drop keyboard focus.
+  const go = (index: number) => {
+    if (index >= 0 && index <= LAST) tour.update((s) => goTo(s, index));
+  };
 
   return (
     <aside
@@ -46,13 +62,13 @@ export default function TourPanel({ tour, state, persona }: Props) {
     >
       <div className="flex flex-wrap items-center gap-3">
         <p aria-live="polite" className="font-medium">
-          Guided tour, step {state.current + 1} of {TOUR_STEPS.length}: {step.title}
+          {`Guided tour, step ${state.current + 1} of ${TOUR_STEPS.length}: ${step.title}`}
         </p>
         <div className="flex flex-wrap gap-2">
           <Button
             variant="secondary"
             size="sm"
-            disabled={state.current === 0}
+            aria-disabled={state.current === 0 || undefined}
             onClick={() => go(state.current - 1)}
           >
             Previous
@@ -62,7 +78,7 @@ export default function TourPanel({ tour, state, persona }: Props) {
               Next
             </Button>
           ) : (
-            <Button size="sm" onClick={tour.end}>
+            <Button size="sm" onClick={() => endTour(tour)}>
               Finish tour
             </Button>
           )}
@@ -76,10 +92,13 @@ export default function TourPanel({ tour, state, persona }: Props) {
           </Button>
         </div>
       </div>
+      <p role="status" className="sr-only">
+        {complete ? "Tour complete: every step is done." : ""}
+      </p>
       {expanded ? (
         <div className="space-y-4">
-          {isComplete(state) ? (
-            <p role="status" className="font-medium">
+          {complete ? (
+            <p className="font-medium">
               Tour complete: every step is done. Restart it from step one or end the tour.
             </p>
           ) : null}
@@ -88,10 +107,14 @@ export default function TourPanel({ tour, state, persona }: Props) {
             index={state.current}
             persona={persona}
             done={state.done.includes(step.id)}
-            onMarkDone={() => tour.update((s) => markDone(s, step.id))}
+            onToggleDone={() =>
+              tour.update((s) =>
+                s.done.includes(step.id) ? unmarkDone(s, step.id) : markDone(s, step.id),
+              )
+            }
           >
-            <ResetButton label="Reset demo" />
-            {isComplete(state) ? (
+            <ResetButton />
+            {complete ? (
               <Button
                 variant="secondary"
                 size="sm"
@@ -100,7 +123,7 @@ export default function TourPanel({ tour, state, persona }: Props) {
                 Restart tour
               </Button>
             ) : null}
-            <Button variant="ghost" size="sm" onClick={tour.end}>
+            <Button variant="ghost" size="sm" onClick={() => endTour(tour)}>
               End tour
             </Button>
           </TourStepCard>

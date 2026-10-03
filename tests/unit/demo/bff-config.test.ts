@@ -84,15 +84,16 @@ describe("PUT /api/demo/config", () => {
     expect(sentBody(fetchMock)).toEqual({ speed_factor: null });
   });
 
-  it("forwards only speed_factor, dropping extra fields", async () => {
-    const fetchMock = armBff([Response.json(config)]);
-    await PUT(
+  it("rejects extra fields like the backend does, without calling it", async () => {
+    const fetchMock = armBff([]);
+    const response = await PUT(
       bffRequest("/api/demo/config", {
         method: "PUT",
-        json: { speed_factor: 2, tenant_id: "other", extra: true },
+        json: { speed_factor: 2, tenant_id: "other" },
       }),
     );
-    expect(sentBody(fetchMock)).toEqual({ speed_factor: 2 });
+    expect(response.status).toBe(422);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -101,6 +102,12 @@ describe("PUT /api/demo/config", () => {
     ["negative", { speed_factor: -1 }],
     ["a string", { speed_factor: "4" }],
     ["missing", {}],
+    ["a boolean", { speed_factor: true }],
+    ["an array", { speed_factor: [4] }],
+    ["an object", { speed_factor: { v: 4 } }],
+    ["below one", { speed_factor: 0.99 }],
+    ["above ten", { speed_factor: 10.01 }],
+    ["negative zero", { speed_factor: -0 }],
     ["not an object", [4]],
   ])("rejects %s with 422 before reaching the API", async (_name, body) => {
     const fetchMock = armBff([]);

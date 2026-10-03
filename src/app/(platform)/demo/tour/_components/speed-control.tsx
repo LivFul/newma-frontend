@@ -44,7 +44,7 @@ export function SpeedControl() {
   const selectId = useId();
   const [config, setConfig] = useState<DemoConfig | undefined>();
   const [error, setError] = useState<string | undefined>();
-  const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState<string | undefined>();
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
@@ -63,32 +63,38 @@ export function SpeedControl() {
     };
   }, [attempt]);
 
-  const choose = useCallback(async (choice: string) => {
-    const speed = parseSpeedChoice(choice);
-    if (speed === undefined) return setError(RANGE_MESSAGE);
-    setError(undefined);
-    setBusy(true);
-    const result = await putJson<DemoConfig>(CONFIG_URL, { speed_factor: speed });
-    setBusy(false);
-    if (result.ok) setConfig(result.data);
-    else setError(result.error.message);
-  }, []);
+  const choose = useCallback(
+    async (choice: string) => {
+      if (pending !== undefined) return;
+      const speed = parseSpeedChoice(choice);
+      if (speed === undefined) return setError(RANGE_MESSAGE);
+      setError(undefined);
+      setPending(choice);
+      const result = await putJson<DemoConfig>(CONFIG_URL, { speed_factor: speed });
+      setPending(undefined);
+      if (result.ok) setConfig(result.data);
+      else setError(result.error.message);
+    },
+    [pending],
+  );
 
   return (
     <section aria-labelledby="speed-heading" className="space-y-3" data-testid="demo-speed">
       <h2 id="speed-heading" className="flex flex-wrap items-center gap-2 text-xl font-semibold">
         Demo speed <Badge>Simulated workflow engine</Badge>
       </h2>
-      {config ? (
-        <p>
-          <strong>Demo speed: {config.speed_factor}×</strong>{" "}
-          <span className="text-fg-muted">
-            {config.speed_source === "tenant_override" ? "(your override)" : "(server default)"}
-          </span>
-        </p>
-      ) : error ? null : (
-        <p className="text-fg-muted">Reading the demo speed…</p>
-      )}
+      <div role="status">
+        {config ? (
+          <p>
+            <strong>Demo speed: {config.speed_factor}×</strong>{" "}
+            <span className="text-fg-muted">
+              {config.speed_source === "tenant_override" ? "(your override)" : "(server default)"}
+            </span>
+          </p>
+        ) : error ? null : (
+          <p className="text-fg-muted">Reading the demo speed…</p>
+        )}
+      </div>
       {config ? (
         <div className="flex flex-col gap-1">
           <label htmlFor={selectId} className="text-sm font-medium">
@@ -96,9 +102,8 @@ export function SpeedControl() {
           </label>
           <select
             id={selectId}
-            value={choiceOf(config)}
-            disabled={busy}
-            aria-busy={busy || undefined}
+            value={pending ?? choiceOf(config)}
+            aria-busy={pending !== undefined || undefined}
             onChange={(event) => void choose(event.target.value)}
             className="min-h-10 w-fit rounded-md border border-border-strong bg-bg-elevated px-3 text-fg"
           >

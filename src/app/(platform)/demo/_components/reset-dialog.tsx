@@ -30,8 +30,8 @@ export default function ResetDialog({ open, onOpenChange }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        title="Reset this tenant?"
-        description="Synthetic records for your demo tenant return to the seed. Other sessions are unaffected."
+        title="Reset demo data?"
+        description="Synthetic records for your demo tenant return to the seed, and an active guided tour returns to step 1. Other sessions are unaffected."
       >
         {error ? (
           <p role="alert" className="mb-3 text-sm text-danger">

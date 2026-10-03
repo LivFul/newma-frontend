@@ -19,8 +19,8 @@ describe("reset dialog and the tour", () => {
     );
     const heard = vi.fn();
     window.addEventListener(DEMO_RESET_EVENT, heard);
-    render(<ResetButton label="Reset demo" />);
-    fireEvent.click(screen.getByRole("button", { name: "Reset demo" }));
+    render(<ResetButton />);
+    fireEvent.click(screen.getByRole("button", { name: "Reset demo data" }));
     fireEvent.click(await screen.findByRole("button", { name: "Reset" }));
     await waitFor(() => expect(heard).toHaveBeenCalledTimes(1));
     window.removeEventListener(DEMO_RESET_EVENT, heard);

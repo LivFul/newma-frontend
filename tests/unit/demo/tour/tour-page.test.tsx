@@ -61,7 +61,8 @@ describe("/demo/tour", () => {
       tenant_id: "tenant-abc",
       current: 0,
     });
-    expect(await screen.findByRole("status")).toHaveTextContent(/step 1 of 16/i);
+    const progress = await screen.findByText(/in progress: step 1 of 16/i);
+    await waitFor(() => expect(progress).toHaveFocus());
   });
 
   it("shows progress and a restart when a tour is already running", async () => {
