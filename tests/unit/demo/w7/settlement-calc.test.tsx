@@ -281,6 +281,7 @@ const entry = (
   share_basis_points: kind === "residual" ? 0 : 1000,
   amount_demo_credits: amount,
   posted_at: "2030-01-02T00:00:00Z",
+  synthetic: true,
 });
 
 describe("LedgerTable (Review Focus 4)", () => {

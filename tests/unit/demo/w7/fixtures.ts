@@ -86,6 +86,7 @@ export const receipt = (over: Partial<Receipt> = {}): Receipt => ({
   duplicate_of: null,
   dispute_reason: null,
   recorded_by_persona: "finance",
+  synthetic: true,
   created_at: "2030-01-01T00:00:00Z",
   ...over,
 });
@@ -183,6 +184,7 @@ export const settlement = (over: Partial<Settlement> = {}): Settlement => ({
     },
   ],
   seeded_example: false,
+  synthetic: true,
   created_at: "2030-01-01T00:00:00Z",
   ...over,
 });

@@ -167,10 +167,11 @@ export type RetrainingProposal = Schemas["RetrainingProposalOut"];
 export type ElnEditResult = Schemas["ElnEditOut"];
 
 // ---------------------------------------------------------------------------------------------
-// W7 (D-17) contract shapes (docs/plans/p5a.md Contract table), hand-derived until the backend
-// spec for each group lands; then each group switches to components["schemas"] (one repin each).
+// W7 (D-17): licenses and settlements are generated from the pinned contract; the benefit,
+// beneficiary and outage shapes below follow docs/plans/p5a.md until their spec group lands.
 // Money is an integer in demo credits, shares are integer basis points (always "Illustrative").
 // ---------------------------------------------------------------------------------------------
+// Settlements (A8–A20): generated from the pinned contract.
 export const SETTLEMENT_STATES = [
   "submitted",
   "reviewed",
@@ -182,26 +183,17 @@ export const SETTLEMENT_STATES = [
   "paid",
   "audited",
   "paused",
-] as const;
-export type SettlementState = (typeof SETTLEMENT_STATES)[number];
+] as const satisfies readonly Schemas["SettlementOut"]["state"][];
+export type SettlementState = Schemas["SettlementOut"]["state"];
 // Licenses (A1–A7): generated from the pinned contract.
 export type LicenseState = Schemas["LicenseOut"]["status"];
 export type CredentialStatus = Schemas["CredentialOut"]["status"];
 export type LicenseAction = Schemas["LicenseOut"]["next_actions"][number];
-export type SettlementAction =
-  | "record_receipt"
-  | "review"
-  | "dispute"
-  | "resolve"
-  | "evidence_approval"
-  | "reconcile"
-  | "approve_distribution"
-  | "distribute"
-  | "audit";
-export type ReceiptStatus = "recorded" | "duplicate" | "disputed";
-export type LedgerKind = "beneficiary" | "reserve" | "residual";
+export type SettlementAction = Schemas["SettlementOut"]["next_actions"][number];
+export type ReceiptStatus = Schemas["ReceiptOut"]["status"];
+export type LedgerKind = Schemas["LedgerEntryOut"]["kind"];
 export type BenefitStatus = "planned" | "scheduled" | "delivered";
-export type AnchorStatus = "not_requested" | "pending" | "anchored";
+export type AnchorStatus = Schemas["AnchorOut"]["status"];
 export type LicensePurpose = Schemas["LicenseOut"]["purpose"];
 
 export type AgreementRule = Schemas["RuleOut"];
@@ -211,122 +203,17 @@ export type LicenseDecision = Schemas["DecisionOut"];
 export type License = Schemas["LicenseOut"];
 export type LicenseOptions = Schemas["LicenseOptions"];
 
-export type Receipt = Readonly<{
-  id: string;
-  settlement_id: string;
-  external_ref: string;
-  amount_demo_credits: number;
-  status: ReceiptStatus;
-  duplicate_of: string | null;
-  dispute_reason: string | null;
-  recorded_by_persona: string | null;
-  created_at: string;
-}>;
-export type CalcLine = Readonly<{
-  kind: LedgerKind;
-  beneficiary_id: string | null;
-  beneficiary_display_name: string | null;
-  share_basis_points: number;
-  amount_demo_credits: number;
-}>;
-export type Calculation = Readonly<{
-  distributable_demo_credits: number;
-  held_demo_credits: number;
-  lines: readonly CalcLine[];
-  sha256: string;
-  frozen: boolean;
-  label: "Illustrative";
-}>;
-export type SettlementApproval = Readonly<{
-  persona: string;
-  rationale: string;
-  calculation_sha256: string;
-  approved_at: string;
-  event_id: string;
-}>;
-export type LedgerEntry = Readonly<{
-  id: string;
-  kind: LedgerKind;
-  beneficiary_id: string | null;
-  beneficiary_display_name: string | null;
-  share_basis_points: number;
-  amount_demo_credits: number;
-  posted_at: string;
-}>;
-export type Commitment = Readonly<{
-  event_id: string;
-  manifest_sha256: string;
-  signature: string;
-  kid: string;
-  signature_label: "Demo signature, not production key";
-  committed_at: string;
-  summary: Readonly<{
-    distributable_demo_credits: number;
-    ledger_total_demo_credits: number;
-    rules_sha256: string;
-    receipts_sha256: string;
-    ledger_sha256: string;
-  }>;
-}>;
-export type Anchor = Readonly<{
-  status: AnchorStatus;
-  label: "Optional, simulated";
-  job_id: string | null;
-  job_state: string | null;
-  receipt_ref: string | null;
-  manifest_sha256: string | null;
-  requested_at: string | null;
-  anchored_at: string | null;
-}>;
-export type SettlementHistoryEntry = Readonly<{
-  from: string | null;
-  event: string;
-  to: string;
-  persona: string;
-  at: string;
-}>;
-export type Settlement = Readonly<{
-  id: string;
-  display_id: string;
-  license_id: string | null;
-  license_display_id: string | null;
-  agreement: AgreementView;
-  state: SettlementState;
-  next_actions: readonly SettlementAction[];
-  receipts: readonly Receipt[];
-  totals: Readonly<{
-    recorded_demo_credits: number;
-    held_demo_credits: number;
-    duplicate_count: number;
-  }>;
-  calculation: Calculation | null;
-  approvals: Readonly<{
-    required: 2;
-    eligible_personas: readonly string[];
-    items: readonly SettlementApproval[];
-  }>;
-  ledger: readonly LedgerEntry[];
-  commitment: Commitment | null;
-  anchor: Anchor;
-  history: readonly SettlementHistoryEntry[];
-  seeded_example: boolean;
-  created_at: string;
-}>;
-export type SettlementSummary = Readonly<{
-  id: string;
-  display_id: string;
-  license_id: string | null;
-  state: SettlementState;
-  recorded_demo_credits: number;
-  held_demo_credits: number;
-  seeded_example: boolean;
-  created_at: string;
-}>;
-export type ApprovalResult = Readonly<{
-  approval: SettlementApproval;
-  settlement: Settlement;
-  authorized: boolean;
-}>;
+export type Receipt = Schemas["ReceiptOut"];
+export type CalcLine = Schemas["CalcLineOut"];
+export type Calculation = Schemas["CalculationOut"];
+export type SettlementApproval = Schemas["ApprovalOut"];
+export type LedgerEntry = Schemas["LedgerEntryOut"];
+export type Commitment = Schemas["CommitmentOut"];
+export type Anchor = Schemas["AnchorOut"];
+export type SettlementHistoryEntry = Schemas["HistoryEntry"];
+export type Settlement = Schemas["SettlementOut"];
+export type SettlementSummary = Schemas["SettlementSummary"];
+export type ApprovalResult = Schemas["ApprovalCreated"];
 export type BenefitItem = Readonly<{
   id: string;
   license_id: string;
