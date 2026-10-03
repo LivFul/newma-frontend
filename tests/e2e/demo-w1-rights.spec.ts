@@ -113,6 +113,7 @@ test.describe("W1 rights and policy", { tag: "@needs-backend" }, () => {
     });
     expect(raised.status()).toBe(303);
 
+    await page.waitForLoadState("networkidle");
     await switchPersona(page, "data_steward");
     await page.goto(ROUTE);
     const row = page
@@ -127,6 +128,7 @@ test.describe("W1 rights and policy", { tag: "@needs-backend" }, () => {
     await expect(row.getByTestId("grievance-indicator")).toHaveText("None", { timeout: SLOW_MS });
 
     // Persona check: a partner sees the notice and a forced list request is refused.
+    await page.waitForLoadState("networkidle");
     await switchPersona(page, "partner");
     await page.goto(ROUTE);
     await expect(page.getByText(/Only .*Data steward.* can do this/).first()).toBeVisible();

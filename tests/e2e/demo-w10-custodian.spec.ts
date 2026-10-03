@@ -58,6 +58,8 @@ test.describe("W10 custodian view", { tag: "@needs-backend" }, () => {
     await expect(concerns(page).first()).toContainText("The promised yearly report did not arrive");
     await expect(concerns(page).first()).toContainText("Open");
 
+    await page.waitForLoadState("networkidle");
+
     await switchPersona(page, "data_steward");
     await page.goto("/demo/w1-rights");
     const indicator = page.getByTestId("grievance-indicator").filter({ hasText: "1 open" });
@@ -90,12 +92,14 @@ test.describe("W10 custodian view", { tag: "@needs-backend" }, () => {
         items: { id: string }[];
       }
     ).items[0].id;
+    await page.waitForLoadState("networkidle");
     await switchPersona(page, "scientist");
     await page.goto(ROUTE);
     await expect(page.getByRole("note").filter({ hasText: "Community liaison" })).toBeVisible();
     await expect(page.getByRole("article")).toHaveCount(0);
 
     // A forced post as partner redirects with an error code and creates nothing.
+    await page.waitForLoadState("networkidle");
     await switchPersona(page, "partner");
     const forced = await page.request.post("/api/demo/grievances", {
       headers: { origin: baseURL ?? "" },
@@ -109,6 +113,7 @@ test.describe("W10 custodian view", { tag: "@needs-backend" }, () => {
     });
     expect(forced.status()).toBe(303);
     expect(forced.headers().location).toContain("/demo/w10-custodian?error=persona_forbidden");
+    await page.waitForLoadState("networkidle");
     await switchPersona(page, "data_steward");
     const queue = (await (await page.request.get("/api/demo/grievances")).json()) as {
       items: unknown[];

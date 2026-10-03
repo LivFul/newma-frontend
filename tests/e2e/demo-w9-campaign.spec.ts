@@ -108,6 +108,7 @@ test.describe("W9 campaign charter and quotas", { tag: "@needs-backend" }, () =>
     const campaignId = (
       (await (await page.request.get("/api/demo/campaigns")).json()) as { items: { id: string }[] }
     ).items[0].id;
+    await page.waitForLoadState("networkidle");
     await switchPersona(page, "scientist");
     await page.goto(ROUTE);
     await expect(saveThresholds(page)).toHaveAttribute("aria-disabled", "true");

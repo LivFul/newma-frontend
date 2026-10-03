@@ -79,12 +79,15 @@ test.describe("W8 partner portal and controlled export", { tag: "@needs-backend"
     const evidence = await page.request.get(`/api/demo/assets/${assetId}/evidence`);
     const recordId = ((await evidence.json()) as { policy: { rights_record_ids: string[] } }).policy
       .rights_record_ids[0];
+    await page.waitForLoadState("networkidle");
     await switchPersona(page, "community_liaison");
     const withdrawn = await page.request.post(`/api/demo/rights/records/${recordId}/withdraw`, {
       headers: { origin: baseURL ?? "" },
       data: { reason: "The fictional community withdrew consent" },
     });
     expect(withdrawn.ok()).toBe(true);
+
+    await page.waitForLoadState("networkidle");
 
     await switchPersona(page, "partner");
     await page.goto(ROUTE);
@@ -111,6 +114,8 @@ test.describe("W8 partner portal and controlled export", { tag: "@needs-backend"
     await page.goto(ROUTE);
     await expect(issue(page)).toHaveAttribute("aria-disabled", "true");
     const assetId = await rankOneAssetId(page);
+
+    await page.waitForLoadState("networkidle");
 
     await switchPersona(page, "scientist");
     await page.goto(ROUTE);
