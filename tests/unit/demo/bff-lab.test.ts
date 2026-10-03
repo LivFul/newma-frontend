@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { GET as BATCHES } from "@/app/api/demo/material-batches/route";
 import { POST as CREATE_WP } from "@/app/api/demo/work-packages/route";
 import { GET as READ_WP } from "@/app/api/demo/work-packages/[id]/route";
@@ -152,5 +152,17 @@ describe("W5 lab BFF", () => {
     });
     expect(sentUrl(fetchMock, 1)).toBe(`https://api.example/v1/retraining-proposals/${ID}/execute`);
     expect(fetchMock.mock.calls[1][1].body).toBeUndefined();
+  });
+
+  it("answers 409 locally even if the backend ever returns 2xx for execute (IP C-04 invariant)", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    armBff([Response.json({ id: ID, status: "executed" }, { status: 200 })]);
+    const response = await EXECUTE(post(), ctx(ID));
+    expect(response.status).toBe(409);
+    const body = await response.json();
+    expect(body.code).toBe("retraining_not_authorized");
+    expect(JSON.stringify(body)).not.toContain("executed");
+    expect(error).toHaveBeenCalled();
+    error.mockRestore();
   });
 });
