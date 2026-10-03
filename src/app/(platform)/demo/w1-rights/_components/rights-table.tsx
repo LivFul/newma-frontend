@@ -1,5 +1,5 @@
 import { Badge, type BadgeProps, SyntheticBadge } from "@/components/ui";
-import type { RightsRecordWithGrievances, RightsStatus } from "@/lib/demo/types";
+import type { RightsRecord, RightsStatus } from "@/lib/demo/types";
 import { humanize } from "../../_components/fields";
 import { WithdrawDialog } from "./withdraw-dialog";
 
@@ -16,11 +16,11 @@ const grievanceText = (open: number | undefined): string => (open ? `${open} ope
 const list = (values: readonly string[]) =>
   values.length ? values.map(humanize).join(", ") : "none";
 
-function validity(record: RightsRecordWithGrievances): string {
+function validity(record: RightsRecord): string {
   return `${record.valid_from} – ${record.valid_until ?? "open-ended"}`;
 }
 
-type Props = Readonly<{ records: readonly RightsRecordWithGrievances[]; canWithdraw: boolean }>;
+type Props = Readonly<{ records: readonly RightsRecord[]; canWithdraw: boolean }>;
 
 export function RightsTable({ records, canWithdraw }: Props) {
   return (

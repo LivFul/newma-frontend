@@ -324,6 +324,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/custodian/view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Plain-language custodian view: approved uses, obligations and grievances (synthetic) */
+        get: operations["custodian_get_custodian_view"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/demo/eln/records/{record_id}/edit": {
         parameters: {
             query?: never;
@@ -490,6 +507,41 @@ export interface paths {
         put?: never;
         /** Sign a gate decision (scientific approver, step-up confirmed; signed event) */
         post: operations["review_decide_gate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/grievances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The grievance queue, newest first (at most 100) */
+        get: operations["grievances_list_grievances"];
+        put?: never;
+        /** Raise a grievance against a rights record (signed event, text hashed) */
+        post: operations["grievances_raise_grievance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/grievances/{grievance_id}/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Acknowledge a grievance (signed event) */
+        post: operations["grievances_acknowledge_grievance"];
         delete?: never;
         options?: never;
         head?: never;
@@ -900,6 +952,8 @@ export interface components {
             /** Rationale */
             rationale: string;
         };
+        /** AcknowledgeRequest */
+        AcknowledgeRequest: Record<string, never>;
         /** AgentQueryCreate */
         AgentQueryCreate: {
             /** Budget Credits */
@@ -1392,6 +1446,87 @@ export interface components {
              */
             unit: "demo credits";
         };
+        /** CustodianAgreement */
+        CustodianAgreement: {
+            /** Authority */
+            authority: string;
+            /** Can Raise Grievance */
+            can_raise_grievance: boolean;
+            /** Grievances */
+            grievances: components["schemas"]["GrievanceOut"][];
+            /** Obligations */
+            obligations: components["schemas"]["CustodianObligation"][];
+            /**
+             * Rights Record Id
+             * Format: uuid
+             */
+            rights_record_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "valid" | "expired" | "purpose_restricted" | "disputed" | "withdrawn";
+            /** Status Text */
+            status_text: string;
+            /** Title */
+            title: string;
+            /** Uses Allowed */
+            uses_allowed: components["schemas"]["UseText"][];
+            /** Uses Not Allowed */
+            uses_not_allowed: components["schemas"]["UseText"][];
+            /** Validity Text */
+            validity_text: string;
+        };
+        /** CustodianObligation */
+        CustodianObligation: {
+            /** Due On */
+            due_on: string | null;
+            /** Fulfilled On */
+            fulfilled_on: string | null;
+            /** Id */
+            id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "fulfilled" | "due" | "overdue";
+            /** Status Text */
+            status_text: string;
+            /** Text */
+            text: string;
+        };
+        /** CustodianSummary */
+        CustodianSummary: {
+            /** Agreements */
+            agreements: number;
+            /** Obligations */
+            obligations: number;
+            /** Obligations Fulfilled */
+            obligations_fulfilled: number;
+            /** Obligations Overdue */
+            obligations_overdue: number;
+            /** Open Grievances */
+            open_grievances: number;
+            /** Uses Allowed */
+            uses_allowed: number;
+        };
+        /** CustodianViewOut */
+        CustodianViewOut: {
+            /** Agreements */
+            agreements: components["schemas"]["CustodianAgreement"][];
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+            summary: components["schemas"]["CustodianSummary"];
+            /**
+             * Synthetic
+             * @default true
+             * @constant
+             */
+            synthetic: true;
+        };
         /** DemoKeys */
         DemoKeys: {
             /** Keys */
@@ -1861,6 +1996,75 @@ export interface components {
             /** Gates */
             gates: components["schemas"]["GateOut"][];
         };
+        /** GrievanceCreate */
+        GrievanceCreate: {
+            /**
+             * Category
+             * @enum {string}
+             */
+            category: "obligation_not_met" | "use_outside_agreement" | "consent_concern" | "benefit_not_received" | "other";
+            /** Description */
+            description: string;
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+            /** Obligation Id */
+            obligation_id?: string | null;
+            /**
+             * Rights Record Id
+             * Format: uuid
+             */
+            rights_record_id: string;
+        };
+        /** GrievanceOut */
+        GrievanceOut: {
+            /** Acknowledged At */
+            acknowledged_at: string | null;
+            /** Acknowledged By Persona */
+            acknowledged_by_persona: string | null;
+            /**
+             * Category
+             * @enum {string}
+             */
+            category: "obligation_not_met" | "use_outside_agreement" | "consent_concern" | "benefit_not_received" | "other";
+            /** Category Text */
+            category_text: string;
+            /** Description */
+            description: string;
+            /**
+             * Event Id
+             * Format: uuid
+             */
+            event_id: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Obligation Id */
+            obligation_id: string | null;
+            /**
+             * Raised At
+             * Format: date-time
+             */
+            raised_at: string;
+            /** Raised By Persona */
+            raised_by_persona: string;
+            /**
+             * Rights Record Id
+             * Format: uuid
+             */
+            rights_record_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "acknowledged";
+            /** Subject Display Name */
+            subject_display_name: string;
+        };
         /** HealthResponse */
         HealthResponse: {
             /**
@@ -1985,6 +2189,11 @@ export interface components {
         ItemList_ExportSummaryOut_: {
             /** Items */
             items: components["schemas"]["ExportSummaryOut"][];
+        };
+        /** ItemList[GrievanceOut] */
+        ItemList_GrievanceOut_: {
+            /** Items */
+            items: components["schemas"]["GrievanceOut"][];
         };
         /** ItemList[MaterialBatchOut] */
         ItemList_MaterialBatchOut_: {
@@ -2574,6 +2783,11 @@ export interface components {
             obligations: {
                 [key: string]: unknown;
             }[];
+            /**
+             * Open Grievance Count
+             * @default 0
+             */
+            open_grievance_count: number;
             /** Permitted Uses */
             permitted_uses: string[];
             /** Pic Reference */
@@ -2745,6 +2959,16 @@ export interface components {
             entity_type: "rights_record" | "policy_decision" | "claim" | "curated_release" | "agent_query" | "gate" | "work_package" | "assay_import";
             /** Events */
             events: components["schemas"]["EventOut"][];
+        };
+        /** UseText */
+        UseText: {
+            /**
+             * Purpose
+             * @enum {string}
+             */
+            purpose: "research" | "commercial" | "disclosure" | "model_training" | "onward_transfer";
+            /** Text */
+            text: string;
         };
         /** VerifyOut */
         VerifyOut: {
@@ -4316,6 +4540,64 @@ export interface operations {
             };
         };
     };
+    custodian_get_custodian_view: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustodianViewOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     demo_edit_eln_record: {
         parameters: {
             query?: never;
@@ -5046,6 +5328,238 @@ export interface operations {
                 };
             };
             /** @description step_up_mismatch or validation_error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    grievances_list_grievances: {
+        parameters: {
+            query?: {
+                status?: ("open" | "acknowledged") | null;
+                rights_record_id?: string | null;
+            };
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemList_GrievanceOut_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description validation_error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    grievances_raise_grievance: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GrievanceCreate"];
+            };
+        };
+        responses: {
+            /** @description Replay of an existing idempotency key */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GrievanceOut"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GrievanceOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such rights record or obligation in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description idempotency_conflict: same key, different body */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description validation_error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    grievances_acknowledge_grievance: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                grievance_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcknowledgeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GrievanceOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such grievance in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description grievance_already_acknowledged */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -6539,7 +7053,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description idempotency_conflict: same key, different body */
+            /** @description idempotency_conflict: same key, different body; quota_exhausted: the lab job exceeds the campaign credit quota */
             409: {
                 headers: {
                     [name: string]: unknown;

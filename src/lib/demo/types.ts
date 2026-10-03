@@ -168,7 +168,7 @@ export type ElnEditResult = Schemas["ElnEditOut"];
 
 // ---------------------------------------------------------------------------------------------
 // P5b contract shapes (docs/plans/p5b.md Contract table, rows 1-17). W8 and W9 are generated from
-// the pinned contract; W10 and the demo config stay hand-derived until their spec lands.
+// the pinned contract; the demo config stays hand-derived until its spec lands.
 // ---------------------------------------------------------------------------------------------
 export const EXPORT_PURPOSES = ["research", "commercial"] as const;
 export type ExportPurpose = (typeof EXPORT_PURPOSES)[number];
@@ -221,60 +221,11 @@ export type CharterOut = Schemas["CharterOut"];
 export type CharterChange = Schemas["CharterChangeOut"];
 export type CreditUsage = Schemas["CreditUsageOut"];
 
-export type Grievance = Readonly<{
-  id: string;
-  rights_record_id: string;
-  subject_display_name: string;
-  obligation_id: string | null;
-  category: GrievanceCategory;
-  category_text: string;
-  description: string;
-  status: GrievanceStatus;
-  raised_by_persona: string;
-  raised_at: string;
-  acknowledged_at: string | null;
-  acknowledged_by_persona: string | null;
-  event_id: string;
-}>;
-
-export type CustodianObligation = Readonly<{
-  id: string;
-  text: string;
-  due_on: string | null;
-  status: ObligationStatus;
-  status_text: string;
-  fulfilled_on: string | null;
-}>;
-
-export type CustodianUse = Readonly<{ purpose: Purpose; text: string }>;
-
-export type CustodianAgreement = Readonly<{
-  rights_record_id: string;
-  title: string;
-  authority: string;
-  status: RightsStatus;
-  status_text: string;
-  validity_text: string;
-  uses_allowed: readonly CustodianUse[];
-  uses_not_allowed: readonly CustodianUse[];
-  obligations: readonly CustodianObligation[];
-  grievances: readonly Grievance[];
-  can_raise_grievance: boolean;
-}>;
-
-export type CustodianView = Readonly<{
-  generated_at: string;
-  summary: Readonly<{
-    agreements: number;
-    uses_allowed: number;
-    obligations: number;
-    obligations_fulfilled: number;
-    obligations_overdue: number;
-    open_grievances: number;
-  }>;
-  agreements: readonly CustodianAgreement[];
-  synthetic: true;
-}>;
+export type Grievance = Schemas["GrievanceOut"];
+export type CustodianObligation = Schemas["CustodianObligation"];
+export type CustodianUse = Schemas["UseText"];
+export type CustodianAgreement = Schemas["CustodianAgreement"];
+export type CustodianView = Schemas["CustodianViewOut"];
 
 export type DemoConfig = Readonly<{
   speed_factor: number;
@@ -283,6 +234,3 @@ export type DemoConfig = Readonly<{
   min_speed_factor: 1;
   max_speed_factor: 10;
 }>;
-
-/** A rights record as W1 reads it once the backend adds the grievance counter (row 15). */
-export type RightsRecordWithGrievances = RightsRecord & { open_grievance_count?: number };

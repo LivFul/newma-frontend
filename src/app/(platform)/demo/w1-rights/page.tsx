@@ -1,7 +1,7 @@
 import { requireSession } from "@/lib/demo/current-session";
 import { canAct } from "@/lib/demo/persona-actions";
 import { load } from "@/lib/demo/server-data";
-import type { CacheEntry, Grievance, Items, RightsRecordWithGrievances } from "@/lib/demo/types";
+import type { CacheEntry, Grievance, Items, RightsRecord } from "@/lib/demo/types";
 import { ErrorNotice } from "../_components/error-notice";
 import { PersonaForbiddenNotice } from "../_components/persona-forbidden-notice";
 import { WorkflowHeader } from "../_components/workflow-header";
@@ -14,14 +14,14 @@ import { REGISTRY_HEADING_ID } from "./_components/withdraw-dialog";
 // Every read is no-store (demoFetch) and the layout is force-dynamic, so router.refresh() after a
 // withdrawal re-reads the registry and the cache (Review Focus 1). The evaluator is keyed on the
 // record statuses: a withdrawal remounts it and drops the earlier "allow".
-const statusKey = (records: readonly RightsRecordWithGrievances[]) =>
+const statusKey = (records: readonly RightsRecord[]) =>
   records.map((r) => `${r.id}:${r.status}`).join(",");
 
 export default async function RightsPage() {
   const session = await requireSession();
   const canSeeGrievances = canAct(session.persona, "view_grievances");
   const [records, cache, grievances] = await Promise.all([
-    load<Items<RightsRecordWithGrievances>>("/v1/rights/records"),
+    load<Items<RightsRecord>>("/v1/rights/records"),
     load<Items<CacheEntry>>("/v1/retrieval/cache"),
     canSeeGrievances ? load<Items<Grievance>>("/v1/grievances") : undefined,
   ]);

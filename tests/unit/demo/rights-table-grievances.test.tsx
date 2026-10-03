@@ -1,11 +1,11 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { RightsTable } from "@/app/(platform)/demo/w1-rights/_components/rights-table";
-import type { RightsRecordWithGrievances } from "@/lib/demo/types";
+import type { RightsRecord } from "@/lib/demo/types";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 
-const record = (id: string, open?: number): RightsRecordWithGrievances => ({
+const record = (id: string, open?: number): RightsRecord => ({
   id,
   subject_type: "taxon",
   subject_id: `s-${id}`,
@@ -21,7 +21,7 @@ const record = (id: string, open?: number): RightsRecordWithGrievances => ({
   mat_reference: null,
   obligations: [],
   synthetic: true,
-  ...(open === undefined ? {} : { open_grievance_count: open }),
+  open_grievance_count: open as number,
 });
 
 describe("RightsTable grievance indicator", () => {
