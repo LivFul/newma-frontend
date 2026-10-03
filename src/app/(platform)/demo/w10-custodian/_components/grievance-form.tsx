@@ -10,16 +10,27 @@ const CATEGORY_TEXT: Readonly<Record<GrievanceCategory, string>> = {
 
 const FIELD = "min-h-10 w-full rounded-md border border-border-strong bg-bg-elevated px-3 text-fg";
 
-type Props = Readonly<{ agreement: CustodianAgreement; idempotencyKey: string }>;
+type Props = Readonly<{
+  agreement: CustodianAgreement;
+  idempotencyKey: string;
+  /** The last post for this agreement was refused: mark the description and say why. */
+  invalid?: boolean;
+  invalidText?: string;
+}>;
 
 /**
  * A plain HTML form: it works without JavaScript. The page renders a fresh key per agreement, so a
  * double submit is a replay at the backend, not a second concern.
  */
-export function GrievanceForm({ agreement, idempotencyKey }: Props) {
+export function GrievanceForm({ agreement, idempotencyKey, invalid, invalidText }: Props) {
   const id = agreement.rights_record_id;
   return (
-    <form method="post" action="/api/demo/grievances" className="space-y-3">
+    <form
+      method="post"
+      action="/api/demo/grievances"
+      aria-labelledby={`agreement-${id}`}
+      className="space-y-3"
+    >
       <input type="hidden" name="rights_record_id" value={id} />
       <input type="hidden" name="idempotency_key" value={idempotencyKey} />
       <div className="space-y-1">
@@ -54,17 +65,23 @@ export function GrievanceForm({ agreement, idempotencyKey }: Props) {
       </div>
       <div className="space-y-1">
         <label htmlFor={`description-${id}`} className="block text-sm font-medium">
-          Tell us what happened
+          Tell us what happened (required)
         </label>
         <p id={`hint-${id}`} className="text-xs text-fg-muted">
           Write at least 10 characters and at most 1000.
         </p>
+        {invalid && invalidText ? (
+          <p id={`error-${id}`} className="text-sm text-danger">
+            {invalidText}
+          </p>
+        ) : null}
         <textarea
           id={`description-${id}`}
           name="description"
           rows={4}
           maxLength={1000}
-          aria-describedby={`hint-${id}`}
+          aria-describedby={invalid ? `error-${id} hint-${id}` : `hint-${id}`}
+          aria-invalid={invalid || undefined}
           className={`${FIELD} py-2`}
         />
       </div>

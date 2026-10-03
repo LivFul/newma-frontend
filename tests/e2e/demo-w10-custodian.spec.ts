@@ -108,7 +108,7 @@ test.describe("W10 custodian view", { tag: "@needs-backend" }, () => {
       maxRedirects: 0,
     });
     expect(forced.status()).toBe(303);
-    expect(forced.headers().location).toBe("/demo/w10-custodian?error=persona_forbidden");
+    expect(forced.headers().location).toContain("/demo/w10-custodian?error=persona_forbidden");
     await switchPersona(page, "data_steward");
     const queue = (await (await page.request.get("/api/demo/grievances")).json()) as {
       items: unknown[];

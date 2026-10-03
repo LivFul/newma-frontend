@@ -6,7 +6,7 @@ export function GrievanceList({ grievances }: { grievances: readonly Grievance[]
     return <p className="text-sm">No concerns have been sent about this agreement.</p>;
   }
   return (
-    <ul className="list-none space-y-2 p-0">
+    <ul role="list" className="list-none space-y-2 p-0">
       {grievances.map((grievance) => (
         <li
           key={grievance.id}
@@ -16,7 +16,7 @@ export function GrievanceList({ grievances }: { grievances: readonly Grievance[]
           <p className="font-medium">
             {grievance.status === "open" ? "Open" : "Acknowledged"}: {grievance.category_text}
           </p>
-          <p>{grievance.description}</p>
+          <p className="break-words">{grievance.description}</p>
         </li>
       ))}
     </ul>

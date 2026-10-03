@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { requireSession } from "@/lib/demo/current-session";
 import { canAct } from "@/lib/demo/persona-actions";
 import { load } from "@/lib/demo/server-data";
@@ -9,6 +10,8 @@ import { AgreementCard } from "./_components/agreement-card";
 import { OutcomeNotice } from "./_components/outcome-notice";
 import { Summary } from "./_components/summary";
 
+export const metadata: Metadata = { title: "Custodian view — NEWMA demo" };
+
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 const first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);
 
@@ -18,6 +21,12 @@ export default async function CustodianPage({ searchParams }: { searchParams: Se
   const [session, params] = await Promise.all([requireSession(), searchParams]);
   const allowed = canAct(session.persona, "view_custodian");
   const view = allowed ? await load<CustodianView>("/v1/custodian/view") : undefined;
+  const raised = first(params.raised);
+  const refusedFor = first(params.error) === "validation_error" ? first(params.for) : undefined;
+  // A hand-typed ?raised= must not read as a success: the id has to be a listed concern.
+  const raisedKnown =
+    raised === "1" ||
+    (view?.data?.agreements ?? []).some((a) => a.grievances.some((g) => g.id === raised));
   return (
     <>
       <WorkflowHeader id="W10" title="Custodian view">
@@ -27,7 +36,7 @@ export default async function CustodianPage({ searchParams }: { searchParams: Se
       {allowed ? null : (
         <PersonaForbiddenNotice allowed={["community_liaison", "data_steward", "tenant_admin"]} />
       )}
-      <OutcomeNotice raised={first(params.raised)} error={first(params.error)} />
+      <OutcomeNotice raised={raised} error={first(params.error)} raisedKnown={raisedKnown} />
       <ErrorNotice error={view?.error} />
       {view?.data ? (
         <>
@@ -37,6 +46,7 @@ export default async function CustodianPage({ searchParams }: { searchParams: Se
               key={agreement.rights_record_id}
               agreement={agreement}
               idempotencyKey={crypto.randomUUID()}
+              refused={refusedFor === agreement.rights_record_id}
             />
           ))}
         </>

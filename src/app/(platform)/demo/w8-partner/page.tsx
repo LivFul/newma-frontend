@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { requireSession } from "@/lib/demo/current-session";
 import { canAct } from "@/lib/demo/persona-actions";
 import { load } from "@/lib/demo/server-data";
@@ -26,6 +27,8 @@ import { toExportPackInfo } from "./_components/export-pack-info";
 import { GoverningRights } from "./_components/governing-rights";
 import { PurposeTabs } from "./_components/purpose-tabs";
 import { StageTabs } from "./_components/stage-tabs";
+
+export const metadata: Metadata = { title: "Partner portal & controlled export — NEWMA demo" };
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 

@@ -45,7 +45,8 @@ export function grievanceFromForm(form: URLSearchParams): Record<string, unknown
     rights_record_id: form.get("rights_record_id") ?? undefined,
     ...(obligation ? { obligation_id: obligation } : {}),
     category: form.get("category") ?? undefined,
-    description: form.get("description") ?? undefined,
+    // Browsers send newlines as CRLF; the backend counts characters, so normalise before the check.
+    description: form.get("description")?.replaceAll("\r\n", "\n"),
     idempotency_key: form.get("idempotency_key") ?? undefined,
   };
 }

@@ -121,7 +121,7 @@ describe("GrievanceForm (plain HTML, no JavaScript)", () => {
       "Share a summary of results",
       "Offer a training day",
     ]);
-    const description = screen.getByLabelText("Tell us what happened");
+    const description = screen.getByLabelText("Tell us what happened (required)");
     expect(description).toHaveAttribute("name", "description");
     expect(description).toHaveAttribute("maxlength", "1000");
     expect(description).not.toHaveAttribute("required");
@@ -146,13 +146,21 @@ describe("GrievanceForm (plain HTML, no JavaScript)", () => {
 });
 
 describe("OutcomeNotice", () => {
-  it("announces a sent concern as a status", () => {
+  it("announces a sent concern in a focusable section named by its heading", () => {
     render(<OutcomeNotice raised="grv-1" error={undefined} />);
+    const section = screen.getByRole("region", { name: "Your concern was sent" });
+    expect(section).toHaveAttribute("id", "outcome");
+    expect(section).toHaveAttribute("tabindex", "-1");
     expect(screen.getByRole("status")).toHaveTextContent("Your concern was sent");
   });
 
+  it("does not read a hand-typed ?raised= as a success", () => {
+    render(<OutcomeNotice raised="grv-1" error={undefined} raisedKnown={false} />);
+    expect(screen.queryByText(/Your concern was sent/)).toBeNull();
+  });
+
   it.each([
-    ["validation_error", "Please describe your concern in at least 10 characters"],
+    ["validation_error", "Please describe your concern in at least 10 characters and at most 1000"],
     ["persona_forbidden", "Only a community liaison can send a concern"],
     ["not_found", "could not find"],
     ["idempotency_conflict", "already sent"],
@@ -168,9 +176,9 @@ describe("OutcomeNotice", () => {
     expect(screen.queryByRole("alert")).toBeNull();
   });
 
-  it("keeps a persistent live region even when empty", () => {
+  it("renders nothing visible when there is no outcome", () => {
     const { container } = render(<OutcomeNotice raised={undefined} error={undefined} />);
-    expect(container.querySelector('[aria-live="polite"]')).not.toBeNull();
+    expect(container).toHaveTextContent("");
   });
 });
 
@@ -218,6 +226,29 @@ describe("AgreementCard", () => {
     );
     expect(container.querySelector("details")).toBeNull();
     expect(screen.getByText(/Only a community liaison can send a concern/)).toBeInTheDocument();
+  });
+
+  it("opens the form and marks the description invalid when the last post for it was refused", () => {
+    const { container } = render(
+      <AgreementCard agreement={custodianAgreement()} idempotencyKey="k" refused />,
+    );
+    expect(container.querySelector("details")).toHaveAttribute("open");
+    const description = screen.getByLabelText("Tell us what happened (required)");
+    expect(description).toHaveAttribute("aria-invalid", "true");
+    expect(description.getAttribute("aria-describedby")).toContain("error-rec-1");
+    expect(container.querySelector("#error-rec-1")).toHaveTextContent("at least 10 characters");
+  });
+
+  it("names the form after the agreement heading", () => {
+    render(<AgreementCard agreement={custodianAgreement()} idempotencyKey="k" refused />);
+    expect(screen.getByRole("form", { name: /Exemplaria viridis/ })).toBeInTheDocument();
+  });
+
+  it("names each summary with the agreement title for assistive technology", () => {
+    render(<AgreementCard agreement={custodianAgreement()} idempotencyKey="k" />);
+    expect(
+      screen.getByText(/Exemplaria viridis.*fictional.*Cooperative/, { selector: ".sr-only" }),
+    ).toBeInTheDocument();
   });
 
   it("lists the grievances already raised about the agreement", () => {

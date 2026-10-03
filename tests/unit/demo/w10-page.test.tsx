@@ -57,9 +57,21 @@ describe("W10 page", () => {
     for (const key of keys) expect(key).toMatch(/^[A-Za-z0-9._:-]{1,128}$/);
   });
 
-  it("shows the sent notice from ?raised and the error sentence from ?error", async () => {
-    await page({ raised: "grv-1" });
+  it("shows the sent notice only for a listed concern or the fallback marker", async () => {
+    await page({ raised: "grv-9" });
+    expect(screen.queryByText(/Your concern was sent/)).toBeNull();
+  });
+
+  it("shows the sent notice for the fallback marker", async () => {
+    await page({ raised: "1" });
     expect(screen.getByRole("status")).toHaveTextContent("Your concern was sent");
+  });
+
+  it("reopens the form of the refused agreement from ?for", async () => {
+    const { container } = await page({ error: "validation_error", for: "rec-2" });
+    const open = [...container.querySelectorAll("details")].filter((d) => d.hasAttribute("open"));
+    expect(open).toHaveLength(1);
+    expect(open[0]).toHaveTextContent("Second agreement");
   });
 
   it("shows an alert for an allow-listed ?error", async () => {

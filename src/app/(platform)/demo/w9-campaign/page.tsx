@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { requireSession } from "@/lib/demo/current-session";
 import { canAct } from "@/lib/demo/persona-actions";
 import { load } from "@/lib/demo/server-data";
@@ -11,6 +12,8 @@ import { QuotaForm } from "./_components/quota-form";
 import { QuotaPanel } from "./_components/quota-panel";
 import { ThresholdForm } from "./_components/threshold-form";
 import { VersionHistory } from "./_components/version-history";
+
+export const metadata: Metadata = { title: "Campaign, quotas & cost — NEWMA demo" };
 
 // Reads are no-store (demoFetch) and the layout is force-dynamic: router.refresh() after a write
 // re-reads the charter, the version history and the usage meter (Review Focus 3).

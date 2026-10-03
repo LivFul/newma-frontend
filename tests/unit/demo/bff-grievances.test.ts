@@ -22,7 +22,7 @@ describe("W10 grievance form handler", () => {
     const fetchMock = armBff([Response.json({ id: GRV }, { status: 201 })]);
     const response = await post(form);
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe(`/demo/w10-custodian?raised=${GRV}`);
+    expect(response.headers.get("location")).toBe(`/demo/w10-custodian?raised=${GRV}#outcome`);
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(sentUrl(fetchMock)).toBe("https://api.example/v1/grievances");
     expect(sentBody(fetchMock)).toEqual({
@@ -70,31 +70,34 @@ describe("W10 grievance form handler", () => {
       armBff([envelope(code, status)]);
       const response = await post(form);
       expect(response.status).toBe(303);
-      expect(response.headers.get("location")).toBe(`/demo/w10-custodian?error=${code}`);
+      expect(response.headers.get("location")).toBe(
+        `/demo/w10-custodian?error=${code}&for=${REC}#outcome`,
+      );
     },
   );
 
   it("maps an unlisted backend code and a 5xx to upstream_error", async () => {
     armBff([envelope("something_new", 409), envelope("boom", 500)]);
-    expect((await post(form)).headers.get("location")).toBe(
-      "/demo/w10-custodian?error=upstream_error",
-    );
-    expect((await post(form)).headers.get("location")).toBe(
-      "/demo/w10-custodian?error=upstream_error",
-    );
+    const expected = `/demo/w10-custodian?error=upstream_error&for=${REC}#outcome`;
+    expect((await post(form)).headers.get("location")).toBe(expected);
+    expect((await post(form)).headers.get("location")).toBe(expected);
   });
 
   it("redirects a network failure to upstream_error", async () => {
     armBff([]); // the empty queue makes the mocked fetch throw
     const response = await post(form);
-    expect(response.headers.get("location")).toBe("/demo/w10-custodian?error=upstream_error");
+    expect(response.headers.get("location")).toBe(
+      `/demo/w10-custodian?error=upstream_error&for=${REC}#outcome`,
+    );
   });
 
   it("redirects an empty or short description to validation_error without calling the backend", async () => {
     const fetchMock = armBff([]);
     for (const description of ["", "too short", "   "]) {
       const response = await post({ ...form, description });
-      expect(response.headers.get("location")).toBe("/demo/w10-custodian?error=validation_error");
+      expect(response.headers.get("location")).toBe(
+        `/demo/w10-custodian?error=validation_error&for=${REC}#outcome`,
+      );
     }
     expect(fetchMock).not.toHaveBeenCalled();
   });
@@ -102,14 +105,53 @@ describe("W10 grievance form handler", () => {
   it("omits a raised id that is not a safe id", async () => {
     armBff([Response.json({ id: "../evil?x=1" }, { status: 201 })]);
     const response = await post(form);
-    expect(response.headers.get("location")).toBe("/demo/w10-custodian?raised=1");
+    expect(response.headers.get("location")).toBe("/demo/w10-custodian?raised=1#outcome");
   });
 
-  it("refuses a cross-site post with 403 and an oversize body with 413", async () => {
+  it("refuses a cross-site post with 403", async () => {
     armBff([]);
     expect((await post(form, { fetchSite: "cross-site" })).status).toBe(403);
+  });
+
+  it("sends an oversize body back to the form as a validation error, not a JSON page", async () => {
+    armBff([]);
     const big = await post({ ...form, description: "x".repeat(300 * 1024) });
-    expect(big.status).toBe(413);
+    expect(big.status).toBe(303);
+    expect(big.headers.get("location")).toBe("/demo/w10-custodian?error=validation_error#outcome");
+  });
+
+  it("counts a CRLF newline as one character before validating", async () => {
+    const fetchMock = armBff([Response.json({ id: GRV }, { status: 201 })]);
+    const description = `${"a".repeat(499)}\r\n${"b".repeat(499)}`;
+    expect((await post({ ...form, description })).status).toBe(303);
+    expect((sentBody(fetchMock) as { description: string }).description).toBe(
+      `${"a".repeat(499)}\n${"b".repeat(499)}`,
+    );
+  });
+
+  it("sends an expired session through the cookie-clearing route", async () => {
+    armBff([envelope("invalid_session", 401)]);
+    const response = await post(form);
+    expect(response.status).toBe(303);
+    expect(response.headers.get("location")).toBe("/api/demo/sessions/expired");
+  });
+
+  it("does not echo an unsafe record id into the redirect", async () => {
+    armBff([]);
+    const response = await post({ ...form, rights_record_id: "a/b?x=1", description: "" });
+    expect(response.headers.get("location")).toBe(
+      "/demo/w10-custodian?error=validation_error#outcome",
+    );
+  });
+
+  it("a double post with the same key sends the same key both times (replay at the backend)", async () => {
+    const fetchMock = armBff([
+      Response.json({ id: GRV }, { status: 201 }),
+      Response.json({ id: GRV }, { status: 200, headers: { "Idempotent-Replayed": "true" } }),
+    ]);
+    await post(form);
+    await post(form);
+    expect(sentBody(fetchMock, 0)).toEqual(sentBody(fetchMock, 1));
   });
 
   it("answers 415 to a JSON body and 401 without a session", async () => {
