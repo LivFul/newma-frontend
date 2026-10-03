@@ -19,3 +19,4 @@ export { VisuallyHidden } from "./visually-hidden";
 export { JsonView, type JsonViewProps } from "./json-view";
 export { SyntheticBadge } from "./synthetic-badge";
 export { Withheld } from "./withheld";
+export { IllustrativeBadge } from "./illustrative-badge";

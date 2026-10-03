@@ -129,8 +129,8 @@ Frontend-only assumptions (copy into `PROGRESS.md` when the task that relies on 
 ### Task 0: Preconditions (no production code)
 
 - [ ] Backend P5a commits for the rows being proxied are on the integration branch and `docs/openapi.yaml` is re-exported (backend Tasks 5, 7, 11); `ls ../newma-backend/docs/openapi.yaml` exists.
-- [ ] Re-read the Contract table here against the backend plan (diff the two Contract blocks; they must be identical) and, if the sources have become readable, the checks in backend Task 0; record differences in `PROGRESS.md`.
-- [ ] Baseline in the P5a worktree: `pnpm install && pnpm check` green.
+- [x] Re-read the Contract table here against the backend plan (diff the two Contract blocks; they must be identical) and, if the sources have become readable, the checks in backend Task 0; record differences in `PROGRESS.md`.
+- [x] Baseline in the P5a worktree: `pnpm install && pnpm check` green.
 
 ### Task 1: Plumbing — types, parsers, allow-list block, persona hints, formatting, dashboard entry
 
@@ -138,9 +138,9 @@ Frontend-only assumptions (copy into `PROGRESS.md` when the task that relies on 
 
 TDD steps:
 
-- [ ] Failing Vitest first: `tests/unit/demo/error-details.test.ts` (table test over the fifteen codes: documented keys pass, extra keys and wrong types drop the details; the unlisted codes in the Contract pass without details), `tests/unit/demo/parse-settlement.test.ts` (each parser accepts a valid body, rejects float, negative, bool, oversize, bad key; mints a key when absent), `tests/unit/credits.test.ts` (`formatCredits(1234)` = "1,234 demo credits"; `checkConservation` true for 100 + 60 + 240 + 0 vs 400, false for a broken fixture; 7 demo credits fixture; no percent output), `tests/unit/demo/persona-actions.test.ts` (new entries), `tests/unit/ui/illustrative-badge.test.tsx`, workflow and dashboard tests.
-- [ ] Implement; `pnpm test` green.
-- [ ] Commit: `feat(demo): W7 plumbing — contract types, body guards, allow-list block, persona hints and credits formatting`
+- [x] Failing Vitest first: `tests/unit/demo/error-details.test.ts` (table test over the fifteen codes: documented keys pass, extra keys and wrong types drop the details; the unlisted codes in the Contract pass without details), `tests/unit/demo/parse-settlement.test.ts` (each parser accepts a valid body, rejects float, negative, bool, oversize, bad key; mints a key when absent), `tests/unit/credits.test.ts` (`formatCredits(1234)` = "1,234 demo credits"; `checkConservation` true for 100 + 60 + 240 + 0 vs 400, false for a broken fixture; 7 demo credits fixture; no percent output), `tests/unit/demo/persona-actions.test.ts` (new entries), `tests/unit/ui/illustrative-badge.test.tsx`, workflow and dashboard tests.
+- [x] Implement; `pnpm test` green.
+- [x] Commit: `feat(demo): W7 plumbing — contract types, body guards, allow-list block, persona hints and credits formatting`
 
 ### Task 2: W7 BFF routes (Contract A1–A26)
 

@@ -54,6 +54,12 @@ function pickValidation(details: unknown): unknown[] | undefined {
   return entries;
 }
 
+function pickPolicyDecision(d: unknown): unknown {
+  if (!isRecord(d) || !isString(d.policy_decision_id)) return undefined;
+  const reasons = pickReasons(d.reasons);
+  return reasons ? { policy_decision_id: d.policy_decision_id, reasons } : undefined;
+}
+
 const PICKERS: Readonly<Record<string, Picker>> = {
   persona_forbidden: (d) => pickRecord(d, { persona: isString, allowed: isStringArray }),
   gate_requirements_missing: (d) =>
@@ -66,11 +72,27 @@ const PICKERS: Readonly<Record<string, Picker>> = {
   claim_quarantined: (d) => pickRecord(d, { reason: isString }),
   retraining_not_authorized: (d) => pickRecord(d, { reason: isString }),
   validation_error: pickValidation,
-  source_not_cleared: (d) => {
-    if (!isRecord(d) || !isString(d.policy_decision_id)) return undefined;
-    const reasons = pickReasons(d.reasons);
-    return reasons ? { policy_decision_id: d.policy_decision_id, reasons } : undefined;
-  },
+  source_not_cleared: pickPolicyDecision,
+  // W7 (D-17): the fifteen settlement and license codes forwarded with details.
+  settlement_state_conflict: (d) => pickRecord(d, { state: isString, attempted: isString }),
+  license_state_conflict: (d) => pickRecord(d, { state: isString, attempted: isString }),
+  receipt_duplicate: (d) => pickRecord(d, { duplicate_of: isString, receipt_id: isString }),
+  settlement_has_disputed_receipts: (d) => pickRecord(d, { receipt_ids: isStringArray }),
+  approver_already_approved: (d) => pickRecord(d, { persona: isString }),
+  calculation_stale: (d) => pickRecord(d, { current_sha256: isString }),
+  conservation_violation: (d) =>
+    pickRecord(d, {
+      distributable_demo_credits: isFiniteNumber,
+      ledger_demo_credits: isFiniteNumber,
+    }),
+  license_rights_not_allowed: pickPolicyDecision,
+  credential_check_failed: (d) => pickRecord(d, { reason: isString }),
+  license_not_approved: (d) => pickRecord(d, { status: isString }),
+  settlement_exists: (d) => pickRecord(d, { settlement_id: isString }),
+  agreement_superseded: (d) => pickRecord(d, { latest_agreement_id: isString }),
+  receipt_not_disputable: (d) => pickRecord(d, { status: isString }),
+  receipt_not_disputed: (d) => pickRecord(d, { status: isString }),
+  benefit_state_conflict: (d) => pickRecord(d, { state: isString }),
 };
 
 /** The browser-safe details for a backend error code, or undefined (omit the field). */
