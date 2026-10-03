@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { ClientError } from "@/lib/demo/client";
 import { isRecord, isStringArray } from "@/lib/demo/guards";
 import { allowedLabels } from "./persona-forbidden-notice";
@@ -9,7 +10,13 @@ function allowedFrom(error: ClientError): readonly string[] | undefined {
 }
 
 /** A backend (or BFF) error envelope, rendered with its code; persona_forbidden names who may act. */
-export function ErrorNotice({ error }: { error: ClientError | undefined }) {
+export function ErrorNotice({
+  error,
+  children,
+}: {
+  error: ClientError | undefined;
+  children?: ReactNode;
+}) {
   if (!error) return null;
   const allowed = allowedFrom(error);
   return (
@@ -18,6 +25,7 @@ export function ErrorNotice({ error }: { error: ClientError | undefined }) {
         {error.message} <span className="font-mono">({error.code})</span>
       </p>
       {allowed ? <p>Allowed: {allowedLabels(allowed)}</p> : null}
+      {children}
     </div>
   );
 }

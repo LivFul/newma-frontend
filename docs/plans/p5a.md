@@ -163,9 +163,9 @@ TDD steps:
 
 TDD steps:
 
-- [ ] Failing Vitest first (`tests/unit/demo/w7/overview.test.tsx`, `license-request-form.test.tsx`, `outage-toggle.test.tsx`): non-partner sees the notice and no submit; rules render "Illustrative" and "basis points", never "%"; submit reuses one key across two clicks; superseded error renders; the toggle sends `{active: true}` and reflects the response; lists render the seeded example with its badges.
-- [ ] Implement.
-- [ ] Commit: `feat(demo): W7 overview with license request, settlement list and simulated outage control`
+- [x] Failing Vitest first (`tests/unit/demo/w7/overview.test.tsx`, `license-request-form.test.tsx`, `outage-toggle.test.tsx`): non-partner sees the notice and no submit; rules render "Illustrative" and "basis points", never "%"; submit reuses one key across two clicks; superseded error renders; the toggle sends `{active: true}` and reflects the response; lists render the seeded example with its badges.
+- [x] Implement.
+- [x] Commit: `feat(demo): W7 overview with license request, settlement list and simulated outage control`
 
 ### Task 4: License page — credential check, decision, events, benefits, create settlement
 
