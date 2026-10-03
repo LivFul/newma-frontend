@@ -148,9 +148,9 @@ TDD steps:
 
 TDD steps:
 
-- [ ] Failing tests first, for each handler: forwards `X-Demo-Session`; `Cache-Control: no-store`; same-origin guard 403 for a cross-site POST; invalid id → 400 `invalid_id`; invalid body → 422 `validation_error` before any upstream call; 200 replay body and `Idempotent-Replayed` forwarded unchanged; 403 `persona_forbidden` passes `{persona, allowed}`; `receipt_duplicate` 409 forwards `{duplicate_of, receipt_id}` and nothing else; an unknown details key is dropped; PUT outage rejects a non-boolean; no route handler exists for settlement `pause` or `resume` (directory listing test).
-- [ ] Implement with `withSession`/`withParams`, `proxy`, `validationError`; one file per route, each under 40 lines.
-- [ ] Commit: `feat(demo): W7 BFF routes for licenses, settlements, benefits, beneficiaries and the anchoring outage`
+- [x] Failing tests first, for each handler: forwards `X-Demo-Session`; `Cache-Control: no-store`; same-origin guard 403 for a cross-site POST; invalid id → 400 `invalid_id`; invalid body → 422 `validation_error` before any upstream call; 200 replay body and `Idempotent-Replayed` forwarded unchanged; 403 `persona_forbidden` passes `{persona, allowed}`; `receipt_duplicate` 409 forwards `{duplicate_of, receipt_id}` and nothing else; an unknown details key is dropped; PUT outage rejects a non-boolean; no route handler exists for settlement `pause` or `resume` (directory listing test).
+- [x] Implement with `withSession`/`withParams`, `proxy`, `validationError`; one file per route, each under 40 lines.
+- [x] Commit: `feat(demo): W7 BFF routes for licenses, settlements, benefits, beneficiaries and the anchoring outage`
 - [ ] `pnpm api:update` when the backend spec lands; commit `chore(api): refresh pinned contract (D-17)`
 
 ## D-17 — W7 pages
