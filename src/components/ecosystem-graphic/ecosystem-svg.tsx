@@ -72,7 +72,7 @@ function PartBody({ part }: { part: PartGeometry }) {
   );
 }
 
-function Edges() {
+function Edges({ arrowId }: { arrowId: string }) {
   return (
     <g className="eco-edges" aria-hidden="true">
       {EDGES.map((edge) => (
@@ -81,7 +81,7 @@ function Edges() {
           d={edge.d}
           data-kind={edge.kind}
           data-dashed={edge.dashed || undefined}
-          markerEnd={edge.kind === "flow" ? "url(#eco-arrow)" : undefined}
+          markerEnd={edge.kind === "flow" ? `url(#${arrowId})` : undefined}
         />
       ))}
     </g>
@@ -100,6 +100,7 @@ export function EcosystemSvg({
 }: EcosystemSvgProps) {
   const titleId = `${svgId}-title`;
   const descId = `${svgId}-desc`;
+  const arrowId = `${svgId}-arrow`;
   return (
     <svg
       {...rest}
@@ -107,7 +108,8 @@ export function EcosystemSvg({
       className={["eco-svg", className].filter(Boolean).join(" ")}
       viewBox={`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`}
       role="group"
-      aria-labelledby={`${titleId} ${descId}`}
+      aria-labelledby={titleId}
+      aria-describedby={descId}
       data-layer={layer}
       data-view={view}
     >
@@ -115,7 +117,7 @@ export function EcosystemSvg({
       <desc id={descId}>{HERO_SVG_DESC.text}</desc>
       <defs>
         <marker
-          id="eco-arrow"
+          id={arrowId}
           viewBox="0 0 8 8"
           refX={7}
           refY={4}
@@ -126,7 +128,7 @@ export function EcosystemSvg({
           <path d="M0 0L8 4L0 8Z" className="eco-arrowhead" />
         </marker>
       </defs>
-      <Edges />
+      <Edges arrowId={arrowId} />
       {PARTS.map((part, index) => (
         <Part key={part.slug} geometry={part} index={index} view={view}>
           <PartBody part={part} />

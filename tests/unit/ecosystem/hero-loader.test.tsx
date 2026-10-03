@@ -10,6 +10,7 @@ vi.mock("@/components/ecosystem-graphic/interactive", () => ({
     onReady: () => void;
     swapped: boolean;
     initialFocus: string | null;
+    initialHovering?: boolean;
   }) {
     const { onReady } = props;
     useLayoutEffect(() => onReady(), [onReady]);
@@ -176,6 +177,30 @@ describe("HeroLoader", () => {
     act(() => media.set(true));
     expect(screen.queryByTestId("interactive")).toBeNull();
     expect(screen.getByText("static")).toBeInTheDocument();
+  });
+
+  it("seeds the interactive layer with the pointer hover present at the swap", async () => {
+    stubMatchMedia(false);
+    const { container } = render(
+      <HeroLoader>
+        <Static />
+      </HeroLoader>,
+    );
+    fireEvent.pointerEnter(container.firstElementChild!, { pointerType: "mouse" });
+    await flushAndGet();
+    expect(mounted).toHaveBeenLastCalledWith(expect.objectContaining({ initialHovering: true }));
+  });
+
+  it("does not seed hover from a touch pointer", async () => {
+    stubMatchMedia(false);
+    const { container } = render(
+      <HeroLoader>
+        <Static />
+      </HeroLoader>,
+    );
+    fireEvent.pointerEnter(container.firstElementChild!, { pointerType: "touch" });
+    await flushAndGet();
+    expect(mounted).toHaveBeenLastCalledWith(expect.objectContaining({ initialHovering: false }));
   });
 
   it("passes the slug that held focus to the interactive layer", async () => {

@@ -41,9 +41,12 @@ describe("EcosystemSvg", () => {
     const svg = svgs[0]!;
     expect(svg.getAttribute("role")).toBe("group");
     expect(container.querySelector('[role="img"]')).toBeNull();
-    const ids = svg.getAttribute("aria-labelledby")!.split(" ");
-    expect(ids.length).toBeGreaterThanOrEqual(1);
-    for (const id of ids) expect(container.querySelector(`#${id}`)).not.toBeNull();
+    // The name is the short title; the long description is only a description.
+    const labelledBy = svg.getAttribute("aria-labelledby")!;
+    const describedBy = svg.getAttribute("aria-describedby")!;
+    expect(labelledBy.split(" ")).toHaveLength(1);
+    expect(container.querySelector(`#${labelledBy}`)?.tagName.toLowerCase()).toBe("title");
+    expect(container.querySelector(`#${describedBy}`)?.tagName.toLowerCase()).toBe("desc");
     expect(svg.querySelector("title")?.textContent).toBe("NEWMA ecosystem diagram");
     expect(svg.querySelector("desc")?.textContent?.length).toBeGreaterThan(40);
     expect(svg.getAttribute("viewBox")).toBe(`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`);

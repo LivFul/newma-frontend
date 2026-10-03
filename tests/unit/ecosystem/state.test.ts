@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  createHeroState,
   heroReducer,
   INITIAL_HERO_STATE,
   type HeroEvent,
@@ -29,6 +30,20 @@ describe("heroReducer", () => {
       active: null,
     });
     expect(Object.isFrozen(INITIAL_HERO_STATE)).toBe(true);
+  });
+
+  it("can be seeded from hover and focus already present at mount", () => {
+    expect(createHeroState({ hovering: true })).toMatchObject({ view: "exploded", hovering: true });
+    expect(createHeroState({ active: SECOND })).toMatchObject({ view: "exploded", active: SECOND });
+    expect(createHeroState()).toEqual(INITIAL_HERO_STATE);
+  });
+
+  it("returns the very same state object when an event changes nothing", () => {
+    const open = run([{ type: "focusIn", slug: FIRST }]).state;
+    expect(heroReducer(open, { type: "focusIn", slug: FIRST }).state).toBe(open);
+    expect(heroReducer(open, { type: "pointerEnter" }).state).not.toBe(open);
+    const pinned = run([{ type: "toggle" }]).state;
+    expect(heroReducer(pinned, { type: "outsideTap" }).state).toBe(pinned);
   });
 
   it("never mutates the previous state", () => {
@@ -215,8 +230,20 @@ describe("heroReducer", () => {
       expect(run([{ type: "outsideTap" }], open).state.view).toBe("assembled");
     });
     it("unpinning clears a touch-opened view too", () => {
+      const pinnedAndTouched = run([
+        { type: "toggle" },
+        { type: "tap", slug: FIRST, touch: true, view: "assembled" },
+      ]).state;
+      expect(pinnedAndTouched).toMatchObject({ pinned: true, touchOpen: true });
+      expect(run([{ type: "toggle" }], pinnedAndTouched).state.view).toBe("assembled");
+    });
+    it("the toggle closes a touch-opened view instead of pinning it", () => {
       const open = run([{ type: "tap", slug: FIRST, touch: true, view: "assembled" }]).state;
-      expect(run([{ type: "toggle" }, { type: "toggle" }], open).state.view).toBe("assembled");
+      expect(run([{ type: "toggle" }], open).state).toMatchObject({
+        view: "assembled",
+        pinned: false,
+        touchOpen: false,
+      });
     });
     it("mouse clicks are never intercepted", () => {
       const { effect, state } = run([

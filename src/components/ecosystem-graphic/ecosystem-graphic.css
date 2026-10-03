@@ -14,6 +14,7 @@
   margin-inline: auto;
 }
 .eco-svg {
+  touch-action: manipulation;
   display: block;
   width: 100%;
   height: auto;
@@ -35,7 +36,7 @@
 .eco-hit {
   fill: transparent;
   stroke: transparent;
-  stroke-width: 3px;
+  stroke-width: 4px;
 }
 .eco-link:focus-visible .eco-hit {
   stroke: var(--color-focus);
@@ -101,8 +102,9 @@
   stroke-width: 1.75px;
   stroke-linecap: round;
 }
+/* The rail carries "every component relies on Data & Knowledge", so it needs 3:1 (WCAG 1.4.11). */
 .eco-edges path[data-kind="rail"] {
-  stroke: var(--color-border);
+  stroke: var(--color-border-strong);
 }
 .eco-edges path[data-dashed] {
   stroke: var(--color-eco-optional);
@@ -152,7 +154,9 @@
 
 /* Reduced motion: the exploded, labelled diagram is final. No transition, no animation. */
 @media (prefers-reduced-motion: reduce) {
-  .eco-svg .eco-part {
+  /* Static layer only: the interactive layer is never mounted under reduce, and its parts carry no
+     --ex/--ey variables. */
+  .eco-svg[data-layer="static"] .eco-part {
     transform: translate(var(--ex), var(--ey)) !important;
     transition: none !important;
   }

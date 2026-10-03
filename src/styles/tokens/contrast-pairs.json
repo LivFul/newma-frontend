@@ -88,5 +88,25 @@
     "fg": "--color-eco-optional",
     "bg": "--color-bg-elevated",
     "min": 4.5
+  },
+  {
+    "fg": "--color-border-strong",
+    "bg": "--color-bg-elevated",
+    "min": 3
+  },
+  {
+    "fg": "--color-accent",
+    "bg": "--color-bg-elevated",
+    "min": 4.5
+  },
+  {
+    "fg": "--color-warning",
+    "bg": "--color-bg-elevated",
+    "min": 4.5
+  },
+  {
+    "fg": "--color-success",
+    "bg": "--color-bg-elevated",
+    "min": 4.5
   }
 ]

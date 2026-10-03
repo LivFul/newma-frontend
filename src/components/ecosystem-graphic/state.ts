@@ -47,13 +47,21 @@ function settle(draft: Omit<HeroState, "view">): HeroState {
   return Object.freeze({ ...draft, view: open ? "exploded" : "assembled" });
 }
 
-export const INITIAL_HERO_STATE: HeroState = settle({
-  pinned: false,
-  suppressed: false,
-  active: null,
-  hovering: false,
-  touchOpen: false,
-});
+export type HeroSeed = Readonly<{ hovering?: boolean; active?: EcosystemSlug | null }>;
+
+// The interactive layer mounts after the static layer may already have been hovered or focused (that
+// is what triggers the load), so it starts from that state instead of from "assembled".
+export function createHeroState(seed: HeroSeed = {}): HeroState {
+  return settle({
+    pinned: false,
+    suppressed: false,
+    active: seed.active ?? null,
+    hovering: seed.hovering ?? false,
+    touchOpen: false,
+  });
+}
+
+export const INITIAL_HERO_STATE: HeroState = createHeroState();
 
 const result = (state: HeroState, effect: HeroEffect = NO_EFFECT): HeroResult =>
   Object.freeze({ state, effect });
@@ -81,7 +89,21 @@ function tap(state: HeroState, event: Extract<HeroEvent, { type: "tap" }>): Hero
   return result(state, event.slug ? { type: "navigate", slug: event.slug } : NO_EFFECT);
 }
 
+const sameState = (a: HeroState, b: HeroState): boolean =>
+  a.view === b.view &&
+  a.pinned === b.pinned &&
+  a.suppressed === b.suppressed &&
+  a.active === b.active &&
+  a.hovering === b.hovering &&
+  a.touchOpen === b.touchOpen;
+
+// Returns the previous state object when nothing changed, so React can bail out of a re-render.
 export function heroReducer(state: HeroState, event: HeroEvent): HeroResult {
+  const next = transition(state, event);
+  return sameState(state, next.state) ? result(state, next.effect) : next;
+}
+
+function transition(state: HeroState, event: HeroEvent): HeroResult {
   switch (event.type) {
     case "pointerEnter":
       return result(settle({ ...state, hovering: true }));
@@ -102,6 +124,10 @@ export function heroReducer(state: HeroState, event: HeroEvent): HeroResult {
         ? result(state)
         : result(settle({ ...state, pinned: false, touchOpen: false, suppressed: true }));
     case "toggle":
+      // A touch-opened view is "pressed" for assistive technology, so the toggle closes it.
+      if (state.touchOpen && !state.pinned) {
+        return result(settle({ ...state, touchOpen: false, suppressed: false }));
+      }
       return result(
         settle({ ...state, pinned: !state.pinned, suppressed: false, touchOpen: false }),
       );

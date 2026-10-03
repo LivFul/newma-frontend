@@ -25,7 +25,8 @@ test("without JavaScript every label is visible and each link navigates", async 
 test("without JavaScript hover explodes the diagram by CSS", async ({ page, isMobile }) => {
   test.skip(isMobile, "hover is a desktop input");
   await page.goto("/");
-  const y = () => heroPart(page, "wet-lab").evaluate((g) => g.getBoundingClientRect().y);
+  const y = () =>
+    heroPart(page, "wet-lab").evaluate((g) => g.getBoundingClientRect().y + window.scrollY);
   const before = await y();
   await page.locator("svg.eco-svg").hover();
   await expect.poll(y, { timeout: 5_000 }).toBeGreaterThan(before + 20);

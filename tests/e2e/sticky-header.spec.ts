@@ -127,3 +127,29 @@ test("in-page anchors land below the sticky header", async ({ page, isMobile }) 
     expect(top).toBeGreaterThanOrEqual(headerHeight - 1);
   }
 });
+
+test("WCAG 2.4.11: Shift+Tab back up the page never leaves focus under the sticky header", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const headerHeight = await page
+    .locator("[data-site-header]")
+    .evaluate((el) => el.getBoundingClientRect().height);
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await page.getByRole("link", { name: "Terms" }).focus();
+  for (let i = 0; i < 25; i += 1) {
+    await page.keyboard.press("Shift+Tab");
+    const state = await page.evaluate(() => {
+      const el = document.activeElement;
+      if (!el || el === document.body || el.tagName === "NEXTJS-PORTAL") return null;
+      return {
+        inHeader: el.closest("[data-site-header]") !== null,
+        isSkip: el.textContent === "Skip to content",
+        top: el.getBoundingClientRect().top,
+      };
+    });
+    if (!state) break;
+    if (!state.inHeader && !state.isSkip)
+      expect(state.top).toBeGreaterThanOrEqual(headerHeight - 1);
+  }
+});

@@ -5,6 +5,7 @@ import { EcosystemSvg } from "@/components/ecosystem-graphic/ecosystem-svg";
 import Interactive from "@/components/ecosystem-graphic/interactive";
 import { MotionPart, partVariants } from "@/components/ecosystem-graphic/motion-part";
 import { PARTS } from "@/components/ecosystem-graphic/geometry";
+import { HeroStatic } from "@/components/ecosystem-graphic/hero-static";
 import { StaticPart } from "@/components/ecosystem-graphic/static-part";
 import { ECOSYSTEM_SLUGS, HERO_LABELS } from "@/content/ecosystem/registry";
 import { expectNoAxeViolations } from "../ui/axe";
@@ -90,13 +91,82 @@ describe("Interactive hero layer", () => {
     expect(links[0]).toHaveFocus();
   });
 
-  it("prevents default on arrows inside the graphic only", () => {
+  it("prevents default on arrows only when focus really moves inside the graphic", () => {
     const { links } = mount();
-    links[0]!.focus();
-    const inside = fireEvent.keyDown(links[0]!, { key: "ArrowDown" });
-    expect(inside).toBe(false);
+    act(() => links[0]!.focus());
+    expect(fireEvent.keyDown(links[0]!, { key: "ArrowDown" })).toBe(false);
+    expect(links[1]).toHaveFocus();
+    // At the end of the list nothing moves, so the key is left to the page (no scroll trap).
+    act(() => links[5]!.focus());
+    expect(fireEvent.keyDown(links[5]!, { key: "ArrowDown" })).toBe(true);
     const toggle = screen.getByRole("button", { name: "Explore components" });
     expect(fireEvent.keyDown(toggle, { key: "ArrowDown" })).toBe(true);
+  });
+
+  it("starts exploded when hover or focus was present at the swap", () => {
+    const hovered = mount({ initialHovering: true });
+    expect(hovered.svg).toHaveAttribute("data-view", "exploded");
+    hovered.unmount();
+    const focused = mount({ initialFocus: ECOSYSTEM_SLUGS[2] });
+    expect(focused.svg).toHaveAttribute("data-view", "exploded");
+  });
+
+  it("treats a pen like a hover device and a touch pointer like a tap device", () => {
+    const { svg } = mount();
+    const frame = svg.parentElement!;
+    fireEvent.pointerEnter(frame, { pointerType: "pen" });
+    expect(svg).toHaveAttribute("data-view", "exploded");
+    fireEvent.pointerLeave(frame, { pointerType: "pen" });
+    expect(svg).toHaveAttribute("data-view", "assembled");
+    fireEvent.pointerEnter(frame, { pointerType: "touch" });
+    expect(svg).toHaveAttribute("data-view", "assembled");
+  });
+
+  it("does not intercept a click that had no touch pointerdown (assistive technology)", () => {
+    const { links } = mount();
+    fireEvent.pointerDown(links[0]!, { pointerType: "touch" });
+    fireEvent.click(links[0]!); // consumes the touch tap
+    expect(fireEvent.click(links[1]!)).toBe(true); // programmatic click, no pointerdown
+  });
+
+  it("announces the intercepted first touch tap in a polite status region", () => {
+    const { links } = mount();
+    const status = screen.getByRole("status");
+    expect(status).toHaveTextContent("");
+    fireEvent.pointerDown(links[3]!, { pointerType: "touch" });
+    fireEvent.click(links[3]!);
+    expect(status).toHaveTextContent("Components separated. Activate again to open Wet Lab.");
+  });
+
+  it("reports a touch-opened view as pressed and lets the toggle close it", async () => {
+    const user = userEvent.setup();
+    const { links, svg } = mount();
+    fireEvent.pointerDown(links[0]!, { pointerType: "touch" });
+    fireEvent.click(links[0]!);
+    const toggle = screen.getByRole("button", { name: "Explore components" });
+    expect(toggle).toHaveAttribute("aria-pressed", "true");
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute("aria-pressed", "false");
+    expect(svg).toHaveAttribute("data-view", "assembled");
+  });
+
+  it("reassembles on Escape from anywhere on the page and removes its listeners", async () => {
+    const user = userEvent.setup();
+    const { svg, unmount } = mount();
+    await user.click(screen.getByRole("button", { name: "Explore components" }));
+    expect(svg).toHaveAttribute("data-view", "exploded");
+    const before = document.body.querySelectorAll("*").length;
+    act(() => {
+      document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    });
+    expect(svg).toHaveAttribute("data-view", "assembled");
+    expect(before).toBeGreaterThan(0);
+    const remove = vi.spyOn(document, "removeEventListener");
+    await user.click(screen.getByRole("button", { name: "Explore components" }));
+    unmount();
+    expect(remove.mock.calls.map(([type]) => type)).toEqual(
+      expect.arrayContaining(["pointerdown", "keydown"]),
+    );
   });
 
   it("does not wipe focus state when focus moves between components", async () => {
@@ -140,7 +210,7 @@ describe("Interactive hero layer", () => {
   });
 
   it("restores focus to the slug that had it before the swap", () => {
-    const { links, rerender, onReady } = mount();
+    const { links, rerender, onReady } = mount({ initialFocus: ECOSYSTEM_SLUGS[3] });
     rerender(<Interactive onReady={onReady} swapped initialFocus={ECOSYSTEM_SLUGS[3]} />);
     expect(links[3]).toHaveFocus();
   });
@@ -160,6 +230,18 @@ describe("Interactive hero layer", () => {
     expect(links.map((a) => a.getAttribute("aria-label")?.split(".")[0])).toEqual(
       ECOSYSTEM_SLUGS.map((s) => HERO_LABELS[s].title),
     );
+  });
+
+  it("keeps the controls row identical to the static layer so the swap moves nothing", () => {
+    const stat = render(<HeroStatic />);
+    const staticRow = stat.container.querySelector(".eco-controls")!;
+    const staticClasses = staticRow.className;
+    const staticHint = staticRow.querySelector("p")!.textContent;
+    stat.unmount();
+    const { container } = mount();
+    const row = container.querySelector(".eco-controls")!;
+    expect(row.className).toBe(staticClasses);
+    expect(row.querySelector("p")!.textContent).toBe(staticHint);
   });
 
   it("is axe clean", async () => {

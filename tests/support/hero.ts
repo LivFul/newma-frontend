@@ -23,8 +23,9 @@ export async function gotoHeroReady(page: Page): Promise<void> {
   await page.waitForSelector('[data-hero-ready="true"]', { timeout: 30_000 });
 }
 
+/** Document-relative y, so scrolling a part into view never looks like movement. */
 export async function partY(page: Page, slug: Slug): Promise<number> {
-  return heroPart(page, slug).evaluate((g) => g.getBoundingClientRect().y);
+  return heroPart(page, slug).evaluate((g) => g.getBoundingClientRect().y + window.scrollY);
 }
 
 const SETTLE_SAMPLES = 5;
@@ -33,7 +34,7 @@ const SETTLE_INTERVAL_MS = 150;
 async function allPartYs(page: Page): Promise<number[]> {
   return page.evaluate(() =>
     Array.from(document.querySelectorAll("svg.eco-svg g[data-slug]")).map(
-      (g) => g.getBoundingClientRect().y,
+      (g) => g.getBoundingClientRect().y + window.scrollY,
     ),
   );
 }
