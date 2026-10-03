@@ -115,7 +115,7 @@ Frontend-only assumptions (copy into `PROGRESS.md` with the shared ones):
 
 Tests: pickers keep documented keys and drop everything else (table test over the five codes plus a hostile extra key); `parseExportRequest` rejects a recipient without "fictional", a 41st path and an unknown purpose; `FieldDisclosure` renders "withheld" and the reason for a withheld row even when the fixture carries a `value` (Review Focus 2); the dashboard lists W8–W10 as links with the new names; status texts contain words as well as symbols.
 
-- [ ] Commit: `feat(demo): P5b shared plumbing, disclosure and status components, dashboard entries for W8–W10`
+- [x] Commit: `feat(demo): P5b shared plumbing, disclosure and status components, dashboard entries for W8–W10`
 
 ## D-18 — W8 partner portal and controlled export
 
@@ -131,7 +131,7 @@ Tests: pickers keep documented keys and drop everything else (table test over th
 - failure `w8 export after consent withdrawn is denied with reasons`: as `partner` issue an export; read the governing record id from `policy.rights_record_ids` in `/api/demo/assets/<id>/evidence`; switch to `community_liaison` and withdraw that record (the helper from `tests/support/w4.ts` for forced POSTs); switch back to `partner`: the register shows the earlier export as "suspended" without a body, a new export attempt shows the refusal card with reason `consent_withdrawn` and no new register row; the pack still renders with rights-gated rows "withheld". Persona check: `tenant_admin` sees the form disabled; `scientist` sees the persona notice and a forced POST returns 403 `persona_forbidden`.
 - axe scan of the page (pack, result and refusal states).
 
-- [ ] Commit: `feat(demo): W8 partner evidence pack and controlled export with withheld fields, refusal reasons and export register`
+- [x] Commit: `feat(demo): W8 partner evidence pack and controlled export with withheld fields, refusal reasons and export register`
 - [ ] `pnpm api:update` when the D-18 W8 spec lands; commit `chore(api): refresh pinned contract (D-18 W8)`
 
 ## D-18 — W9 campaign charter and quotas
