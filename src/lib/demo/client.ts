@@ -46,3 +46,12 @@ export function postJson<T>(url: string, body: unknown): Promise<ClientResult<T>
     body: JSON.stringify(body),
   });
 }
+
+/** PUT JSON (charter and quota edits). */
+export function putJson<T>(url: string, body: unknown): Promise<ClientResult<T>> {
+  return requestJson<T>(url, {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}

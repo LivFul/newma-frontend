@@ -148,7 +148,7 @@ Tests: pickers keep documented keys and drop everything else (table test over th
 - failure `w9 quota exhausted refuses the job with a documented code`: set the quota to the current committed value (reason required) → remaining 0 → the job probe shows `quota_exhausted` with the numbers and no job appears in the usage list → raise the quota → the same probe now creates a job and the usage shows it as reserved. Persona check: `scientist` sees both forms disabled and a forced `PUT` returns 403 `persona_forbidden`.
 - axe scan.
 
-- [ ] Commit: `feat(demo): W9 campaign charter with protocol versions, credit quota panel and quota-refusal probe`
+- [x] Commit: `feat(demo): W9 campaign charter with protocol versions, credit quota panel and quota-refusal probe`
 - [ ] `pnpm api:update` (D-18 W9); commit `chore(api): refresh pinned contract (D-18 W9)`
 
 ## D-19 — W10 custodian view
