@@ -37,7 +37,9 @@ export async function requestJson<T>(
   return { ok: true, status: response.status, data: body as T, replayed };
 }
 
+/** POST JSON; an undefined body sends no body (for action routes such as execute). */
 export function postJson<T>(url: string, body: unknown): Promise<ClientResult<T>> {
+  if (body === undefined) return requestJson<T>(url, { method: "POST" });
   return requestJson<T>(url, {
     method: "POST",
     headers: { "content-type": "application/json" },
