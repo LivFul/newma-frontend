@@ -1,5 +1,6 @@
 import { expect, test } from "../support/test";
 import { SLUGS, type Slug } from "../support/hero";
+import { warmUp } from "../support/target";
 
 // Plain data (the homepage never imports demo code, and neither do these specs).
 const TITLES: Record<Slug, string> = {
@@ -43,6 +44,7 @@ for (const slug of SLUGS) {
   test(`the demo route ${DEMO_ROUTES[slug]} redirects to /access without a session`, async ({
     request,
   }) => {
+    await warmUp(request);
     const response = await request.get(DEMO_ROUTES[slug], { maxRedirects: 0 });
     test.skip(
       response.status() === 404,

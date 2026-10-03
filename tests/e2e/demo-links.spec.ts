@@ -1,5 +1,6 @@
 import { expect, test } from "../support/test";
 import { SLUGS } from "../support/hero";
+import { warmUp } from "../support/target";
 
 const PAGES = ["/", ...SLUGS.map((slug) => `/ecosystem/${slug}`)];
 
@@ -7,6 +8,7 @@ test("every demo and sign-in link on the home and component pages is plain and r
   page,
   request,
 }) => {
+  await warmUp(request);
   const hrefs = new Set<string>();
   for (const path of PAGES) {
     await page.goto(path);
