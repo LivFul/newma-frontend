@@ -17,6 +17,8 @@ export default defineConfig({
   testMatch: ["e2e/**/*.spec.ts", "a11y/**/*.spec.ts"],
   fullyParallel: true,
   timeout: TEST_TIMEOUT_MS,
+  // next dev compiles routes on first hit; the demo pages re-render after BFF writes.
+  expect: { timeout: process.env.CI ? 5_000 : 15_000 },
   retries: process.env.CI ? 2 : 0,
   reporter: [["list"], ["html", { open: "never" }]],
   use: { baseURL, trace: "on-first-retry", extraHTTPHeaders },

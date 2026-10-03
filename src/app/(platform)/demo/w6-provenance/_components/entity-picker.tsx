@@ -10,7 +10,7 @@ const href = (link: EntityLink) =>
 export function EntityLinks({ title, links }: { title: string; links: readonly EntityLink[] }) {
   return (
     <section aria-label={title} className="space-y-2">
-      <h3 className="text-lg font-semibold">{title}</h3>
+      <h2 className="text-xl font-semibold">{title}</h2>
       {links.length === 0 ? <p className="text-sm text-fg-muted">None yet.</p> : null}
       <ul className="grid list-none gap-1 p-0 text-sm">
         {links.map((link) => (

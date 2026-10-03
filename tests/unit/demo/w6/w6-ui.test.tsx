@@ -123,3 +123,21 @@ describe("ManifestWorkbench", () => {
     );
   });
 });
+
+describe("EntityLinks", () => {
+  it("uses an h2 so the page heading order never skips a level", async () => {
+    const { EntityLinks } =
+      await import("@/app/(platform)/demo/w6-provenance/_components/entity-picker");
+    render(
+      <EntityLinks
+        title="Decided gates"
+        links={[{ entityType: "gate", entityId: "g-1", label: "DEMO-C-002 H1 (PASS)" }]}
+      />,
+    );
+    expect(screen.getByRole("heading", { level: 2, name: "Decided gates" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "DEMO-C-002 H1 (PASS)" })).toHaveAttribute(
+      "href",
+      "/demo/w6-provenance/gate/g-1",
+    );
+  });
+});
