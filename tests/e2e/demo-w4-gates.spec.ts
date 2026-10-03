@@ -9,6 +9,9 @@ import {
 } from "../support/demo";
 import { W4_ROUTE as ROUTE, openCandidate, signGate } from "../support/w4";
 
+// Signing includes a signed-event write and, under next dev, first-hit route compilation.
+const SLOW_MS = 30_000;
+
 test.describe("W4 gates", { tag: "@needs-backend" }, () => {
   test.beforeEach(needsBackend);
 
@@ -17,9 +20,9 @@ test.describe("W4 gates", { tag: "@needs-backend" }, () => {
     const displayId = await openCandidate(page, 2);
     await expect(banner(page)).toContainText(DEMO_BANNER_TEXT);
     const { dialog, gateId } = await signGate(page, "H1", displayId, { doubleClick: true });
-    await expect(dialog).toBeHidden();
+    await expect(dialog).toBeHidden({ timeout: SLOW_MS });
     const card = page.getByTestId("signed-decision");
-    await expect(card).toHaveCount(1);
+    await expect(card).toHaveCount(1, { timeout: SLOW_MS });
     await expect(card).toContainText("Demo signature, not production key");
     await expect(page.locator('[data-stage="H1"]')).toHaveAttribute("data-status", "PASS");
     // Review Focus 2: a double click is one decision, never two.
