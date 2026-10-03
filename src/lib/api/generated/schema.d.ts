@@ -221,6 +221,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/demo/provenance/tamper": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Demo tamper toggle: altered manifest with the original signature (not persisted) */
+        post: operations["demo_tamper_manifest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/demo/reset": {
         parameters: {
             query?: never;
@@ -404,6 +421,57 @@ export interface paths {
         put?: never;
         /** Evaluate purpose-based policy for an asset; records the decision (signed event) */
         post: operations["policy_evaluate_policy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/provenance/events/{event_id}/manifest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The exact manifest that was signed, its canonical string and signature */
+        get: operations["provenance_get_event_manifest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/provenance/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify a manifest and signature against the demo public key */
+        post: operations["provenance_verify_signature"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/provenance/{entity_type}/{entity_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Signed event timeline of one entity, ascending seq */
+        get: operations["provenance_get_timeline"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -750,6 +818,41 @@ export interface components {
             /** Message */
             message: string;
         };
+        /** EventOut */
+        EventOut: {
+            /** Actor Persona */
+            actor_persona: string;
+            /** Authority */
+            authority: string;
+            /** Entity Version */
+            entity_version: number;
+            /** Event Type */
+            event_type: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kid */
+            kid: string | null;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+            /** Payload Sha256 */
+            payload_sha256: string;
+            /** Policy Version */
+            policy_version: string | null;
+            /** Seq */
+            seq: number;
+            /** Signature */
+            signature: string | null;
+        };
         /** EvidenceDiffOut */
         EvidenceDiffOut: {
             /** Added */
@@ -760,6 +863,11 @@ export interface components {
             from_version: number;
             /** Removed */
             removed: components["schemas"]["PathValue"][];
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "H0" | "H1" | "H2" | "H3" | "L1" | "L2" | "D";
             /** To Version */
             to_version: number;
         };
@@ -1129,6 +1237,31 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /** ManifestOut */
+        ManifestOut: {
+            /** Canonical */
+            canonical: string;
+            /**
+             * Event Id
+             * Format: uuid
+             */
+            event_id: string;
+            /** Kid */
+            kid: string;
+            /** Manifest */
+            manifest: {
+                [key: string]: unknown;
+            };
+            /** Sha256 */
+            sha256: string;
+            /** Signature */
+            signature: string;
+            /**
+             * Signature Label
+             * @constant
+             */
+            signature_label: "Demo signature, not production key";
         };
         /** ObservationOut */
         ObservationOut: {
@@ -1521,6 +1654,37 @@ export interface components {
             /** Title */
             title: string;
         };
+        /** TamperOut */
+        TamperOut: {
+            /**
+             * Event Id
+             * Format: uuid
+             */
+            event_id: string;
+            /** Kid */
+            kid: string;
+            /**
+             * Label
+             * @constant
+             */
+            label: "Demo tamper toggle";
+            /** Manifest */
+            manifest: {
+                [key: string]: unknown;
+            };
+            /** Signature */
+            signature: string;
+            /** Tampered Path */
+            tampered_path: string;
+        };
+        /** TamperRequest */
+        TamperRequest: {
+            /**
+             * Event Id
+             * Format: uuid
+             */
+            event_id: string;
+        };
         /** TaxonOut */
         TaxonOut: {
             /** Accepted Name */
@@ -1542,6 +1706,41 @@ export interface components {
             verification_status: string;
             /** Withheld Fields */
             withheld_fields: string[];
+        };
+        /** TimelineOut */
+        TimelineOut: {
+            /**
+             * Entity Id
+             * Format: uuid
+             */
+            entity_id: string;
+            /**
+             * Entity Type
+             * @enum {string}
+             */
+            entity_type: "rights_record" | "policy_decision" | "claim" | "curated_release" | "agent_query" | "gate" | "work_package" | "assay_import";
+            /** Events */
+            events: components["schemas"]["EventOut"][];
+        };
+        /** VerifyOut */
+        VerifyOut: {
+            /** Reasons */
+            reasons: ("signature_mismatch" | "unknown_kid" | "malformed_signature")[];
+            /** Sha256 */
+            sha256: string;
+            /** Valid */
+            valid: boolean;
+        };
+        /** VerifyRequest */
+        VerifyRequest: {
+            /** Kid */
+            kid: string;
+            /** Manifest */
+            manifest: {
+                [key: string]: unknown;
+            };
+            /** Signature */
+            signature: string;
         };
         /** WithdrawRequest */
         WithdrawRequest: {
@@ -1923,6 +2122,8 @@ export interface operations {
             query: {
                 from: number;
                 to: number;
+                /** @description Required when ambiguous */
+                stage?: ("H0" | "H1" | "H2" | "H3" | "L1" | "L2" | "D") | null;
             };
             header?: {
                 "X-Demo-Session"?: string | null;
@@ -1970,7 +2171,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description unknown version or validation_error */
+            /** @description unknown or ambiguous version pair, or validation_error */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -2421,6 +2622,77 @@ export interface operations {
             };
             /** @description Missing or invalid service token or session */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    demo_tamper_manifest: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TamperRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TamperOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such signed event */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3242,6 +3514,207 @@ export interface operations {
                 };
             };
             /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    provenance_get_event_manifest: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                event_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ManifestOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such signed event */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    provenance_verify_signature: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VerifyOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description validation_error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    provenance_get_timeline: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                entity_type: "rights_record" | "policy_decision" | "claim" | "curated_release" | "agent_query" | "gate" | "work_package" | "assay_import";
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimelineOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no events for this entity */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description unknown entity_type */
             422: {
                 headers: {
                     [name: string]: unknown;
