@@ -1,11 +1,16 @@
 import { expect, test } from "../support/test";
 
-test("home responds 200 with the NEWMA heading, main landmark and skip link first in tab order", async ({
+test("home responds 200 with the hero heading, main landmark and skip link first in tab order", async ({
   page,
 }) => {
   const response = await page.goto("/");
   expect(response?.status()).toBe(200);
-  await expect(page.getByRole("heading", { level: 1, name: "NEWMA" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "From authorized knowledge to evidence-backed discovery decisions",
+    }),
+  ).toBeVisible();
   await expect(page.locator("main#main")).toHaveCount(1);
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: "Skip to content" })).toBeFocused();

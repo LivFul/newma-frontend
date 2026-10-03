@@ -15,3 +15,12 @@ body {
   /* Two-tone ring: the inner halo keeps the ring visible on accent and warning surfaces. */
   box-shadow: 0 0 0 2px var(--color-bg);
 }
+
+/* Sticky header: keep focused elements and anchor targets out from under it (WCAG 2.4.11). */
+html:has([data-site-header]) {
+  scroll-padding-top: calc(var(--size-header) + var(--space-4));
+}
+[id="product"],
+[id="about"] {
+  scroll-margin-top: calc(var(--size-header) + var(--space-4));
+}
