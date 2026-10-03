@@ -187,9 +187,9 @@ TDD steps:
 
 TDD steps:
 
-- [ ] Failing Vitest first (Review Focus 3 and 4): duplicate refusal text and unchanged totals; duplicate row styling; disputed row shows "held — not payable"; no reconcile/approve/distribute button in states `disputed`; stepper marks the current state with `aria-current="step"`; buttons follow `next_actions`; a dialog reuses one key across two submits; `settlement_state_conflict` renders state and attempted action.
-- [ ] Implement.
-- [ ] Commit: `feat(demo): W7 settlement workspace with state stepper, receipts table and dispute hold`
+- [x] Failing Vitest first (Review Focus 3 and 4): duplicate refusal text and unchanged totals; duplicate row styling; disputed row shows "held — not payable"; no reconcile/approve/distribute button in states `disputed`; stepper marks the current state with `aria-current="step"`; buttons follow `next_actions`; a dialog reuses one key across two submits; `settlement_state_conflict` renders state and attempted action.
+- [x] Implement.
+- [x] Commit: `feat(demo): W7 settlement workspace with state stepper, receipts table and dispute hold`
 
 ### Task 6: Settlement workspace, part 2 — calculation, dual approval, distribution, final reconciliation, commitment, anchor
 

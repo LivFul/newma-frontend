@@ -24,7 +24,8 @@ type Props<D> = Readonly<{
 
 /**
  * A form dialog over one idempotent POST: the key is minted when the dialog opens and reused by
- * every submit, so a double submit or a retry is a replay (Review Focus 2). The draft resets on open.
+ * every submit, so a double submit or a retry is a replay (Review Focus 2); editing the draft mints
+ * a new key because the body is then a different request. The draft resets on open.
  */
 export function ActionDialog<D>({
   trigger,
@@ -56,6 +57,12 @@ export function ActionDialog<D>({
     }
   };
 
+  // A changed draft is a different request, so it gets a new key; an unchanged retry replays.
+  const edit = (patch: Partial<D>) => {
+    setDraft((d) => ({ ...d, ...patch }));
+    setKey(crypto.randomUUID());
+  };
+
   const submit = () => {
     if (busy) return;
     setError(undefined);
@@ -84,7 +91,7 @@ export function ActionDialog<D>({
               submit();
             }}
           >
-            {fields(draft, (patch) => setDraft((d) => ({ ...d, ...patch })))}
+            {fields(draft, edit)}
             <W7ErrorNotice error={error} />
             <Button type="submit" aria-busy={busy || undefined}>
               {submitLabel}

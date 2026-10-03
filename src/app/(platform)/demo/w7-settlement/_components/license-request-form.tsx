@@ -33,6 +33,13 @@ export function LicenseRequestForm({ options, allowed }: Props) {
   const [error, setError] = useState<ClientError | undefined>();
   const { busy, run } = useAction();
   const agreement = agreements.find((a) => a.id === agreementId);
+  // An edited form is a different request: it needs a new key; an unchanged retry replays.
+  const edited =
+    <T,>(setter: (value: T) => void) =>
+    (value: T) => {
+      setter(value);
+      reset();
+    };
 
   const submit = () => {
     if (busy || !allowed) return;
@@ -65,7 +72,7 @@ export function LicenseRequestForm({ options, allowed }: Props) {
       <SelectField
         label="Agreement"
         value={agreementId}
-        onChange={setAgreementId}
+        onChange={edited(setAgreementId)}
         options={agreements.map((a) => ({
           value: a.id,
           label: `Version ${a.version}: ${a.authority}`,
@@ -74,7 +81,7 @@ export function LicenseRequestForm({ options, allowed }: Props) {
       <SelectField
         label="Licensee organization"
         value={licensee}
-        onChange={setLicensee}
+        onChange={edited(setLicensee)}
         options={options.licensee_organizations.map((o) => ({
           value: o.id,
           label: o.display_name,
@@ -86,17 +93,17 @@ export function LicenseRequestForm({ options, allowed }: Props) {
       <SelectField
         label="Purpose"
         value={purpose}
-        onChange={(value) => setPurpose(value as LicensePurpose)}
+        onChange={edited((value: string) => setPurpose(value as LicensePurpose))}
         options={PURPOSES}
       />
-      <TextField label="Term (months)" type="number" value={term} onChange={setTerm} />
+      <TextField label="Term (months)" type="number" value={term} onChange={edited(setTerm)} />
       <div className="sm:col-span-2">
-        <TextField label="Scope" value={scope} onChange={setScope} multiline />
+        <TextField label="Scope" value={scope} onChange={edited(setScope)} multiline />
       </div>
       <SelectField
         label="Credential (optional, simulated)"
         value={credential}
-        onChange={setCredential}
+        onChange={edited(setCredential)}
         options={[
           { value: NO_CREDENTIAL, label: "None" },
           ...options.credentials.map((c) => ({
