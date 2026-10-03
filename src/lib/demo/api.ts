@@ -50,7 +50,7 @@ export function demoApi(sessionId?: string, fetchImpl?: typeof fetch): ApiClient
 }
 
 export type DemoFetchInit = Readonly<{
-  method?: "GET" | "POST" | "DELETE";
+  method?: "GET" | "POST" | "PUT" | "DELETE";
   body?: unknown;
   sessionId?: string;
   /** Query parameters; undefined values are omitted. Values are URL-encoded here. */

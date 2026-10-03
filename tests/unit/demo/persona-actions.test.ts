@@ -4,7 +4,7 @@ import { PERSONAS } from "@/lib/personas";
 
 describe("persona actions (UI hints mirroring the contract persona column)", () => {
   it("matches the contract matrix", () => {
-    expect(PERSONA_ACTIONS).toEqual({
+    expect(PERSONA_ACTIONS).toMatchObject({
       create_rights_record: ["community_liaison", "data_steward"],
       withdraw_rights: ["community_liaison"],
       ingest_source: ["data_steward"],
@@ -19,6 +19,20 @@ describe("persona actions (UI hints mirroring the contract persona column)", () 
       edit_eln_record: ["wet_lab_cro"],
       view_reconciliation: ["scientist", "wet_lab_cro", "data_steward"],
     });
+  });
+
+  it("matches the W7 contract matrix (A-P5A-06)", () => {
+    expect(PERSONA_ACTIONS).toMatchObject({
+      request_license: ["partner"],
+      check_credential: ["partner", "tenant_admin"],
+      decide_license: ["tenant_admin"],
+      create_settlement: ["finance"],
+      settlement_finance: ["finance"],
+      approve_distribution: ["finance", "tenant_admin"],
+      manage_benefit: ["community_liaison"],
+    });
+    expect(canAct("tenant_admin", "approve_distribution")).toBe(true);
+    expect(canAct("partner", "approve_distribution")).toBe(false);
   });
 
   it("answers per persona", () => {

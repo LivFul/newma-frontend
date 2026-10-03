@@ -11,6 +11,7 @@ export const WORKFLOW_ROUTES = [
   "/demo/w4-gates",
   "/demo/w5-wet-lab",
   "/demo/w6-provenance",
+  "/demo/w7-settlement",
 ] as const;
 
 export const DEMO_ROUTES = ["/demo", "/demo/jobs", ...WORKFLOW_ROUTES] as const;

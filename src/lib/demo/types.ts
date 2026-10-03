@@ -165,3 +165,55 @@ export type Reconciliation = Schemas["ReconciliationOut"];
 export type Disposition = Schemas["DispositionRequest"]["disposition"];
 export type RetrainingProposal = Schemas["RetrainingProposalOut"];
 export type ElnEditResult = Schemas["ElnEditOut"];
+
+// ---------------------------------------------------------------------------------------------
+// W7 (D-17): every shape below is generated from the pinned contract (docs/plans/p5a.md Contract).
+// Money is an integer in demo credits, shares are integer basis points (always "Illustrative").
+// ---------------------------------------------------------------------------------------------
+// Settlements (A8–A20): generated from the pinned contract.
+export const SETTLEMENT_STATES = [
+  "submitted",
+  "reviewed",
+  "approved",
+  "disputed",
+  "receipts_reconciled",
+  "distribution_authorized",
+  "funded",
+  "paid",
+  "audited",
+  "paused",
+] as const satisfies readonly Schemas["SettlementOut"]["state"][];
+export type SettlementState = Schemas["SettlementOut"]["state"];
+// Licenses (A1–A7): generated from the pinned contract.
+export type LicenseState = Schemas["LicenseOut"]["status"];
+export type CredentialStatus = Schemas["CredentialOut"]["status"];
+export type LicenseAction = Schemas["LicenseOut"]["next_actions"][number];
+export type SettlementAction = Schemas["SettlementOut"]["next_actions"][number];
+export type ReceiptStatus = Schemas["ReceiptOut"]["status"];
+export type LedgerKind = Schemas["LedgerEntryOut"]["kind"];
+export type BenefitStatus = Schemas["BenefitItemOut"]["status"];
+export type AnchorStatus = Schemas["AnchorOut"]["status"];
+export type LicensePurpose = Schemas["LicenseOut"]["purpose"];
+
+export type AgreementRule = Schemas["RuleOut"];
+export type AgreementView = Schemas["AgreementView"];
+export type LicenseCredential = Schemas["CredentialOut"];
+export type LicenseDecision = Schemas["DecisionOut"];
+export type License = Schemas["LicenseOut"];
+export type LicenseOptions = Schemas["LicenseOptions"];
+
+export type Receipt = Schemas["ReceiptOut"];
+export type CalcLine = Schemas["CalcLineOut"];
+export type Calculation = Schemas["CalculationOut"];
+export type SettlementApproval = Schemas["ApprovalOut"];
+export type LedgerEntry = Schemas["LedgerEntryOut"];
+export type Commitment = Schemas["CommitmentOut"];
+export type Anchor = Schemas["AnchorOut"];
+export type SettlementHistoryEntry = Schemas["HistoryEntry"];
+export type Settlement = Schemas["SettlementOut"];
+export type SettlementSummary = Schemas["SettlementSummary"];
+export type ApprovalResult = Schemas["ApprovalCreated"];
+export type BenefitItem = Schemas["BenefitItemOut"];
+export type Beneficiary = Schemas["BeneficiaryOut"];
+export type OutageState = Schemas["OutageOut"];
+export type EntityEvents = Schemas["EntityEvents"];

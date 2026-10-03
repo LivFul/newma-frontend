@@ -85,6 +85,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/beneficiaries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Beneficiary statements in demo credits from paid settlements (synthetic) */
+        get: operations["benefits_list_beneficiaries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/benefits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Non-monetary benefit items, optionally of one licence (synthetic) */
+        get: operations["benefits_list_benefits"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/benefits/{benefit_id}/deliver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record delivery of a scheduled benefit with an evidence note (community liaison) */
+        post: operations["benefits_deliver_benefit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/benefits/{benefit_id}/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Schedule a planned benefit (community liaison) */
+        post: operations["benefits_schedule_benefit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/candidates": {
         parameters: {
             query?: never;
@@ -231,6 +299,24 @@ export interface paths {
         /** Source records and their clearance status (synthetic) */
         get: operations["curation_list_source_records"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/demo/anchoring/outage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Simulated anchoring outage state of this tenant (demo only) */
+        get: operations["demo_get_outage"];
+        /** Switch the simulated anchoring outage on or off for this tenant (demo only) */
+        put: operations["demo_set_outage"];
         post?: never;
         delete?: never;
         options?: never;
@@ -438,6 +524,109 @@ export interface paths {
         put?: never;
         /** Cancel a job that has not finished */
         post: operations["jobs_cancel_job"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/licenses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Licences of the tenant, newest first (at most 100) */
+        get: operations["licenses_list_licenses"];
+        put?: never;
+        /** Request a licence on the latest agreement version (partner) */
+        post: operations["licenses_request_license"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/licenses/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Agreements, licensee organisations and simulated credential references (synthetic) */
+        get: operations["licenses_license_options"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/licenses/{license_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read one licence */
+        get: operations["licenses_get_license"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/licenses/{license_id}/credential-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Run the optional, simulated credential check (partner or tenant admin) */
+        post: operations["licenses_check_credential"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/licenses/{license_id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve or deny a licence; approval re-evaluates the rights policy (tenant admin) */
+        post: operations["licenses_decide_license"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/licenses/{license_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Signed event timeline of one licence, ascending seq */
+        get: operations["licenses_license_events"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -683,6 +872,211 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/settlements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Settlements of the tenant, newest first (at most 100) */
+        get: operations["settlements_list_settlements"];
+        put?: never;
+        /** Open the settlement of an approved licence (finance) */
+        post: operations["settlements_create_settlement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/settlements/{settlement_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read one settlement with receipts, calculation, approvals, ledger and anchor */
+        get: operations["settlements_get_settlement_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/settlements/{settlement_id}/approvals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve the distribution (finance or tenant admin); the second distinct persona authorizes it with a signed event */
+        post: operations["settlements_approve_distribution"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/settlements/{settlement_id}/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Final reconciliation and signed settlement commitment (paid to audited); optionally request a simulated anchor */
+        post: operations["settlements_audit_settlement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/settlements/{settlement_id}/dispute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dispute a recorded receipt (reviewed to disputed); no payout until resolved */
+        post: operations["settlements_dispute_receipt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/settlements/{settlement_id}/distribution": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Fund and pay in demo credits (authorized to paid); the ledger sums to the distributable amount */
+        post: operations["settlements_distribute_settlement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/settlements/{settlement_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Signed event timeline of one settlement (the seeded example has none) */
+        get: operations["settlements_settlement_events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/settlements/{settlement_id}/evidence-approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve the evidence (reviewed to approved) */
+        post: operations["settlements_approve_evidence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/settlements/{settlement_id}/receipts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record a receipt in demo credits; a duplicate reference is stored and refused */
+        post: operations["settlements_record_receipt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/settlements/{settlement_id}/reconcile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reconcile receipts and freeze the illustrative calculation (approved to reconciled) */
+        post: operations["settlements_reconcile_receipts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/settlements/{settlement_id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reinstate a disputed receipt; back to reviewed when none remain disputed */
+        post: operations["settlements_resolve_dispute"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/settlements/{settlement_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Review the evidence (submitted to reviewed; needs a recorded receipt) */
+        post: operations["settlements_review_settlement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/taxa": {
         parameters: {
             query?: never;
@@ -851,6 +1245,118 @@ export interface components {
             /** Title */
             title: string;
         };
+        /** AgreementView */
+        AgreementView: {
+            /** Authority */
+            authority: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Illustrative
+             * @constant
+             */
+            illustrative: true;
+            /** Latest */
+            latest: boolean;
+            /** Nonmonetary Benefits */
+            nonmonetary_benefits: string[];
+            /** Reserve Basis Points */
+            reserve_basis_points: number;
+            /**
+             * Rights Record Id
+             * Format: uuid
+             */
+            rights_record_id: string;
+            /** Rules */
+            rules: components["schemas"]["RuleOut"][];
+            /** Synthetic */
+            synthetic: boolean;
+            /**
+             * Unit
+             * @constant
+             */
+            unit: "demo credits";
+            /** Version */
+            version: number;
+        };
+        /** AnchorOut */
+        AnchorOut: {
+            /** Anchored At */
+            anchored_at: string | null;
+            /** Job Id */
+            job_id: string | null;
+            /** Job State */
+            job_state: string | null;
+            /**
+             * Label
+             * @constant
+             */
+            label: "Optional, simulated";
+            /** Manifest Sha256 */
+            manifest_sha256: string | null;
+            /** Receipt Ref */
+            receipt_ref: string | null;
+            /** Requested At */
+            requested_at: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "not_requested" | "pending" | "anchored";
+        };
+        /** ApprovalCreate */
+        ApprovalCreate: {
+            /** Calculation Sha256 */
+            calculation_sha256: string;
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+            /** Rationale */
+            rationale: string;
+        };
+        /** ApprovalCreated */
+        ApprovalCreated: {
+            approval: components["schemas"]["ApprovalOut"];
+            /** Authorized */
+            authorized: boolean;
+            settlement: components["schemas"]["SettlementOut"];
+        };
+        /** ApprovalOut */
+        ApprovalOut: {
+            /**
+             * Approved At
+             * Format: date-time
+             */
+            approved_at: string;
+            /** Calculation Sha256 */
+            calculation_sha256: string;
+            /**
+             * Event Id
+             * Format: uuid
+             */
+            event_id: string;
+            /** Persona */
+            persona: string;
+            /** Rationale */
+            rationale: string;
+        };
+        /** ApprovalsOut */
+        ApprovalsOut: {
+            /** Eligible Personas */
+            eligible_personas: string[];
+            /** Items */
+            items: components["schemas"]["ApprovalOut"][];
+            /**
+             * Required
+             * @constant
+             */
+            required: 2;
+        };
         /** AssayImportCreate */
         AssayImportCreate: {
             /** Eln Record Id */
@@ -890,6 +1396,106 @@ export interface components {
              * Format: uuid
              */
             work_package_id: string;
+        };
+        /** AuditRequest */
+        AuditRequest: {
+            /** Anchor */
+            anchor: boolean;
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+        };
+        /** BeneficiaryEntry */
+        BeneficiaryEntry: {
+            /** Amount Demo Credits */
+            amount_demo_credits: number;
+            /** Settlement Display Id */
+            settlement_display_id: string;
+            /**
+             * Settlement Id
+             * Format: uuid
+             */
+            settlement_id: string;
+        };
+        /** BeneficiaryOut */
+        BeneficiaryOut: {
+            /** Channel */
+            channel: string;
+            /** Display Name */
+            display_name: string;
+            /** Entries */
+            entries: components["schemas"]["BeneficiaryEntry"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Received Demo Credits */
+            received_demo_credits: number;
+            /**
+             * Synthetic
+             * @constant
+             */
+            synthetic: true;
+        };
+        /** BenefitDeliverRequest */
+        BenefitDeliverRequest: {
+            /** Evidence Note */
+            evidence_note: string;
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+        };
+        /** BenefitItemOut */
+        BenefitItemOut: {
+            /** Benefit Ref */
+            benefit_ref: string;
+            /** Delivered At */
+            delivered_at: string | null;
+            /** Evidence Note */
+            evidence_note: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** License Display Id */
+            license_display_id: string;
+            /**
+             * License Id
+             * Format: uuid
+             */
+            license_id: string;
+            /** Scheduled For */
+            scheduled_for: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "planned" | "scheduled" | "delivered";
+            /** Synthetic */
+            synthetic: boolean;
+            /** Title */
+            title: string;
+            /** Updated By Persona */
+            updated_by_persona: string | null;
+        };
+        /** BenefitScheduleRequest */
+        BenefitScheduleRequest: {
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+            /**
+             * Scheduled For
+             * Format: date
+             */
+            scheduled_for: string;
         };
         /** Budget */
         Budget: {
@@ -935,6 +1541,40 @@ export interface components {
             subject_id: string;
             /** Subject Type */
             subject_type: string;
+        };
+        /** CalcLineOut */
+        CalcLineOut: {
+            /** Amount Demo Credits */
+            amount_demo_credits: number;
+            /** Beneficiary Display Name */
+            beneficiary_display_name: string | null;
+            /** Beneficiary Id */
+            beneficiary_id: string | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "beneficiary" | "reserve" | "residual";
+            /** Share Basis Points */
+            share_basis_points: number;
+        };
+        /** CalculationOut */
+        CalculationOut: {
+            /** Distributable Demo Credits */
+            distributable_demo_credits: number;
+            /** Frozen */
+            frozen: boolean;
+            /** Held Demo Credits */
+            held_demo_credits: number;
+            /**
+             * Label
+             * @constant
+             */
+            label: "Illustrative";
+            /** Lines */
+            lines: components["schemas"]["CalcLineOut"][];
+            /** Sha256 */
+            sha256: string;
         };
         /** CandidateOut */
         CandidateOut: {
@@ -1025,6 +1665,44 @@ export interface components {
             /** Subject Type */
             subject_type: string;
         };
+        /** CommitmentOut */
+        CommitmentOut: {
+            /**
+             * Committed At
+             * Format: date-time
+             */
+            committed_at: string;
+            /**
+             * Event Id
+             * Format: uuid
+             */
+            event_id: string;
+            /** Kid */
+            kid: string;
+            /** Manifest Sha256 */
+            manifest_sha256: string;
+            /** Signature */
+            signature: string;
+            /**
+             * Signature Label
+             * @constant
+             */
+            signature_label: "Demo signature, not production key";
+            summary: components["schemas"]["CommitmentSummary"];
+        };
+        /** CommitmentSummary */
+        CommitmentSummary: {
+            /** Distributable Demo Credits */
+            distributable_demo_credits: number;
+            /** Ledger Sha256 */
+            ledger_sha256: string;
+            /** Ledger Total Demo Credits */
+            ledger_total_demo_credits: number;
+            /** Receipts Sha256 */
+            receipts_sha256: string;
+            /** Rules Sha256 */
+            rules_sha256: string;
+        };
         /** CompoundOut */
         CompoundOut: {
             /** Display Id */
@@ -1053,6 +1731,61 @@ export interface components {
             /** Withheld Fields */
             withheld_fields: string[];
         };
+        /** CredentialCheckRequest */
+        CredentialCheckRequest: {
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+        };
+        /** CredentialOption */
+        CredentialOption: {
+            /** Credential Ref */
+            credential_ref: string;
+            /** Description */
+            description: string;
+        };
+        /** CredentialOut */
+        CredentialOut: {
+            /** Checked At */
+            checked_at: string | null;
+            /** Credential Ref */
+            credential_ref: string | null;
+            /**
+             * Label
+             * @constant
+             */
+            label: "Optional, simulated";
+            /** Proof Ref */
+            proof_ref: string | null;
+            /** Reason */
+            reason: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "not_requested" | "verified" | "failed";
+        };
+        /** DecisionOut */
+        DecisionOut: {
+            /**
+             * Decided At
+             * Format: date-time
+             */
+            decided_at: string;
+            /** Decided By Persona */
+            decided_by_persona: string;
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "approve" | "deny";
+            /** Policy Decision Id */
+            policy_decision_id: string | null;
+            /** Rationale */
+            rationale: string;
+        };
         /** DemoKeys */
         DemoKeys: {
             /** Keys */
@@ -1069,6 +1802,29 @@ export interface components {
             disposition: "repeat_sample" | "exclude_sample" | "accept_with_deviation";
             /** Rationale */
             rationale: string;
+        };
+        /** DisputeRequest */
+        DisputeRequest: {
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+            /** Reason */
+            reason: string;
+            /**
+             * Receipt Id
+             * Format: uuid
+             */
+            receipt_id: string;
+        };
+        /** DistributionRequest */
+        DistributionRequest: {
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
         };
         /** ElnEditOut */
         ElnEditOut: {
@@ -1101,6 +1857,22 @@ export interface components {
             record_id: string;
             /** Revision */
             revision: number;
+        };
+        /**
+         * EntityEvents
+         * @description Timeline of an entity type outside the P3 `EntityType` enum (`license`, `settlement`);
+         *     `entity_type` is a plain string so the P3 response enum stays untouched (A-P5A-10).
+         */
+        EntityEvents: {
+            /**
+             * Entity Id
+             * Format: uuid
+             */
+            entity_id: string;
+            /** Entity Type */
+            entity_type: string;
+            /** Events */
+            events: components["schemas"]["EventOut"][];
         };
         /** ErrorResponse */
         ErrorResponse: {
@@ -1145,6 +1917,16 @@ export interface components {
             seq: number;
             /** Signature */
             signature: string | null;
+        };
+        /** EvidenceApprovalRequest */
+        EvidenceApprovalRequest: {
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+            /** Rationale */
+            rationale: string;
         };
         /** EvidenceDiffOut */
         EvidenceDiffOut: {
@@ -1358,6 +2140,22 @@ export interface components {
             /** Version */
             version: string;
         };
+        /** HistoryEntry */
+        HistoryEntry: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Event */
+            event: string;
+            /** From */
+            from: string | null;
+            /** Persona */
+            persona: string;
+            /** To */
+            to: string;
+        };
         /** HoldOut */
         HoldOut: {
             /** Code */
@@ -1443,6 +2241,16 @@ export interface components {
              */
             source_record_id: string;
         };
+        /** ItemList[BeneficiaryOut] */
+        ItemList_BeneficiaryOut_: {
+            /** Items */
+            items: components["schemas"]["BeneficiaryOut"][];
+        };
+        /** ItemList[BenefitItemOut] */
+        ItemList_BenefitItemOut_: {
+            /** Items */
+            items: components["schemas"]["BenefitItemOut"][];
+        };
         /** ItemList[CacheEntryOut] */
         ItemList_CacheEntryOut_: {
             /** Items */
@@ -1463,6 +2271,11 @@ export interface components {
             /** Items */
             items: components["schemas"]["EvidencePackageSummary"][];
         };
+        /** ItemList[LicenseOut] */
+        ItemList_LicenseOut_: {
+            /** Items */
+            items: components["schemas"]["LicenseOut"][];
+        };
         /** ItemList[MaterialBatchOut] */
         ItemList_MaterialBatchOut_: {
             /** Items */
@@ -1477,6 +2290,11 @@ export interface components {
         ItemList_RightsRecordOut_: {
             /** Items */
             items: components["schemas"]["RightsRecordOut"][];
+        };
+        /** ItemList[SettlementSummary] */
+        ItemList_SettlementSummary_: {
+            /** Items */
+            items: components["schemas"]["SettlementSummary"][];
         };
         /** ItemList[SourceRecordOut] */
         ItemList_SourceRecordOut_: {
@@ -1569,6 +2387,134 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /** LedgerEntryOut */
+        LedgerEntryOut: {
+            /** Amount Demo Credits */
+            amount_demo_credits: number;
+            /** Beneficiary Display Name */
+            beneficiary_display_name: string | null;
+            /** Beneficiary Id */
+            beneficiary_id: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "beneficiary" | "reserve" | "residual";
+            /**
+             * Posted At
+             * Format: date-time
+             */
+            posted_at: string;
+            /** Share Basis Points */
+            share_basis_points: number;
+            /** Synthetic */
+            synthetic: boolean;
+        };
+        /** LicenseCreate */
+        LicenseCreate: {
+            /**
+             * Agreement Id
+             * Format: uuid
+             */
+            agreement_id: string;
+            /** Credential Ref */
+            credential_ref?: string | null;
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+            /**
+             * Licensee Organization Id
+             * Format: uuid
+             */
+            licensee_organization_id: string;
+            /**
+             * Purpose
+             * @enum {string}
+             */
+            purpose: "research" | "commercial";
+            /** Scope Summary */
+            scope_summary: string;
+            /** Term Months */
+            term_months: number;
+        };
+        /** LicenseDecisionRequest */
+        LicenseDecisionRequest: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "approve" | "deny";
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+            /** Rationale */
+            rationale: string;
+        };
+        /** LicenseOptions */
+        LicenseOptions: {
+            /** Agreements */
+            agreements: components["schemas"]["AgreementView"][];
+            /** Credentials */
+            credentials: components["schemas"]["CredentialOption"][];
+            /** Licensee Organizations */
+            licensee_organizations: components["schemas"]["OrganizationOption"][];
+        };
+        /** LicenseOut */
+        LicenseOut: {
+            agreement: components["schemas"]["AgreementView"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            credential: components["schemas"]["CredentialOut"];
+            decision: components["schemas"]["DecisionOut"] | null;
+            /** Display Id */
+            display_id: string;
+            /** Event Id */
+            event_id: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Licensee Display Name */
+            licensee_display_name: string;
+            /**
+             * Licensee Organization Id
+             * Format: uuid
+             */
+            licensee_organization_id: string;
+            /** Next Actions */
+            next_actions: ("credential_check" | "decide")[];
+            /**
+             * Purpose
+             * @enum {string}
+             */
+            purpose: "research" | "commercial";
+            /** Requested By Persona */
+            requested_by_persona: string;
+            /** Scope Summary */
+            scope_summary: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "requested" | "credential_check" | "approved" | "denied";
+            /** Synthetic */
+            synthetic: boolean;
+            /** Term Months */
+            term_months: number;
         };
         /** ManifestOut */
         ManifestOut: {
@@ -1673,6 +2619,33 @@ export interface components {
             value: number | null;
             /** Withheld Fields */
             withheld_fields: string[];
+        };
+        /** OrganizationOption */
+        OrganizationOption: {
+            /** Display Name */
+            display_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+        };
+        /** OutageOut */
+        OutageOut: {
+            /** Active */
+            active: boolean;
+            /**
+             * Label
+             * @constant
+             */
+            label: "Optional, simulated";
+            /** Updated At */
+            updated_at: string | null;
+        };
+        /** OutageSet */
+        OutageSet: {
+            /** Active */
+            active: boolean;
         };
         /** Page[CompoundOut] */
         Page_CompoundOut_: {
@@ -1834,6 +2807,50 @@ export interface components {
             /** X */
             x: string;
         };
+        /** ReceiptCreate */
+        ReceiptCreate: {
+            /** Amount Demo Credits */
+            amount_demo_credits: number;
+            /** External Ref */
+            external_ref: string;
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+        };
+        /** ReceiptOut */
+        ReceiptOut: {
+            /** Amount Demo Credits */
+            amount_demo_credits: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Dispute Reason */
+            dispute_reason: string | null;
+            /** Duplicate Of */
+            duplicate_of: string | null;
+            /** External Ref */
+            external_ref: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Recorded By Persona */
+            recorded_by_persona: string | null;
+            /** Settlement Id */
+            settlement_id: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "recorded" | "duplicate" | "disputed";
+            /** Synthetic */
+            synthetic: boolean;
+        };
         /** ReconItemOut */
         ReconItemOut: {
             /** Disposition */
@@ -1854,6 +2871,14 @@ export interface components {
              * @enum {string}
              */
             status: "matched" | "missing" | "substituted" | "mislabeled" | "insufficient";
+        };
+        /** ReconcileRequest */
+        ReconcileRequest: {
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
         };
         /** ReconciliationOut */
         ReconciliationOut: {
@@ -1911,6 +2936,21 @@ export interface components {
              */
             tenant_id: string;
         };
+        /** ResolveRequest */
+        ResolveRequest: {
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+            /** Rationale */
+            rationale: string;
+            /**
+             * Receipt Id
+             * Format: uuid
+             */
+            receipt_id: string;
+        };
         /** RetrainingProposalOut */
         RetrainingProposalOut: {
             /**
@@ -1942,6 +2982,14 @@ export interface components {
             included: components["schemas"]["IncludedSubject"][];
             /** Withheld */
             withheld: components["schemas"]["WithheldSubject"][];
+        };
+        /** ReviewRequest */
+        ReviewRequest: {
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
         };
         /** RightsRecordCreate */
         RightsRecordCreate: {
@@ -2022,6 +3070,23 @@ export interface components {
             /** Valid Until */
             valid_until: string | null;
         };
+        /** RuleOut */
+        RuleOut: {
+            /**
+             * Basis
+             * @constant
+             */
+            basis: "net_demo_credits";
+            /** Beneficiary Display Name */
+            beneficiary_display_name: string;
+            /**
+             * Beneficiary Id
+             * Format: uuid
+             */
+            beneficiary_id: string;
+            /** Share Basis Points */
+            share_basis_points: number;
+        };
         /** SessionCreated */
         SessionCreated: {
             /**
@@ -2058,6 +3123,98 @@ export interface components {
              * Format: uuid
              */
             tenant_id: string;
+        };
+        /** SettlementCreate */
+        SettlementCreate: {
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+            /**
+             * License Id
+             * Format: uuid
+             */
+            license_id: string;
+        };
+        /** SettlementOut */
+        SettlementOut: {
+            agreement: components["schemas"]["AgreementView"];
+            anchor: components["schemas"]["AnchorOut"];
+            approvals: components["schemas"]["ApprovalsOut"];
+            calculation: components["schemas"]["CalculationOut"] | null;
+            commitment: components["schemas"]["CommitmentOut"] | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Display Id */
+            display_id: string;
+            /** History */
+            history: components["schemas"]["HistoryEntry"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Ledger */
+            ledger: components["schemas"]["LedgerEntryOut"][];
+            /** License Display Id */
+            license_display_id: string | null;
+            /** License Id */
+            license_id: string | null;
+            /** Next Actions */
+            next_actions: ("record_receipt" | "review" | "dispute" | "resolve" | "evidence_approval" | "reconcile" | "approve_distribution" | "distribute" | "audit")[];
+            /** Receipts */
+            receipts: components["schemas"]["ReceiptOut"][];
+            /** Seeded Example */
+            seeded_example: boolean;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "submitted" | "reviewed" | "approved" | "disputed" | "receipts_reconciled" | "distribution_authorized" | "funded" | "paid" | "audited" | "paused";
+            /** Synthetic */
+            synthetic: boolean;
+            totals: components["schemas"]["SettlementTotals"];
+        };
+        /** SettlementSummary */
+        SettlementSummary: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Display Id */
+            display_id: string;
+            /** Held Demo Credits */
+            held_demo_credits: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** License Id */
+            license_id: string | null;
+            /** Recorded Demo Credits */
+            recorded_demo_credits: number;
+            /** Seeded Example */
+            seeded_example: boolean;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "submitted" | "reviewed" | "approved" | "disputed" | "receipts_reconciled" | "distribution_authorized" | "funded" | "paid" | "audited" | "paused";
+        };
+        /** SettlementTotals */
+        SettlementTotals: {
+            /** Duplicate Count */
+            duplicate_count: number;
+            /** Held Demo Credits */
+            held_demo_credits: number;
+            /** Recorded Demo Credits */
+            recorded_demo_credits: number;
         };
         /** SourceRecordOut */
         SourceRecordOut: {
@@ -2664,6 +3821,288 @@ export interface operations {
             };
         };
     };
+    benefits_list_beneficiaries: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemList_BeneficiaryOut_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    benefits_list_benefits: {
+        parameters: {
+            query?: {
+                license_id?: string | null;
+            };
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemList_BenefitItemOut_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    benefits_deliver_benefit: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                benefit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BenefitDeliverRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BenefitItemOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such benefit in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description benefit_state_conflict: details state; idempotency_conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    benefits_schedule_benefit: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                benefit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BenefitScheduleRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BenefitItemOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such benefit in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description benefit_state_conflict: details state; idempotency_conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     review_list_candidates: {
         parameters: {
             query?: never;
@@ -3236,6 +4675,126 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ItemList_SourceRecordOut_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    demo_get_outage: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutageOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    demo_set_outage: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OutageSet"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutageOut"];
                 };
             };
             /** @description Missing or invalid service token or session */
@@ -4118,6 +5677,513 @@ export interface operations {
             };
             /** @description Job already in a terminal state */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    licenses_list_licenses: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemList_LicenseOut_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    licenses_request_license: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LicenseCreate"];
+            };
+        };
+        responses: {
+            /** @description Replay of an existing idempotency key */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LicenseOut"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LicenseOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description agreement_not_found; licensee_not_found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description agreement_superseded: details latest_agreement_id; idempotency_conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    licenses_license_options: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LicenseOptions"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    licenses_get_license: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                license_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LicenseOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such licence in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    licenses_check_credential: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                license_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CredentialCheckRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LicenseOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such licence in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description credential_not_provided; license_state_conflict: details state, attempted */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    licenses_decide_license: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                license_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LicenseDecisionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LicenseOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such licence in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description credential_check_failed: details reason; license_rights_not_allowed: details policy_decision_id, reasons; license_state_conflict: details state, attempted */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    licenses_license_events: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                license_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EntityEvents"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such licence in this tenant */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5131,6 +7197,1047 @@ export interface operations {
                 };
             };
             /** @description rights_already_withdrawn */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settlements_list_settlements: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemList_SettlementSummary_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settlements_create_settlement: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SettlementCreate"];
+            };
+        };
+        responses: {
+            /** @description Replay of an idempotency key */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettlementOut"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettlementOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: licence not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description license_not_approved: details status; settlement_exists: details settlement_id */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settlements_get_settlement_detail: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                settlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettlementOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such settlement in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settlements_approve_distribution: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                settlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApprovalCreate"];
+            };
+        };
+        responses: {
+            /** @description Replay of an idempotency key */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalCreated"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalCreated"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such settlement in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description approver_already_approved: details persona; calculation_stale: details current_sha256; settlement_state_conflict: details state, attempted; idempotency_conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settlements_audit_settlement: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                settlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AuditRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettlementOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such settlement in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description conservation_violation: details distributable_demo_credits, ledger_demo_credits; settlement_state_conflict: details state, attempted; idempotency_conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settlements_dispute_receipt: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                settlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DisputeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettlementOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such settlement in this tenant; receipt_not_found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description receipt_not_disputable: details status; settlement_state_conflict: details state, attempted; idempotency_conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settlements_distribute_settlement: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                settlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DistributionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettlementOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such settlement in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description conservation_violation: details distributable_demo_credits, ledger_demo_credits; settlement_state_conflict: details state, attempted; idempotency_conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settlements_settlement_events: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                settlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EntityEvents"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such settlement in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settlements_approve_evidence: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                settlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EvidenceApprovalRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettlementOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such settlement in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description settlement_state_conflict: details state, attempted; idempotency_conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settlements_record_receipt: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                settlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReceiptCreate"];
+            };
+        };
+        responses: {
+            /** @description Replay of an idempotency key */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReceiptOut"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReceiptOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such settlement in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description receipt_duplicate: details duplicate_of, receipt_id; receipt_limit_reached; settlement_state_conflict: details state, attempted; idempotency_conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settlements_reconcile_receipts: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                settlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReconcileRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettlementOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such settlement in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description settlement_has_disputed_receipts: details receipt_ids; no_recorded_receipts; invalid_agreement_rules; settlement_state_conflict: details state, attempted; idempotency_conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settlements_resolve_dispute: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                settlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResolveRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettlementOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such settlement in this tenant; receipt_not_found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description receipt_not_disputed: details status; settlement_state_conflict: details state, attempted; idempotency_conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settlements_review_settlement: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                settlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettlementOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such settlement in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description no_recorded_receipts; settlement_state_conflict: details state, attempted; idempotency_conflict */
             409: {
                 headers: {
                     [name: string]: unknown;
