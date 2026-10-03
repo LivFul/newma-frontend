@@ -155,10 +155,132 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/policy/evaluate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Evaluate purpose-based policy for an asset; records the decision (signed event) */
+        post: operations["policy_evaluate_policy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/retrieval/cache": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retrieval cache entries, optionally for one subject */
+        get: operations["retrieval_list_cache_entries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/rights/records": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the tenant's rights records (synthetic) */
+        get: operations["rights_list_rights_records"];
+        put?: never;
+        /** Record rights for a taxon, compound or dataset (signed event) */
+        post: operations["rights_create_rights_record"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/rights/records/{record_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read one rights record */
+        get: operations["rights_get_rights_record"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/rights/records/{record_id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Withdraw consent; invalidates every cached retrieval it governed (signed event) */
+        post: operations["rights_withdraw_rights_record"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** CacheEntryOut */
+        CacheEntryOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Invalidated At */
+            invalidated_at: string | null;
+            /** Invalidation Reason */
+            invalidation_reason: string | null;
+            /**
+             * Policy Decision Id
+             * Format: uuid
+             */
+            policy_decision_id: string;
+            /** Purpose */
+            purpose: string;
+            /**
+             * Rights Record Id
+             * Format: uuid
+             */
+            rights_record_id: string;
+            /**
+             * Subject Id
+             * Format: uuid
+             */
+            subject_id: string;
+            /** Subject Type */
+            subject_type: string;
+        };
         /** DemoKeys */
         DemoKeys: {
             /** Keys */
@@ -184,6 +306,16 @@ export interface components {
             status: "ok";
             /** Version */
             version: string;
+        };
+        /** ItemList[CacheEntryOut] */
+        ItemList_CacheEntryOut_: {
+            /** Items */
+            items: components["schemas"]["CacheEntryOut"][];
+        };
+        /** ItemList[RightsRecordOut] */
+        ItemList_RightsRecordOut_: {
+            /** Items */
+            items: components["schemas"]["RightsRecordOut"][];
         };
         /** JobCreate */
         JobCreate: {
@@ -280,6 +412,106 @@ export interface components {
              */
             persona: "community_liaison" | "scientist" | "data_steward" | "scientific_approver" | "wet_lab_cro" | "partner" | "finance" | "tenant_admin";
         };
+        /** PolicyDecisionOut */
+        PolicyDecisionOut: {
+            /** Cache Entry Id */
+            cache_entry_id: string | null;
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "allow" | "hold" | "deny";
+            /**
+             * Evaluated At
+             * Format: date-time
+             */
+            evaluated_at: string;
+            /**
+             * Event Id
+             * Format: uuid
+             */
+            event_id: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            inputs: components["schemas"]["PolicyInputs"];
+            /** Policy Version */
+            policy_version: string;
+            /** Reasons */
+            reasons: components["schemas"]["PolicyReasonOut"][];
+            /** Rights Record Ids */
+            rights_record_ids: string[];
+        };
+        /** PolicyEvaluateRequest */
+        PolicyEvaluateRequest: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "ingest" | "retrieve" | "compute" | "lab_transfer" | "export" | "train" | "commercialise";
+            /**
+             * Asset Id
+             * Format: uuid
+             */
+            asset_id: string;
+            /**
+             * Asset Type
+             * @enum {string}
+             */
+            asset_type: "taxon" | "compound" | "observation" | "dataset";
+            /** Jurisdiction */
+            jurisdiction?: string | null;
+            /**
+             * Purpose
+             * @enum {string}
+             */
+            purpose: "research" | "commercial" | "disclosure" | "model_training" | "onward_transfer";
+        };
+        /** PolicyInputs */
+        PolicyInputs: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "ingest" | "retrieve" | "compute" | "lab_transfer" | "export" | "train" | "commercialise";
+            /**
+             * Asset Id
+             * Format: uuid
+             */
+            asset_id: string;
+            /**
+             * Asset Type
+             * @enum {string}
+             */
+            asset_type: "taxon" | "compound" | "observation" | "dataset";
+            /** Jurisdiction */
+            jurisdiction: string | null;
+            /** Persona */
+            persona: string;
+            /**
+             * Purpose
+             * @enum {string}
+             */
+            purpose: "research" | "commercial" | "disclosure" | "model_training" | "onward_transfer";
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+        };
+        /** PolicyReasonOut */
+        PolicyReasonOut: {
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
+            /** Remediation */
+            remediation: string | null;
+            /** Rights Record Id */
+            rights_record_id: string | null;
+        };
         /** PublicJwk */
         PublicJwk: {
             /** Alg */
@@ -306,6 +538,85 @@ export interface components {
              * Format: uuid
              */
             tenant_id: string;
+        };
+        /** RightsRecordCreate */
+        RightsRecordCreate: {
+            /** Authority */
+            authority: string;
+            /** Jurisdiction */
+            jurisdiction: string;
+            /** Mat Reference */
+            mat_reference?: string | null;
+            /** Permitted Uses */
+            permitted_uses: ("research" | "commercial" | "disclosure" | "model_training" | "onward_transfer")[];
+            /** Pic Reference */
+            pic_reference?: string | null;
+            /** Restrictions */
+            restrictions: string[];
+            /**
+             * Subject Id
+             * Format: uuid
+             */
+            subject_id: string;
+            /**
+             * Subject Type
+             * @enum {string}
+             */
+            subject_type: "taxon" | "compound" | "dataset";
+            /**
+             * Valid From
+             * Format: date
+             */
+            valid_from: string;
+            /** Valid Until */
+            valid_until?: string | null;
+        };
+        /** RightsRecordOut */
+        RightsRecordOut: {
+            /** Authority */
+            authority: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Jurisdiction */
+            jurisdiction: string;
+            /** Mat Reference */
+            mat_reference: string | null;
+            /** Obligations */
+            obligations: {
+                [key: string]: unknown;
+            }[];
+            /** Permitted Uses */
+            permitted_uses: string[];
+            /** Pic Reference */
+            pic_reference: string | null;
+            /** Restrictions */
+            restrictions: string[];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "valid" | "expired" | "purpose_restricted" | "disputed" | "withdrawn";
+            /** Subject Display Name */
+            subject_display_name: string;
+            /**
+             * Subject Id
+             * Format: uuid
+             */
+            subject_id: string;
+            /** Subject Type */
+            subject_type: string;
+            /** Synthetic */
+            synthetic: boolean;
+            /**
+             * Valid From
+             * Format: date
+             */
+            valid_from: string;
+            /** Valid Until */
+            valid_until: string | null;
         };
         /** SessionCreated */
         SessionCreated: {
@@ -343,6 +654,22 @@ export interface components {
              * Format: uuid
              */
             tenant_id: string;
+        };
+        /** WithdrawRequest */
+        WithdrawRequest: {
+            /** Reason */
+            reason: string;
+        };
+        /** WithdrawResult */
+        WithdrawResult: {
+            /**
+             * Event Id
+             * Format: uuid
+             */
+            event_id: string;
+            /** Invalidated Cache Entries */
+            invalidated_cache_entries: components["schemas"]["CacheEntryOut"][];
+            record: components["schemas"]["RightsRecordOut"];
         };
     };
     responses: never;
@@ -890,6 +1217,417 @@ export interface operations {
                 };
             };
             /** @description Job already in a terminal state */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    policy_evaluate_policy: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PolicyEvaluateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyDecisionOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description asset_not_found: no such asset in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    retrieval_list_cache_entries: {
+        parameters: {
+            query?: {
+                subject_id?: string | null;
+            };
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemList_CacheEntryOut_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    rights_list_rights_records: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemList_RightsRecordOut_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    rights_create_rights_record: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RightsRecordCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RightsRecordOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description subject_not_found: subject does not exist in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    rights_get_rights_record: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                record_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RightsRecordOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such rights record in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    rights_withdraw_rights_record: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                record_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WithdrawRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WithdrawResult"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such rights record in this tenant */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description rights_already_withdrawn */
             409: {
                 headers: {
                     [name: string]: unknown;
