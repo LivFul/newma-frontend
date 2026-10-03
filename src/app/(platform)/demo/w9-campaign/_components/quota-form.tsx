@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@/components/ui";
+import { Button } from "@/components/ui/button";
 import { type ClientError, putJson } from "@/lib/demo/client";
 import { THRESHOLD_LIMITS } from "@/lib/demo/parse-campaigns";
 import type { CampaignSummary } from "@/lib/demo/types";

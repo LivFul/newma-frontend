@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@/components/ui";
+import { Button } from "@/components/ui/button";
 import { type ClientError, postJson } from "@/lib/demo/client";
 import { isRecord } from "@/lib/demo/guards";
 import { useStableKey } from "@/lib/demo/idempotency";

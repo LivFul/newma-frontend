@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
-import { Button } from "@/components/ui";
+import { Button } from "@/components/ui/button";
 import { type ClientError, putJson, requestJson } from "@/lib/demo/client";
 import { useStableKey } from "@/lib/demo/idempotency";
 import { THRESHOLD_LIMITS } from "@/lib/demo/parse-campaigns";

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SyntheticBadge } from "@/components/ui";
+import { SyntheticBadge } from "@/components/ui/synthetic-badge";
 import type { CreditUsage } from "@/lib/demo/types";
 
 const credits = (n: number) => `${n} demo ${n === 1 ? "credit" : "credits"}`;
