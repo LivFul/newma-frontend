@@ -25,6 +25,13 @@ jobs:
       - run: pnpm lint && pnpm typecheck && pnpm format:check && pnpm test:coverage
       - name: Contract check against the deployed API spec
         run: pnpm api:check
+      - name: Canonical vectors drift check
+        # Compares with the deployed API's /canonical-vectors.json. Until the repository variable
+        # exists the step falls back to the lock only and emits a visible warning.
+        env:
+          NEWMA_VECTORS_URL: ${{ vars.NEWMA_VECTORS_URL }}
+          VECTORS_ALLOW_LOCK_ONLY: ${{ vars.NEWMA_VECTORS_URL == '' && '1' || '' }}
+        run: pnpm vectors:check
       - run: bash scripts/check-demo-isolation.sh
       - run: pnpm build
       - run: pnpm bundle:check

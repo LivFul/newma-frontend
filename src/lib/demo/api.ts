@@ -53,6 +53,8 @@ export type DemoFetchInit = Readonly<{
   method?: "GET" | "POST" | "DELETE";
   body?: unknown;
   sessionId?: string;
+  /** Query parameters; undefined values are omitted. Values are URL-encoded here. */
+  query?: Readonly<Record<string, string | undefined>>;
 }>;
 
 export type DemoFetchResult<T> = Readonly<{
@@ -78,17 +80,27 @@ async function parseError(response: Response): Promise<DemoErrorEnvelope> {
     : fallback;
 }
 
+function queryString(query: DemoFetchInit["query"]): string {
+  if (!query) return "";
+  const entries = Object.entries(query).filter(
+    (entry): entry is [string, string] => entry[1] !== undefined,
+  );
+  return entries.length === 0 ? "" : `?${new URLSearchParams(entries).toString()}`;
+}
+
 export async function demoFetch<T = unknown>(
   path: DemoPath,
   init: DemoFetchInit = {},
 ): Promise<DemoFetchResult<T>> {
   const { baseUrl, serviceToken } = readDemoEnv();
-  const url = `${baseUrl.replace(/\/$/, "")}${path}`;
+  const url = `${baseUrl.replace(/\/$/, "")}${path}${queryString(init.query)}`;
   const response = await fetch(url, {
     method: init.method ?? "GET",
     headers: buildHeaders(serviceToken, init),
     body: init.body === undefined ? undefined : JSON.stringify(init.body),
     cache: "no-store",
+    // The bearer token is attached: a redirect is an error, never followed.
+    redirect: "error",
   });
   if (!response.ok) throw new DemoApiError(response.status, await parseError(response));
   const data = response.status === 204 ? undefined : ((await response.json()) as T);

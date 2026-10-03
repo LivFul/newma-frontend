@@ -28,6 +28,8 @@ describe("DemoBanner", () => {
     const note = screen.getByRole("note", { name: "Demo notice" });
     expect(note).toHaveTextContent(DEMO_BANNER_TEXT);
     expect(screen.getByText("Synthetic")).toHaveClass("bg-warning");
+    // axe "region": the note must sit inside a named landmark.
+    expect(screen.getByRole("region", { name: "Demo banner" })).toContainElement(note);
     await expectNoAxeViolations(container);
   });
 });

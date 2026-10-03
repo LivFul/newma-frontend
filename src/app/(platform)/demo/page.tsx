@@ -1,12 +1,28 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui";
 import { requireSession } from "@/lib/demo/current-session";
-import { WORKFLOWS } from "@/lib/demo/workflows";
+import { WORKFLOWS, type Workflow } from "@/lib/demo/workflows";
 import { personaLabel } from "@/lib/personas";
 
 function formatInstant(iso: string): string {
   const date = new Date(iso);
   return Number.isNaN(date.getTime()) ? iso : date.toUTCString();
+}
+
+function WorkflowName({ workflow }: { workflow: Workflow }) {
+  const content = (
+    <span className="flex items-baseline gap-2">
+      <span className="font-mono text-sm text-fg-muted">{workflow.id}</span>
+      <span>{workflow.title}</span>
+    </span>
+  );
+  return workflow.href ? (
+    <Link href={workflow.href} className="underline-offset-4 hover:underline">
+      {content}
+    </Link>
+  ) : (
+    content
+  );
 }
 
 export default async function DemoDashboard() {
@@ -49,11 +65,10 @@ export default async function DemoDashboard() {
               key={workflow.id}
               className="flex items-center justify-between gap-3 rounded-md border border-border px-4 py-3"
             >
-              <span className="flex items-baseline gap-2">
-                <span className="font-mono text-sm text-fg-muted">{workflow.id}</span>
-                <span>{workflow.title}</span>
-              </span>
-              <Badge>Arrives in {workflow.phase}</Badge>
+              <WorkflowName workflow={workflow} />
+              <Badge tone={workflow.href ? "success" : "neutral"}>
+                {workflow.href ? "Available" : `Arrives in ${workflow.phase}`}
+              </Badge>
             </li>
           ))}
         </ul>

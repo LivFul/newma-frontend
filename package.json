@@ -16,10 +16,12 @@
     "test:e2e": "playwright test",
     "test:a11y": "playwright test tests/a11y",
     "lhci": "lhci autorun",
-    "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test:coverage && pnpm api:check && bash scripts/check-demo-isolation.sh",
+    "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test:coverage && pnpm api:check && pnpm vectors:check && bash scripts/check-demo-isolation.sh",
     "api:check": "node scripts/api-check.mjs",
     "api:update": "node scripts/api-check.mjs --update",
-    "bundle:check": "node scripts/check-client-bundle.mjs"
+    "bundle:check": "node scripts/check-client-bundle.mjs",
+    "vectors:sync": "node scripts/sync-canonical-vectors.mjs --write",
+    "vectors:check": "node scripts/sync-canonical-vectors.mjs --check"
   },
   "dependencies": {
     "@sentry/nextjs": "^11.2.0",

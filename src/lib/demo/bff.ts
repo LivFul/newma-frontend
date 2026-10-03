@@ -1,6 +1,7 @@
 import "server-only";
 import { type NextRequest, NextResponse } from "next/server";
 import { DemoApiError } from "./api";
+import { pickDetails } from "./error-details";
 import type { DemoErrorEnvelope } from "./types";
 import { isDemoMode } from "./mode";
 import { isSecureRequest, readSessionId, requestOrigin, sessionCookieName } from "./session";
@@ -76,12 +77,7 @@ export function sameOriginGuard(req: NextRequest): NextResponse | undefined {
   return errorJson(403, "cross_site_request", "Cross-site requests are not accepted.");
 }
 
-// Backend `details` reach the browser only for codes whose details are safe to render.
-const DETAILS_ALLOWLIST: ReadonlySet<string> = new Set([
-  "job_terminal",
-  "validation_error",
-  "idempotency_conflict",
-]);
+// Backend `details` reach the browser only through the per-code pickers in error-details.ts.
 const UPSTREAM_UNAVAILABLE = "The demo backend is unavailable";
 
 function upstreamError(error: unknown): NextResponse {
@@ -94,9 +90,8 @@ function mapError(error: unknown, secure: boolean): NextResponse {
   if (error instanceof BffError) return errorJson(error.status, error.code, error.message);
   if (!(error instanceof DemoApiError) || error.status >= 500) return upstreamError(error);
   const base = { code: error.code, message: error.message };
-  const body: ErrorBody = DETAILS_ALLOWLIST.has(error.code)
-    ? { ...base, details: error.details }
-    : base;
+  const details = pickDetails(error.code, error.details);
+  const body: ErrorBody = details === undefined ? base : { ...base, details };
   const response = noStore(body, { status: error.status });
   return error.isInvalidSession ? clearSessionCookie(response, secure) : response;
 }
@@ -131,13 +126,36 @@ export function withDemo(handler: (req: NextRequest, secure: boolean) => Promise
   };
 }
 
-const SAFE_ID = /^[A-Za-z0-9_-]{1,128}$/;
+export { isSafeId } from "./safe-id";
 
-export function isSafeId(value: string): boolean {
-  return SAFE_ID.test(value);
-}
-
+// Demo request bodies are small forms and manifests; anything larger is refused before parsing.
+const MAX_JSON_BYTES = 256 * 1024;
 const JSON_CONTENT_TYPE = /^application\/json(\s*;|$)/i;
+
+const payloadTooLarge = () =>
+  new BffError(413, "payload_too_large", "The request body is too large.");
+
+/** Reads the body as text, aborting as soon as it passes the cap (chunked bodies included). */
+async function readCappedText(req: NextRequest): Promise<string> {
+  const declared = Number(req.headers.get("content-length"));
+  if (Number.isFinite(declared) && declared > MAX_JSON_BYTES) throw payloadTooLarge();
+  if (!req.body) return "";
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > MAX_JSON_BYTES) {
+      await reader.cancel().catch(() => undefined);
+      throw payloadTooLarge();
+    }
+    chunks.push(value);
+  }
+  const decoder = new TextDecoder();
+  return chunks.map((chunk) => decoder.decode(chunk, { stream: true })).join("") + decoder.decode();
+}
 
 /** Parses a JSON body; a missing or different Content-Type is a 415 before any parsing. */
 export async function readJson(req: NextRequest): Promise<unknown> {
@@ -145,5 +163,10 @@ export async function readJson(req: NextRequest): Promise<unknown> {
   if (!JSON_CONTENT_TYPE.test(contentType)) {
     throw new BffError(415, "unsupported_media_type", "Send application/json.");
   }
-  return req.json().catch(() => undefined);
+  try {
+    return JSON.parse(await readCappedText(req)) as unknown;
+  } catch (error) {
+    if (error instanceof BffError) throw error;
+    return undefined;
+  }
 }

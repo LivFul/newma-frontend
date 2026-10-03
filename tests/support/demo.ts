@@ -1,9 +1,19 @@
 // Playwright helpers for the demo spine (P2 Task 6). The @needs-backend specs talk to a real API
 // through the BFF and only run when DEMO_E2E=1 (see README "Demo end-to-end run").
+import AxeBuilder from "@axe-core/playwright";
 import type { Page } from "@playwright/test";
-import { test } from "./test";
+import { expect, test } from "./test";
 
-export const DEMO_ROUTES = ["/demo", "/demo/jobs"] as const;
+export const WORKFLOW_ROUTES = [
+  "/demo/w1-rights",
+  "/demo/w2-evidence",
+  "/demo/w3-agent",
+  "/demo/w4-gates",
+  "/demo/w5-wet-lab",
+  "/demo/w6-provenance",
+] as const;
+
+export const DEMO_ROUTES = ["/demo", "/demo/jobs", ...WORKFLOW_ROUTES] as const;
 
 export const PERSONA_LABELS = {
   community_liaison: "Community liaison",
@@ -36,3 +46,19 @@ export async function signOut(page: Page): Promise<void> {
 }
 
 export const currentPersona = (page: Page) => page.getByTestId("current-persona");
+
+/** Switches persona through the header select and waits for the refreshed header. */
+export async function switchPersona(page: Page, persona: PersonaId): Promise<void> {
+  await page.getByLabel("Persona").selectOption(persona);
+  await expect(currentPersona(page)).toHaveText(PERSONA_LABELS[persona]);
+}
+
+const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"];
+
+/** Zero axe violations on the current page (no serious ones, and none at all). */
+export async function expectNoAxeViolations(page: Page): Promise<void> {
+  const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
+  expect(results.violations).toEqual([]);
+}
+
+export const banner = (page: Page) => page.getByRole("note", { name: "Demo notice" });

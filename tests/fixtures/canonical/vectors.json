@@ -1,0 +1,152 @@
+[
+  {
+    "name": "nested_objects",
+    "input": {
+      "z": {
+        "b": [
+          1,
+          {
+            "y": "x",
+            "a": null
+          }
+        ],
+        "a": 2
+      },
+      "a": {
+        "k": {
+          "j": []
+        }
+      }
+    },
+    "canonical": "{\"a\":{\"k\":{\"j\":[]}},\"z\":{\"a\":2,\"b\":[1,{\"a\":null,\"y\":\"x\"}]}}",
+    "sha256": "00c53776068ef3b6d480cb6dfbfe5a3d3e51f11178c2b20d052b9291d1a8d1bc"
+  },
+  {
+    "name": "unicode",
+    "input": {
+      "name": "Exemplaria viridis — fictional",
+      "emoji": "🌿",
+      "cjk": "植物"
+    },
+    "canonical": "{\"cjk\":\"植物\",\"emoji\":\"🌿\",\"name\":\"Exemplaria viridis — fictional\"}",
+    "sha256": "0ce94098f19cc7948ac774706730ae959463387395236a0de2388502d451619f"
+  },
+  {
+    "name": "integers",
+    "input": {
+      "zero": 0,
+      "neg": -42,
+      "big": 9007199254740991
+    },
+    "canonical": "{\"big\":9007199254740991,\"neg\":-42,\"zero\":0}",
+    "sha256": "2c94976a5419a37e61093c89e04772ce50c87ba9dfc421685a394a6a39dc54c9",
+    "note": "Integers must stay within ±(2^53-1) (JS Number.MAX_SAFE_INTEGER) so the frontend canonicaliser produces identical bytes."
+  },
+  {
+    "name": "floats",
+    "input": {
+      "half": 1.5,
+      "sci": 1e+21,
+      "tenth": 0.1,
+      "neg": -2.5
+    },
+    "canonical": "{\"half\":1.5,\"neg\":-2.5,\"sci\":1e+21,\"tenth\":0.1}",
+    "sha256": "0bb90871c758ca2cdffa16f13d3dfd517362a3efee46b6ee705c4171eb1de0eb"
+  },
+  {
+    "name": "empty_containers",
+    "input": {
+      "obj": {},
+      "arr": [],
+      "str": ""
+    },
+    "canonical": "{\"arr\":[],\"obj\":{},\"str\":\"\"}",
+    "sha256": "3232586cd023c34b39feb5ba31617ccceb01f5b984c35034a83c4d5b7765f0ce"
+  },
+  {
+    "name": "booleans_null",
+    "input": {
+      "t": true,
+      "f": false,
+      "n": null,
+      "arr": [
+        true,
+        null,
+        false
+      ]
+    },
+    "canonical": "{\"arr\":[true,null,false],\"f\":false,\"n\":null,\"t\":true}",
+    "sha256": "299d1cccc012cc19c53bbc117d101b49c1a009e0caf25606d503105a0ece06f5"
+  },
+  {
+    "name": "event_manifest_v1",
+    "input": {
+      "schema": "newma.event.v1",
+      "tenant_id": "3f2b1c7e-8a4d-5c61-9d0e-1b2a3c4d5e6f",
+      "entity_type": "gate",
+      "entity_id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+      "entity_version": 2,
+      "seq": 1,
+      "event_type": "gate.decided",
+      "actor_persona": "scientific_approver",
+      "authority": "Demo sign-in step-up — fictional authority ü",
+      "occurred_at": "2026-10-02T12:34:56.789012Z",
+      "policy_version": null,
+      "payload": {
+        "decision": "pass",
+        "status_after": "PASS",
+        "rationale": "Synthetic evidence reviewed — ünïcode",
+        "scores": [
+          1.5,
+          -0.25,
+          10
+        ],
+        "nested": {
+          "b": [
+            true,
+            null
+          ],
+          "a": {}
+        }
+      },
+      "references": [
+        "0b6c8f0e-2f4a-5a8e-9b1d-7e3f4a5b6c7d"
+      ]
+    },
+    "canonical": "{\"actor_persona\":\"scientific_approver\",\"authority\":\"Demo sign-in step-up — fictional authority ü\",\"entity_id\":\"7c9e6679-7425-40de-944b-e07fc1f90ae7\",\"entity_type\":\"gate\",\"entity_version\":2,\"event_type\":\"gate.decided\",\"occurred_at\":\"2026-10-02T12:34:56.789012Z\",\"payload\":{\"decision\":\"pass\",\"nested\":{\"a\":{},\"b\":[true,null]},\"rationale\":\"Synthetic evidence reviewed — ünïcode\",\"scores\":[1.5,-0.25,10],\"status_after\":\"PASS\"},\"policy_version\":null,\"references\":[\"0b6c8f0e-2f4a-5a8e-9b1d-7e3f4a5b6c7d\"],\"schema\":\"newma.event.v1\",\"seq\":1,\"tenant_id\":\"3f2b1c7e-8a4d-5c61-9d0e-1b2a3c4d5e6f\"}",
+    "sha256": "c2dbec9afa17a4b63048b9bc05d1532df74b880ca0c7607912ff50facaf4778f"
+  },
+  {
+    "name": "non_bmp_key_order",
+    "input": {
+      "🌿": 3,
+      "𐀀": 2,
+      "�": 1,
+      "～": 0
+    },
+    "canonical": "{\"～\":0,\"�\":1,\"𐀀\":2,\"🌿\":3}",
+    "sha256": "4973011afdd19dcbea36eb8acfa6d2a1ece80e3e0b13d5ddda9509e6d401edde",
+    "note": "Keys sort by Unicode code point (U+FF5E < U+FFFD < U+10000 < U+1F33F). UTF-16 code-unit order puts U+10000 and U+1F33F before U+FF5E, so a JavaScript default sort is wrong."
+  },
+  {
+    "name": "control_characters",
+    "input": {
+      "controls": "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\t\n\u000b\f\r\u000e\u000f\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f  ",
+      "plain": "a\"b\\c/d"
+    },
+    "canonical": "{\"controls\":\"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f  \",\"plain\":\"a\\\"b\\\\c/d\"}",
+    "sha256": "d9d8f04c4a73c8a4d87e46338492f2b14fe4d1d5163ed4db94e905c14da71f06",
+    "note": "U+0000..U+001F use JSON escapes (\\b \\t \\n \\f \\r short forms, \\u00XX otherwise, lower-case hex); U+2028 and U+2029 stay raw; quote and backslash are escaped, slash is not."
+  },
+  {
+    "name": "negative_zero_and_integral_floats",
+    "input": {
+      "negative_zero": -0.0,
+      "integral": 1.0
+    },
+    "canonical": "{\"integral\":1.0,\"negative_zero\":-0.0}",
+    "sha256": "695495bd3c11153ac7d8ea2fabd7c38467f680cafc4ea72456fb66d4c74f7eb3",
+    "note": "Number policy: integers stay within +-(2^53 - 1); integral floats such as 1.0 and -0.0 serialise with Python repr (1.0, -0.0) and cannot survive a browser JSON round trip (JavaScript has one number type), so system-built manifests never contain them (provenance.canonical.check_safe_numbers). Python-side vector only.",
+    "scope": "python_only"
+  }
+]
