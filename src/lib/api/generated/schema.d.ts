@@ -51,6 +51,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/assay-imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import ELN results (idempotent by checksum; quarantined until reconciled) */
+        post: operations["lab_create_assay_import"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assay-imports/{import_id}/acceptance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept reconciled results; re-evaluates H2 and creates a blocked retraining proposal */
+        post: operations["lab_accept_assay_import"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/candidates": {
         parameters: {
             query?: never;
@@ -198,6 +232,23 @@ export interface paths {
         get: operations["curation_list_source_records"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/demo/eln/records/{record_id}/edit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Demo ELN edit: new revision with one corrected value (Mock ELN) */
+        post: operations["demo_edit_eln_record"];
         delete?: never;
         options?: never;
         head?: never;
@@ -393,6 +444,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/material-batches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Material batches, optionally for one candidate (synthetic) */
+        get: operations["lab_list_material_batches"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/observations": {
         parameters: {
             query?: never;
@@ -472,6 +540,74 @@ export interface paths {
         get: operations["provenance_get_timeline"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reconciliation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sample reconciliation of a work package's latest import */
+        get: operations["lab_get_reconciliation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reconciliation/items/{item_id}/disposition": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record the scientist's disposition for a non-matched sample (signed event) */
+        post: operations["lab_record_disposition"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/retraining-proposals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retraining proposals (always blocked pending authorization) */
+        get: operations["lab_list_retraining_proposals"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/retraining-proposals/{proposal_id}/execute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Always refused: retraining is not authorized (IP C-04) */
+        post: operations["lab_execute_retraining_proposal"];
         delete?: never;
         options?: never;
         head?: never;
@@ -564,10 +700,85 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/work-packages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit a work package; the material gate decides between a lab order and a hold */
+        post: operations["lab_create_work_package"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/work-packages/{work_package_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read a work package */
+        get: operations["lab_get_work_package"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AcceptanceOut */
+        AcceptanceOut: {
+            /** Checksum Sha256 */
+            checksum_sha256: string;
+            /** Duplicate */
+            duplicate: boolean;
+            /** Duplicate Detection Key */
+            duplicate_detection_key: string;
+            /** Eln Record Id */
+            eln_record_id: string;
+            /** Eln Revision */
+            eln_revision: number;
+            gate_effect: components["schemas"]["GateEffect"];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Observation Ids */
+            observation_ids: string[];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "quarantined" | "reconciled" | "accepted" | "needs_review" | "superseded";
+            /**
+             * Work Package Id
+             * Format: uuid
+             */
+            work_package_id: string;
+        };
+        /** AcceptanceRequest */
+        AcceptanceRequest: {
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+            /** Rationale */
+            rationale: string;
+        };
         /** AgentQueryCreate */
         AgentQueryCreate: {
             /** Budget Credits */
@@ -639,6 +850,46 @@ export interface components {
             status: "pending" | "running" | "done" | "held" | "failed";
             /** Title */
             title: string;
+        };
+        /** AssayImportCreate */
+        AssayImportCreate: {
+            /** Eln Record Id */
+            eln_record_id: string;
+            /**
+             * Work Package Id
+             * Format: uuid
+             */
+            work_package_id: string;
+        };
+        /** AssayImportOut */
+        AssayImportOut: {
+            /** Checksum Sha256 */
+            checksum_sha256: string;
+            /** Duplicate */
+            duplicate: boolean;
+            /** Duplicate Detection Key */
+            duplicate_detection_key: string;
+            /** Eln Record Id */
+            eln_record_id: string;
+            /** Eln Revision */
+            eln_revision: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Observation Ids */
+            observation_ids: string[];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "quarantined" | "reconciled" | "accepted" | "needs_review" | "superseded";
+            /**
+             * Work Package Id
+             * Format: uuid
+             */
+            work_package_id: string;
         };
         /** Budget */
         Budget: {
@@ -808,6 +1059,48 @@ export interface components {
             keys: components["schemas"]["PublicJwk"][];
             /** Note */
             note: string;
+        };
+        /** DispositionRequest */
+        DispositionRequest: {
+            /**
+             * Disposition
+             * @enum {string}
+             */
+            disposition: "repeat_sample" | "exclude_sample" | "accept_with_deviation";
+            /** Rationale */
+            rationale: string;
+        };
+        /** ElnEditOut */
+        ElnEditOut: {
+            /**
+             * Adapter Label
+             * @constant
+             */
+            adapter_label: "Mock ELN";
+            /** Record Id */
+            record_id: string;
+            /** Revision */
+            revision: number;
+        };
+        /** ElnEditRequest */
+        ElnEditRequest: {
+            /**
+             * Change
+             * @constant
+             */
+            change: "correct_value";
+        };
+        /** ElnRefOut */
+        ElnRefOut: {
+            /**
+             * Adapter Label
+             * @constant
+             */
+            adapter_label: "Mock ELN";
+            /** Record Id */
+            record_id: string;
+            /** Revision */
+            revision: number;
         };
         /** ErrorResponse */
         ErrorResponse: {
@@ -984,6 +1277,21 @@ export interface components {
             /** Rationale */
             rationale: string;
         };
+        /** GateEffect */
+        GateEffect: {
+            /**
+             * Gate Id
+             * Format: uuid
+             */
+            gate_id: string;
+            /**
+             * Stage
+             * @constant
+             */
+            stage: "H2";
+            /** Status After */
+            status_after: string;
+        };
         /** GateOut */
         GateOut: {
             /** Checks */
@@ -1016,6 +1324,13 @@ export interface components {
              */
             status: "NOT_STARTED" | "PENDING" | "PASS" | "FAIL" | "HOLD" | "INVALIDATED";
         };
+        /** GateReasonOut */
+        GateReasonOut: {
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
+        };
         /** GateTracker */
         GateTracker: {
             /** Can Advance To */
@@ -1042,6 +1357,13 @@ export interface components {
             status: "ok";
             /** Version */
             version: string;
+        };
+        /** HoldOut */
+        HoldOut: {
+            /** Code */
+            code: string;
+            /** Disposition */
+            disposition: string | null;
         };
         /** HypothesisOut */
         HypothesisOut: {
@@ -1140,6 +1462,16 @@ export interface components {
         ItemList_EvidencePackageSummary_: {
             /** Items */
             items: components["schemas"]["EvidencePackageSummary"][];
+        };
+        /** ItemList[MaterialBatchOut] */
+        ItemList_MaterialBatchOut_: {
+            /** Items */
+            items: components["schemas"]["MaterialBatchOut"][];
+        };
+        /** ItemList[RetrainingProposalOut] */
+        ItemList_RetrainingProposalOut_: {
+            /** Items */
+            items: components["schemas"]["RetrainingProposalOut"][];
         };
         /** ItemList[RightsRecordOut] */
         ItemList_RightsRecordOut_: {
@@ -1262,6 +1594,41 @@ export interface components {
              * @constant
              */
             signature_label: "Demo signature, not production key";
+        };
+        /** MaterialBatchOut */
+        MaterialBatchOut: {
+            /**
+             * Availability
+             * @enum {string}
+             */
+            availability: "available" | "reserved" | "unavailable";
+            /** Batch Ref */
+            batch_ref: string;
+            /**
+             * Compound Id
+             * Format: uuid
+             */
+            compound_id: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Identity Accepted */
+            identity_accepted: boolean;
+            /** Purity Synthetic */
+            purity_synthetic: number;
+            /** Quantity Mg */
+            quantity_mg: number;
+            /** Synthetic */
+            synthetic: boolean;
+        };
+        /** MaterialGateOut */
+        MaterialGateOut: {
+            /** Passed */
+            passed: boolean;
+            /** Reasons */
+            reasons: components["schemas"]["GateReasonOut"][];
         };
         /** ObservationOut */
         ObservationOut: {
@@ -1467,6 +1834,42 @@ export interface components {
             /** X */
             x: string;
         };
+        /** ReconItemOut */
+        ReconItemOut: {
+            /** Disposition */
+            disposition: ("repeat_sample" | "exclude_sample" | "accept_with_deviation") | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Owner Persona */
+            owner_persona: string;
+            /** Rationale */
+            rationale: string | null;
+            /** Sample Ref */
+            sample_ref: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "matched" | "missing" | "substituted" | "mislabeled" | "insufficient";
+        };
+        /** ReconciliationOut */
+        ReconciliationOut: {
+            /** Items */
+            items: components["schemas"]["ReconItemOut"][];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "reconciled" | "hold";
+            /**
+             * Work Package Id
+             * Format: uuid
+             */
+            work_package_id: string;
+        };
         /** ReleaseCreate */
         ReleaseCreate: {
             /** Claim Ids */
@@ -1507,6 +1910,31 @@ export interface components {
              * Format: uuid
              */
             tenant_id: string;
+        };
+        /** RetrainingProposalOut */
+        RetrainingProposalOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Reason */
+            reason: string;
+            /**
+             * Source Import Id
+             * Format: uuid
+             */
+            source_import_id: string;
+            /**
+             * Status
+             * @constant
+             */
+            status: "blocked_pending_authorization";
         };
         /** RetrievalScope */
         RetrievalScope: {
@@ -1768,6 +2196,81 @@ export interface components {
              */
             subject_id: string;
         };
+        /** WorkPackageCreate */
+        WorkPackageCreate: {
+            /** Assay Endpoint */
+            assay_endpoint: string;
+            /**
+             * Candidate Id
+             * Format: uuid
+             */
+            candidate_id: string;
+            /** Concentrations Um */
+            concentrations_um: number[];
+            /** Controls */
+            controls: string[];
+            /** Deliverables */
+            deliverables: string[];
+            /** Hypothesis */
+            hypothesis: string;
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+            /**
+             * Material Batch Id
+             * Format: uuid
+             */
+            material_batch_id: string;
+            /** Protocol Version */
+            protocol_version: string;
+            /** Replicates */
+            replicates: number;
+            /**
+             * Scenario
+             * @enum {string}
+             */
+            scenario: "standard" | "missing_sample";
+        };
+        /** WorkPackageOut */
+        WorkPackageOut: {
+            /**
+             * Candidate Id
+             * Format: uuid
+             */
+            candidate_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            eln: components["schemas"]["ElnRefOut"] | null;
+            /** Holds */
+            holds: components["schemas"]["HoldOut"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Job Id */
+            job_id: string | null;
+            /** Learning Loop State */
+            learning_loop_state: string | null;
+            /** Loop State */
+            loop_state: string;
+            /**
+             * Material Batch Id
+             * Format: uuid
+             */
+            material_batch_id: string;
+            material_gate: components["schemas"]["MaterialGateOut"];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "held" | "submitted" | "executing" | "results_available" | "in_review" | "accepted";
+        };
         /**
          * WorkPackageProposal
          * @description A proposal only: the scientist submits it to `POST /v1/work-packages` (IS-07, ENT-05).
@@ -1963,6 +2466,177 @@ export interface operations {
             };
             /** @description not_found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    lab_create_assay_import: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssayImportCreate"];
+            };
+        };
+        responses: {
+            /** @description Same checksum again: the original, duplicate=true */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssayImportOut"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssayImportOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: work package or ELN record */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description eln_record_not_ready */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    lab_accept_assay_import: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                import_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptanceRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AcceptanceOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such import */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description reconciliation_hold (details.open_items) or import_not_reviewable */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2575,6 +3249,79 @@ export interface operations {
             };
             /** @description persona_forbidden: persona not allowed */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    demo_edit_eln_record: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                record_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ElnEditRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ElnEditOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such ELN record */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3398,6 +4145,66 @@ export interface operations {
             };
         };
     };
+    lab_list_material_batches: {
+        parameters: {
+            query?: {
+                candidate_id?: string | null;
+            };
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemList_MaterialBatchOut_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     evidence_list_observations: {
         parameters: {
             query?: {
@@ -3715,6 +4522,284 @@ export interface operations {
                 };
             };
             /** @description unknown entity_type */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    lab_get_reconciliation: {
+        parameters: {
+            query: {
+                work_package_id: string;
+            };
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReconciliationOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such work package */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    lab_record_disposition: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DispositionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReconItemOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such reconciliation item */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description disposition_already_recorded */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    lab_list_retraining_proposals: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemList_RetrainingProposalOut_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    lab_execute_retraining_proposal: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                proposal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description retraining_not_authorized: always */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -4117,6 +5202,164 @@ export interface operations {
                 };
             };
             /** @description invalid_cursor or validation_error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    lab_create_work_package: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WorkPackageCreate"];
+            };
+        };
+        responses: {
+            /** @description Replay of an existing idempotency key */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkPackageOut"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkPackageOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: candidate or material batch not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description idempotency_conflict: same key, different body */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    lab_get_work_package: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                work_package_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkPackageOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
