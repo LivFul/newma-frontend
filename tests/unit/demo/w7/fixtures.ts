@@ -19,6 +19,7 @@ export const agreement = (over: Partial<AgreementView> = {}): AgreementView => (
   rights_record_id: UUID(2),
   authority: "Community Cooperative A, fictional",
   illustrative: true,
+  synthetic: true,
   unit: "demo credits",
   rules: [
     {
@@ -70,6 +71,7 @@ export const license = (over: Partial<License> = {}): License => ({
   },
   decision: null,
   requested_by_persona: "partner",
+  synthetic: true,
   event_id: UUID(11),
   created_at: "2030-01-01T00:00:00Z",
   ...over,

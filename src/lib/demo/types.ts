@@ -184,9 +184,10 @@ export const SETTLEMENT_STATES = [
   "paused",
 ] as const;
 export type SettlementState = (typeof SETTLEMENT_STATES)[number];
-export type LicenseState = "requested" | "credential_check" | "approved" | "denied";
-export type CredentialStatus = "not_requested" | "verified" | "failed";
-export type LicenseAction = "credential_check" | "decide";
+// Licenses (A1–A7): generated from the pinned contract.
+export type LicenseState = Schemas["LicenseOut"]["status"];
+export type CredentialStatus = Schemas["CredentialOut"]["status"];
+export type LicenseAction = Schemas["LicenseOut"]["next_actions"][number];
 export type SettlementAction =
   | "record_receipt"
   | "review"
@@ -201,64 +202,14 @@ export type ReceiptStatus = "recorded" | "duplicate" | "disputed";
 export type LedgerKind = "beneficiary" | "reserve" | "residual";
 export type BenefitStatus = "planned" | "scheduled" | "delivered";
 export type AnchorStatus = "not_requested" | "pending" | "anchored";
-export type LicensePurpose = "research" | "commercial";
+export type LicensePurpose = Schemas["LicenseOut"]["purpose"];
 
-export type AgreementRule = Readonly<{
-  beneficiary_id: string;
-  beneficiary_display_name: string;
-  basis: "net_demo_credits";
-  share_basis_points: number;
-}>;
-export type AgreementView = Readonly<{
-  id: string;
-  version: number;
-  rights_record_id: string;
-  authority: string;
-  illustrative: true;
-  unit: "demo credits";
-  rules: readonly AgreementRule[];
-  reserve_basis_points: number;
-  nonmonetary_benefits: readonly string[];
-  latest: boolean;
-}>;
-
-export type LicenseCredential = Readonly<{
-  status: CredentialStatus;
-  label: "Optional, simulated";
-  credential_ref: string | null;
-  proof_ref: string | null;
-  reason: string | null;
-  checked_at: string | null;
-}>;
-export type LicenseDecision = Readonly<{
-  decision: "approve" | "deny";
-  rationale: string;
-  decided_by_persona: string;
-  policy_decision_id: string | null;
-  decided_at: string;
-}>;
-export type License = Readonly<{
-  id: string;
-  display_id: string;
-  agreement: AgreementView;
-  licensee_organization_id: string;
-  licensee_display_name: string;
-  purpose: LicensePurpose;
-  scope_summary: string;
-  term_months: number;
-  status: LicenseState;
-  next_actions: readonly LicenseAction[];
-  credential: LicenseCredential;
-  decision: LicenseDecision | null;
-  requested_by_persona: string;
-  event_id: string;
-  created_at: string;
-}>;
-export type LicenseOptions = Readonly<{
-  agreements: readonly AgreementView[];
-  licensee_organizations: readonly Readonly<{ id: string; display_name: string }>[];
-  credentials: readonly Readonly<{ credential_ref: string; description: string }>[];
-}>;
+export type AgreementRule = Schemas["RuleOut"];
+export type AgreementView = Schemas["AgreementView"];
+export type LicenseCredential = Schemas["CredentialOut"];
+export type LicenseDecision = Schemas["DecisionOut"];
+export type License = Schemas["LicenseOut"];
+export type LicenseOptions = Schemas["LicenseOptions"];
 
 export type Receipt = Readonly<{
   id: string;
@@ -405,8 +356,4 @@ export type OutageState = Readonly<{
   label: "Optional, simulated";
   updated_at: string | null;
 }>;
-export type EntityEvents = Readonly<{
-  entity_type: string;
-  entity_id: string;
-  events: readonly ProvenanceEvent[];
-}>;
+export type EntityEvents = Schemas["EntityEvents"];
