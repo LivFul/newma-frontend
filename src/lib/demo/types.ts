@@ -167,8 +167,8 @@ export type RetrainingProposal = Schemas["RetrainingProposalOut"];
 export type ElnEditResult = Schemas["ElnEditOut"];
 
 // ---------------------------------------------------------------------------------------------
-// P5b contract shapes (docs/plans/p5b.md Contract table, rows 1-17). Hand-derived until the backend
-// spec for each D-item lands; then the workflow switches to components["schemas"] (repin commits).
+// P5b contract shapes (docs/plans/p5b.md Contract table, rows 1-17). W8 and W9 are generated from
+// the pinned contract; W10 and the demo config stay hand-derived until their spec lands.
 // ---------------------------------------------------------------------------------------------
 export const EXPORT_PURPOSES = ["research", "commercial"] as const;
 export type ExportPurpose = (typeof EXPORT_PURPOSES)[number];
@@ -209,156 +209,17 @@ export type GrievanceCategory = (typeof GRIEVANCE_CATEGORIES)[number];
 export const GRIEVANCE_STATUSES = ["open", "acknowledged"] as const;
 export type GrievanceStatus = (typeof GRIEVANCE_STATUSES)[number];
 
-export type FieldDisclosure = Readonly<{
-  path: string;
-  section: string;
-  label: string;
-  status: FieldStatus;
-  value: unknown;
-  withheld_reason: Readonly<{
-    code: WithheldCode;
-    message: string;
-    rights_record_id: string | null;
-  }> | null;
-  synthetic: true;
-}>;
-
-export type AssetEvidence = Readonly<{
-  asset_id: string;
-  display_id: string;
-  label: "Synthetic";
-  purpose: ExportPurpose;
-  requested_stage: GateStage | null;
-  stage: GateStage | null;
-  gate_status: GateStatus | null;
-  released: boolean;
-  not_released_reason: Readonly<{ code: string; message: string }> | null;
-  package_version: number | null;
-  content_sha256: string | null;
-  available_stages: readonly Readonly<{
-    stage: GateStage;
-    version: number;
-    gate_status: GateStatus;
-    released: boolean;
-  }>[];
-  policy: Readonly<{
-    decision: Decision;
-    reasons: readonly PolicyReason[];
-    rights_record_ids: readonly string[];
-    policy_version: string;
-  }>;
-  fields: readonly FieldDisclosure[];
-  generated_at: string;
-  synthetic: true;
-}>;
-
-export type ExportRecord = Readonly<{
-  id: string;
-  asset_id: string;
-  display_id: string;
-  stage: GateStage;
-  package_version: number;
-  recipient: string;
-  purpose: ExportPurpose;
-  expires_at: string;
-  status: ExportStatus;
-  created_at: string;
-  created_by_persona: string;
-  policy_decision_id: string;
-  event_id: string;
-  body_sha256: string;
-  disclosed: readonly FieldDisclosure[];
-  withheld: readonly FieldDisclosure[];
-  suspended_reasons: readonly PolicyReason[];
-  signature_label: string;
-  synthetic: true;
-}>;
-
-export type ExportSummary = Readonly<{
-  id: string;
-  asset_id: string;
-  display_id: string;
-  stage: GateStage;
-  recipient: string;
-  purpose: ExportPurpose;
-  expires_at: string;
-  status: ExportStatus;
-  created_at: string;
-  disclosed_count: number;
-  withheld_count: number;
-}>;
-
-export type Thresholds = Readonly<{
-  potency_um_max: number;
-  replicates_min: number;
-  controls_required: boolean;
-  note?: string;
-}>;
-
-export type CampaignSummary = Readonly<{
-  id: string;
-  name: string;
-  protocol_version: number;
-  lock_state: LockState;
-  credit_quota: number;
-  committed: number;
-  remaining: number;
-  exhausted: boolean;
-  unit: string;
-  synthetic: true;
-}>;
-
-export type CharterVersion = Readonly<{
-  version: number;
-  thresholds: Thresholds;
-  locked: boolean;
-  bound_candidate_count: number;
-  revision: number;
-  change_reason: string;
-  supersedes_version: number | null;
-  created_by_persona: string;
-  created_at: string;
-  event_id: string | null;
-}>;
-
-export type CharterOut = Readonly<{
-  id: string;
-  name: string;
-  protocol_version: number;
-  lock_state: LockState;
-  bound_candidate_count: number;
-  thresholds: Thresholds;
-  credit_quota: number;
-  versions: readonly CharterVersion[];
-  synthetic: true;
-}>;
-
-export type CharterChange = Readonly<{
-  outcome: ChangeOutcome;
-  previous_version: number;
-  charter: CharterOut;
-  event_id: string | null;
-}>;
-
-export type CreditUsage = Readonly<{
-  campaign_id: string;
-  unit: string;
-  credit_quota: number;
-  committed: number;
-  spent: number;
-  reserved: number;
-  remaining: number;
-  exhausted: boolean;
-  by_kind: readonly Readonly<{ kind: string; jobs: number; credits: number }>[];
-  jobs: readonly Readonly<{
-    job_id: string;
-    kind: string;
-    state: string;
-    credits: number;
-    counted_as: "spent" | "reserved";
-  }>[];
-  synthetic: true;
-}>;
+// Repinned (D-18): generated from the pinned contract.
+export type FieldDisclosure = Schemas["FieldDisclosureOut"];
+export type AssetEvidence = Schemas["AssetEvidenceOut"];
+export type ExportRecord = Schemas["ExportRecordOut"];
+export type ExportSummary = Schemas["ExportSummaryOut"];
+export type Thresholds = Schemas["Thresholds"];
+export type CampaignSummary = Schemas["CampaignSummaryOut"];
+export type CharterVersion = Schemas["CharterVersionOut"];
+export type CharterOut = Schemas["CharterOut"];
+export type CharterChange = Schemas["CharterChangeOut"];
+export type CreditUsage = Schemas["CreditUsageOut"];
 
 export type Grievance = Readonly<{
   id: string;
