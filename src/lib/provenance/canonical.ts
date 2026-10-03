@@ -22,6 +22,8 @@ export class CanonicalJsonError extends Error {
 const LONE_SURROGATE = /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/;
 const FIXED_MIN_EXP = -4;
 const FIXED_MAX_EXP = 16;
+// vectors.json "floats" pins 1e+21 as a float; below it, integral values beyond 2^53 are refused.
+const MIN_AMBIGUOUS_FREE_FLOAT = 1e21;
 
 function canonicalString(value: string): string {
   if (LONE_SURROGATE.test(value)) throw new CanonicalJsonError("Lone surrogate in string.");
@@ -48,7 +50,13 @@ function canonicalNumber(value: number): string {
   if (!Number.isFinite(value)) throw new CanonicalJsonError("Non-finite number.");
   // Python ints are never -0, so -0 can only be the float -0.0.
   if (Object.is(value, -0)) return "-0.0";
-  return Number.isSafeInteger(value) ? String(value) : pythonFloatRepr(value);
+  if (Number.isSafeInteger(value)) return String(value);
+  // Beyond ±(2^53−1) an integral number could be a Python int (digits) or float (repr); JSON.parse
+  // cannot tell which, so only the pinned vector's float range (>= 1e21) is accepted (A-P3-F06).
+  if (Number.isInteger(value) && Math.abs(value) < MIN_AMBIGUOUS_FREE_FLOAT) {
+    throw new CanonicalJsonError("Integral number outside the safe integer range.");
+  }
+  return pythonFloatRepr(value);
 }
 
 /** Compares two strings by Unicode code point (Python's default str ordering). */
@@ -96,4 +104,39 @@ function canonicalAt(value: unknown, depth: number): string {
 
 export function canonicalJson(value: unknown): string {
   return canonicalAt(value, 0);
+}
+
+const NUMBER_TOKEN = /-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/y;
+
+/**
+ * Scans JSON text for numbers whose int/float spelling cannot survive JSON.parse: integral
+ * floats (`1.0`, `2e0`, `-0.0`), `-0`, and integers beyond ±(2^53−1). The server's canonical
+ * string would spell them differently from canonicalJson(JSON.parse(text)).
+ */
+export function hasIntegralFloatRisk(jsonText: string): boolean {
+  let i = 0;
+  while (i < jsonText.length) {
+    const char = jsonText[i];
+    if (char === '"') {
+      i += 1;
+      while (i < jsonText.length && jsonText[i] !== '"') i += jsonText[i] === "\\" ? 2 : 1;
+      i += 1;
+      continue;
+    }
+    if (char === "-" || (char >= "0" && char <= "9")) {
+      NUMBER_TOKEN.lastIndex = i;
+      const token = NUMBER_TOKEN.exec(jsonText)?.[0];
+      if (token) {
+        const value = Number(token);
+        const isFloatSpelling = /[.eE]/.test(token);
+        if (Object.is(value, -0)) return true;
+        if (isFloatSpelling && Number.isInteger(value)) return true;
+        if (!isFloatSpelling && !Number.isSafeInteger(value)) return true;
+        i += token.length;
+        continue;
+      }
+    }
+    i += 1;
+  }
+  return false;
 }
