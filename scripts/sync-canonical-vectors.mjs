@@ -56,9 +56,9 @@ async function fetchDeployed(url, fetchImpl) {
  */
 export async function checkVectors({
   repoRoot,
-  backendFile,
+  backendFile = undefined,
   ci = false,
-  vectorsUrl,
+  vectorsUrl = undefined,
   allowLockOnly = false,
   fetchImpl = fetch,
 }) {
