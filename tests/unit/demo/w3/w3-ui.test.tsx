@@ -211,3 +211,32 @@ function AgentConversationProbe({ initial }: { initial: AgentQuery }) {
   );
   return <AgentConversation id="q-1" initial={initial} />;
 }
+
+describe("retry notice from the settled jobs", () => {
+  const job = (attempts: number) => ({ id: "j", state: "SUCCEEDED", attempts });
+
+  it("fetches each job once after completion and shows the notice when one was retried", async () => {
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url.includes("/api/demo/agent/")) return Response.json(query({ status: "completed" }));
+      return Response.json(url.includes("/jobs/j-1") ? job(1) : job(0));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<AgentConversation id="q-1" initial={query({ status: "completed" })} />);
+    expect(await screen.findByText("Retried after simulated failure")).toBeInTheDocument();
+    const jobCalls = fetchMock.mock.calls.filter((c) => String(c[0]).includes("/api/demo/jobs/"));
+    expect(jobCalls.map((c) => String(c[0])).sort()).toEqual([
+      "/api/demo/jobs/j-1",
+      "/api/demo/jobs/j-2",
+    ]);
+  });
+
+  it("does not fetch jobs while running or when held without jobs", async () => {
+    const fetchMock = vi.fn<(url: string) => Promise<Response>>(async () =>
+      Response.json(query({ status: "running" })),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    render(<AgentConversation id="q-1" initial={query({ status: "running" })} />);
+    await Promise.resolve();
+    expect(fetchMock.mock.calls.filter((c) => String(c[0]).includes("/jobs/"))).toHaveLength(0);
+  });
+});
