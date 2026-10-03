@@ -56,11 +56,8 @@ test.describe("W3 scripted agent", { tag: "@needs-backend" }, () => {
     await expect(hold).toContainText("Held");
     await expect(hold).toContainText("No simulated jobs were submitted.");
     await expect(
-      page
-        .getByRole("list", { name: "Withheld subjects" })
-        .getByLabel(/^withheld: /)
-        .first(),
-    ).toHaveText("withheld");
+      page.getByRole("list", { name: "Withheld subjects" }).getByTestId("withheld").first(),
+    ).toContainText("withheld");
     await expect(page.getByRole("button", { name: /approve/i })).toHaveCount(0);
   });
 

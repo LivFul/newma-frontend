@@ -102,7 +102,9 @@ describe("AgentView", () => {
     expect(screen.getByText("Simulated workflow engine")).toBeInTheDocument();
     expect(screen.getByText("Simulated compute")).toBeInTheDocument();
     expect(screen.getByText("Retried after simulated failure")).toBeInTheDocument();
-    expect(screen.getByLabelText("withheld: t-2")).toHaveTextContent("withheld");
+    expect(document.querySelector('[data-testid="withheld"][data-field="t-2"]')).toHaveTextContent(
+      "withheld",
+    );
     expect(screen.getByText("consent_withdrawn")).toBeInTheDocument();
     expect(
       within(screen.getByRole("list", { name: "Ranked hypotheses" })).getByText("Synthetic"),

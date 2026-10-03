@@ -98,8 +98,12 @@ describe("evidence tables", () => {
         ]}
       />,
     );
-    expect(screen.getByLabelText("withheld: value")).toHaveTextContent("withheld");
-    expect(screen.getByLabelText("withheld: concentration_um")).toBeInTheDocument();
+    expect(
+      document.querySelector('[data-testid="withheld"][data-field="value"]'),
+    ).toHaveTextContent("withheld");
+    expect(
+      document.querySelector('[data-testid="withheld"][data-field="concentration_um"]'),
+    ).toBeInTheDocument();
     expect(screen.getAllByText("Synthetic").length).toBeGreaterThan(0);
     expect(screen.getAllByTestId("evidence-label")[0]).toHaveTextContent("Measured observation");
   });
@@ -138,7 +142,9 @@ describe("evidence tables", () => {
     );
     const table = screen.getByRole("table", { name: "Taxa" });
     expect(table).toHaveTextContent("Literature-reported");
-    expect(within(table).getByLabelText("withheld: restricted_location")).toBeInTheDocument();
+    expect(
+      table.querySelector('[data-testid="withheld"][data-field="restricted_location"]'),
+    ).toBeInTheDocument();
   });
 });
 

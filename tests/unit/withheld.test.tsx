@@ -5,10 +5,13 @@ import { JsonView } from "@/components/ui/json-view";
 import { StatusBadge } from "@/components/ui";
 
 describe("Withheld", () => {
-  it("renders the word withheld with a field-specific label", () => {
+  it("renders the word withheld plus the field name as visually hidden text (no aria-label on a role-less span)", () => {
     render(<Withheld field="value" />);
-    const cell = screen.getByLabelText("withheld: value");
+    const cell = screen.getByTestId("withheld");
     expect(cell).toHaveTextContent("withheld");
+    expect(cell).toHaveTextContent("withheld: value");
+    expect(cell).toHaveAttribute("data-field", "value");
+    expect(cell).not.toHaveAttribute("aria-label");
   });
 });
 

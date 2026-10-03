@@ -75,7 +75,7 @@ test.describe("W2 evidence and curation", { tag: "@needs-backend" }, () => {
     ).toHaveCount(queueSize);
 
     await page.goto(`${ROUTE}?tab=observations`);
-    await expect(page.getByLabel(/^withheld: /).first()).toHaveText("withheld");
+    await expect(page.getByTestId("withheld").first()).toContainText("withheld");
   });
 
   for (const tab of TABS) {
