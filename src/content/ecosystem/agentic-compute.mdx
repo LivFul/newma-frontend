@@ -1,0 +1,13 @@
+{/* claims: C-41, C-47 */}
+
+## From query to hypotheses
+
+A scientist submits a query, an objective and constraints. The Hermes Agent is designed to load a qualified procedure from the K-Dense-AI scientific skills, check identity, purpose and permitted use, and retrieve evidence only within the authorized scope. Permission checks are designed to run before retrieved content reaches the model.
+
+## Screening as durable workflows
+
+The agent builds hypotheses and prepared chemical states, then submits a structured screening request to a durable workflow service. The workflow is designed to validate permissions, licenses and budget; record inputs, versions, parameters and seeds; apply bounded retries; and support cancellation and holds. Chemistry preparation and docking are designed to use RDKit, Meeko and AutoDock Vina.
+
+## Limits that stay in place
+
+Rankings remain hypotheses, with their limitations stated alongside. Agents cannot approve advancement: scientists approve or revise the experimental work package.

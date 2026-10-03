@@ -14,6 +14,38 @@ For local development against the sibling backend checkout, read the spec from d
 
 The pinned sha is enforced against whichever source is used.
 
+## Review the homepage
+
+Port 3000 is held by an unrelated container on the dev machine, so review runs on 3100 (A-P0-F04):
+
+    PORT=3100 pnpm dev                      # then open http://localhost:3100/
+    PORT=3100 pnpm screenshots              # desktop and mobile shots into docs/screenshots/ (git-ignored)
+
+The homepage is `/`; the six component pages are `/ecosystem/<slug>`; the draft legal pages are
+`/legal/privacy` and `/legal/terms`. Dev-mode performance is not budget evidence (A-P0-F12): for a
+production-mode review use
+
+    pnpm build && pnpm start --port 3100
+
+Budgets and checks specific to the public site: `pnpm claims:check` (copy against the claim register),
+`pnpm hero:check` (hero JS at most 80 KiB gzip, after `pnpm build`), `pnpm lhci` and `pnpm lhci:mobile`
+(Lighthouse, desktop and mobile). Copy provenance is in `docs/CONTENT_MATRIX.md`; the manual keyboard
+and screen-reader checklist is `docs/A11Y_MANUAL_PASS.md`.
+
+Two deployment notes: set `NEXT_PUBLIC_SITE_URL` to the canonical production origin (metadata,
+sitemap and JSON-LD use it; without it a build warns and uses the placeholder project domain), and do
+not promote a preview build to production, because `robots.txt` is built per environment and a
+preview build disallows crawling. Check `/robots.txt` on production after every deploy.
+
+To reproduce a Vercel preview locally (previews disallow crawling, resolve Open Graph images on the
+branch host and have demo mode on), build with Vercel's variables set and point Playwright at it:
+
+    VERCEL=1 VERCEL_ENV=preview NEXT_PUBLIC_VERCEL_ENV=preview NEXT_PUBLIC_DEMO_MODE=true \
+      VERCEL_PROJECT_PRODUCTION_URL=newma-frontend.vercel.app \
+      VERCEL_BRANCH_URL=newma-frontend-git-example.vercel.app NEWMA_API_URL=http://127.0.0.1:9 \
+      BFF_SERVICE_TOKEN=dummy pnpm build && pnpm start --port 3100
+    PLAYWRIGHT_BASE_URL=http://localhost:3100 PLAYWRIGHT_EMULATE_VERCEL_PREVIEW=1 pnpm exec playwright test
+
 See `docs/ARCHITECTURE.md` and `PROGRESS.md`.
 
 ## Demo end-to-end run (`@needs-backend` specs)

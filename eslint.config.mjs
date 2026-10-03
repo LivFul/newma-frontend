@@ -17,6 +17,8 @@ const eslintConfig = defineConfig([
     "playwright-report/**",
     "test-results/**",
     ".lighthouseci/**",
+    // Mini repositories used as inputs by the claims-check tests.
+    "tests/fixtures/**",
   ]),
 ]);
 

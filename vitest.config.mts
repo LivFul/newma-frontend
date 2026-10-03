@@ -1,9 +1,11 @@
+import mdx from "@mdx-js/rollup";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 import path from "node:path";
 
 export default defineConfig({
-  plugins: [react()],
+  // MDX is compiled for the ecosystem detail pages, exactly as @next/mdx does at build time.
+  plugins: [{ enforce: "pre", ...mdx({ providerImportSource: "@mdx-js/react" }) }, react()],
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
@@ -19,7 +21,13 @@ export default defineConfig({
     include: ["tests/unit/**/*.test.{ts,tsx}", "src/**/*.test.{ts,tsx}"],
     coverage: {
       provider: "v8",
-      include: ["src/components/ui/**", "src/lib/**", "scripts/**/*.{js,mjs,ts}"],
+      include: [
+        "src/components/ui/**",
+        "src/components/ecosystem-graphic/**",
+        "src/components/site/**",
+        "src/lib/**",
+        "scripts/**/*.{js,mjs,ts}",
+      ],
       exclude: ["src/lib/api/generated/**"],
       thresholds: { lines: 80, functions: 80, branches: 70, statements: 80 },
     },

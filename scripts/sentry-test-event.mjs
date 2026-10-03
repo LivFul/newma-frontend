@@ -21,6 +21,8 @@ export async function sendTestEvent(env, sentry) {
 
 const isDirectRun = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (isDirectRun) {
-  const Sentry = await import("@sentry/nextjs");
+  // Under Node ESM the package's CJS build exposes captureMessage/flush only on `default`.
+  const namespace = await import("@sentry/nextjs");
+  const Sentry = namespace.default ?? namespace;
   process.stdout.write(`${await sendTestEvent(process.env, Sentry)}\n`);
 }

@@ -12,3 +12,4 @@ next-env.d.ts
 
 # Byte-identical copy of the backend canonical vectors (A-P3-20)
 tests/fixtures/canonical/
+.serena

@@ -1,14 +1,15 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { HOME_META } from "@/content/home/copy";
+import { BACKGROUND_HEX } from "@/lib/brand";
+import { siteUrl } from "@/lib/site";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: "NEWMA",
-  description: "NEWMA ethnobotanical drug-discovery platform by LivFul.",
+  description: HOME_META.defaultDescription.text,
 };
-
-// Mirrors --color-bg in src/styles/tokens/color.css (metadata cannot read CSS variables).
-const BACKGROUND_HEX = "#0b1020";
 
 export const viewport: Viewport = { colorScheme: "dark", themeColor: BACKGROUND_HEX };
 

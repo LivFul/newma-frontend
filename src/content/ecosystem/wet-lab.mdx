@@ -1,0 +1,13 @@
+{/* claims: C-43, C-47 */}
+
+## Assay requests through an adapter
+
+Approved assay requests are designed to flow through an eLabFTW adapter, carrying the protocol, endpoints and controls. The adapter is designed to reconcile samples and results against NEWMA records and to keep the external record identifiers.
+
+## Results return with their context
+
+Results are designed to return with raw data, replicates, uncertainty and failures. Missing, substituted or mislabeled samples are designed to enter a hold that needs a disposition, and repeated imports are designed to create no duplicate observations.
+
+## Recorded is not accepted
+
+A result recorded in the laboratory system and a result accepted by a NEWMA scientist are designed to be distinct states. Only accepted observations count as evidence, and predictions never become experimental ground truth. Training a model on accepted labels needs a separate authorization.
