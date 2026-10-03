@@ -128,7 +128,7 @@ Frontend-only assumptions (copy into `PROGRESS.md` when the task that relies on 
 
 ### Task 0: Preconditions (no production code)
 
-- [ ] Backend P5a commits for the rows being proxied are on the integration branch and `docs/openapi.yaml` is re-exported (backend Tasks 5, 7, 11); `ls ../newma-backend/docs/openapi.yaml` exists.
+- [x] Backend P5a commits for the rows being proxied are on the integration branch and `docs/openapi.yaml` is re-exported (backend Tasks 5, 7, 11); `ls ../newma-backend/docs/openapi.yaml` exists.
 - [x] Re-read the Contract table here against the backend plan (diff the two Contract blocks; they must be identical) and, if the sources have become readable, the checks in backend Task 0; record differences in `PROGRESS.md`.
 - [x] Baseline in the P5a worktree: `pnpm install && pnpm check` green.
 
@@ -151,7 +151,7 @@ TDD steps:
 - [x] Failing tests first, for each handler: forwards `X-Demo-Session`; `Cache-Control: no-store`; same-origin guard 403 for a cross-site POST; invalid id → 400 `invalid_id`; invalid body → 422 `validation_error` before any upstream call; 200 replay body and `Idempotent-Replayed` forwarded unchanged; 403 `persona_forbidden` passes `{persona, allowed}`; `receipt_duplicate` 409 forwards `{duplicate_of, receipt_id}` and nothing else; an unknown details key is dropped; PUT outage rejects a non-boolean; no route handler exists for settlement `pause` or `resume` (directory listing test).
 - [x] Implement with `withSession`/`withParams`, `proxy`, `validationError`; one file per route, each under 40 lines.
 - [x] Commit: `feat(demo): W7 BFF routes for licenses, settlements, benefits, beneficiaries and the anchoring outage`
-- [ ] `pnpm api:update` when the backend spec lands; commit `chore(api): refresh pinned contract (D-17)`
+- [x] `pnpm api:update` when the backend spec lands; commit `chore(api): refresh pinned contract (D-17)`
 
 ## D-17 — W7 pages
 
@@ -233,12 +233,12 @@ TDD steps:
 
 TDD steps:
 
-- [ ] Write the specs first; run against local API plus worker (`SIM_SPEED_FACTOR=4`, README recipe, names only) — they fail until Tasks 3–7 are in, then pass; run the full demo suite once to confirm no regression in W1–W6 selectors.
-- [ ] Commit: `test(demo): W7 happy and failure Playwright paths with axe and banner assertions`
+- [x] Write the specs first; run against local API plus worker (`SIM_SPEED_FACTOR=4`, README recipe, names only) — they fail until Tasks 3–7 are in, then pass; run the full demo suite once to confirm no regression in W1–W6 selectors.
+- [x] Commit: `test(demo): W7 happy and failure Playwright paths with axe and banner assertions`
 
 ### Task 9: Reviews, PROGRESS and phase exit
 
 - [ ] `ecc:code-reviewer`, `ecc:react-reviewer`, `ecc:security-reviewer`, `ecc:a11y-architect`; fix CRITICAL and HIGH; re-run `pnpm check`.
-- [ ] `PROGRESS.md` (additive only; P5b edits the same file): D-17 frontend row → done with spec names; copy A-P5A-01..15 and A-P5A-F01..06; claim-register rows `C-60..C-66` for the new UI strings (labels, "Illustrative", "demo credits", "basis points", "Reserve (illustrative)", "Training workshop (illustrative)", the dual-approval and duplicate-rejection texts, the outage switch text, the workflow title) all `synthetic` or sourced to the sprint plan labelling table; update the `api/openapi.lock` sha.
+- [x] `PROGRESS.md` (additive only; P5b edits the same file): D-17 frontend row → done with spec names; copy A-P5A-01..15 and A-P5A-F01..06; claim-register rows `C-60..C-66` for the new UI strings (labels, "Illustrative", "demo credits", "basis points", "Reserve (illustrative)", "Training workshop (illustrative)", the dual-approval and duplicate-rejection texts, the outage switch text, the workflow title) all `synthetic` or sourced to the sprint plan labelling table; update the `api/openapi.lock` sha.
 - [ ] Phase exit: both W7 specs and the axe scans green locally, then on a Vercel preview against Railway `demo` after the controller deploys (record the run URL); dashboard shows W7 "Available".
-- [ ] Commit: `chore(progress): P5a frontend D-17 done`
+- [x] Commit: `chore(progress): P5a frontend D-17 done`
