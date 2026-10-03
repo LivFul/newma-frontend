@@ -1,8 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui";
 import { type ClientError, postJson } from "@/lib/demo/client";
+import { useAction } from "@/lib/demo/use-action";
 import { useStableKey } from "@/lib/demo/idempotency";
 import type { Candidate, MaterialBatch, WorkPackage, WorkPackageProposal } from "@/lib/demo/types";
 import { ErrorNotice } from "../../_components/error-notice";
@@ -73,7 +74,7 @@ export function WorkPackageForm({ candidates, batches, proposal, allowed }: Prop
   const { key, reset } = useStableKey();
   const [draft, setDraft] = useState<Draft>(() => initialDraft(candidates, batches, proposal));
   const [error, setError] = useState<ClientError | undefined>();
-  const [pending, startTransition] = useTransition();
+  const { busy, run } = useAction();
   const set = (field: keyof Draft) => (value: string) =>
     setDraft((d) => ({ ...d, [field]: value }));
   const compoundOf = (candidateId: string) =>
@@ -90,9 +91,9 @@ export function WorkPackageForm({ candidates, batches, proposal, allowed }: Prop
     }));
 
   const submit = () => {
-    if (pending || !allowed) return;
+    if (busy || !allowed) return;
     setError(undefined);
-    startTransition(async () => {
+    void run(async () => {
       const result = await postJson<WorkPackage>("/api/demo/work-packages", toBody(draft, key));
       if (!result.ok) return setError(result.error);
       reset();
@@ -176,11 +177,7 @@ export function WorkPackageForm({ candidates, batches, proposal, allowed }: Prop
         ]}
       />
       <div className="flex items-end">
-        <Button
-          type="submit"
-          aria-busy={pending || undefined}
-          aria-disabled={!allowed || undefined}
-        >
+        <Button type="submit" aria-busy={busy || undefined} aria-disabled={!allowed || undefined}>
           Submit work package
         </Button>
       </div>

@@ -1,7 +1,8 @@
 "use client";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Badge, Button } from "@/components/ui";
 import { type ClientError, postJson } from "@/lib/demo/client";
+import { useAction } from "@/lib/demo/use-action";
 import type { RetrainingProposal } from "@/lib/demo/types";
 import { ErrorNotice } from "../../_components/error-notice";
 import { formatInstant } from "../../_components/fields";
@@ -9,9 +10,9 @@ import { formatInstant } from "../../_components/fields";
 /** IP C-04: retraining is never executed in the demo; Execute exists to show the refusal. */
 export function RetrainingProposalCard({ proposal }: { proposal: RetrainingProposal }) {
   const [error, setError] = useState<ClientError | undefined>();
-  const [pending, startTransition] = useTransition();
+  const { busy, run } = useAction();
   const execute = () =>
-    startTransition(async () => {
+    void run(async () => {
       const result = await postJson(
         `/api/demo/retraining-proposals/${encodeURIComponent(proposal.id)}/execute`,
         undefined,
@@ -32,7 +33,7 @@ export function RetrainingProposalCard({ proposal }: { proposal: RetrainingPropo
         <span className="text-fg-muted">created {formatInstant(proposal.created_at)}</span>
       </p>
       <p>{proposal.reason}</p>
-      <Button size="sm" variant="secondary" onClick={execute} aria-busy={pending || undefined}>
+      <Button size="sm" variant="secondary" onClick={execute} aria-busy={busy || undefined}>
         Execute retraining
       </Button>
       <ErrorNotice error={error} />

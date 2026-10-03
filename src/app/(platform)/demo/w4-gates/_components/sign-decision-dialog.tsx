@@ -1,8 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Button, Dialog, DialogContent, DialogTrigger } from "@/components/ui";
 import { type ClientError, postJson } from "@/lib/demo/client";
+import { useAction } from "@/lib/demo/use-action";
 import type { Gate, GateDecision, GateDecisionValue } from "@/lib/demo/types";
 import { SelectField, TextField } from "../../_components/fields";
 import { GateErrorNotice } from "./missing-requirements";
@@ -47,7 +48,7 @@ export function SignDecisionDialog({
   const [key, setKey] = useState("");
   const [draft, setDraft] = useState<Draft>(() => emptyDraft(versions));
   const [error, setError] = useState<ClientError | undefined>();
-  const [pending, startTransition] = useTransition();
+  const { busy, run } = useAction();
   const name = `Sign ${gate.stage} decision`;
   const matches = draft.typed.trim() === candidateDisplayId;
   const set = (patch: Partial<Draft>) => setDraft((previous) => ({ ...previous, ...patch }));
@@ -62,7 +63,7 @@ export function SignDecisionDialog({
 
   // While a decision is in flight the dialog cannot close (and so cannot re-open with a new key).
   const onOpenChange = (next: boolean) => {
-    if (pending) return;
+    if (busy) return;
     setOpen(next);
     setError(undefined);
     if (next) {
@@ -72,9 +73,9 @@ export function SignDecisionDialog({
   };
 
   const submit = () => {
-    if (pending || !matches) return;
+    if (busy || !matches) return;
     setError(undefined);
-    startTransition(async () => {
+    void run(async () => {
       const result = await postJson<GateDecision>(
         `/api/demo/gates/${encodeURIComponent(gate.id)}/decisions`,
         {
@@ -145,11 +146,7 @@ export function SignDecisionDialog({
             onChange={(typed) => set({ typed })}
           />
           <GateErrorNotice error={error} />
-          <Button
-            type="submit"
-            aria-busy={pending || undefined}
-            aria-disabled={!matches || undefined}
-          >
+          <Button type="submit" aria-busy={busy || undefined} aria-disabled={!matches || undefined}>
             Sign decision
           </Button>
         </form>

@@ -1,8 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Button, Dialog, DialogContent, DialogTrigger } from "@/components/ui";
 import { type ClientError, postJson } from "@/lib/demo/client";
+import { useAction } from "@/lib/demo/use-action";
 import type { Disposition, ReconciliationItem } from "@/lib/demo/types";
 import { ErrorNotice } from "../../_components/error-notice";
 import { SelectField, TextField, humanize } from "../../_components/fields";
@@ -19,11 +20,11 @@ export function DispositionDialog({ item }: { item: ReconciliationItem }) {
   const [disposition, setDisposition] = useState<Disposition>("exclude_sample");
   const [rationale, setRationale] = useState("");
   const [error, setError] = useState<ClientError | undefined>();
-  const [pending, startTransition] = useTransition();
+  const { busy, run } = useAction();
 
   const submit = () => {
-    if (pending) return;
-    startTransition(async () => {
+    if (busy) return;
+    void run(async () => {
       const result = await postJson(
         `/api/demo/reconciliation/items/${encodeURIComponent(item.id)}/disposition`,
         { disposition, rationale },
@@ -35,7 +36,7 @@ export function DispositionDialog({ item }: { item: ReconciliationItem }) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !pending && setOpen(next)}>
+    <Dialog open={open} onOpenChange={(next) => !busy && setOpen(next)}>
       <DialogTrigger asChild>
         <Button size="sm" aria-label={`Record disposition for ${item.sample_ref}`}>
           Record disposition
@@ -60,7 +61,7 @@ export function DispositionDialog({ item }: { item: ReconciliationItem }) {
           />
           <TextField label="Rationale" value={rationale} onChange={setRationale} multiline />
           <ErrorNotice error={error} />
-          <Button type="submit" aria-busy={pending || undefined}>
+          <Button type="submit" aria-busy={busy || undefined}>
             Record disposition
           </Button>
         </form>

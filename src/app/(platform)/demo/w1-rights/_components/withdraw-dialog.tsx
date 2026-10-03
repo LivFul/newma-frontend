@@ -1,8 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Button, Dialog, DialogContent, DialogTrigger } from "@/components/ui";
 import { type ClientError, postJson } from "@/lib/demo/client";
+import { useAction } from "@/lib/demo/use-action";
 import type { RightsRecord, WithdrawResult } from "@/lib/demo/types";
 import { ErrorNotice } from "../../_components/error-notice";
 import { TextField } from "../../_components/fields";
@@ -19,7 +20,7 @@ export function WithdrawDialog({ record, allowed }: Props) {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
   const [error, setError] = useState<ClientError | undefined>();
-  const [pending, startTransition] = useTransition();
+  const { busy, run } = useAction();
   const name = `Withdraw consent for ${record.subject_display_name}`;
 
   if (!allowed) {
@@ -39,9 +40,9 @@ export function WithdrawDialog({ record, allowed }: Props) {
   };
 
   const submit = () => {
-    if (pending) return;
+    if (busy) return;
     if (reason.trim().length === 0) return setError(REASON_REQUIRED);
-    startTransition(async () => {
+    void run(async () => {
       const result = await postJson<WithdrawResult>(
         `/api/demo/rights/records/${encodeURIComponent(record.id)}/withdraw`,
         { reason: reason.trim() },
@@ -74,7 +75,7 @@ export function WithdrawDialog({ record, allowed }: Props) {
         >
           <TextField label="Reason" value={reason} onChange={setReason} multiline />
           <ErrorNotice error={error} />
-          <Button type="submit" variant="danger" aria-busy={pending || undefined}>
+          <Button type="submit" variant="danger" aria-busy={busy || undefined}>
             Confirm withdrawal
           </Button>
         </form>

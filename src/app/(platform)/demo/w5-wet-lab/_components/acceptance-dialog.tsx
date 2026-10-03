@@ -1,7 +1,8 @@
 "use client";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Button, Dialog, DialogContent, DialogTrigger } from "@/components/ui";
 import { type ClientError, postJson } from "@/lib/demo/client";
+import { useAction } from "@/lib/demo/use-action";
 import type { AssayImport } from "@/lib/demo/types";
 import { ErrorNotice } from "../../_components/error-notice";
 import { TextField } from "../../_components/fields";
@@ -14,18 +15,18 @@ export function AcceptanceDialog({ assayImport, onAccepted }: Props) {
   const [key, setKey] = useState("");
   const [rationale, setRationale] = useState("");
   const [error, setError] = useState<ClientError | undefined>();
-  const [pending, startTransition] = useTransition();
+  const { busy, run } = useAction();
 
   const onOpenChange = (next: boolean) => {
-    if (pending) return;
+    if (busy) return;
     setOpen(next);
     setError(undefined);
     if (next) setKey(crypto.randomUUID());
   };
 
   const submit = () => {
-    if (pending) return;
-    startTransition(async () => {
+    if (busy) return;
+    void run(async () => {
       const result = await postJson<AssayImport>(
         `/api/demo/assay-imports/${encodeURIComponent(assayImport.id)}/acceptance`,
         { rationale, idempotency_key: key },
@@ -54,7 +55,7 @@ export function AcceptanceDialog({ assayImport, onAccepted }: Props) {
         >
           <TextField label="Rationale" value={rationale} onChange={setRationale} multiline />
           <ErrorNotice error={error} />
-          <Button type="submit" aria-busy={pending || undefined}>
+          <Button type="submit" aria-busy={busy || undefined}>
             Confirm acceptance
           </Button>
         </form>

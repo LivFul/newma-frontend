@@ -1,8 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui";
 import { type ClientError, postJson } from "@/lib/demo/client";
+import { useAction } from "@/lib/demo/use-action";
 import { useStableKey } from "@/lib/demo/idempotency";
 import type { AgentQuery } from "@/lib/demo/types";
 import { ErrorNotice } from "../../_components/error-notice";
@@ -27,12 +28,12 @@ export function AgentQueryForm({
   const [target, setTarget] = useState(targets[0]?.id ?? "");
   const [budget, setBudget] = useState(DEFAULT_BUDGET);
   const [error, setError] = useState<ClientError | undefined>();
-  const [pending, startTransition] = useTransition();
+  const { busy, run } = useAction();
 
   const submit = () => {
-    if (pending || !allowed) return;
+    if (busy || !allowed) return;
     setError(undefined);
-    startTransition(async () => {
+    void run(async () => {
       const body = {
         objective,
         target_id: target,
@@ -71,11 +72,7 @@ export function AgentQueryForm({
         />
       </div>
       <div>
-        <Button
-          type="submit"
-          aria-busy={pending || undefined}
-          aria-disabled={!allowed || undefined}
-        >
+        <Button type="submit" aria-busy={busy || undefined} aria-disabled={!allowed || undefined}>
           Ask the simulated agent
         </Button>
       </div>
