@@ -58,7 +58,7 @@ export default async function SettlementOverviewPage() {
         </h2>
         {allowed ? null : <PersonaForbiddenNotice allowed={["partner"]} />}
         {allowed && options.data ? (
-          <LicenseRequestForm options={options.data} allowed={allowed} />
+          <LicenseRequestForm key={session.persona} options={options.data} allowed={allowed} />
         ) : null}
       </section>
       <section aria-labelledby="licenses-heading" className="space-y-3">
@@ -77,7 +77,11 @@ export default async function SettlementOverviewPage() {
         <h2 id="benefits-heading" className="text-xl font-semibold">
           Non-monetary benefits
         </h2>
-        <BenefitTracker items={benefits.data?.items ?? []} persona={session.persona} />
+        <BenefitTracker
+          key={session.persona}
+          items={benefits.data?.items ?? []}
+          persona={session.persona}
+        />
       </section>
       <section aria-labelledby="beneficiaries-heading" className="space-y-3">
         <h2 id="beneficiaries-heading" className="text-xl font-semibold">

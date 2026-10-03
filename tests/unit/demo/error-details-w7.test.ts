@@ -72,6 +72,7 @@ describe("W7 allow-list (Contract: fifteen codes forwarded with details)", () =>
     "receipt_not_found",
     "not_found",
     "idempotency_conflict",
+    "receipt_limit_reached",
   ])("%s passes without details", (code) => {
     expect(pickDetails(code, { anything: "x" })).toBeUndefined();
   });

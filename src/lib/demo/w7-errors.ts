@@ -37,10 +37,16 @@ function disputedCount(d: Record<string, unknown>): string | undefined {
   return `${n} disputed receipt${n === 1 ? "" : "s"} must be resolved first.`;
 }
 
+const UNCHECKED_CREDENTIAL =
+  "Run the credential check before approving: the supplied credential has not been checked yet.";
+
 function stateConflict(subject: string): Describe {
   return (d) => {
     const state = str(d, "state");
     const attempted = str(d, "attempted");
+    if (subject === "License" && state === "requested" && attempted === "approve") {
+      return UNCHECKED_CREDENTIAL;
+    }
     return state && attempted
       ? `${subject} is ${spaced(state)}; attempted ${spaced(attempted)}.`
       : undefined;

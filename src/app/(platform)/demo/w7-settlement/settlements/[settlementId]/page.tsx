@@ -42,7 +42,9 @@ export default async function SettlementPage({ params }: { params: Params }) {
         </Link>
       </WorkflowHeader>
       <ErrorNotice error={settlement.error} />
-      {data ? <SettlementWorkspace settlement={data} persona={session.persona} /> : null}
+      {data ? (
+        <SettlementWorkspace key={session.persona} settlement={data} persona={session.persona} />
+      ) : null}
       <section aria-labelledby="events-heading" className="space-y-3">
         <h2 id="events-heading" className="text-xl font-semibold">
           Signed events

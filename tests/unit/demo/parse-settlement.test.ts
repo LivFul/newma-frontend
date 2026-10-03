@@ -54,6 +54,8 @@ describe("W7 body guards (undefined means reject with 422)", () => {
       { agreement_id: "nope" },
       { licensee_organization_id: 5 },
       { credential_ref: "has space" },
+      { credential_ref: "demo-cred-valid-001" },
+      { credential_ref: "OTHER-CRED-001" },
       { idempotency_key: "bad key!" },
     ])("rejects %j", (patch) => {
       expect(parseLicenseRequest({ ...valid, ...patch })).toBeUndefined();

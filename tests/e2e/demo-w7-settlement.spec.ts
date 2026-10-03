@@ -86,8 +86,9 @@ test.describe("W7 licensing and benefit settlement", { tag: "@needs-backend" }, 
     const lines = page.getByTestId("calc-line");
     await expect(lines).toHaveCount(4);
     await expect(page.getByTestId("illustrative-badge").first()).toBeVisible();
-    await expect(lines.nth(0)).toContainText("150 demo credits");
-    await expect(lines.nth(1)).toContainText("90 demo credits");
+    // Beneficiary lines come in beneficiary-id order, so their order is not asserted.
+    await expect(lines.filter({ hasText: "150 demo credits" })).toHaveCount(1);
+    await expect(lines.filter({ hasText: "90 demo credits" })).toHaveCount(1);
     await expect(lines.nth(2)).toContainText("Reserve (illustrative)");
     await expect(lines.nth(2)).toContainText("360 demo credits");
     await expect(lines.nth(3)).toContainText("0 demo credits");

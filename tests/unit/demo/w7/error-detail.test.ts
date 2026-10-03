@@ -46,6 +46,14 @@ describe("errorDetailLine renders the allow-listed details as one readable line"
     expect(errorDetailLine(err(code, details))).toBe(expected);
   });
 
+  it("explains approving a license whose credential was not checked", () => {
+    expect(
+      errorDetailLine(err("license_state_conflict", { state: "requested", attempted: "approve" })),
+    ).toBe(
+      "Run the credential check before approving: the supplied credential has not been checked yet.",
+    );
+  });
+
   it("returns undefined without details, with the wrong shape or for other codes", () => {
     expect(errorDetailLine(err("agreement_superseded"))).toBeUndefined();
     expect(

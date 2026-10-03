@@ -7,7 +7,8 @@ const MAX_TEXT = 500;
 const MAX_AMOUNT = 100_000_000;
 const MAX_TERM_MONTHS = 120;
 const EXTERNAL_REF = /^[A-Za-z0-9._:-]{1,60}$/;
-const CREDENTIAL_REF = /^[A-Za-z0-9._:-]{1,64}$/;
+// The simulator's fictional references only (backend contract).
+const CREDENTIAL_REF = /^DEMO-[A-Z0-9-]{1,55}$/;
 const SHA256_HEX = /^[0-9a-f]{64}$/;
 
 const isPurpose = oneOf(["research", "commercial"] as const);

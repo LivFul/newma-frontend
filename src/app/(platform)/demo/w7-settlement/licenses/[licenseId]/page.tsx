@@ -50,12 +50,12 @@ export default async function LicensePage({ params }: { params: Params }) {
       {data ? (
         <>
           <LicenseSummary license={data} />
-          <CredentialPanel license={data} allowed={canCheck} />
+          <CredentialPanel key={session.persona} license={data} allowed={canCheck} />
           <section aria-labelledby="decision-heading" className="space-y-3">
             <h2 id="decision-heading" className="text-xl font-semibold">
               Decision
             </h2>
-            <DecisionDialog license={data} allowed={canDecide} />
+            <DecisionDialog key={session.persona} license={data} allowed={canDecide} />
           </section>
           {data.status === "approved" ? (
             <section aria-labelledby="settlement-heading" className="space-y-3">
@@ -63,7 +63,7 @@ export default async function LicensePage({ params }: { params: Params }) {
                 Settlement
               </h2>
               {canSettle ? (
-                <CreateSettlementButton licenseId={data.id} />
+                <CreateSettlementButton key={session.persona} licenseId={data.id} />
               ) : (
                 <PersonaForbiddenNotice allowed={["finance"]} />
               )}
@@ -76,7 +76,11 @@ export default async function LicensePage({ params }: { params: Params }) {
           Non-monetary benefits
         </h2>
         <ErrorNotice error={benefits.error} />
-        <BenefitTracker items={benefits.data?.items ?? []} persona={session.persona} />
+        <BenefitTracker
+          key={session.persona}
+          items={benefits.data?.items ?? []}
+          persona={session.persona}
+        />
       </section>
       <section aria-labelledby="events-heading" className="space-y-3">
         <h2 id="events-heading" className="text-xl font-semibold">
