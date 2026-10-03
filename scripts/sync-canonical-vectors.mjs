@@ -25,6 +25,7 @@ function paths(repoRoot, backendFile) {
   };
 }
 
+/** @param {{ repoRoot: string, backendFile?: string }} options */
 export function syncVectors({ repoRoot, backendFile }) {
   const p = paths(repoRoot, backendFile);
   if (!existsSync(p.backend)) throw new VectorsError(`backend vectors not found at ${p.backend}`);
@@ -54,11 +55,16 @@ async function fetchDeployed(url, fetchImpl) {
  * API's /canonical-vectors.json), then the lock alone. In CI the lock alone is never silent: it
  * fails unless `allowLockOnly` is set, in which case it emits a GitHub warning.
  */
+/**
+ * @param {{ repoRoot: string, backendFile?: string, ci?: boolean, vectorsUrl?: string,
+ *   allowLockOnly?: boolean, fetchImpl?: typeof fetch }} options
+ * @returns {Promise<string>}
+ */
 export async function checkVectors({
   repoRoot,
-  backendFile = undefined,
+  backendFile,
   ci = false,
-  vectorsUrl = undefined,
+  vectorsUrl,
   allowLockOnly = false,
   fetchImpl = fetch,
 }) {
