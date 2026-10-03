@@ -1,14 +1,24 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import PartnerPage from "@/app/(platform)/demo/w8-partner/page";
-import { evidence } from "./p5b-fixtures";
+import { evidence as baseEvidence, withheldField } from "./p5b-fixtures";
+
+const evidence = (over: Parameters<typeof baseEvidence>[0] = {}) => baseEvidence(over);
 
 const state = vi.hoisted(() => ({
   persona: "partner",
   paths: [] as { path: string; query?: unknown }[],
   packError: undefined as undefined | { code: string; message: string },
+  hostile: false,
 }));
 
+const formProps = vi.hoisted(() => ({ last: undefined as unknown }));
+vi.mock("@/app/(platform)/demo/w8-partner/_components/export-form", () => ({
+  ExportForm: (props: { allowed: boolean }) => {
+    formProps.last = props;
+    return <button aria-disabled={!props.allowed || undefined}>Issue export</button>;
+  },
+}));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }) }));
 vi.mock("@/lib/demo/current-session", () => ({
   requireSession: async () => ({ persona: state.persona, tenant_id: "t" }),
@@ -27,7 +37,13 @@ vi.mock("@/lib/demo/server-data", () => ({
       };
     }
     if (path.endsWith("/evidence")) {
-      return state.packError ? { error: state.packError } : { data: evidence({ asset_id: "a" }) };
+      if (state.packError) return { error: state.packError };
+      return {
+        data: evidence({
+          asset_id: "a",
+          fields: state.hostile ? [withheldField({ value: "TOP-SECRET" })] : undefined,
+        }),
+      };
     }
     if (path === "/v1/exports") return { data: { items: [] } };
     return {
@@ -44,6 +60,7 @@ describe("W8 page", () => {
     state.persona = "partner";
     state.paths = [];
     state.packError = undefined;
+    state.hostile = false;
   });
 
   it("opens the rank-1 asset, reads the pack with the purpose and renders the sections", async () => {
@@ -62,6 +79,13 @@ describe("W8 page", () => {
       "aria-disabled",
     );
     expect(screen.getByText("No exports yet.")).toBeInTheDocument();
+  });
+
+  it("nulls a hostile withheld value and never hands values to the client form", async () => {
+    state.hostile = true;
+    await render_();
+    expect(JSON.stringify(formProps.last)).not.toContain("TOP-SECRET");
+    expect(document.body).not.toHaveTextContent("TOP-SECRET");
   });
 
   it("falls back to rank 1 for an unknown asset and ignores an invalid stage and purpose", async () => {

@@ -1,4 +1,5 @@
-import { SyntheticBadge, Withheld } from "@/components/ui";
+import { SyntheticBadge } from "@/components/ui/synthetic-badge";
+import { Withheld } from "@/components/ui/withheld";
 import type { FieldDisclosure } from "@/lib/demo/types";
 
 // A table of FieldDisclosure rows (W8 pack and export). A withheld row shows the word "withheld"

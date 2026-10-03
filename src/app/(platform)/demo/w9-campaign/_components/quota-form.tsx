@@ -65,24 +65,26 @@ export function QuotaForm({ campaignId, current, allowed }: Props) {
           submit();
         }}
       >
-        <TextField
-          label="Credit quota (demo credits)"
-          type="number"
-          value={quota}
-          onChange={setQuota}
-        />
-        <TextField label="Reason for the quota" value={reason} onChange={setReason} />
+        <fieldset disabled={!allowed} className="contents">
+          <TextField
+            label="Credit quota (demo credits)"
+            type="number"
+            value={quota}
+            onChange={setQuota}
+          />
+          <TextField label="Reason for the quota" value={reason} onChange={setReason} />
+        </fieldset>
         <div>
           <Button type="submit" aria-busy={busy || undefined} aria-disabled={!allowed || undefined}>
             Set quota
           </Button>
         </div>
       </form>
-      {result ? (
-        <p role="status" className="rounded-md border border-border-strong px-3 py-2 text-sm">
-          {result}
-        </p>
-      ) : null}
+      <div role="status" aria-live="polite">
+        {result ? (
+          <p className="rounded-md border border-border-strong px-3 py-2 text-sm">{result}</p>
+        ) : null}
+      </div>
       <ErrorNotice error={error} />
     </section>
   );

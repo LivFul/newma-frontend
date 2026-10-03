@@ -75,6 +75,7 @@ test.describe("W9 campaign charter and quotas", { tag: "@needs-backend" }, () =>
     });
     await expect(v1).toContainText(`≥ ${original} replicates`);
 
+    await page.getByLabel("Reason for the change").fill("Resubmit the same thresholds");
     await saveThresholds(page).click();
     await expect(status(page, "No change")).toBeVisible({ timeout: SLOW_MS });
   });

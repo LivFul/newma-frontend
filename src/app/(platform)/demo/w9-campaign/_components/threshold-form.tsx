@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { Button } from "@/components/ui";
-import { type ClientError, putJson } from "@/lib/demo/client";
+import { type ClientError, putJson, requestJson } from "@/lib/demo/client";
 import { useStableKey } from "@/lib/demo/idempotency";
 import { THRESHOLD_LIMITS } from "@/lib/demo/parse-campaigns";
 import type { CharterChange, CharterOut } from "@/lib/demo/types";
@@ -99,6 +99,23 @@ export function ThresholdForm({ charter, allowed }: Props) {
   const set = (field: "potency" | "replicates" | "note" | "reason") => (value: string) =>
     setDraft((d) => ({ ...d, [field]: value }));
 
+  // After a version conflict the draft is replaced by the winning thresholds (the reason is kept).
+  const resync = async () => {
+    const fresh = await requestJson<CharterOut>(
+      `/api/demo/campaigns/${encodeURIComponent(charter.id)}/charter`,
+    );
+    if (fresh.ok) {
+      const t = fresh.data.thresholds;
+      setDraft((d) => ({
+        ...d,
+        potency: String(t.potency_um_max),
+        replicates: String(t.replicates_min),
+        controls: t.controls_required,
+        note: t.note ?? "",
+      }));
+    }
+  };
+
   const submit = () => {
     if (busy || !allowed) return;
     setResult(undefined);
@@ -112,8 +129,13 @@ export function ThresholdForm({ charter, allowed }: Props) {
       );
       // A definitive answer ends this attempt; only a network failure or 5xx retries with the key.
       if (response.ok || (response.status >= 400 && response.status < 500)) reset();
-      if (response.ok) setResult(describeChange(response.data));
-      else setError(conflictText(response.error));
+      if (response.ok) {
+        setResult(describeChange(response.data));
+        setDraft((d) => ({ ...d, reason: "" }));
+      } else {
+        setError(conflictText(response.error));
+        if (response.error.code === "charter_version_conflict") await resync();
+      }
       router.refresh();
     });
   };
@@ -133,47 +155,49 @@ export function ThresholdForm({ charter, allowed }: Props) {
           submit();
         }}
       >
-        <TextField
-          label="Potency maximum (µM)"
-          type="number"
-          value={draft.potency}
-          onChange={set("potency")}
-        />
-        <TextField
-          label="Minimum replicates"
-          type="number"
-          value={draft.replicates}
-          onChange={set("replicates")}
-        />
-        <label htmlFor={controlsId} className="flex items-center gap-2 text-sm">
-          <input
-            id={controlsId}
-            type="checkbox"
-            checked={draft.controls}
-            onChange={(event) => setDraft((d) => ({ ...d, controls: event.target.checked }))}
-          />
-          Controls required
-        </label>
-        <TextField label="Note (optional)" value={draft.note} onChange={set("note")} />
-        <div className="sm:col-span-2">
+        <fieldset disabled={!allowed} className="contents">
           <TextField
-            label="Reason for the change"
-            value={draft.reason}
-            onChange={set("reason")}
-            multiline
+            label="Potency maximum (µM)"
+            type="number"
+            value={draft.potency}
+            onChange={set("potency")}
           />
-        </div>
+          <TextField
+            label="Minimum replicates"
+            type="number"
+            value={draft.replicates}
+            onChange={set("replicates")}
+          />
+          <label htmlFor={controlsId} className="flex items-center gap-2 text-sm">
+            <input
+              id={controlsId}
+              type="checkbox"
+              checked={draft.controls}
+              onChange={(event) => setDraft((d) => ({ ...d, controls: event.target.checked }))}
+            />
+            Controls required
+          </label>
+          <TextField label="Note (optional)" value={draft.note} onChange={set("note")} />
+          <div className="sm:col-span-2">
+            <TextField
+              label="Reason for the change"
+              value={draft.reason}
+              onChange={set("reason")}
+              multiline
+            />
+          </div>
+        </fieldset>
         <div>
           <Button type="submit" aria-busy={busy || undefined} aria-disabled={!allowed || undefined}>
             Save thresholds
           </Button>
         </div>
       </form>
-      {result ? (
-        <p role="status" className="rounded-md border border-border-strong px-3 py-2 text-sm">
-          {result}
-        </p>
-      ) : null}
+      <div role="status" aria-live="polite">
+        {result ? (
+          <p className="rounded-md border border-border-strong px-3 py-2 text-sm">{result}</p>
+        ) : null}
+      </div>
       <ErrorNotice error={error} />
     </section>
   );

@@ -16,6 +16,8 @@ const PROBE_CREDITS = 10;
 type Outcome =
   Readonly<{ kind: "started"; jobId: string }> | Readonly<{ kind: "failed"; error: ClientError }>;
 
+const num = (value: unknown): string => (typeof value === "number" ? String(value) : "unknown");
+
 function QuotaRefusal({ details }: { details: Record<string, unknown> }) {
   return (
     <div role="alert" className="space-y-1 rounded-md border border-danger p-4 text-sm">
@@ -23,11 +25,12 @@ function QuotaRefusal({ details }: { details: Record<string, unknown> }) {
         Refused: <span className="font-mono">quota_exhausted</span>. No job was created.
       </p>
       <ul className="list-disc pl-5">
-        <li>Quota: {String(details.credit_quota)} demo credits</li>
-        <li>Committed: {String(details.committed)} demo credits</li>
-        <li>Requested: {String(details.requested)} demo credits</li>
-        <li>Remaining: {String(details.remaining)} demo credits</li>
+        <li>Quota: {num(details.credit_quota)} demo credits</li>
+        <li>Committed: {num(details.committed)} demo credits</li>
+        <li>Requested: {num(details.requested)} demo credits</li>
+        <li>Remaining: {num(details.remaining)} demo credits</li>
       </ul>
+      <p className="text-fg-muted">Numbers as of this request.</p>
     </div>
   );
 }
@@ -73,17 +76,19 @@ export function JobProbe() {
       <Button type="button" onClick={start} aria-busy={busy || undefined}>
         Start a simulated screening job, {PROBE_CREDITS} demo credits
       </Button>
-      {outcome?.kind === "started" ? (
-        <p role="status" className="text-sm">
-          Job started.{" "}
-          <Link
-            href={`/demo/jobs/${encodeURIComponent(outcome.jobId)}`}
-            className="underline underline-offset-4"
-          >
-            Open the job ({outcome.jobId})
-          </Link>
-        </p>
-      ) : null}
+      <div role="status" aria-live="polite">
+        {outcome?.kind === "started" ? (
+          <p className="text-sm">
+            Job started.{" "}
+            <Link
+              href={`/demo/jobs/${encodeURIComponent(outcome.jobId)}`}
+              className="underline underline-offset-4"
+            >
+              Open the job ({outcome.jobId})
+            </Link>
+          </p>
+        ) : null}
+      </div>
       {outcome?.kind === "failed" && isQuotaRefusal(outcome.error) ? (
         <QuotaRefusal details={outcome.error.details as Record<string, unknown>} />
       ) : null}

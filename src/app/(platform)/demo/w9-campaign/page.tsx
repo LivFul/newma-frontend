@@ -32,7 +32,12 @@ export default async function CampaignPage() {
         The campaign charter holds the scientific thresholds as numbered protocol versions, and a
         credit quota in demo credits limits what simulated jobs may reserve.
       </WorkflowHeader>
-      <ErrorNotice error={campaigns.error ?? charter?.error ?? usage?.error} />
+      <ErrorNotice error={campaigns.error} />
+      <ErrorNotice error={charter?.error} />
+      <ErrorNotice error={usage?.error} />
+      {!campaign && !campaigns.error ? (
+        <p className="text-sm text-fg-muted">No campaign was found for this tenant.</p>
+      ) : null}
       {campaign && charter?.data ? (
         <>
           <CharterPanel charter={charter.data} />

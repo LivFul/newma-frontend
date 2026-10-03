@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AssetPicker } from "@/app/(platform)/demo/w8-partner/_components/asset-picker";
 import { EvidencePack } from "@/app/(platform)/demo/w8-partner/_components/evidence-pack";
+import { toExportPackInfo } from "@/app/(platform)/demo/w8-partner/_components/export-pack-info";
+import { PurposeTabs } from "@/app/(platform)/demo/w8-partner/_components/purpose-tabs";
 import { ExportForm } from "@/app/(platform)/demo/w8-partner/_components/export-form";
 import { ExportRefusal } from "@/app/(platform)/demo/w8-partner/_components/export-refusal";
 import { ExportRegister } from "@/app/(platform)/demo/w8-partner/_components/export-register";
@@ -29,7 +31,7 @@ describe("ExportForm", () => {
   const pack = evidence();
 
   it("prefills the fictional recipient and offers 7, 30 and 90 days", () => {
-    render(<ExportForm pack={pack} allowed />);
+    render(<ExportForm pack={toExportPackInfo(pack)} allowed />);
     expect(screen.getByLabelText("Recipient")).toHaveValue("Partner Biologics A — fictional");
     const options = within(screen.getByLabelText("Expires in")).getAllByRole("option");
     expect(options.map((o) => o.textContent)).toEqual(["7 days", "30 days", "90 days"]);
@@ -39,7 +41,7 @@ describe("ExportForm", () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
     const user = userEvent.setup();
-    render(<ExportForm pack={pack} allowed />);
+    render(<ExportForm pack={toExportPackInfo(pack)} allowed />);
     const recipient = screen.getByLabelText("Recipient");
     await user.clear(recipient);
     await user.type(recipient, "Real Pharma Inc");
@@ -53,7 +55,7 @@ describe("ExportForm", () => {
     vi.stubGlobal("fetch", fetchMock);
     const user = userEvent.setup();
     const before = Date.now();
-    render(<ExportForm pack={pack} allowed />);
+    render(<ExportForm pack={toExportPackInfo(pack)} allowed />);
     await user.click(screen.getByRole("button", { name: "Issue export" }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     expect(fetchMock.mock.calls[0]).toEqual([
@@ -81,7 +83,7 @@ describe("ExportForm", () => {
     const fetchMock = vi.fn(async () => Response.json(exportRecord(), { status: 201 }));
     vi.stubGlobal("fetch", fetchMock);
     const user = userEvent.setup();
-    render(<ExportForm pack={pack} allowed />);
+    render(<ExportForm pack={toExportPackInfo(pack)} allowed />);
     const location = screen.getByRole("checkbox", { name: /Collection location/ });
     expect(location).toBeChecked();
     await user.click(location);
@@ -104,7 +106,7 @@ describe("ExportForm", () => {
       .mockResolvedValueOnce(Response.json(exportRecord({ id: "exp-2" }), { status: 201 }));
     vi.stubGlobal("fetch", fetchMock);
     const user = userEvent.setup();
-    render(<ExportForm pack={pack} allowed />);
+    render(<ExportForm pack={toExportPackInfo(pack)} allowed />);
     const submit = screen.getByRole("button", { name: "Issue export" });
     await user.click(submit);
     await screen.findByRole("alert");
@@ -117,12 +119,73 @@ describe("ExportForm", () => {
     expect(keys[2]).not.toBe(keys[0]);
   });
 
+  it("resends the same expiry on a retry and starts a new attempt when the form is edited", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    try {
+      const fetchMock = vi
+        .fn()
+        .mockRejectedValueOnce(new TypeError("offline"))
+        .mockRejectedValueOnce(new TypeError("offline"))
+        .mockResolvedValue(Response.json(exportRecord(), { status: 201 }));
+      vi.stubGlobal("fetch", fetchMock);
+      vi.setSystemTime(new Date("2030-01-01T00:00:00Z"));
+      const user = userEvent.setup({ advanceTimers: (ms) => vi.advanceTimersByTime(ms) });
+      render(<ExportForm pack={toExportPackInfo(pack)} allowed />);
+      const submit = screen.getByRole("button", { name: "Issue export" });
+      await user.click(submit);
+      await screen.findByRole("alert");
+      vi.setSystemTime(new Date("2030-01-01T01:00:00Z"));
+      await user.click(submit);
+      await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+      expect(lastBody(fetchMock, 1).expires_at).toBe(lastBody(fetchMock, 0).expires_at);
+      expect(lastBody(fetchMock, 1).idempotency_key).toBe(lastBody(fetchMock, 0).idempotency_key);
+      await user.selectOptions(screen.getByLabelText("Expires in"), "7");
+      await user.click(submit);
+      await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
+      expect(lastBody(fetchMock, 2).idempotency_key).not.toBe(
+        lastBody(fetchMock, 0).idempotency_key,
+      );
+      expect(lastBody(fetchMock, 2).expires_at).toBe("2030-01-08T01:00:00Z");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("shows the purpose from the pack as text and sends it", async () => {
+    const fetchMock = vi.fn(async () => Response.json(exportRecord(), { status: 201 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<ExportForm pack={toExportPackInfo(evidence({ purpose: "commercial" }))} allowed />);
+    expect(screen.queryByLabelText("Purpose")).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Issue export" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    expect(lastBody(fetchMock).purpose).toBe("commercial");
+  });
+
+  it("drops the body of an issued card once the register says it is suspended", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => Response.json(exportRecord(), { status: 201 })),
+    );
+    const user = userEvent.setup();
+    const { rerender } = render(<ExportForm pack={toExportPackInfo(pack)} allowed />);
+    await user.click(screen.getByRole("button", { name: "Issue export" }));
+    const card = await screen.findByRole("region", { name: "Export issued" });
+    expect(card).toHaveTextContent("Active");
+    rerender(
+      <ExportForm pack={toExportPackInfo(pack)} allowed liveStatuses={{ "exp-1": "suspended" }} />,
+    );
+    const stale = screen.getByRole("region", { name: "Export issued" });
+    expect(stale).toHaveTextContent("Suspended");
+    expect(within(stale).queryAllByTestId("field-disclosed")).toHaveLength(0);
+  });
+
   it("ignores a second click while the first request is in flight", async () => {
     let release: (r: Response) => void = () => undefined;
     const fetchMock = vi.fn(() => new Promise<Response>((resolve) => (release = resolve)));
     vi.stubGlobal("fetch", fetchMock);
     const user = userEvent.setup();
-    render(<ExportForm pack={pack} allowed />);
+    render(<ExportForm pack={toExportPackInfo(pack)} allowed />);
     const submit = screen.getByRole("button", { name: "Issue export" });
     await user.dblClick(submit);
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -158,7 +221,7 @@ describe("ExportForm", () => {
         ),
       );
       const user = userEvent.setup();
-      render(<ExportForm pack={pack} allowed />);
+      render(<ExportForm pack={toExportPackInfo(pack)} allowed />);
       await user.click(screen.getByRole("button", { name: "Issue export" }));
       const refusal = await screen.findByRole("alert", { name: "Export refused" });
       expect(refusal).toHaveTextContent("consent_withdrawn");
@@ -172,7 +235,7 @@ describe("ExportForm", () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
     const user = userEvent.setup();
-    render(<ExportForm pack={pack} allowed={false} />);
+    render(<ExportForm pack={toExportPackInfo(pack)} allowed={false} />);
     const submit = screen.getByRole("button", { name: "Issue export" });
     expect(submit).toHaveAttribute("aria-disabled", "true");
     await user.click(submit);
@@ -195,9 +258,29 @@ describe("ExportForm", () => {
       ),
     );
     const user = userEvent.setup();
-    render(<ExportForm pack={pack} allowed />);
+    render(<ExportForm pack={toExportPackInfo(pack)} allowed />);
     await user.click(screen.getByRole("button", { name: "Issue export" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("Biopharma partner");
+  });
+});
+
+describe("PurposeTabs and the slim form props", () => {
+  it("links one tab per purpose and marks the current one", () => {
+    render(<PurposeTabs asset="asset-1" stage="H1" purpose="research" />);
+    const nav = screen.getByRole("navigation", { name: "Purpose" });
+    expect(within(nav).getByRole("link", { name: /research/ })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(within(nav).getByRole("link", { name: /commercial/ })).toHaveAttribute(
+      "href",
+      "/demo/w8-partner?asset=asset-1&stage=H1&purpose=commercial",
+    );
+  });
+
+  it("carries no field value into the client form props", () => {
+    const hostile = evidence({ fields: [withheldField({ value: "TOP-SECRET" })] });
+    expect(JSON.stringify(toExportPackInfo(hostile))).not.toContain("TOP-SECRET");
   });
 });
 

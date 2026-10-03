@@ -27,8 +27,8 @@ export function GoverningRights({ policy, recordNames }: Props) {
         </p>
       ) : null}
       <ul className="list-disc space-y-1 pl-5 text-sm">
-        {policy.reasons.map((reason) => (
-          <li key={`${reason.code}-${reason.rights_record_id ?? "none"}`}>
+        {policy.reasons.map((reason, index) => (
+          <li key={`${reason.code}-${index}`}>
             <span className="font-mono">{reason.code}</span>: {reason.message}
             {reason.remediation ? <> Remediation: {reason.remediation}</> : null}
           </li>

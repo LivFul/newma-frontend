@@ -1,4 +1,5 @@
-import { Badge, SyntheticBadge } from "@/components/ui";
+import { Badge } from "@/components/ui/badge";
+import { SyntheticBadge } from "@/components/ui/synthetic-badge";
 import type { AssetEvidence } from "@/lib/demo/types";
 import { FieldDisclosureTable } from "../../_components/field-disclosure";
 

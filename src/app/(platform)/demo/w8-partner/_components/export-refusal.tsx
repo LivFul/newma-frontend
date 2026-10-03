@@ -42,8 +42,8 @@ export function ExportRefusal({ message, details }: { message: string; details: 
             Decision: <strong>{refusal.decision}</strong>
           </p>
           <ul className="list-disc space-y-1 pl-5">
-            {refusal.reasons.map((reason) => (
-              <li key={reason.code}>
+            {refusal.reasons.map((reason, index) => (
+              <li key={`${reason.code}-${index}`}>
                 <span className="font-mono">{reason.code}</span>
                 {reason.message ? <>: {reason.message}</> : null}
                 {reason.remediation ? <> Remediation: {reason.remediation}</> : null}

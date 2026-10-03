@@ -17,11 +17,14 @@ import { ErrorNotice } from "../_components/error-notice";
 import { PersonaForbiddenNotice } from "../_components/persona-forbidden-notice";
 import { SimulatedLabel } from "../_components/simulated-label";
 import { WorkflowHeader } from "../_components/workflow-header";
+import { nullWithheldValues } from "@/lib/demo/parse-exports";
 import { AssetPicker } from "./_components/asset-picker";
 import { EvidencePack } from "./_components/evidence-pack";
 import { ExportForm } from "./_components/export-form";
 import { ExportRegister } from "./_components/export-register";
+import { toExportPackInfo } from "./_components/export-pack-info";
 import { GoverningRights } from "./_components/governing-rights";
+import { PurposeTabs } from "./_components/purpose-tabs";
 import { StageTabs } from "./_components/stage-tabs";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -51,7 +54,9 @@ async function loadWorkspace({ asset, stage, purpose }: WorkspaceProps) {
   const names = Object.fromEntries(
     (records.data?.items ?? []).map((r) => [r.id, r.subject_display_name]),
   );
-  return { pack, exports, names };
+  // Server reads bypass the BFF, so withheld values are nulled here as well (Review Focus 2).
+  const clean = pack.data ? (nullWithheldValues(pack.data) as AssetEvidence) : undefined;
+  return { pack: { ...pack, data: clean }, exports, names };
 }
 
 type WorkspaceData = Awaited<ReturnType<typeof loadWorkspace>>;
@@ -68,13 +73,17 @@ function Workspace(props: WorkspaceProps & { data: WorkspaceData }) {
       )}
       {data ? (
         <>
+          <PurposeTabs asset={asset} stage={data.requested_stage ?? data.stage} purpose={purpose} />
           <StageTabs pack={data} asset={asset} purpose={purpose} />
           <EvidencePack pack={data} />
           <GoverningRights policy={data.policy} recordNames={names} />
           <ExportForm
             key={`${data.asset_id}:${data.requested_stage ?? data.stage}:${data.purpose}`}
-            pack={data}
+            pack={toExportPackInfo(data)}
             allowed={canAct(persona, "export_evidence")}
+            liveStatuses={Object.fromEntries(
+              (exports.data?.items ?? []).map((entry) => [entry.id, entry.status]),
+            )}
           />
         </>
       ) : null}

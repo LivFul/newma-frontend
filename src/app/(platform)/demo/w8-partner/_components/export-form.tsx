@@ -1,19 +1,14 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { Button } from "@/components/ui";
 import { type ClientError, postJson } from "@/lib/demo/client";
-import { useStableKey } from "@/lib/demo/idempotency";
+import type { ExportRecord, ExportStatus } from "@/lib/demo/types";
 import { useAction } from "@/lib/demo/use-action";
-import {
-  EXPORT_PURPOSES,
-  type AssetEvidence,
-  type ExportPurpose,
-  type ExportRecord,
-} from "@/lib/demo/types";
 import { ErrorNotice } from "../../_components/error-notice";
 import { SelectField, TextField } from "../../_components/fields";
 import { PersonaForbiddenNotice } from "../../_components/persona-forbidden-notice";
+import type { ExportPackInfo } from "./export-pack-info";
 import { ExportRefusal, isRefusalCode } from "./export-refusal";
 import { ExportResult } from "./export-result";
 
@@ -36,14 +31,23 @@ export function expiryFrom(days: number, now: number = Date.now()): string {
   return new Date(now + days * DAY_MS).toISOString().replace(/\.\d{3}Z$/, "Z");
 }
 
-type Props = Readonly<{ pack: AssetEvidence; allowed: boolean }>;
+type Props = Readonly<{
+  pack: ExportPackInfo;
+  allowed: boolean;
+  /** Current status per export id from the register, so a stale result card never says "Active". */
+  liveStatuses?: Readonly<Record<string, ExportStatus>>;
+}>;
 type Outcome =
   | Readonly<{ kind: "issued"; record: ExportRecord }>
   | Readonly<{ kind: "refused"; error: ClientError }>
   | Readonly<{ kind: "error"; error: ClientError }>;
 
+// One attempt = one idempotency key and one expiry. The backend compares the whole request on a
+// replay, so a retry after an unknown outcome must resend the same instant; any edit starts anew.
+type Attempt = Readonly<{ signature: string; key: string; expiresAt: string }>;
+
 function FieldChecklist(props: {
-  pack: AssetEvidence;
+  pack: ExportPackInfo;
   selected: ReadonlySet<string>;
   onToggle: (path: string) => void;
 }) {
@@ -65,13 +69,18 @@ function FieldChecklist(props: {
   );
 }
 
-export function ExportForm({ pack, allowed }: Props) {
+/** The issued card follows the register: a suspended or expired export shows no body. */
+function currentRecord(record: ExportRecord, live: ExportStatus | undefined): ExportRecord {
+  const status = live ?? record.status;
+  return status === "active" ? record : { ...record, status, disclosed: [] };
+}
+
+export function ExportForm({ pack, allowed, liveStatuses = {} }: Props) {
   const router = useRouter();
-  const { key, reset } = useStableKey();
   const headingId = useId();
+  const attempt = useRef<Attempt | undefined>(undefined);
   const [recipient, setRecipient] = useState(DEFAULT_RECIPIENT);
   const [days, setDays] = useState(String(DEFAULT_DAYS));
-  const [purpose, setPurpose] = useState<ExportPurpose>(pack.purpose);
   const [selected, setSelected] = useState<ReadonlySet<string>>(
     () => new Set(pack.fields.map((field) => field.path)),
   );
@@ -88,25 +97,32 @@ export function ExportForm({ pack, allowed }: Props) {
     if (busy || !allowed) return;
     if (!/fictional/i.test(recipient)) return setOutcome({ kind: "error", error: NEEDS_FICTIONAL });
     if (selected.size === 0) return setOutcome({ kind: "error", error: NEEDS_FIELD });
-    const all = selected.size === pack.fields.length;
+    const paths = pack.fields.map((f) => f.path).filter((p) => selected.has(p));
     const stage = pack.requested_stage ?? pack.stage;
+    const signature = JSON.stringify([recipient.trim(), days, paths]);
+    if (attempt.current?.signature !== signature) {
+      attempt.current = {
+        signature,
+        key: crypto.randomUUID(),
+        expiresAt: expiryFrom(Number(days)),
+      };
+    }
+    const { key, expiresAt } = attempt.current;
     const body = {
       asset_id: pack.asset_id,
       ...(stage ? { stage } : {}),
-      purpose,
+      purpose: pack.purpose,
       recipient: recipient.trim(),
-      expires_at: expiryFrom(Number(days)),
-      ...(all
-        ? {}
-        : { field_paths: pack.fields.map((f) => f.path).filter((p) => selected.has(p)) }),
+      expires_at: expiresAt,
+      ...(paths.length === pack.fields.length ? {} : { field_paths: paths }),
       idempotency_key: key,
     };
     void run(async () => {
       const result = await postJson<ExportRecord>("/api/demo/exports", body);
-      if (result.ok) {
-        reset();
-        setOutcome({ kind: "issued", record: result.data });
-      } else {
+      // A definitive answer ends the attempt; a network failure or 5xx retries with the same one.
+      if (result.ok || (result.status >= 400 && result.status < 500)) attempt.current = undefined;
+      if (result.ok) setOutcome({ kind: "issued", record: result.data });
+      else {
         setOutcome({
           kind: isRefusalCode(result.error.code) ? "refused" : "error",
           error: result.error,
@@ -131,33 +147,37 @@ export function ExportForm({ pack, allowed }: Props) {
           submit();
         }}
       >
-        <TextField label="Recipient" value={recipient} onChange={setRecipient} />
-        <SelectField
-          label="Purpose"
-          value={purpose}
-          onChange={(value) => setPurpose(value as ExportPurpose)}
-          options={EXPORT_PURPOSES.map((value) => ({ value, label: value }))}
-        />
-        <SelectField
-          label="Expires in"
-          value={days}
-          onChange={setDays}
-          options={DAY_CHOICES.map((n) => ({ value: String(n), label: `${n} days` }))}
-        />
-        <div className="sm:col-span-2">
-          <FieldChecklist pack={pack} selected={selected} onToggle={toggle} />
-        </div>
+        <fieldset disabled={!allowed} className="contents">
+          <TextField label="Recipient" value={recipient} onChange={setRecipient} />
+          <SelectField
+            label="Expires in"
+            value={days}
+            onChange={setDays}
+            options={DAY_CHOICES.map((n) => ({ value: String(n), label: `${n} days` }))}
+          />
+          <p className="text-sm sm:col-span-2">
+            Purpose: <strong>{pack.purpose}</strong> (change it with the purpose links above)
+          </p>
+          <div className="sm:col-span-2">
+            <FieldChecklist pack={pack} selected={selected} onToggle={toggle} />
+          </div>
+        </fieldset>
         <div>
           <Button type="submit" aria-busy={busy || undefined} aria-disabled={!allowed || undefined}>
             Issue export
           </Button>
         </div>
       </form>
+      <div role="status" aria-live="polite" className="sr-only">
+        {outcome?.kind === "issued" ? `Export issued for ${outcome.record.recipient}.` : ""}
+      </div>
       {outcome?.kind === "error" ? <ErrorNotice error={outcome.error} /> : null}
       {outcome?.kind === "refused" ? (
         <ExportRefusal message={outcome.error.message} details={outcome.error.details} />
       ) : null}
-      {outcome?.kind === "issued" ? <ExportResult record={outcome.record} /> : null}
+      {outcome?.kind === "issued" ? (
+        <ExportResult record={currentRecord(outcome.record, liveStatuses[outcome.record.id])} />
+      ) : null}
     </section>
   );
 }

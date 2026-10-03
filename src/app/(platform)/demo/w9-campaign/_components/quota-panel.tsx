@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SyntheticBadge } from "@/components/ui";
 import type { CreditUsage } from "@/lib/demo/types";
 
-const credits = (n: number) => `${n} demo credits`;
+const credits = (n: number) => `${n} demo ${n === 1 ? "credit" : "credits"}`;
 
 export function meterText(usage: Pick<CreditUsage, "remaining" | "credit_quota" | "exhausted">) {
   const base = `${usage.remaining} of ${credits(usage.credit_quota)} remaining`;

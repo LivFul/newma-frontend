@@ -123,9 +123,9 @@ describe("ThresholdForm", () => {
       change_reason: "tighten replicates",
       expected_version: 1,
     });
-    expect(await screen.findByRole("status")).toHaveTextContent(
-      "Protocol version 2 created, version 1 is unchanged",
-    );
+    expect(
+      await screen.findByText("Protocol version 2 created, version 1 is unchanged"),
+    ).toBeInTheDocument();
     expect(refresh).toHaveBeenCalled();
   });
 
@@ -141,6 +141,7 @@ describe("ThresholdForm", () => {
     );
     await edit(user);
     expect(await screen.findByText("Open version 2 updated (revision 2)")).toBeInTheDocument();
+    await user.type(screen.getByLabelText("Reason for the change"), "resubmit as is");
     await user.click(screen.getByRole("button", { name: "Save thresholds" }));
     expect(await screen.findByText("No change")).toBeInTheDocument();
   });
@@ -157,7 +158,8 @@ describe("ThresholdForm", () => {
     await edit(user);
     await screen.findByRole("alert");
     await user.click(screen.getByRole("button", { name: "Save thresholds" }));
-    await screen.findByRole("status");
+    await screen.findByText(/Protocol version 2 created/);
+    await user.type(screen.getByLabelText("Reason for the change"), "second attempt");
     await user.click(screen.getByRole("button", { name: "Save thresholds" }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
     const keys = [0, 1, 2].map((i) => bodyOf(fetchMock, i).idempotency_key);
@@ -175,7 +177,7 @@ describe("ThresholdForm", () => {
     await user.dblClick(screen.getByRole("button", { name: "Save thresholds" }));
     expect(fetchMock).toHaveBeenCalledTimes(1);
     release(Response.json(change("new_protocol_version", 2, 1), { status: 201 }));
-    await screen.findByRole("status");
+    await screen.findByText(/Protocol version 2 created/);
   });
 
   it("shows the current version on charter_version_conflict and refreshes", async () => {
@@ -193,6 +195,29 @@ describe("ThresholdForm", () => {
     await edit(user);
     expect(await screen.findByRole("alert")).toHaveTextContent("version 3");
     expect(refresh).toHaveBeenCalled();
+  });
+
+  it("replaces the draft with the winning thresholds after a version conflict", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        Response.json(
+          { code: "charter_version_conflict", message: "Stale.", details: { current_version: 3 } },
+          { status: 409 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        Response.json(
+          charter({ protocol_version: 3, thresholds: thresholds({ replicates_min: 8 }) }),
+        ),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<ThresholdForm charter={charter()} allowed />);
+    await edit(user);
+    await screen.findByRole("alert");
+    await waitFor(() => expect(screen.getByLabelText("Minimum replicates")).toHaveValue(8));
+    expect(screen.getByLabelText("Reason for the change")).toHaveValue("tighten replicates");
   });
 
   it("validates the reason and the ranges before posting", async () => {
@@ -278,7 +303,7 @@ describe("QuotaForm", () => {
     expect(call[0]).toBe("/api/demo/campaigns/camp-1/quota");
     expect(call[1].method).toBe("PUT");
     expect(bodyOf(fetchMock)).toEqual({ credit_quota: 200, reason: "match committed" });
-    expect(await screen.findByRole("status")).toHaveTextContent("Quota set to 200 demo credits");
+    expect(await screen.findByText(/Quota set to 200 demo credits/)).toBeInTheDocument();
     expect(refresh).toHaveBeenCalled();
   });
 
@@ -343,7 +368,7 @@ describe("JobProbe", () => {
       kind: "screening",
       payload: { estimated_credits: 10 },
     });
-    expect(await screen.findByRole("link", { name: /job-9|Open the job/ })).toHaveAttribute(
+    expect(await screen.findByRole("link", { name: /Open the job/ })).toHaveAttribute(
       "href",
       "/demo/jobs/job-9",
     );
