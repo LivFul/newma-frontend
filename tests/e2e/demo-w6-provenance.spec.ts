@@ -44,7 +44,10 @@ test.describe("W6 provenance", { tag: "@needs-backend" }, () => {
     await expect(page.getByText(/Altered field:/)).toBeVisible();
     await expect(hashes(page)).toHaveText("Hashes differ");
     await page.getByRole("button", { name: "Verify signature" }).click();
-    await expect(page.getByRole("alert").filter({ hasText: "Invalid" })).toBeVisible();
+    await expect(verifyResult(page)).toHaveText(/Invalid/);
+    await expect(page.getByRole("status", { name: "Verification result" })).toContainText(
+      "Invalid",
+    );
     await toggle.click();
     await expect(toggle).toHaveAttribute("aria-checked", "false");
     await expect(verifyResult(page)).toHaveText("Valid");

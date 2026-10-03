@@ -113,7 +113,12 @@ describe("ManifestWorkbench", () => {
     );
     expect(screen.queryByTestId("verify-result")).toBeNull();
     await user.click(screen.getByRole("button", { name: "Verify signature" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent("Invalid: signature_mismatch");
+    expect(await screen.findByTestId("verify-result")).toHaveTextContent(
+      "Invalid: signature_mismatch",
+    );
+    expect(screen.getByRole("status", { name: "Verification result" })).toHaveTextContent(
+      "Invalid",
+    );
 
     await user.click(toggle);
     await waitFor(() => expect(toggle).toHaveAttribute("aria-checked", "false"));
@@ -139,5 +144,130 @@ describe("EntityLinks", () => {
       "href",
       "/demo/w6-provenance/gate/g-1",
     );
+  });
+});
+
+describe("ManifestWorkbench races and failure modes", () => {
+  type Deferred = { resolve: (r: Response) => void };
+  const deferred = (): [Promise<Response>, Deferred] => {
+    let resolve: (r: Response) => void = () => undefined;
+    const promise = new Promise<Response>((r) => (resolve = r));
+    return [promise, { resolve }];
+  };
+
+  it("keeps Verify inert while a tamper request is in flight, and never shows a stale Valid", async () => {
+    const original = await manifestFixture();
+    const tampered = { ...(original.manifest as object), payload: { decision: "fail" } };
+    const [tamperPending, tamperGate] = deferred();
+    const verifies: unknown[] = [];
+    const fetchMock = vi.fn<(url: string, init: RequestInit) => Promise<Response>>(
+      async (url, init) => {
+        if (url.endsWith("/tamper")) return tamperPending;
+        const sent = JSON.parse(String(init.body));
+        verifies.push(sent.manifest);
+        const valid = JSON.stringify(sent.manifest) === JSON.stringify(original.manifest);
+        return Response.json({ valid, sha256: "x", reasons: valid ? [] : ["signature_mismatch"] });
+      },
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<ManifestWorkbench manifest={original} />);
+    await user.click(screen.getByRole("switch", { name: "Demo tamper toggle" }));
+    const verify = screen.getByRole("button", { name: "Verify signature" });
+    expect(verify).toHaveAttribute("aria-disabled", "true");
+    await user.click(verify);
+    expect(verifies).toHaveLength(0);
+    tamperGate.resolve(
+      Response.json({
+        event_id: "e-1",
+        manifest: tampered,
+        signature: "c2ln",
+        kid: "demo-key-1",
+        tampered_path: "payload.decision",
+        label: "Demo tamper toggle",
+      }),
+    );
+    await waitFor(() =>
+      expect(screen.getByRole("switch", { name: "Demo tamper toggle" })).toHaveAttribute(
+        "aria-checked",
+        "true",
+      ),
+    );
+    expect(screen.queryByTestId("verify-result")).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Verify signature" }));
+    expect(await screen.findByTestId("verify-result")).toHaveTextContent("Invalid");
+    expect(verifies).toEqual([tampered]);
+  });
+
+  it("a double click on Verify sends one request", async () => {
+    const original = await manifestFixture();
+    const [gate, release] = deferred();
+    const fetchMock = vi.fn<(url: string, init: RequestInit) => Promise<Response>>(() => gate);
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<ManifestWorkbench manifest={original} />);
+    const verify = screen.getByRole("button", { name: "Verify signature" });
+    await user.dblClick(verify);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    release.resolve(Response.json({ valid: true, sha256: "x", reasons: [] }));
+    expect(await screen.findByTestId("verify-result")).toHaveTextContent("Valid");
+  });
+
+  it("keeps a persistent polite status region for the verification result", async () => {
+    const original = await manifestFixture();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => Response.json({ valid: true, sha256: "x", reasons: [] })),
+    );
+    render(<ManifestWorkbench manifest={original} />);
+    const region = screen.getByRole("status", { name: "Verification result" });
+    expect(region).toHaveAttribute("aria-live", "polite");
+    expect(region).toBeEmptyDOMElement();
+    await userEvent.setup().click(screen.getByRole("button", { name: "Verify signature" }));
+    expect(await screen.findByTestId("verify-result")).toBeInTheDocument();
+    expect(screen.getByRole("status", { name: "Verification result" })).toBe(region);
+  });
+
+  it("says why it cannot canonicalise instead of hashing an empty string", async () => {
+    const original = await manifestFixture();
+    const bad = { ...original, manifest: { schema: "x", big: 1e16 } };
+    render(<ManifestWorkbench manifest={bad} />);
+    expect(await screen.findByTestId("canonical-error")).toHaveTextContent(/Cannot canonicalise/);
+    expect(screen.getByTestId("hash-comparison")).toHaveTextContent("No browser hash");
+  });
+
+  it("explains an unavailable crypto.subtle and a canonical form that differs by float spelling", async () => {
+    const original = await manifestFixture();
+    const subtle = globalThis.crypto.subtle;
+    Object.defineProperty(globalThis.crypto, "subtle", { value: undefined, configurable: true });
+    try {
+      render(
+        <ManifestWorkbench
+          manifest={{ ...original, canonical: '{"a":1.0}', manifest: { a: 1 } }}
+        />,
+      );
+      expect(await screen.findByTestId("hash-comparison")).toHaveTextContent(
+        "Browser hashing unavailable",
+      );
+      expect(screen.getByTestId("canonical-comparison")).toHaveTextContent("integral floats");
+    } finally {
+      Object.defineProperty(globalThis.crypto, "subtle", { value: subtle, configurable: true });
+    }
+  });
+});
+
+describe("JsonView tamper mark", () => {
+  it("marks the altered line inside the JSON as well as in the text", async () => {
+    const { JsonView } = await import("@/components/ui/json-view");
+    const { container } = render(
+      <JsonView
+        value={{ payload: { decision: "fail", n: 1 } }}
+        label="Manifest"
+        highlightPath="payload.decision"
+      />,
+    );
+    const marked = container.querySelector("mark");
+    expect(marked).toHaveTextContent('"decision": "fail"');
+    expect(container.querySelectorAll("mark")).toHaveLength(1);
   });
 });
