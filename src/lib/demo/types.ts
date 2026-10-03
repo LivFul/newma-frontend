@@ -83,61 +83,14 @@ export type AgentStepKey =
   | "ranking"
   | "work_package_proposal";
 
-export type AgentStepStatus = "pending" | "running" | "done" | "held" | "failed";
-export type AgentStatus = "running" | "held" | "completed" | "failed";
-
-export type Hypothesis = Readonly<{
-  rank: number;
-  compound_id: string;
-  display_id: string;
-  target_id: string;
-  score_synthetic: number;
-  score_label: "Synthetic";
-  evidence_label: "computational_prediction";
-  uncertainty: number | string;
-  limitations: readonly string[];
-}>;
-
-export type WorkPackageProposal = Readonly<Record<string, unknown>>;
-
-export type AgentQuery = Readonly<{
-  id: string;
-  label: "Simulated agent";
-  status: AgentStatus;
-  objective: string;
-  steps: readonly Readonly<{
-    key: AgentStepKey;
-    title: string;
-    status: AgentStepStatus;
-    detail: string;
-  }>[];
-  retrieval_scope: Readonly<{
-    included: readonly Readonly<{
-      subject_id: string;
-      display_name: string;
-      evidence_label: EvidenceLabel;
-    }>[];
-    withheld: readonly Readonly<{ subject_id: string; reason_code: string }>[];
-  }>;
-  budget: Readonly<{
-    requested_credits: number;
-    estimated_credits: number;
-    remaining_quota: number;
-  }>;
-  job_ids: readonly string[];
-  hypotheses: readonly Hypothesis[];
-  work_package_proposal: WorkPackageProposal | null;
-  remediation: readonly string[];
-  created_at: string;
-  updated_at: string;
-}>;
-
-export type AgentQueryRequest = Readonly<{
-  objective: string;
-  target_id: string;
-  budget_credits: number;
-  idempotency_key: string;
-}>;
+// W3 (D-13): generated from the pinned contract.
+export type AgentQuery = Schemas["AgentQueryOut"];
+export type AgentStep = Schemas["AgentStep"];
+export type AgentStepStatus = AgentStep["status"];
+export type AgentStatus = AgentQuery["status"];
+export type Hypothesis = Schemas["HypothesisOut"];
+export type WorkPackageProposal = Schemas["WorkPackageProposal"];
+export type AgentQueryRequest = Schemas["AgentQueryCreate"];
 
 export const GATE_STAGES = ["H0", "H1", "H2", "H3", "L1", "L2", "D"] as const;
 export type GateStage = (typeof GATE_STAGES)[number];

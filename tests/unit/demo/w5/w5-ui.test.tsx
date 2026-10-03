@@ -247,6 +247,10 @@ describe("WorkPackageForm", () => {
         ]}
         proposal={{
           candidate_id: "c-1",
+          compound_id: "x",
+          display_id: "DEMO-C-003",
+          estimated_cost_credits: 120,
+          note: "Proposal only",
           material_batch_id: "b-1",
           hypothesis: "H from agent",
           assay_endpoint: "IC50",

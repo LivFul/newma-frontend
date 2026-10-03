@@ -88,3 +88,22 @@ describe("P3 contract — D-12 (W2)", () => {
     }
   });
 });
+
+describe("P3 contract — D-13 (W3)", () => {
+  it("pins exactly the two agent paths (ENT-05) and drops the hand-written block", () => {
+    const agentPaths = [...schema.matchAll(/^ {4}"(\/v1\/agent[^"]*)": \{/gm)].map((m) => m[1]);
+    expect(agentPaths.sort()).toEqual(["/v1/agent/queries", "/v1/agent/queries/{agent_query_id}"]);
+    expect(contractPaths).not.toMatch(/W3Paths/);
+  });
+
+  it("derives W3 types from the generated schema", () => {
+    for (const name of [
+      "AgentQueryOut",
+      "AgentQueryCreate",
+      "HypothesisOut",
+      "WorkPackageProposal",
+    ]) {
+      expect(types).toContain(`Schemas["${name}"]`);
+    }
+  });
+});
