@@ -22,6 +22,7 @@ export function ApproveDialog({ settlementId, calculation, disabledReason }: Pro
       endpoint={`/api/demo/settlements/${encodeURIComponent(settlementId)}/approvals`}
       initial={{ rationale: "" }}
       disabledReason={disabledReason}
+      keyScope={calculation.sha256}
       toBody={(draft, key) => ({
         calculation_sha256: calculation.sha256,
         rationale: draft.rationale,

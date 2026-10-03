@@ -12,7 +12,7 @@ export function W7StateBadge<V extends W7Vocabulary>({ vocabulary, value }: Prop
   const tones: Readonly<Record<string, "neutral" | "accent" | "warning" | "danger" | "success">> =
     W7_STATE_TONES[vocabulary];
   return (
-    <Badge tone={tones[value] ?? "neutral"} data-state={value}>
+    <Badge tone={Object.hasOwn(tones, value) ? tones[value] : "neutral"} data-state={value}>
       <VisuallyHidden>Status: </VisuallyHidden>
       {humanize(value)}
     </Badge>

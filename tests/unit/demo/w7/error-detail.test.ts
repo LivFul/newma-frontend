@@ -77,3 +77,9 @@ describe("policyReasons", () => {
     expect(policyReasons(err("license_rights_not_allowed", { reasons: "x" }))).toEqual([]);
   });
 });
+
+describe("prototype keys render nothing", () => {
+  it.each(["constructor", "__proto__", "toString"])("%s", (code) => {
+    expect(errorDetailLine({ code, message: "m", details: { a: "b" } })).toBeUndefined();
+  });
+});

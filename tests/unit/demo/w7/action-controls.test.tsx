@@ -169,6 +169,20 @@ describe("ActionDialog", () => {
     expect(keyOf(fetchMock, 1)).not.toBe(keyOf(fetchMock, 0));
   });
 
+  it("mints a new key when the server-bound scope changes while open", async () => {
+    const fetchMock = vi.fn().mockImplementation(async () => refusal());
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    const { rerender } = render(dialog({ keyScope: "hash-1" }));
+    await user.click(screen.getByRole("button", { name: "Approve distribution" }));
+    await user.click(screen.getByRole("button", { name: "Confirm approval" }));
+    await screen.findByRole("alert");
+    rerender(dialog({ keyScope: "hash-2" }));
+    await user.click(screen.getByRole("button", { name: "Confirm approval" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(keyOf(fetchMock, 1)).not.toBe(keyOf(fetchMock, 0));
+  });
+
   it("is disabled with a visible reason", () => {
     render(dialog({ disabledReason: "Finance has already approved this calculation." }));
     expect(screen.getByRole("button", { name: "Approve distribution" })).toBeDisabled();

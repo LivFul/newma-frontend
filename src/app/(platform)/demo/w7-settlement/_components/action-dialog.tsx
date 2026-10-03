@@ -20,6 +20,8 @@ type Props<D> = Readonly<{
   disabledReason?: string;
   /** Receives the 2xx body; default is router.refresh(). */
   onDone?: (data: unknown) => void;
+  /** Server-bound value the body depends on (not part of the draft); a change mints a new key. */
+  keyScope?: string;
 }>;
 
 /**
@@ -39,12 +41,18 @@ export function ActionDialog<D>({
   triggerVariant,
   disabledReason,
   onDone,
+  keyScope,
 }: Props<D>) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [key, setKey] = useState("");
   const [draft, setDraft] = useState<D>(initial);
   const [error, setError] = useState<ClientError | undefined>();
+  const [scope, setScope] = useState(keyScope);
+  if (scope !== keyScope) {
+    setScope(keyScope);
+    setKey(crypto.randomUUID());
+  }
   const { busy, run } = useAction();
 
   const onOpenChange = (next: boolean) => {

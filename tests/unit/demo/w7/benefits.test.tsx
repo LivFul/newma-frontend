@@ -24,6 +24,7 @@ const item = (over: Partial<BenefitItem> = {}): BenefitItem => ({
   delivered_at: null,
   evidence_note: null,
   updated_by_persona: null,
+  synthetic: true,
   ...over,
 });
 

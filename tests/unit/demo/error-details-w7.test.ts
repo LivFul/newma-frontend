@@ -76,3 +76,12 @@ describe("W7 allow-list (Contract: fifteen codes forwarded with details)", () =>
     expect(pickDetails(code, { anything: "x" })).toBeUndefined();
   });
 });
+
+describe("prototype keys are never allow-list entries", () => {
+  it.each(["constructor", "__proto__", "toString", "hasOwnProperty"])(
+    "%s passes without details",
+    (code) => {
+      expect(pickDetails(code, { secret: "x" })).toBeUndefined();
+    },
+  );
+});

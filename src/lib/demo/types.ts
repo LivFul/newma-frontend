@@ -167,8 +167,7 @@ export type RetrainingProposal = Schemas["RetrainingProposalOut"];
 export type ElnEditResult = Schemas["ElnEditOut"];
 
 // ---------------------------------------------------------------------------------------------
-// W7 (D-17): licenses and settlements are generated from the pinned contract; the benefit,
-// beneficiary and outage shapes below follow docs/plans/p5a.md until their spec group lands.
+// W7 (D-17): every shape below is generated from the pinned contract (docs/plans/p5a.md Contract).
 // Money is an integer in demo credits, shares are integer basis points (always "Illustrative").
 // ---------------------------------------------------------------------------------------------
 // Settlements (A8–A20): generated from the pinned contract.
@@ -192,7 +191,7 @@ export type LicenseAction = Schemas["LicenseOut"]["next_actions"][number];
 export type SettlementAction = Schemas["SettlementOut"]["next_actions"][number];
 export type ReceiptStatus = Schemas["ReceiptOut"]["status"];
 export type LedgerKind = Schemas["LedgerEntryOut"]["kind"];
-export type BenefitStatus = "planned" | "scheduled" | "delivered";
+export type BenefitStatus = Schemas["BenefitItemOut"]["status"];
 export type AnchorStatus = Schemas["AnchorOut"]["status"];
 export type LicensePurpose = Schemas["LicenseOut"]["purpose"];
 
@@ -214,33 +213,7 @@ export type SettlementHistoryEntry = Schemas["HistoryEntry"];
 export type Settlement = Schemas["SettlementOut"];
 export type SettlementSummary = Schemas["SettlementSummary"];
 export type ApprovalResult = Schemas["ApprovalCreated"];
-export type BenefitItem = Readonly<{
-  id: string;
-  license_id: string;
-  license_display_id: string;
-  benefit_ref: string;
-  title: string;
-  status: BenefitStatus;
-  scheduled_for: string | null;
-  delivered_at: string | null;
-  evidence_note: string | null;
-  updated_by_persona: string | null;
-}>;
-export type Beneficiary = Readonly<{
-  id: string;
-  display_name: string;
-  channel: string;
-  received_demo_credits: number;
-  entries: readonly Readonly<{
-    settlement_id: string;
-    settlement_display_id: string;
-    amount_demo_credits: number;
-  }>[];
-  synthetic: true;
-}>;
-export type OutageState = Readonly<{
-  active: boolean;
-  label: "Optional, simulated";
-  updated_at: string | null;
-}>;
+export type BenefitItem = Schemas["BenefitItemOut"];
+export type Beneficiary = Schemas["BeneficiaryOut"];
+export type OutageState = Schemas["OutageOut"];
 export type EntityEvents = Schemas["EntityEvents"];

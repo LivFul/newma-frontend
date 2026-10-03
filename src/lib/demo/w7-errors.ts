@@ -68,7 +68,7 @@ const DESCRIBERS: Readonly<Record<string, Describe>> = {
 
 export function errorDetailLine(error: ClientError): string | undefined {
   if (!isRecord(error.details)) return undefined;
-  return DESCRIBERS[error.code]?.(error.details);
+  return Object.hasOwn(DESCRIBERS, error.code) ? DESCRIBERS[error.code](error.details) : undefined;
 }
 
 export type PolicyReasonLine = Readonly<{ code: string; message: string | undefined }>;
