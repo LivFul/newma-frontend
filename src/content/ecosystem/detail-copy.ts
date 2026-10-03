@@ -17,6 +17,7 @@ export const DETAIL_COPY = Object.freeze({
   sourcesHeading: block("detail.sources.heading", "Sources"),
   demoHeading: block("detail.demo.heading", "See it in the demo"),
   demoCta: block("detail.demo.cta", "See it in the demo", ["C-47"]),
+  ogAlt: block("detail.og.alt", "A NEWMA ecosystem component", ["C-50"]),
   signIn: block("detail.demo.signin", "Opens Demo sign-in.", ["C-47"]),
 });
 
@@ -32,3 +33,7 @@ export function demoLabelsSentence(entry: EcosystemEntry): string | null {
   const { labels } = entry.demo;
   return labels.length === 0 ? null : `In the demo this is labelled ${labels.join(", ")}.`;
 }
+
+/** Page title of a component page (claim C-50, derived). */
+export const detailTitle = (entry: EcosystemEntry): string =>
+  `${entry.title} \u2014 NEWMA ecosystem`;

@@ -4,7 +4,7 @@ import { DemoLink } from "@/components/site/demo-link";
 import { DetailHeader } from "@/components/site/detail-header";
 import { JsonLd } from "@/components/site/json-ld";
 import { SourcesList } from "@/components/site/sources-list";
-import { DETAIL_COPY } from "@/content/ecosystem/detail-copy";
+import { DETAIL_COPY, detailTitle } from "@/content/ecosystem/detail-copy";
 import {
   ECOSYSTEM,
   ECOSYSTEM_SLUGS,
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const entry = ECOSYSTEM[slug];
   return pageMetadata({
     path: `/ecosystem/${slug}`,
-    title: `${entry.title} \u2014 NEWMA ecosystem`,
+    title: detailTitle(entry),
     description: metaDescription(entry.summary),
   });
 }

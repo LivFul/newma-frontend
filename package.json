@@ -16,12 +16,13 @@
     "test:e2e": "playwright test",
     "test:a11y": "playwright test tests/a11y",
     "lhci": "lhci autorun",
-    "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test:coverage && pnpm api:check && pnpm vectors:check && bash scripts/check-demo-isolation.sh",
+    "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm claims:check && pnpm test:coverage && pnpm api:check && pnpm vectors:check && bash scripts/check-demo-isolation.sh",
     "api:check": "node scripts/api-check.mjs",
     "api:update": "node scripts/api-check.mjs --update",
     "bundle:check": "node scripts/check-client-bundle.mjs",
     "vectors:sync": "node scripts/sync-canonical-vectors.mjs --write",
-    "vectors:check": "node scripts/sync-canonical-vectors.mjs --check"
+    "vectors:check": "node scripts/sync-canonical-vectors.mjs --check",
+    "claims:check": "node scripts/check-claims.mjs"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",
@@ -29,6 +30,7 @@
     "@next/mdx": "^16.3.8",
     "@sentry/nextjs": "^11.2.0",
     "@types/mdx": "^2.0.14",
+    "@vercel/analytics": "^2.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "motion": "^13.5.0",

@@ -1,8 +1,8 @@
 import { ImageResponse } from "next/og";
-import { HERO } from "@/content/home/copy";
+import { HERO, HOME_META } from "@/content/home/copy";
 import { OG_CONTENT_TYPE, OG_SIZE, OgCard } from "@/lib/seo/og";
 
-export const alt = "NEWMA, a proposed platform for evidence-led ethnobotanical discovery";
+export const alt = HOME_META.ogAlt.text;
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 

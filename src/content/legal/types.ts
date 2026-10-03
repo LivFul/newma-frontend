@@ -20,3 +20,6 @@ export const section = (heading: CopyBlock, ...paragraphs: CopyBlock[]): LegalSe
 export const DRAFT_LABEL: CopyBlock = block("legal.draft", "Draft for review — not legal advice", [
   "C-31",
 ]);
+
+/** Page title of a legal page (claim C-30, derived). */
+export const legalTitle = (doc: LegalDocument): string => `${doc.title.text} \u2014 NEWMA`;

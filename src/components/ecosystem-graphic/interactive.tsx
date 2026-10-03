@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
 import type { EcosystemSlug } from "@/content/ecosystem/registry";
+import { trackEvent } from "@/lib/analytics/events";
 import { HERO_TOGGLE_LABEL, heroTouchAnnouncement } from "@/content/home/hero-help";
 import { HERO_SVG_ID } from "./constants";
 import { ControlsRow, TOGGLE_CLASS } from "./controls-row";
@@ -99,6 +100,8 @@ export default function Interactive({
     if (tapEffect.type === "preventNavigation") {
       event.preventDefault();
       if (tap.type === "tap" && tap.slug) setAnnouncement(heroTouchAnnouncement(tap.slug));
+    } else if (tap.type === "tap" && tap.slug) {
+      trackEvent({ name: "component_open", slug: tap.slug });
     }
     dispatch(tap);
   };

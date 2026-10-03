@@ -74,6 +74,11 @@ export const HOME_META = Object.freeze({
   title: block("home.meta.title", "NEWMA \u2014 evidence-led discovery from authorized knowledge", [
     "C-50",
   ]),
+  ogAlt: block(
+    "home.meta.ogalt",
+    "NEWMA, a proposed platform for evidence-led ethnobotanical discovery",
+    ["C-50"],
+  ),
   description: block(
     "home.meta.description",
     "NEWMA is a proposed platform that connects authorized ethnobotanical knowledge and materials to computational prioritization and scientist-approved experiments.",

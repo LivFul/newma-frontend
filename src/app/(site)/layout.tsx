@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AnalyticsMount } from "@/components/site/analytics-mount";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 
@@ -12,6 +13,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         {children}
       </main>
       <SiteFooter />
+      <AnalyticsMount />
     </>
   );
 }
