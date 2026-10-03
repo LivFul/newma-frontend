@@ -18,6 +18,14 @@ export function targetKind(baseURL: string | undefined): TargetKind {
 }
 
 /**
+ * True when Next resolves static Open Graph images against the deployment's own host: on a Vercel
+ * preview, or on a local build made with Vercel's system variables set to emulate one
+ * (`PLAYWRIGHT_EMULATE_VERCEL_PREVIEW=1`, see the README).
+ */
+export const imagesUseDeploymentHost = (kind: TargetKind): boolean =>
+  kind === "preview" || process.env.PLAYWRIGHT_EMULATE_VERCEL_PREVIEW === "1";
+
+/**
  * Vercel Deployment Protection answers the first request that carries `x-vercel-set-bypass-cookie`
  * with a 307 to the same URL that sets the bypass cookie. A test that disables redirects to inspect
  * a route's own redirect would see that one instead, so make one ordinary request first and let the

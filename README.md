@@ -37,6 +37,15 @@ sitemap and JSON-LD use it; without it a build warns and uses the placeholder pr
 not promote a preview build to production, because `robots.txt` is built per environment and a
 preview build disallows crawling. Check `/robots.txt` on production after every deploy.
 
+To reproduce a Vercel preview locally (previews disallow crawling, resolve Open Graph images on the
+branch host and have demo mode on), build with Vercel's variables set and point Playwright at it:
+
+    VERCEL=1 VERCEL_ENV=preview NEXT_PUBLIC_VERCEL_ENV=preview NEXT_PUBLIC_DEMO_MODE=true \
+      VERCEL_PROJECT_PRODUCTION_URL=newma-frontend.vercel.app \
+      VERCEL_BRANCH_URL=newma-frontend-git-example.vercel.app NEWMA_API_URL=http://127.0.0.1:9 \
+      BFF_SERVICE_TOKEN=dummy pnpm build && pnpm start --port 3100
+    PLAYWRIGHT_BASE_URL=http://localhost:3100 PLAYWRIGHT_EMULATE_VERCEL_PREVIEW=1 pnpm exec playwright test
+
 See `docs/ARCHITECTURE.md` and `PROGRESS.md`.
 
 ## Demo end-to-end run (`@needs-backend` specs)
