@@ -34,6 +34,20 @@ describe("GET /api/demo/config", () => {
     expect(sentHeaders(fetchMock).get("authorization")).toBe(`Bearer ${TOKEN}`);
   });
 
+  it("forwards only the documented config fields", async () => {
+    armBff([Response.json({ ...config, tenant_id: "t", debug: { x: 1 } })]);
+    const response = await GET(bffRequest("/api/demo/config"));
+    expect(await response.json()).toEqual(config);
+  });
+
+  it("answers 502 when the upstream body is not a config", async () => {
+    armBff([Response.json(null)]);
+    expect((await GET(bffRequest("/api/demo/config"))).status).toBe(502);
+    disarmBff();
+    armBff([Response.json({ ...config, speed_factor: { a: 1 } })]);
+    expect((await GET(bffRequest("/api/demo/config"))).status).toBe(502);
+  });
+
   it("needs a session and the demo switched on", async () => {
     armBff([]);
     expect((await GET(bffRequest("/api/demo/config", { cookie: false }))).status).toBe(401);

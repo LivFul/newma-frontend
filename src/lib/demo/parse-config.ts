@@ -28,3 +28,30 @@ export function parseSpeedChoice(choice: string): number | null | undefined {
   if (!/^\d{1,2}$/.test(choice)) return undefined;
   return parseConfigUpdate({ speed_factor: Number(choice) })?.speed_factor ?? undefined;
 }
+
+export type ConfigView = Readonly<{
+  speed_factor: number;
+  server_speed_factor: number;
+  speed_source: "server_default" | "tenant_override";
+  min_speed_factor: number;
+  max_speed_factor: number;
+}>;
+
+/** The documented config fields only, or undefined when the upstream body has another shape. */
+export function pickConfig(data: unknown): ConfigView | undefined {
+  if (!isRecord(data)) return undefined;
+  const { speed_factor, server_speed_factor, speed_source, min_speed_factor, max_speed_factor } =
+    data;
+  if (
+    typeof speed_factor !== "number" ||
+    !Number.isFinite(speed_factor) ||
+    typeof server_speed_factor !== "number" ||
+    !Number.isFinite(server_speed_factor) ||
+    typeof min_speed_factor !== "number" ||
+    typeof max_speed_factor !== "number" ||
+    (speed_source !== "server_default" && speed_source !== "tenant_override")
+  ) {
+    return undefined;
+  }
+  return { speed_factor, server_speed_factor, speed_source, min_speed_factor, max_speed_factor };
+}
