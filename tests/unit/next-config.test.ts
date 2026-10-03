@@ -32,7 +32,7 @@ describe("next.config security headers", () => {
   });
   it("adds X-Robots-Tag noindex rules for the demo, sign-in, primitives and API surfaces", async () => {
     const rules = await (nextConfig as NextConfig).headers!();
-    for (const source of ["/demo/:path*", "/access", "/primitives", "/api/:path*"]) {
+    for (const source of ["/demo/:path*", "/access/:path*", "/primitives/:path*", "/api/:path*"]) {
       const rule = rules.find((r) => r.source === source);
       expect(rule, source).toBeDefined();
       expect(rule!.headers).toEqual([{ key: "X-Robots-Tag", value: "noindex, nofollow" }]);
@@ -43,7 +43,12 @@ describe("next.config security headers", () => {
     const robotsSources = rules
       .filter((r) => r.headers.some((h) => h.key === "X-Robots-Tag"))
       .map((r) => r.source);
-    expect(robotsSources.sort()).toEqual(["/access", "/api/:path*", "/demo/:path*", "/primitives"]);
+    expect(robotsSources.sort()).toEqual([
+      "/access/:path*",
+      "/api/:path*",
+      "/demo/:path*",
+      "/primitives/:path*",
+    ]);
   });
   it("sets no Content-Security-Policy: it is deferred to the deploy-hardening item (A-P4-16)", async () => {
     const rules = await (nextConfig as NextConfig).headers!();

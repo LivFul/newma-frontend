@@ -13,10 +13,14 @@ const SECURITY_HEADERS = [
 
 // Surfaces that must stay out of the index: robots metadata plus this header, because robots.txt does
 // not disallow them (a crawler has to fetch a page to see its noindex; assumption A-P4-11).
-const NOINDEX_SOURCES = ["/demo/:path*", "/access", "/primitives", "/api/:path*"];
+const NOINDEX_SOURCES = ["/demo/:path*", "/access/:path*", "/primitives/:path*", "/api/:path*"];
 const NOINDEX_HEADERS = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
 
 const nextConfig: NextConfig = {
+  // /ecosystem has no index page: send a trimmed URL to the components list instead of a 404.
+  async redirects() {
+    return [{ source: "/ecosystem", destination: "/#components", permanent: true }];
+  },
   async headers() {
     return [
       { source: "/:path*", headers: SECURITY_HEADERS },

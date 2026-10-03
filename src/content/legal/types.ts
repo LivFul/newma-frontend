@@ -3,6 +3,8 @@ import type { CopyBlock } from "../types";
 export type LegalSection = Readonly<{ heading: CopyBlock; paragraphs: readonly CopyBlock[] }>;
 export type LegalDocument = Readonly<{
   title: CopyBlock;
+  /** Meta description (claim C-50, derived). */
+  description: CopyBlock;
   draftLabel: CopyBlock;
   sections: readonly LegalSection[];
 }>;

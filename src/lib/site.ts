@@ -32,7 +32,21 @@ function candidate(env: SiteEnv): string {
   return vercelHost ? `https://${vercelHost}` : FALLBACK_SITE_URL;
 }
 
+// A production build with neither variable set would publish canonical URLs on the placeholder host.
+// Failing the build would break local `pnpm build`, so it warns once instead (assumption A-P4-10).
+let warnedAboutFallback = false;
+function warnOnPlaceholder(env: SiteEnv): void {
+  const unset = !clean(env.NEXT_PUBLIC_SITE_URL) && !clean(env.VERCEL_PROJECT_PRODUCTION_URL);
+  if (unset && env.NODE_ENV === "production" && !warnedAboutFallback) {
+    warnedAboutFallback = true;
+    console.warn(
+      `[site] NEXT_PUBLIC_SITE_URL is not set: canonical URLs use the placeholder ${FALLBACK_SITE_URL}.`,
+    );
+  }
+}
+
 export function siteUrl(env: SiteEnv = buildEnv()): string {
+  warnOnPlaceholder(env);
   const url = candidate(env);
   if (!/^https?:\/\//.test(url)) throw new Error(`Site URL must be absolute, got "${url}".`);
   if (url.startsWith("http://") && env.NODE_ENV === "production") {

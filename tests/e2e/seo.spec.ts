@@ -117,3 +117,11 @@ test("a component page has its own canonical, title and a single TechArticle", a
   expect(scripts.map((s) => s["@type"])).toEqual(["TechArticle"]);
   expect(scripts[0].url).toBe(`${ORIGIN}/ecosystem/wet-lab`);
 });
+
+test("a trimmed /ecosystem URL redirects to the components list instead of a 404", async ({
+  request,
+}) => {
+  const response = await request.get("/ecosystem", { maxRedirects: 0 });
+  expect(response.status()).toBe(308);
+  expect(response.headers()["location"]).toMatch(/\/#components$/);
+});

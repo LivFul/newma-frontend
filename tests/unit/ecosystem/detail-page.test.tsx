@@ -96,6 +96,21 @@ describe("ecosystem detail route", () => {
     expect(container.textContent?.toLowerCase()).toContain("off-chain");
   });
 
+  it("links to the five other components, never to itself", async () => {
+    for (const slug of ECOSYSTEM_SLUGS) {
+      const { container, unmount } = await renderSlug(slug);
+      const nav = screen.getByRole("navigation", { name: "Other components" });
+      const hrefs = within(nav)
+        .getAllByRole("link")
+        .map((a) => a.getAttribute("href"));
+      expect(hrefs).toEqual(
+        ECOSYSTEM_SLUGS.filter((s) => s !== slug).map((s) => `/ecosystem/${s}`),
+      );
+      expect(container.querySelectorAll("nav").length).toBe(1);
+      unmount();
+    }
+  });
+
   it("shows no callout on the other pages", async () => {
     await renderSlug("interface");
     expect(screen.queryByRole("note")).toBeNull();

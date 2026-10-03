@@ -8,6 +8,7 @@ const ALL_PAGES = ["C-40", "C-41", "C-42", "C-43", "C-44", "C-45"] as const;
 
 // Fixed headings and sentences shared by the six detail pages.
 export const DETAIL_COPY = Object.freeze({
+  relatedHeading: block("detail.related.heading", "Other components", ["C-48"]),
   fitHeading: block("detail.fit.heading", "How it fits the platform"),
   proposed: block(
     "detail.proposed",

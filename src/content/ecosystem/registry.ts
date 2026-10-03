@@ -192,7 +192,10 @@ export function metaDescription(summary: string): string {
     if (candidate.length > MAX_DESCRIPTION_LENGTH) break;
     best = candidate;
   }
-  return best;
+  if (best) return best;
+  // No sentence ends inside the budget: cut at a word boundary rather than return nothing.
+  const cut = summary.slice(0, MAX_DESCRIPTION_LENGTH - 1).replace(/\s+\S*$/, "");
+  return `${cut}\u2026`;
 }
 
 export const HERO_CLAIMS: readonly string[] = Object.freeze(["C-48"]);

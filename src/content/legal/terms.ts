@@ -2,6 +2,11 @@ import { block, DRAFT_LABEL, section, type LegalDocument } from "./types";
 
 export const TERMS: LegalDocument = Object.freeze({
   title: block("legal.terms.title", "Terms", ["C-30"]),
+  description: block(
+    "legal.terms.description",
+    "Draft terms for the NEWMA site: a proposed platform and a demo on synthetic data that is not evidence of performance. Not legal advice.",
+    ["C-50"],
+  ),
   draftLabel: DRAFT_LABEL,
   sections: Object.freeze([
     section(

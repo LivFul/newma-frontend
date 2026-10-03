@@ -39,8 +39,13 @@ describe("JSON-LD builders", () => {
       for (const forbidden of ["datePublished", "dateModified", "author", "citation"]) {
         expect(article).not.toHaveProperty(forbidden);
       }
-      expect(article.isPartOf).toEqual({ "@id": websiteJsonLd()["@id"] });
-      expect(article.publisher).toEqual({ "@id": organizationJsonLd()["@id"] });
+      expect(article.isPartOf).toMatchObject({ "@type": "WebSite", "@id": websiteJsonLd()["@id"] });
+      expect(article.publisher).toMatchObject({
+        "@type": "Organization",
+        "@id": organizationJsonLd()["@id"],
+        name: "LivFul",
+      });
+      expect(article.mainEntityOfPage).toBe(`${FALLBACK_SITE_URL}/ecosystem/${slug}`);
     }
   });
   it("uses the canonical origin even when VERCEL_URL is set", () => {

@@ -38,8 +38,11 @@ export function techArticleJsonLd(slug: EcosystemSlug) {
     headline: entry.title,
     description: metaDescription(entry.summary),
     url: absoluteUrl(`/ecosystem/${slug}`),
-    isPartOf: { "@id": siteId() },
-    publisher: { "@id": orgId() },
+    mainEntityOfPage: absoluteUrl(`/ecosystem/${slug}`),
+    // Inlined, not bare @id references: structured data is read per page, and these nodes are only
+    // defined in full on the home page.
+    isPartOf: { "@type": "WebSite", "@id": siteId(), name: SITE_NAME, url: absoluteUrl("/") },
+    publisher: { "@type": "Organization", "@id": orgId(), name: "LivFul", url: absoluteUrl("/") },
     inLanguage: "en",
   } as const;
 }

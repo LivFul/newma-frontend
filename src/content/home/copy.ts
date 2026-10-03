@@ -81,7 +81,7 @@ export const HOME_META = Object.freeze({
   ),
   description: block(
     "home.meta.description",
-    "NEWMA is a proposed platform that connects authorized ethnobotanical knowledge and materials to computational prioritization and scientist-approved experiments.",
+    "NEWMA is a proposed platform that connects authorized ethnobotanical knowledge to computational prioritization and scientist-approved experiments.",
     ["C-50"],
   ),
 });

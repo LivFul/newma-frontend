@@ -75,6 +75,8 @@ describe("legal metadata", () => {
       const { metadata } = await import(`@/app/(site)/legal/${page}/page`);
       expect(metadata.robots).toEqual({ index: false, follow: true });
       expect(metadata.alternates?.canonical).toBe(`/legal/${page}`);
+      expect(String(metadata.description).length).toBeGreaterThanOrEqual(MIN);
+      expect(String(metadata.description).length).toBeLessThanOrEqual(MAX);
     }
   });
 });

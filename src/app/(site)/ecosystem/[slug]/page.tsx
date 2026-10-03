@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { DemoLink } from "@/components/site/demo-link";
 import { DetailHeader } from "@/components/site/detail-header";
 import { JsonLd } from "@/components/site/json-ld";
+import { RelatedComponents } from "@/components/site/related-components";
 import { SourcesList } from "@/components/site/sources-list";
 import { DETAIL_COPY, detailTitle } from "@/content/ecosystem/detail-copy";
 import {
@@ -54,6 +55,7 @@ export default async function EcosystemPage({ params }: Params) {
       <p className="mt-12 max-w-[62ch] text-sm text-fg-muted">{DETAIL_COPY.proposed.text}</p>
       <SourcesList entry={entry} />
       <DemoLink entry={entry} />
+      <RelatedComponents current={slug} />
     </article>
   );
 }

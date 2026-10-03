@@ -8,7 +8,7 @@ import { LEGAL_APPROVED } from "@/lib/site";
 export const metadata = pageMetadata({
   path: "/legal/privacy",
   title: legalTitle(PRIVACY),
-  description: PRIVACY.sections[0]!.paragraphs[0]!.text,
+  description: PRIVACY.description.text,
   index: LEGAL_APPROVED,
 });
 
