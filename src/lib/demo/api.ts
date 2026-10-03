@@ -99,6 +99,8 @@ export async function demoFetch<T = unknown>(
     headers: buildHeaders(serviceToken, init),
     body: init.body === undefined ? undefined : JSON.stringify(init.body),
     cache: "no-store",
+    // The bearer token is attached: a redirect is an error, never followed.
+    redirect: "error",
   });
   if (!response.ok) throw new DemoApiError(response.status, await parseError(response));
   const data = response.status === 204 ? undefined : ((await response.json()) as T);

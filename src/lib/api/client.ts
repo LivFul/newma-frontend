@@ -21,5 +21,6 @@ export function createApiClient({
     Authorization: `Bearer ${serviceToken}`,
     ...(sessionId ? { "X-Demo-Session": sessionId } : {}),
   };
-  return createClient<paths>({ baseUrl, headers, fetch });
+  // The bearer token is attached: a redirect is an error, never followed.
+  return createClient<paths>({ baseUrl, headers, fetch, redirect: "error" });
 }
