@@ -132,7 +132,7 @@ Tests: pickers keep documented keys and drop everything else (table test over th
 - axe scan of the page (pack, result and refusal states).
 
 - [x] Commit: `feat(demo): W8 partner evidence pack and controlled export with withheld fields, refusal reasons and export register`
-- [ ] `pnpm api:update` when the D-18 W8 spec lands; commit `chore(api): refresh pinned contract (D-18 W8)`
+- [x] `pnpm api:update` when the D-18 W8 spec lands; commit `chore(api): refresh pinned contract (D-18 W8)`
 
 ## D-18 — W9 campaign charter and quotas
 
@@ -149,7 +149,7 @@ Tests: pickers keep documented keys and drop everything else (table test over th
 - axe scan.
 
 - [x] Commit: `feat(demo): W9 campaign charter with protocol versions, credit quota panel and quota-refusal probe`
-- [ ] `pnpm api:update` (D-18 W9); commit `chore(api): refresh pinned contract (D-18 W9)`
+- [x] `pnpm api:update` (D-18 W9); commit `chore(api): refresh pinned contract (D-18 W9)`
 
 ## D-19 — W10 custodian view
 
@@ -184,7 +184,7 @@ Tests: pickers keep documented keys and drop everything else (table test over th
 **Manual pass `docs/A11Y_MANUAL_PASS_W10.md`** (same style as `docs/A11Y_MANUAL_PASS.md`): keyboard only; VoiceOver in Safari then Chrome (landmarks, headings, table navigation of the obligations, the `<details>` forms, the status and alert regions); 200% zoom and 320 px reflow; Slow 3G throttle (A-P5B-F03); reading-level read-through of every string; "no information by colour alone". The controller logs each line in `PROGRESS.md` under "Manual accessibility log (P5)".
 
 - [x] Commit: `feat(demo): W10 low-bandwidth custodian view with plain-language agreements, obligation status and no-JS grievance form`
-- [ ] `pnpm api:update` (D-19); commit `chore(api): refresh pinned contract (D-19)`
+- [x] `pnpm api:update` (D-19); commit `chore(api): refresh pinned contract (D-19)`
 
 ### Task 7: Phase gate before the tour
 
@@ -230,7 +230,7 @@ Tests (Vitest): `steps.test.ts` (ids unique and ordered; every persona valid; ev
 **Manual timed run (controller, at the end of P5; logged in `PROGRESS.md` under "Guided tour timed run (P5)" using `docs/DEMO_TOUR_RUN.md`):** on the preview or production URL at the server default speed (4×), a person follows the tour from step 1 to 16 with a clock, notes every moment the next action was unclear or blocked, and records the total (target 12–15 minutes, no dead ends). Failing the range or finding a dead end reopens this task.
 
 - [ ] Commit: `feat(demo): guided tour with persistent panel, persona switch, reset and demo-speed control`
-- [ ] `pnpm api:update` (D-20); commit `chore(api): refresh pinned contract (D-20)`
+- [x] `pnpm api:update` (D-20); commit `chore(api): refresh pinned contract (D-20)`
 
 ### Task 9: Phase exit, axe sweep, PROGRESS
 
