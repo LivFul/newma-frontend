@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState } from "react";
-import { Button } from "@/components/ui";
+import { Button } from "@/components/ui/button";
 import { type ClientError, postJson } from "@/lib/demo/client";
 import type { ExportRecord, ExportStatus } from "@/lib/demo/types";
 import { useAction } from "@/lib/demo/use-action";

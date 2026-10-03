@@ -1,4 +1,5 @@
-import { Badge, type BadgeProps, SyntheticBadge } from "@/components/ui";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
+import { SyntheticBadge } from "@/components/ui/synthetic-badge";
 import type { RightsRecord, RightsStatus } from "@/lib/demo/types";
 import { humanize } from "../../_components/fields";
 import { WithdrawDialog } from "./withdraw-dialog";
