@@ -168,7 +168,9 @@ describe("W3 review fixes", () => {
       />,
     );
     fetchMock.mockClear();
-    screen.getByRole("form", { name: "Ask the simulated agent" }).requestSubmit();
+    (
+      screen.getByRole("form", { name: "Ask the simulated agent" }) as HTMLFormElement
+    ).requestSubmit();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

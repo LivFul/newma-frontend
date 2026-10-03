@@ -26,9 +26,14 @@ export function uuid5(namespace: string, name: string): string {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
+/** The tenant's seeded targets; an unexpected tenant id yields none (the form then has no target). */
 export function seededTargets(tenantId: string): readonly TargetOption[] {
-  return SEED_TARGETS.map((t) => ({
-    id: uuid5(tenantId, t.fixture_id),
-    display_name: t.display_name,
-  }));
+  try {
+    return SEED_TARGETS.map((t) => ({
+      id: uuid5(tenantId, t.fixture_id),
+      display_name: t.display_name,
+    }));
+  } catch {
+    return [];
+  }
 }
