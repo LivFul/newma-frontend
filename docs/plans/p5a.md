@@ -175,9 +175,9 @@ TDD steps:
 
 TDD steps:
 
-- [ ] Failing Vitest first: label text present; failed check shows reason and disables approve with the explanation; deny stays enabled; reasons list renders from `details`; decision dialog double submit sends one key; create button hidden for other personas; events link target.
-- [ ] Implement.
-- [ ] Commit: `feat(demo): W7 license page with simulated credential check, decision and signed event list`
+- [x] Failing Vitest first: label text present; failed check shows reason and disables approve with the explanation; deny stays enabled; reasons list renders from `details`; decision dialog double submit sends one key; create button hidden for other personas; events link target.
+- [x] Implement.
+- [x] Commit: `feat(demo): W7 license page with simulated credential check, decision and signed event list`
 
 ### Task 5: Settlement workspace, part 1 — header, stepper, receipts, review, dispute, resolve
 

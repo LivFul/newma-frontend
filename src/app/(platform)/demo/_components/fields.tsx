@@ -7,7 +7,7 @@ const CONTROL =
 type SelectFieldProps = Readonly<{
   label: string;
   value: string;
-  options: readonly Readonly<{ value: string; label: string }>[];
+  options: readonly Readonly<{ value: string; label: string; disabled?: boolean }>[];
   onChange: (value: string) => void;
   name?: string;
 }>;
@@ -27,7 +27,7 @@ export function SelectField({ label, value, options, onChange, name }: SelectFie
         className={CONTROL}
       >
         {options.map((option) => (
-          <option key={option.value} value={option.value}>
+          <option key={option.value} value={option.value} disabled={option.disabled}>
             {option.label}
           </option>
         ))}
