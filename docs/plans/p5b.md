@@ -183,7 +183,7 @@ Tests: pickers keep documented keys and drop everything else (table test over th
 
 **Manual pass `docs/A11Y_MANUAL_PASS_W10.md`** (same style as `docs/A11Y_MANUAL_PASS.md`): keyboard only; VoiceOver in Safari then Chrome (landmarks, headings, table navigation of the obligations, the `<details>` forms, the status and alert regions); 200% zoom and 320 px reflow; Slow 3G throttle (A-P5B-F03); reading-level read-through of every string; "no information by colour alone". The controller logs each line in `PROGRESS.md` under "Manual accessibility log (P5)".
 
-- [ ] Commit: `feat(demo): W10 low-bandwidth custodian view with plain-language agreements, obligation status and no-JS grievance form`
+- [x] Commit: `feat(demo): W10 low-bandwidth custodian view with plain-language agreements, obligation status and no-JS grievance form`
 - [ ] `pnpm api:update` (D-19); commit `chore(api): refresh pinned contract (D-19)`
 
 ### Task 7: Phase gate before the tour

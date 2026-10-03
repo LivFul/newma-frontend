@@ -4,6 +4,8 @@ import type {
   CampaignSummary,
   CharterOut,
   CreditUsage,
+  CustodianAgreement,
+  CustodianView,
   ExportRecord,
   FieldDisclosure,
   Grievance,
@@ -176,5 +178,62 @@ export const grievance = (over: Partial<Grievance> = {}): Grievance => ({
   acknowledged_at: null,
   acknowledged_by_persona: null,
   event_id: "evt-g1",
+  ...over,
+});
+
+export const custodianAgreement = (over: Partial<CustodianAgreement> = {}): CustodianAgreement => ({
+  rights_record_id: "rec-1",
+  title: "Exemplaria viridis — fictional, shared by Community Cooperative A — fictional",
+  authority: "Community Cooperative A — fictional",
+  status: "valid",
+  status_text: "This agreement is in force.",
+  validity_text: "It runs from 1 January 2026 and has no end date.",
+  uses_allowed: [{ purpose: "research", text: "Research use is allowed." }],
+  uses_not_allowed: [
+    { purpose: "commercial", text: "Selling or licensing for profit is not allowed." },
+  ],
+  obligations: [
+    {
+      id: "ob-1",
+      text: "Send a yearly progress report",
+      due_on: null,
+      status: "fulfilled",
+      status_text: "Done on 12 February 2026",
+      fulfilled_on: "2026-02-12",
+    },
+    {
+      id: "ob-2",
+      text: "Share a summary of results",
+      due_on: "2027-03-31",
+      status: "due",
+      status_text: "Due by 31 March 2027",
+      fulfilled_on: null,
+    },
+    {
+      id: "ob-3",
+      text: "Offer a training day",
+      due_on: "2025-12-31",
+      status: "overdue",
+      status_text: "Late: was due on 31 December 2025",
+      fulfilled_on: null,
+    },
+  ],
+  grievances: [],
+  can_raise_grievance: true,
+  ...over,
+});
+
+export const custodianView = (over: Partial<CustodianView> = {}): CustodianView => ({
+  generated_at: "2030-01-01T00:00:00Z",
+  summary: {
+    agreements: 1,
+    uses_allowed: 1,
+    obligations: 3,
+    obligations_fulfilled: 1,
+    obligations_overdue: 1,
+    open_grievances: 0,
+  },
+  agreements: [custodianAgreement()],
+  synthetic: true,
   ...over,
 });
