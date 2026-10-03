@@ -17,6 +17,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/agent/queries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start a scripted agent query (Simulated agent; signed event) */
+        post: operations["agent_create_agent_query"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/agent/queries/{agent_query_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read an agent query; step statuses follow the simulated jobs */
+        get: operations["agent_get_agent_query"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/compounds": {
         parameters: {
             query?: never;
@@ -381,6 +415,87 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AgentQueryCreate */
+        AgentQueryCreate: {
+            /** Budget Credits */
+            budget_credits: number;
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+            /** Objective */
+            objective: string;
+            /**
+             * Target Id
+             * Format: uuid
+             */
+            target_id: string;
+        };
+        /** AgentQueryOut */
+        AgentQueryOut: {
+            budget: components["schemas"]["Budget"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Hypotheses */
+            hypotheses: components["schemas"]["HypothesisOut"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Job Ids */
+            job_ids: string[];
+            /**
+             * Label
+             * @constant
+             */
+            label: "Simulated agent";
+            /** Objective */
+            objective: string;
+            /** Remediation */
+            remediation: string[];
+            retrieval_scope: components["schemas"]["RetrievalScope"];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "running" | "held" | "completed" | "failed";
+            /** Steps */
+            steps: components["schemas"]["AgentStep"][];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            work_package_proposal: components["schemas"]["WorkPackageProposal"] | null;
+        };
+        /** AgentStep */
+        AgentStep: {
+            /** Detail */
+            detail: string;
+            /** Key */
+            key: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "running" | "done" | "held" | "failed";
+            /** Title */
+            title: string;
+        };
+        /** Budget */
+        Budget: {
+            /** Estimated Credits */
+            estimated_credits: number;
+            /** Remaining Quota */
+            remaining_quota: number;
+            /** Requested Credits */
+            requested_credits: number;
+        };
         /** CacheEntryOut */
         CacheEntryOut: {
             /**
@@ -538,6 +653,51 @@ export interface components {
             status: "ok";
             /** Version */
             version: string;
+        };
+        /** HypothesisOut */
+        HypothesisOut: {
+            /**
+             * Compound Id
+             * Format: uuid
+             */
+            compound_id: string;
+            /** Display Id */
+            display_id: string;
+            /**
+             * Evidence Label
+             * @constant
+             */
+            evidence_label: "computational_prediction";
+            /** Limitations */
+            limitations: string[];
+            /** Rank */
+            rank: number;
+            /**
+             * Score Label
+             * @constant
+             */
+            score_label: "Synthetic";
+            /** Score Synthetic */
+            score_synthetic: number;
+            /**
+             * Target Id
+             * Format: uuid
+             */
+            target_id: string;
+            /** Uncertainty */
+            uncertainty: string;
+        };
+        /** IncludedSubject */
+        IncludedSubject: {
+            /** Display Name */
+            display_name: string;
+            /** Evidence Label */
+            evidence_label: string;
+            /**
+             * Subject Id
+             * Format: uuid
+             */
+            subject_id: string;
         };
         /** IngestionRunCreate */
         IngestionRunCreate: {
@@ -908,6 +1068,13 @@ export interface components {
              */
             tenant_id: string;
         };
+        /** RetrievalScope */
+        RetrievalScope: {
+            /** Included */
+            included: components["schemas"]["IncludedSubject"][];
+            /** Withheld */
+            withheld: components["schemas"]["WithheldSubject"][];
+        };
         /** RightsRecordCreate */
         RightsRecordCreate: {
             /** Authority */
@@ -1085,6 +1252,51 @@ export interface components {
             invalidated_cache_entries: components["schemas"]["CacheEntryOut"][];
             record: components["schemas"]["RightsRecordOut"];
         };
+        /** WithheldSubject */
+        WithheldSubject: {
+            /** Reason Code */
+            reason_code: string;
+            /**
+             * Subject Id
+             * Format: uuid
+             */
+            subject_id: string;
+        };
+        /**
+         * WorkPackageProposal
+         * @description A proposal only: the scientist submits it to `POST /v1/work-packages` (IS-07, ENT-05).
+         */
+        WorkPackageProposal: {
+            /** Assay Endpoint */
+            assay_endpoint: string;
+            /** Candidate Id */
+            candidate_id: string | null;
+            /**
+             * Compound Id
+             * Format: uuid
+             */
+            compound_id: string;
+            /** Concentrations Um */
+            concentrations_um: number[];
+            /** Controls */
+            controls: string[];
+            /** Deliverables */
+            deliverables: string[];
+            /** Display Id */
+            display_id: string;
+            /** Estimated Cost Credits */
+            estimated_cost_credits: number;
+            /** Hypothesis */
+            hypothesis: string;
+            /** Material Batch Id */
+            material_batch_id: string | null;
+            /** Note */
+            note: string;
+            /** Protocol Version */
+            protocol_version: string;
+            /** Replicates */
+            replicates: number;
+        };
     };
     responses: never;
     parameters: never;
@@ -1110,6 +1322,164 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    agent_create_agent_query: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AgentQueryCreate"];
+            };
+        };
+        responses: {
+            /** @description Replay of an existing idempotency key */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentQueryOut"];
+                };
+            };
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentQueryOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description target_not_found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description idempotency_conflict: same key, different body */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    agent_get_agent_query: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                agent_query_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentQueryOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };
