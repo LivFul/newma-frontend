@@ -142,6 +142,35 @@ describe("withheld values never pass (Review Focus 2)", () => {
     expect(clean).toMatchObject({ status, disclosed: [] });
   });
 
+  it("fails closed: a value survives only on a row that says disclosed", () => {
+    const odd = { ...hostile("withheld"), status: "Redacted" };
+    const clean = nullWithheldValues({ fields: [odd, "junk", null, hostile("disclosed")] }) as {
+      fields: { value: unknown }[];
+    };
+    expect(clean.fields.map((f) => f.value)).toEqual([null, "SECRET"]);
+    expect((nullWithheldValues({ fields: { a: 1 } }) as { fields: unknown }).fields).toEqual([]);
+  });
+
+  it("allowlists export keys and drops a body-like extra key", () => {
+    const clean = sanitiseExport({
+      id: "e",
+      status: "suspended",
+      body: "LEAK",
+      manifest: { x: 1 },
+      disclosed: { not: "a list" },
+      withheld: [hostile("disclosed"), 5],
+    }) as Record<string, unknown>;
+    expect(clean).not.toHaveProperty("body");
+    expect(clean).not.toHaveProperty("manifest");
+    expect(clean.disclosed).toEqual([]);
+    expect((clean.withheld as { value: unknown }[]).map((w) => w.value)).toEqual([null]);
+    const active = sanitiseExport({ status: "active", disclosed: "x", withheld: null }) as Record<
+      string,
+      unknown
+    >;
+    expect(active.disclosed).toEqual([]);
+  });
+
   it("passes non-record input through untouched", () => {
     expect(nullWithheldValues(null)).toBeNull();
     expect(sanitiseExport("x")).toBe("x");

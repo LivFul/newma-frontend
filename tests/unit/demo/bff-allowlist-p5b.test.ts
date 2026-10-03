@@ -65,6 +65,13 @@ describe("P5b error details pickers (Review Focus: no echoed input)", () => {
     ).toBeUndefined();
   });
 
+  it.each(["constructor", "__proto__", "toString", "valueOf", "hasOwnProperty"])(
+    "never runs an inherited property for the code %s",
+    (code) => {
+      expect(pickDetails(code, { secret: "x" })).toBeUndefined();
+    },
+  );
+
   it("keeps the earlier P3 pickers working", () => {
     expect(pickDetails("job_terminal", { state: "FAILED", ...extra })).toEqual({ state: "FAILED" });
   });

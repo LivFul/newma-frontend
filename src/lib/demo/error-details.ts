@@ -48,5 +48,5 @@ const PICKERS: Readonly<Record<string, Picker>> = {
 
 /** The browser-safe details for a backend error code, or undefined (omit the field). */
 export function pickDetails(code: string, details: unknown): unknown {
-  return PICKERS[code]?.(details);
+  return Object.hasOwn(PICKERS, code) ? PICKERS[code](details) : undefined;
 }

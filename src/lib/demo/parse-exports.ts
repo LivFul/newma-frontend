@@ -1,4 +1,4 @@
-import { isBoundedStringArray, isRecord, oneOf, withIdempotencyKey } from "./guards";
+import { isBoundedStringArray, isRecord, oneOf, pick, withIdempotencyKey } from "./guards";
 import { isSafeId } from "./safe-id";
 import { EXPORT_PURPOSES, GATE_STAGES } from "./types";
 
@@ -70,30 +70,49 @@ export function parseLimitQuery(params: URLSearchParams): { limit?: string } | u
   return /^[0-9]{1,3}$/.test(limit) && value >= 1 && value <= MAX_LIMIT ? { limit } : undefined;
 }
 
-// Defence in depth (Review Focus 2): a withheld row never carries a value, whatever upstream sends.
-type Row = Record<string, unknown>;
-
-function nullRow(row: unknown, forceWithheld: boolean): unknown {
-  if (!isRecord(row)) return row;
-  return forceWithheld || row.status === "withheld" ? { ...row, value: null } : row;
+// Defence in depth (Review Focus 2), failing closed: a value survives only on a row that says
+// "disclosed"; rows that are not records are dropped and a rows field that is not a list is empty.
+function cleanRow(row: unknown, forceWithheld: boolean): Record<string, unknown>[] {
+  if (!isRecord(row)) return [];
+  return [forceWithheld || row.status !== "disclosed" ? { ...row, value: null } : row];
 }
 
-const mapRows = (rows: unknown, forceWithheld: boolean): unknown =>
-  Array.isArray(rows) ? rows.map((row) => nullRow(row, forceWithheld)) : rows;
+const cleanRows = (rows: unknown, forceWithheld: boolean): Record<string, unknown>[] =>
+  Array.isArray(rows) ? rows.flatMap((row) => cleanRow(row, forceWithheld)) : [];
 
-/** A copy of an evidence pack whose withheld rows have `value: null`. */
+/** A copy of an evidence pack whose non-disclosed rows have `value: null`. */
 export function nullWithheldValues(pack: unknown): unknown {
   if (!isRecord(pack)) return pack;
-  return { ...pack, fields: mapRows(pack.fields, false) } satisfies Row;
+  return { ...pack, fields: cleanRows(pack.fields, false) };
 }
 
-/** A copy of an export record: withheld rows nulled; the body is dropped unless `active`. */
+const EXPORT_KEYS = [
+  "id",
+  "asset_id",
+  "display_id",
+  "stage",
+  "package_version",
+  "recipient",
+  "purpose",
+  "expires_at",
+  "status",
+  "created_at",
+  "created_by_persona",
+  "policy_decision_id",
+  "event_id",
+  "body_sha256",
+  "suspended_reasons",
+  "signature_label",
+  "synthetic",
+] as const;
+
+/** An allowlisted copy of an export record: no unknown keys, body only while `active`. */
 export function sanitiseExport(record: unknown): unknown {
   if (!isRecord(record)) return record;
   const active = record.status === "active";
   return {
-    ...record,
-    disclosed: active ? mapRows(record.disclosed, false) : [],
-    withheld: mapRows(record.withheld, true),
-  } satisfies Row;
+    ...pick(record, EXPORT_KEYS),
+    disclosed: active ? cleanRows(record.disclosed, false) : [],
+    withheld: cleanRows(record.withheld, true),
+  };
 }
