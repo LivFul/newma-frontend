@@ -9,11 +9,13 @@ import {
 } from "../support/demo";
 
 const ROUTE = "/demo/w1-rights";
+// next dev compiles the BFF route and re-renders the page on the first withdrawal.
+const SLOW_MS = 20_000;
 
-async function evaluate(page: Page, status: string, purpose: string, action: string) {
+async function evaluate(page: Page, optionText: string, purpose: string, action: string) {
   const asset = page.getByLabel("Asset");
   const value = await asset
-    .locator("option", { hasText: `(${status})` })
+    .locator("option", { hasText: optionText })
     .first()
     .getAttribute("value");
   await asset.selectOption(value ?? "");
@@ -32,7 +34,7 @@ test.describe("W1 rights and policy", { tag: "@needs-backend" }, () => {
     await signIn(page, "community_liaison");
     await page.goto(ROUTE);
     await expect(banner(page)).toContainText(DEMO_BANNER_TEXT);
-    const card = await evaluate(page, "valid", "research", "retrieve");
+    const card = await evaluate(page, "(valid)", "research", "retrieve");
     await expect(decision(page)).toHaveText(/allow/);
     await expect(card).toContainText("rights_valid_for_purpose");
     await expect(page.getByRole("list", { name: "Retrieval cache entries" })).toContainText(
@@ -43,24 +45,31 @@ test.describe("W1 rights and policy", { tag: "@needs-backend" }, () => {
   test("w1 expired holds, commercial denies, withdrawal invalidates cache", async ({ page }) => {
     await signIn(page, "community_liaison");
     await page.goto(ROUTE);
-    let card = await evaluate(page, "expired", "research", "retrieve");
+    let card = await evaluate(page, "(expired)", "research", "retrieve");
     await expect(decision(page)).toHaveText(/hold/);
     await expect(card).toContainText("Remediation:");
-    card = await evaluate(page, "purpose restricted", "commercial", "commercialise");
+    card = await evaluate(page, "(purpose restricted)", "commercial", "commercialise");
     await expect(decision(page)).toHaveText(/deny/);
 
-    await evaluate(page, "valid", "research", "retrieve");
+    // Withdraw the first valid subject; the same subject is evaluated before and after.
+    const optionLabel = await page
+      .getByLabel("Asset")
+      .locator("option", { hasText: "(valid)" })
+      .first()
+      .textContent();
+    const subject = (optionLabel ?? "").replace(/ \(valid\)$/, "");
+    await evaluate(page, `${subject} (valid)`, "research", "retrieve");
     await expect(decision(page)).toHaveText(/allow/);
-    const validRow = page.getByTestId("rights-row-valid");
+    const validRow = page.getByTestId("rights-row-valid").filter({ hasText: subject });
     await validRow.getByRole("button", { name: /Withdraw consent/ }).click();
     await page.getByLabel("Reason").fill("The fictional community withdrew consent");
     await page.getByRole("button", { name: "Confirm withdrawal" }).click();
-    await expect(page.getByRole("dialog")).toBeHidden();
+    await expect(page.getByRole("dialog")).toBeHidden({ timeout: SLOW_MS });
     // Review Focus 1: no stale allow survives the withdrawal.
-    await expect(decision(page)).toHaveCount(0);
+    await expect(decision(page)).toHaveCount(0, { timeout: SLOW_MS });
     const cache = page.getByRole("list", { name: "Retrieval cache entries" });
     await expect(cache.locator('[data-invalidated="true"]').first()).toContainText("Invalidated");
-    await evaluate(page, "withdrawn", "research", "retrieve");
+    await evaluate(page, `${subject} (withdrawn)`, "research", "retrieve");
     await expect(decision(page)).toHaveText(/deny/);
     await expect(page.getByRole("region", { name: "Policy decision" })).toContainText(
       "consent_withdrawn",
