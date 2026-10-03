@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { ASSET_TYPES, POLICY_ACTIONS, PURPOSES, SUBJECT_TYPES } from "@/lib/demo/types";
@@ -8,7 +8,9 @@ const root = path.resolve(__dirname, "../../..");
 const read = (file: string) => readFileSync(path.join(root, file), "utf8");
 const schema = read("src/lib/api/generated/schema.d.ts");
 const types = read("src/lib/demo/types.ts");
-const contractPaths = read("src/lib/demo/contract-paths.ts");
+// The hand-written path block is gone once every D-item is pinned.
+const contractPathsFile = path.join(root, "src/lib/demo/contract-paths.ts");
+const contractPaths = existsSync(contractPathsFile) ? read("src/lib/demo/contract-paths.ts") : "";
 
 const enumOf = (schemaName: string, field: string): string[] => {
   const block = schema.slice(schema.indexOf(`        ${schemaName}: {`));
@@ -162,5 +164,42 @@ describe("P3 contract — D-16 (W6)", () => {
     const { ENTITY_TYPES } = await import("@/lib/demo/types");
     const line = schema.split("\n").find((l) => l.includes('entity_type: "rights_record"')) ?? "";
     expect([...ENTITY_TYPES]).toEqual([...line.matchAll(/"([a-z_]+)"/g)].map((m) => m[1]));
+  });
+});
+
+describe("P3 contract — D-15 (W5)", () => {
+  it("pins the W5 paths and drops the last hand-written block", () => {
+    for (const p of [
+      "/v1/material-batches",
+      "/v1/work-packages",
+      "/v1/work-packages/{work_package_id}",
+      "/v1/assay-imports",
+      "/v1/assay-imports/{import_id}/acceptance",
+      "/v1/reconciliation",
+      "/v1/reconciliation/items/{item_id}/disposition",
+      "/v1/demo/eln/records/{record_id}/edit",
+      "/v1/retraining-proposals",
+      "/v1/retraining-proposals/{proposal_id}/execute",
+    ]) {
+      expect(schema).toContain(`"${p}": {`);
+    }
+    expect(contractPaths).not.toMatch(/W5Paths/);
+    expect(existsSync(contractPathsFile)).toBe(false);
+  });
+
+  it("derives W5 types from the generated schema", () => {
+    for (const name of [
+      "MaterialBatchOut",
+      "WorkPackageOut",
+      "AssayImportOut",
+      "GateEffect",
+      "ReconciliationOut",
+      "ReconItemOut",
+      "RetrainingProposalOut",
+      "ElnEditOut",
+      "WorkPackageCreate",
+    ]) {
+      expect(types).toContain(`Schemas["${name}"]`);
+    }
   });
 });

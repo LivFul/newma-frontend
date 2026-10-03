@@ -1,7 +1,6 @@
 import "server-only";
 import type { paths } from "@/lib/api/generated/schema";
 import { createApiClient, type ApiClient } from "@/lib/api/server";
-import type { ContractPath } from "./contract-paths";
 import type { DemoErrorEnvelope } from "./types";
 
 // Server-only access to the Railway API (D-09/D-10). `demoFetch` is a thin wrapper whose paths are
@@ -10,7 +9,7 @@ import type { DemoErrorEnvelope } from "./types";
 type TemplatePath<P extends string> = P extends `${infer Head}{${string}}${infer Tail}`
   ? `${Head}${string}${TemplatePath<Tail>}`
   : P;
-export type DemoPath = TemplatePath<keyof paths & string> | ContractPath;
+export type DemoPath = TemplatePath<keyof paths & string>;
 export type { DemoErrorEnvelope };
 
 const INVALID_SESSION_CODES: ReadonlySet<string> = new Set(["invalid_session", "session_expired"]);

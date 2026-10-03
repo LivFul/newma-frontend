@@ -22,7 +22,7 @@ function Branch({
 }: {
   label: string;
   states: readonly LoopState[];
-  current: LoopState | null;
+  current: string | null;
 }) {
   return (
     <div className="space-y-1">
@@ -42,7 +42,8 @@ function Branch({
   );
 }
 
-type Props = Readonly<{ assayState: LoopState; learningState: LoopState | null }>;
+// The backend types loop states as plain strings; the lists above are the TA §3 vocabulary.
+type Props = Readonly<{ assayState: string; learningState: string | null }>;
 
 export function LoopDiagram({ assayState, learningState }: Props) {
   return (

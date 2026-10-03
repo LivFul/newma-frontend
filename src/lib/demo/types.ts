@@ -130,18 +130,9 @@ export type EventManifest = Schemas["ManifestOut"];
 export type VerifyResult = Schemas["VerifyOut"];
 export type TamperResult = Schemas["TamperOut"];
 
-export type MaterialBatch = Readonly<{
-  id: string;
-  compound_id: string;
-  batch_ref: string;
-  quantity_mg: number;
-  purity_synthetic: number;
-  availability: "available" | "reserved" | "unavailable";
-  identity_accepted: boolean;
-  synthetic: boolean;
-}>;
+// W5 (D-15): generated from the pinned contract.
+export type MaterialBatch = Schemas["MaterialBatchOut"];
 
-// TA §3 wet-lab loop states, exactly the backend lab/state_machine.py LAB_STATES.
 export const LOOP_STATES = [
   "authorization",
   "prioritization",
@@ -165,80 +156,12 @@ export const LOOP_STATES = [
 ] as const;
 export type LoopState = (typeof LOOP_STATES)[number];
 
-export type WorkPackageStatus =
-  "held" | "submitted" | "executing" | "results_available" | "in_review" | "accepted";
-
-export type WorkPackage = Readonly<{
-  id: string;
-  candidate_id: string;
-  material_batch_id: string;
-  status: WorkPackageStatus;
-  loop_state: LoopState;
-  learning_loop_state: LoopState | null;
-  material_gate: Readonly<{
-    passed: boolean;
-    reasons: readonly Readonly<{ code: string; message: string }>[];
-  }>;
-  eln: Readonly<{ adapter_label: "Mock ELN"; record_id: string; revision: number }> | null;
-  job_id: string | null;
-  holds: readonly Readonly<{ code: string; disposition: string | null }>[];
-  created_at: string;
-}>;
-
-export type WorkPackageRequest = Readonly<{
-  candidate_id: string;
-  material_batch_id: string;
-  hypothesis: string;
-  assay_endpoint: string;
-  protocol_version: string;
-  controls: readonly string[];
-  concentrations_um: readonly number[];
-  replicates: number;
-  deliverables: readonly string[];
-  scenario: "standard" | "missing_sample";
-  idempotency_key: string;
-}>;
-
-export type AssayImport = Readonly<{
-  id: string;
-  work_package_id: string;
-  eln_record_id: string;
-  eln_revision: number;
-  checksum_sha256: string;
-  duplicate_detection_key: string;
-  status: "quarantined" | "reconciled" | "accepted" | "needs_review" | "superseded";
-  observation_ids: readonly string[];
-  duplicate: boolean;
-  gate_effect?: Readonly<{ gate_id: string; stage: "H2"; status_after: GateStatus }>;
-}>;
-
-export type ReconciliationItem = Readonly<{
-  id: string;
-  sample_ref: string;
-  status: "matched" | "missing" | "substituted" | "mislabeled" | "insufficient";
-  disposition: string | null;
-  owner_persona: string;
-  rationale: string | null;
-}>;
-
-export type Reconciliation = Readonly<{
-  work_package_id: string;
-  status: "reconciled" | "hold";
-  items: readonly ReconciliationItem[];
-}>;
-
-export type Disposition = "repeat_sample" | "exclude_sample" | "accept_with_deviation";
-
-export type RetrainingProposal = Readonly<{
-  id: string;
-  status: "blocked_pending_authorization";
-  reason: string;
-  source_import_id: string;
-  created_at: string;
-}>;
-
-export type ElnEditResult = Readonly<{
-  record_id: string;
-  revision: number;
-  adapter_label: "Mock ELN";
-}>;
+export type WorkPackageStatus = Schemas["WorkPackageOut"]["status"];
+export type WorkPackage = Schemas["WorkPackageOut"];
+export type WorkPackageRequest = Schemas["WorkPackageCreate"];
+export type AssayImport = Schemas["AssayImportOut"] & { gate_effect?: Schemas["GateEffect"] };
+export type ReconciliationItem = Schemas["ReconItemOut"];
+export type Reconciliation = Schemas["ReconciliationOut"];
+export type Disposition = Schemas["DispositionRequest"]["disposition"];
+export type RetrainingProposal = Schemas["RetrainingProposalOut"];
+export type ElnEditResult = Schemas["ElnEditOut"];
