@@ -251,6 +251,7 @@ Resolved by `pnpm install` on 2026-10-02 (create-next-app defaults accepted).
 | eslint / eslint-config-next                      | 9.39.5 / 16.3.8         |
 | prettier                                         | 3.9.9                   |
 | @sentry/nextjs                                   | 11.2.0                  |
+| motion (P4)                                      | 13.5.0 (`motion/react` exports `LazyMotion`, `m`, `domAnimation`, `useReducedMotion`; verified in `node_modules/framer-motion/dist/index.d.ts`) |
 
 ### P2 exit evidence (live, 2026-10-02)
 

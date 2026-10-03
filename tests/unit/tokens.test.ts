@@ -16,7 +16,7 @@ const cssFiles = (dir: string): string[] =>
 
 describe("design tokens", () => {
   it("every declared text/background pair meets 4.5:1", () => {
-    const vars = parseCssVars(read("color.css"));
+    const vars = { ...parseCssVars(read("color.css")), ...parseCssVars(read("ecosystem.css")) };
     const pairs = JSON.parse(read("contrast-pairs.json")) as {
       fg: string;
       bg: string;
@@ -38,6 +38,20 @@ describe("design tokens", () => {
         p.min,
       );
     }
+  });
+
+  it("declares the ecosystem hues and the display, header tokens", () => {
+    const eco = parseCssVars(read("ecosystem.css"));
+    for (const name of [
+      "--color-eco-compute",
+      "--color-eco-optional",
+      "--font-display",
+      "--text-display",
+      "--size-header",
+    ]) {
+      expect(eco[name], name).toBeDefined();
+    }
+    expect(read("index.css")).toContain('@import "./ecosystem.css"');
   });
 
   it("zeros every motion duration under prefers-reduced-motion", () => {
