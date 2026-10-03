@@ -65,6 +65,7 @@
   fill-opacity: 0.12;
 }
 .eco-glyph {
+  color: var(--eco-ink);
   fill: none;
   stroke: var(--eco-ink);
   stroke-width: 1.8px;

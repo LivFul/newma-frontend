@@ -2,8 +2,8 @@ import createMDX from "@next/mdx";
 import { withSentryConfig } from "@sentry/nextjs/config";
 import type { NextConfig } from "next";
 
-// Baseline security headers for every route. A Content-Security-Policy is deliberately absent until
-// P4 decides the hero/analytics origins.
+// Baseline security headers for every route. A Content-Security-Policy stays deferred to the
+// deploy-hardening item (assumption A-P4-16): inline JSON-LD and the Next runtime need nonces.
 const SECURITY_HEADERS = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
@@ -11,9 +11,17 @@ const SECURITY_HEADERS = [
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
 ];
 
+// Surfaces that must stay out of the index: robots metadata plus this header, because robots.txt does
+// not disallow them (a crawler has to fetch a page to see its noindex; assumption A-P4-11).
+const NOINDEX_SOURCES = ["/demo/:path*", "/access", "/primitives", "/api/:path*"];
+const NOINDEX_HEADERS = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
+
 const nextConfig: NextConfig = {
   async headers() {
-    return [{ source: "/:path*", headers: SECURITY_HEADERS }];
+    return [
+      { source: "/:path*", headers: SECURITY_HEADERS },
+      ...NOINDEX_SOURCES.map((source) => ({ source, headers: NOINDEX_HEADERS })),
+    ];
   },
 };
 

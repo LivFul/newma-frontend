@@ -68,3 +68,15 @@ export const COMPONENTS_INDEX = Object.freeze({
 export const ABOUT = Object.freeze({
   heading: block("home.about.heading", "About LivFul"),
 });
+
+// Meta description of the home page (claim C-50, derived: no new claim).
+export const HOME_META = Object.freeze({
+  title: block("home.meta.title", "NEWMA \u2014 evidence-led discovery from authorized knowledge", [
+    "C-50",
+  ]),
+  description: block(
+    "home.meta.description",
+    "NEWMA is a proposed platform that connects authorized ethnobotanical knowledge and materials to computational prioritization and scientist-approved experiments.",
+    ["C-50"],
+  ),
+});

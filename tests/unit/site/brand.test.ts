@@ -8,6 +8,10 @@ const vars = parseCssVars(
   readFileSync(path.resolve(__dirname, "../../../src/styles/tokens/color.css"), "utf8"),
 );
 
+const eco = parseCssVars(
+  readFileSync(path.resolve(__dirname, "../../../src/styles/tokens/ecosystem.css"), "utf8"),
+);
+
 describe("brand constants", () => {
   it("equal the values parsed from src/styles/tokens/color.css", () => {
     expect(BACKGROUND_HEX).toBe(vars["--color-bg"]);
@@ -16,5 +20,10 @@ describe("brand constants", () => {
     expect(BRAND_HEX.foreground).toBe(vars["--color-fg"]);
     expect(BRAND_HEX.muted).toBe(vars["--color-fg-muted"]);
     expect(BRAND_HEX.accent).toBe(vars["--color-accent"]);
+    expect(BRAND_HEX.warning).toBe(vars["--color-warning"]);
+    expect(BRAND_HEX.success).toBe(vars["--color-success"]);
+    expect(BRAND_HEX.borderStrong).toBe(vars["--color-border-strong"]);
+    expect(BRAND_HEX.ecoCompute).toBe(eco["--color-eco-compute"]);
+    expect(BRAND_HEX.ecoOptional).toBe(eco["--color-eco-optional"]);
   });
 });

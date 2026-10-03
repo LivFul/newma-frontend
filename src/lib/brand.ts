@@ -6,5 +6,10 @@ export const BRAND_HEX = Object.freeze({
   foreground: "#f3f5f9",
   muted: "#b7bfd1",
   accent: "#7cc4ff",
+  warning: "#ffd27a",
+  success: "#8fe3b4",
+  borderStrong: "#6b7694",
+  ecoCompute: "#b69cff",
+  ecoOptional: "#ff9a85",
 });
 export const BACKGROUND_HEX = BRAND_HEX.background;
