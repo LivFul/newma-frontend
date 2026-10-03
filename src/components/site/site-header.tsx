@@ -11,9 +11,9 @@ export function SiteHeader() {
       data-site-header
       className="sticky top-0 z-40 min-h-[var(--size-header)] border-b border-border bg-bg"
     >
-      <div className="mx-auto flex min-h-[var(--size-header)] max-w-6xl items-center justify-between gap-4 px-4 md:px-8">
+      <div className="mx-auto flex min-h-[var(--size-header)] max-w-6xl flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-1 md:px-8">
         <Wordmark />
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 sm:gap-6">
           <nav aria-label={HEADER_NAV_LABEL.text} className="hidden items-center gap-6 md:flex">
             {NAV_LINKS.map((link) => (
               <a
@@ -25,7 +25,7 @@ export function SiteHeader() {
               </a>
             ))}
           </nav>
-          <AccessLink variant="primary" className="min-h-11 whitespace-nowrap">
+          <AccessLink variant="primary" className="min-h-11 px-3 text-sm sm:px-4 sm:text-base">
             {ACCESS_LABEL.text}
           </AccessLink>
         </div>

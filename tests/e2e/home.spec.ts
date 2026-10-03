@@ -1,5 +1,6 @@
 import { expect, test } from "../support/test";
 import { SLUGS } from "../support/hero";
+import { forceWideFont, horizontalOverflow, overflowingElements } from "../support/reflow";
 
 test("home responds 200 with one h1 and the page landmarks", async ({ page }) => {
   const response = await page.goto("/");
@@ -56,3 +57,15 @@ test("the in-page anchors resolve to sections", async ({ page }) => {
   await page.getByRole("link", { name: "How it works" }).first().click();
   await expect(page).toHaveURL(/#product$/);
 });
+
+for (const path of ["/", "/ecosystem/provenance-dlt", "/legal/privacy"]) {
+  test(`${path} does not scroll sideways at 320 px even with a wide fallback font`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto(path);
+    await forceWideFont(page);
+    expect(await overflowingElements(page)).toEqual([]);
+    expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
+  });
+}
