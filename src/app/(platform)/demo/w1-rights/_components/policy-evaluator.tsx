@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui";
 import { type ClientError, postJson } from "@/lib/demo/client";
 import { useAction } from "@/lib/demo/use-action";
@@ -45,7 +45,10 @@ export function PolicyEvaluator({ records, tenantId, persona }: Props) {
   const { busy, run } = useAction();
 
   // A decision belongs to the inputs it was evaluated for: changing any input clears it.
+  // The generation also drops any response still in flight for the previous inputs.
+  const generation = useRef(0);
   const changed = (set: (value: string) => void) => (value: string) => {
+    generation.current += 1;
     setDecision(undefined);
     set(value);
   };
@@ -56,9 +59,11 @@ export function PolicyEvaluator({ records, tenantId, persona }: Props) {
     const assetId = separator > 0 ? asset.slice(separator + 1) : "";
     if (busy || !assetId) return;
     setError(undefined);
+    const issued = generation.current;
     void run(async () => {
       const body = { purpose, action, asset_type: assetType as AssetType, asset_id: assetId };
       const result = await postJson<PolicyDecision>("/api/demo/policy/evaluate", body);
+      if (generation.current !== issued) return;
       if (!result.ok) {
         setDecision(undefined);
         return setError(result.error);

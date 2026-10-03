@@ -198,3 +198,27 @@ describe("PolicyEvaluator", () => {
     expect(screen.queryByTestId("policy-decision")).toBeNull();
   });
 });
+
+describe("PolicyEvaluator in-flight inputs", () => {
+  it("never shows a decision evaluated for inputs that changed while it was in flight", async () => {
+    let release: (r: Response) => void = () => undefined;
+    const pending = new Promise<Response>((resolve) => (release = resolve));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<(url: string, init: RequestInit) => Promise<Response>>(() => pending),
+    );
+    const user = userEvent.setup();
+    render(
+      <PolicyEvaluator records={[record("valid")]} tenantId="t-1" persona="community_liaison" />,
+    );
+    await user.click(screen.getByRole("button", { name: "Evaluate policy" }));
+    await user.selectOptions(screen.getByLabelText("Purpose"), "commercial");
+    release(Response.json(decision("allow", "rights_valid_for_purpose", null)));
+    await vi.waitFor(() =>
+      expect(screen.getByRole("button", { name: "Evaluate policy" })).not.toHaveAttribute(
+        "aria-busy",
+      ),
+    );
+    expect(screen.queryByTestId("policy-decision")).toBeNull();
+  });
+});
