@@ -17,6 +17,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/compounds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Page compounds */
+        get: operations["evidence_list_compounds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/curation/claims/{claim_id}/decisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve or reject a pending claim (signed event) */
+        post: operations["curation_decide_curation_claim"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/curation/queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Curation queue of extracted claims */
+        get: operations["curation_list_curation_queue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/curation/releases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish a versioned curated release of approved claims (signed event) */
+        post: operations["curation_create_curated_release"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/curation/source-records": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Source records and their clearance status (synthetic) */
+        get: operations["curation_list_source_records"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/demo/keys": {
         parameters: {
             query?: never;
@@ -103,6 +188,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/ingestion/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ingest a cleared source: rights check first, then scripted extraction */
+        post: operations["curation_create_ingestion_run"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/jobs": {
         parameters: {
             query?: never;
@@ -149,6 +251,23 @@ export interface paths {
         put?: never;
         /** Cancel a job that has not finished */
         post: operations["jobs_cancel_job"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/observations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Page observations; values withheld when rights do not allow retrieval */
+        get: operations["evidence_list_observations"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -241,6 +360,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/taxa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Page taxa */
+        get: operations["evidence_list_taxa"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -281,6 +417,90 @@ export interface components {
             /** Subject Type */
             subject_type: string;
         };
+        /** ClaimDecisionRequest */
+        ClaimDecisionRequest: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "approve" | "reject";
+            /** Rationale */
+            rationale: string;
+        };
+        /** ClaimOut */
+        ClaimOut: {
+            /** Confidence */
+            confidence: number;
+            /**
+             * Evidence Label
+             * @enum {string}
+             */
+            evidence_label: "literature_reported" | "tentative_annotation" | "computational_prediction" | "measured_observation" | "scientist_accepted" | "unresolved_conflicting";
+            /** Extraction Method */
+            extraction_method: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Quarantine Reason */
+            quarantine_reason: string | null;
+            /** Release Id */
+            release_id: string | null;
+            /** Reviewed At */
+            reviewed_at: string | null;
+            /** Reviewer Persona */
+            reviewer_persona: string | null;
+            /** Source Location */
+            source_location: string;
+            /**
+             * Source Record Id
+             * Format: uuid
+             */
+            source_record_id: string;
+            /** Statement Synthetic */
+            statement_synthetic: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending_review" | "quarantined" | "approved" | "rejected" | "released";
+            /**
+             * Subject Id
+             * Format: uuid
+             */
+            subject_id: string;
+            /** Subject Type */
+            subject_type: string;
+        };
+        /** CompoundOut */
+        CompoundOut: {
+            /** Display Id */
+            display_id: string;
+            /** Evidence */
+            evidence: components["schemas"]["EvidenceRefOut"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Identity Status
+             * @enum {string}
+             */
+            identity_status: "reported_in_taxon" | "detected_in_sample" | "tentatively_annotated" | "isolated_structure_confirmed";
+            /** Quarantined */
+            quarantined: boolean;
+            /**
+             * Stereochemistry Status
+             * @enum {string}
+             */
+            stereochemistry_status: "defined" | "ambiguous";
+            /** Synthetic */
+            synthetic: boolean;
+            /** Withheld Fields */
+            withheld_fields: string[];
+        };
         /** DemoKeys */
         DemoKeys: {
             /** Keys */
@@ -297,6 +517,18 @@ export interface components {
             /** Message */
             message: string;
         };
+        /** EvidenceRefOut */
+        EvidenceRefOut: {
+            /** Claim Id */
+            claim_id?: string | null;
+            /**
+             * Label
+             * @enum {string}
+             */
+            label: "literature_reported" | "tentative_annotation" | "computational_prediction" | "measured_observation" | "scientist_accepted" | "unresolved_conflicting";
+            /** Source Ref */
+            source_ref?: string | null;
+        };
         /** HealthResponse */
         HealthResponse: {
             /**
@@ -307,15 +539,58 @@ export interface components {
             /** Version */
             version: string;
         };
+        /** IngestionRunCreate */
+        IngestionRunCreate: {
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+            /**
+             * Source Record Id
+             * Format: uuid
+             */
+            source_record_id: string;
+        };
+        /** IngestionRunOut */
+        IngestionRunOut: {
+            /** Claims */
+            claims: components["schemas"]["ClaimOut"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Policy Decision Id
+             * Format: uuid
+             */
+            policy_decision_id: string;
+            /**
+             * Source Record Id
+             * Format: uuid
+             */
+            source_record_id: string;
+        };
         /** ItemList[CacheEntryOut] */
         ItemList_CacheEntryOut_: {
             /** Items */
             items: components["schemas"]["CacheEntryOut"][];
         };
+        /** ItemList[ClaimOut] */
+        ItemList_ClaimOut_: {
+            /** Items */
+            items: components["schemas"]["ClaimOut"][];
+        };
         /** ItemList[RightsRecordOut] */
         ItemList_RightsRecordOut_: {
             /** Items */
             items: components["schemas"]["RightsRecordOut"][];
+        };
+        /** ItemList[SourceRecordOut] */
+        ItemList_SourceRecordOut_: {
+            /** Items */
+            items: components["schemas"]["SourceRecordOut"][];
         };
         /** JobCreate */
         JobCreate: {
@@ -403,6 +678,71 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /** ObservationOut */
+        ObservationOut: {
+            /** Compound Id */
+            compound_id: string | null;
+            /** Concentration Um */
+            concentration_um: number | null;
+            /** Endpoint */
+            endpoint: string;
+            /**
+             * Evidence Label
+             * @enum {string}
+             */
+            evidence_label: "literature_reported" | "tentative_annotation" | "computational_prediction" | "measured_observation" | "scientist_accepted" | "unresolved_conflicting";
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Out Of Domain */
+            out_of_domain: boolean;
+            /** Qualifier */
+            qualifier: string;
+            /** Replicate Index */
+            replicate_index: number;
+            /** Revision */
+            revision: number;
+            /** Run Status */
+            run_status: string;
+            /** Superseded */
+            superseded: boolean;
+            /** Synthetic */
+            synthetic: boolean;
+            /**
+             * Target Id
+             * Format: uuid
+             */
+            target_id: string;
+            /** Units */
+            units: string;
+            /** Value */
+            value: number | null;
+            /** Withheld Fields */
+            withheld_fields: string[];
+        };
+        /** Page[CompoundOut] */
+        Page_CompoundOut_: {
+            /** Items */
+            items: components["schemas"]["CompoundOut"][];
+            /** Next Cursor */
+            next_cursor: string | null;
+        };
+        /** Page[ObservationOut] */
+        Page_ObservationOut_: {
+            /** Items */
+            items: components["schemas"]["ObservationOut"][];
+            /** Next Cursor */
+            next_cursor: string | null;
+        };
+        /** Page[TaxonOut] */
+        Page_TaxonOut_: {
+            /** Items */
+            items: components["schemas"]["TaxonOut"][];
+            /** Next Cursor */
+            next_cursor: string | null;
         };
         /** PersonaRequest */
         PersonaRequest: {
@@ -526,6 +866,35 @@ export interface components {
             use: string;
             /** X */
             x: string;
+        };
+        /** ReleaseCreate */
+        ReleaseCreate: {
+            /** Claim Ids */
+            claim_ids: string[];
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+        };
+        /** ReleaseOut */
+        ReleaseOut: {
+            /** Claim Ids */
+            claim_ids: string[];
+            /**
+             * Event Id
+             * Format: uuid
+             */
+            event_id: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Manifest Sha256 */
+            manifest_sha256: string;
+            /** Version */
+            version: number;
         };
         /** ResetResult */
         ResetResult: {
@@ -655,6 +1024,51 @@ export interface components {
              */
             tenant_id: string;
         };
+        /** SourceRecordOut */
+        SourceRecordOut: {
+            /**
+             * Clearance Status
+             * @enum {string}
+             */
+            clearance_status: "cleared" | "uncleared";
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Rights Record Id */
+            rights_record_id: string | null;
+            /** Source Ref */
+            source_ref: string;
+            /** Source Type */
+            source_type: string;
+            /** Synthetic */
+            synthetic: boolean;
+            /** Title */
+            title: string;
+        };
+        /** TaxonOut */
+        TaxonOut: {
+            /** Accepted Name */
+            accepted_name: string;
+            /** Display Name */
+            display_name: string;
+            /** Evidence */
+            evidence: components["schemas"]["EvidenceRefOut"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Synonyms */
+            synonyms: string[];
+            /** Synthetic */
+            synthetic: boolean;
+            /** Verification Status */
+            verification_status: string;
+            /** Withheld Fields */
+            withheld_fields: string[];
+        };
         /** WithdrawRequest */
         WithdrawRequest: {
             /** Reason */
@@ -696,6 +1110,348 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    evidence_list_compounds: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor from `next_cursor` */
+                cursor?: string | null;
+                limit?: number;
+            };
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_CompoundOut_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description invalid_cursor or validation_error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    curation_decide_curation_claim: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                claim_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClaimDecisionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClaimOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such claim */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description claim_quarantined or claim_already_decided */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    curation_list_curation_queue: {
+        parameters: {
+            query?: {
+                status?: ("pending_review" | "quarantined" | "approved" | "rejected" | "released") | null;
+            };
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemList_ClaimOut_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    curation_create_curated_release: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReleaseCreate"];
+            };
+        };
+        responses: {
+            /** @description Replay of an existing idempotency key */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReleaseOut"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReleaseOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description claim_not_approved: details.claim_ids lists them; idempotency_conflict: same key, different body */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    curation_list_source_records: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemList_SourceRecordOut_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };
@@ -996,6 +1752,95 @@ export interface operations {
             };
         };
     };
+    curation_create_ingestion_run: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IngestionRunCreate"];
+            };
+        };
+        responses: {
+            /** @description Replay of an existing idempotency key */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IngestionRunOut"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IngestionRunOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such source record */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description source_not_cleared: rejected before ingestion, no claims created; idempotency_conflict: same key, different body */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     jobs_list_jobs: {
         parameters: {
             query?: never;
@@ -1226,6 +2071,70 @@ export interface operations {
                 };
             };
             /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    evidence_list_observations: {
+        parameters: {
+            query?: {
+                compound_id?: string | null;
+                evidence_label?: ("literature_reported" | "tentative_annotation" | "computational_prediction" | "measured_observation" | "scientist_accepted" | "unresolved_conflicting") | null;
+                /** @description Opaque cursor from `next_cursor` */
+                cursor?: string | null;
+                limit?: number;
+            };
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_ObservationOut_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description invalid_cursor or validation_error */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -1637,6 +2546,68 @@ export interface operations {
                 };
             };
             /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    evidence_list_taxa: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor from `next_cursor` */
+                cursor?: string | null;
+                limit?: number;
+            };
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_TaxonOut_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description invalid_cursor or validation_error */
             422: {
                 headers: {
                     [name: string]: unknown;
