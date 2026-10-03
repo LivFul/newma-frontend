@@ -10,19 +10,32 @@ import {
 } from "@/lib/provenance/canonical";
 import { sha256Hex } from "@/lib/provenance/sha256";
 
-type Vector = { name: string; input: unknown; canonical: string; sha256: string };
+type Vector = { name: string; input: unknown; canonical: string; sha256: string; scope?: string };
 const vectors: Vector[] = JSON.parse(
   readFileSync(path.resolve(__dirname, "../../fixtures/canonical/vectors.json"), "utf8"),
 );
 
-describe("canonicalJson matches the backend vectors byte-for-byte", () => {
-  it("has vectors", () => expect(vectors.length).toBeGreaterThan(0));
+// "python_only" vectors hold integral floats / -0.0, which JavaScript cannot represent after a
+// JSON round trip; the browser must flag them (hasIntegralFloatRisk), never claim a match.
+const shared = vectors.filter((v) => v.scope !== "python_only");
+const pythonOnly = vectors.filter((v) => v.scope === "python_only");
 
-  it.each(vectors.map((v) => [v.name, v] as const))("%s", async (_name, vector) => {
+describe("canonicalJson matches the backend vectors byte-for-byte", () => {
+  it("has vectors", () => expect(shared.length).toBeGreaterThan(0));
+
+  it.each(shared.map((v) => [v.name, v] as const))("%s", async (_name, vector) => {
     const canonical = canonicalJson(vector.input);
     expect(canonical).toBe(vector.canonical);
     expect(await sha256Hex(canonical)).toBe(vector.sha256);
   });
+
+  it.each(pythonOnly.map((v) => [v.name, v] as const))(
+    "%s (python_only) differs in the browser and is detectable in the server's canonical text",
+    (_name, vector) => {
+      expect(canonicalJson(vector.input)).not.toBe(vector.canonical);
+      expect(hasIntegralFloatRisk(vector.canonical)).toBe(true);
+    },
+  );
 });
 
 describe("canonicalJson rules", () => {
