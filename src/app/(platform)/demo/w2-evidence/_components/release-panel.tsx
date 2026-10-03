@@ -1,11 +1,14 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui";
 import { type ClientError, postJson } from "@/lib/demo/client";
 import { useStableKey } from "@/lib/demo/idempotency";
 import type { Claim, CuratedRelease } from "@/lib/demo/types";
+import { useAction } from "@/lib/demo/use-action";
 import { ErrorNotice } from "../../_components/error-notice";
+
+const isDefiniteRefusal = (status: number) => status >= 400 && status < 500;
 
 /** Publishes every approved claim as one curated release; one key per release attempt. */
 export function ReleasePanel({ claims, allowed }: { claims: readonly Claim[]; allowed: boolean }) {
@@ -13,20 +16,21 @@ export function ReleasePanel({ claims, allowed }: { claims: readonly Claim[]; al
   const { key, reset } = useStableKey();
   const [release, setRelease] = useState<CuratedRelease | undefined>();
   const [error, setError] = useState<ClientError | undefined>();
-  const [pending, startTransition] = useTransition();
+  const { busy, run } = useAction();
   const approved = claims.filter((claim) => claim.status === "approved");
 
   const publish = () => {
-    if (pending || !allowed || approved.length === 0) return;
+    if (busy || !allowed || approved.length === 0) return;
     setError(undefined);
-    startTransition(async () => {
+    void run(async () => {
       const result = await postJson<CuratedRelease>("/api/demo/curation/releases", {
         claim_ids: approved.map((claim) => claim.id),
         idempotency_key: key,
       });
       if (!result.ok) {
-        // The approved set may change before a retry: a new attempt gets a new key.
-        reset();
+        // A definite refusal committed nothing and the approved set may change before a retry;
+        // after a network failure or 5xx the outcome is unknown, so the same key is kept.
+        if (isDefiniteRefusal(result.status)) reset();
         return setError(result.error);
       }
       setRelease(result.data);
@@ -42,7 +46,7 @@ export function ReleasePanel({ claims, allowed }: { claims: readonly Claim[]; al
       </p>
       <Button
         onClick={publish}
-        aria-busy={pending || undefined}
+        aria-busy={busy || undefined}
         aria-disabled={!allowed || approved.length === 0 || undefined}
       >
         Publish curated release

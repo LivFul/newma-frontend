@@ -1,5 +1,5 @@
 import { EvidenceLabelBadge } from "@/components/evidence/evidence-label-badge";
-import { Badge } from "@/components/ui";
+import { Badge, SyntheticBadge } from "@/components/ui";
 import type { Claim } from "@/lib/demo/types";
 import { humanize } from "../../_components/fields";
 import { ClaimReviewDialog } from "./claim-review-dialog";
@@ -27,9 +27,9 @@ export function CurationQueue({ claims, allowed }: { claims: readonly Claim[]; a
               <span className="text-fg-muted">{humanize(claim.quarantine_reason)}</span>
             ) : null}
             <span className="text-fg-muted">
-              {claim.source_location} · {claim.extraction_method} · confidence {claim.confidence}{" "}
-              (synthetic)
+              {claim.source_location} · {claim.extraction_method} · confidence {claim.confidence}
             </span>
+            <SyntheticBadge />
             {reviewable(claim) ? <ClaimReviewDialog claim={claim} allowed={allowed} /> : null}
           </div>
         </li>

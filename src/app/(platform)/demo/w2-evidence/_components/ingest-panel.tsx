@@ -1,10 +1,11 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Badge, Button } from "@/components/ui";
 import { type ClientError, postJson } from "@/lib/demo/client";
 import { isRecord } from "@/lib/demo/guards";
 import type { IngestionRun, SourceRecord } from "@/lib/demo/types";
+import { useAction } from "@/lib/demo/use-action";
 import { ErrorNotice } from "../../_components/error-notice";
 
 type Reason = Readonly<{ code: string; message?: string }>;
@@ -37,14 +38,14 @@ function SourceRow({ source }: { source: SourceRecord }) {
   const router = useRouter();
   const [error, setError] = useState<ClientError | undefined>();
   const [run, setRun] = useState<IngestionRun | undefined>();
-  const [pending, startTransition] = useTransition();
+  const { busy, run: act } = useAction();
   // One key per source row: a double click replays the same ingestion.
   const [key] = useState(() => crypto.randomUUID());
 
   const ingest = () => {
-    if (pending || run) return;
+    if (busy || run) return;
     setError(undefined);
-    startTransition(async () => {
+    void act(async () => {
       const result = await postJson<IngestionRun>("/api/demo/ingestion/runs", {
         source_record_id: source.id,
         idempotency_key: key,
@@ -65,7 +66,7 @@ function SourceRow({ source }: { source: SourceRecord }) {
         <Button
           size="sm"
           onClick={ingest}
-          aria-busy={pending || undefined}
+          aria-busy={busy || undefined}
           aria-disabled={run ? true : undefined}
           aria-label={`Ingest ${source.title}`}
         >
@@ -77,12 +78,14 @@ function SourceRow({ source }: { source: SourceRecord }) {
       ) : (
         <ErrorNotice error={error} />
       )}
-      {run ? (
-        <p role="status" className="text-sm">
-          {run.claims.length} claim{run.claims.length === 1 ? "" : "s"} extracted into the curation
-          queue.
-        </p>
-      ) : null}
+      <div role="status" aria-live="polite">
+        {run ? (
+          <p className="text-sm">
+            {run.claims.length} claim{run.claims.length === 1 ? "" : "s"} extracted into the
+            curation queue.
+          </p>
+        ) : null}
+      </div>
     </li>
   );
 }

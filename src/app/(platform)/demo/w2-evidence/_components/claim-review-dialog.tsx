@@ -1,11 +1,14 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
-import { Button, Dialog, DialogContent, DialogTrigger } from "@/components/ui";
+import { useRef, useState } from "react";
+import { Button, Dialog, DialogContent, DialogTrigger, SyntheticBadge } from "@/components/ui";
 import { type ClientError, postJson } from "@/lib/demo/client";
 import type { Claim } from "@/lib/demo/types";
+import { useAction } from "@/lib/demo/use-action";
 import { ErrorNotice } from "../../_components/error-notice";
 import { TextField } from "../../_components/fields";
+
+export const QUEUE_HEADING_ID = "queue-heading";
 
 type Props = Readonly<{ claim: Claim; allowed: boolean }>;
 
@@ -20,7 +23,8 @@ export function ClaimReviewDialog({ claim, allowed }: Props) {
   const [open, setOpen] = useState(false);
   const [rationale, setRationale] = useState("");
   const [error, setError] = useState<ClientError | undefined>();
-  const [pending, startTransition] = useTransition();
+  const { busy, run } = useAction();
+  const decided = useRef(false);
   const name = `Review claim ${claim.statement_synthetic}`;
 
   if (!allowed) {
@@ -32,10 +36,10 @@ export function ClaimReviewDialog({ claim, allowed }: Props) {
   }
 
   const decide = (decision: "approve" | "reject") => {
-    if (pending) return;
+    if (busy) return;
     if (!rationale.trim()) return setError(RATIONALE_REQUIRED);
     setError(undefined);
-    startTransition(async () => {
+    void run(async () => {
       const result = await postJson<Claim>(
         `/api/demo/curation/claims/${encodeURIComponent(claim.id)}/decisions`,
         {
@@ -46,6 +50,7 @@ export function ClaimReviewDialog({ claim, allowed }: Props) {
       if (!result.ok) return setError(result.error);
       setOpen(false);
       router.refresh();
+      decided.current = true;
     });
   };
 
@@ -64,7 +69,16 @@ export function ClaimReviewDialog({ claim, allowed }: Props) {
           Review
         </Button>
       </DialogTrigger>
-      <DialogContent title="Review extracted claim" description={claim.statement_synthetic}>
+      <DialogContent
+        title="Review extracted claim"
+        description={claim.statement_synthetic}
+        onCloseAutoFocus={(event) => {
+          // The decided claim leaves the queue, so the trigger unmounts: land focus on the queue.
+          if (!decided.current) return;
+          event.preventDefault();
+          document.getElementById(QUEUE_HEADING_ID)?.focus();
+        }}
+      >
         <div className="space-y-3">
           <dl className="grid gap-1 text-sm">
             <div>
@@ -77,20 +91,18 @@ export function ClaimReviewDialog({ claim, allowed }: Props) {
             </div>
             <div>
               <dt className="inline text-fg-muted">Confidence: </dt>
-              <dd className="inline">{claim.confidence} (synthetic)</dd>
+              <dd className="inline">
+                {claim.confidence} <SyntheticBadge />
+              </dd>
             </div>
           </dl>
           <TextField label="Rationale" value={rationale} onChange={setRationale} multiline />
           <ErrorNotice error={error} />
           <div className="flex gap-3">
-            <Button onClick={() => decide("approve")} aria-busy={pending || undefined}>
+            <Button onClick={() => decide("approve")} aria-busy={busy || undefined}>
               Approve
             </Button>
-            <Button
-              variant="danger"
-              onClick={() => decide("reject")}
-              aria-busy={pending || undefined}
-            >
+            <Button variant="danger" onClick={() => decide("reject")} aria-busy={busy || undefined}>
               Reject
             </Button>
           </div>
