@@ -15,7 +15,16 @@ export type ActionId =
   | "record_disposition"
   | "accept_import"
   | "edit_eln_record"
-  | "view_reconciliation";
+  | "view_reconciliation"
+  // P5b (A-P5B-09)
+  | "export_evidence"
+  | "view_exports"
+  | "edit_charter"
+  | "edit_quota"
+  | "view_custodian"
+  | "view_grievances"
+  | "raise_grievance"
+  | "acknowledge_grievance";
 
 export const PERSONA_ACTIONS: Readonly<Record<ActionId, readonly PersonaId[]>> = Object.freeze({
   create_rights_record: ["community_liaison", "data_steward"],
@@ -31,6 +40,14 @@ export const PERSONA_ACTIONS: Readonly<Record<ActionId, readonly PersonaId[]>> =
   accept_import: ["scientist"],
   edit_eln_record: ["wet_lab_cro"],
   view_reconciliation: ["scientist", "wet_lab_cro", "data_steward"],
+  export_evidence: ["partner"],
+  view_exports: ["partner", "tenant_admin"],
+  edit_charter: ["tenant_admin"],
+  edit_quota: ["tenant_admin"],
+  view_custodian: ["community_liaison", "data_steward", "tenant_admin"],
+  view_grievances: ["community_liaison", "data_steward", "tenant_admin"],
+  raise_grievance: ["community_liaison"],
+  acknowledge_grievance: ["data_steward"],
 });
 
 export function canAct(persona: PersonaId, action: ActionId): boolean {

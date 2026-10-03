@@ -14,7 +14,8 @@ describe("workflow index (A-P3-21)", () => {
     ]);
   });
 
-  it("keeps W8–W10 as P5 placeholders", () => {
-    expect(WORKFLOWS.slice(7).every((w) => w.phase === "P5" && w.href === undefined)).toBe(true);
+  it("keeps unlinked workflows as P5 placeholders", () => {
+    const unlinked = WORKFLOWS.filter((w) => w.href === undefined);
+    expect(unlinked.every((w) => w.phase === "P5")).toBe(true);
   });
 });

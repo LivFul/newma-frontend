@@ -12,7 +12,7 @@ export const WORKFLOWS: readonly Workflow[] = Object.freeze([
   { id: "W5", title: "Closed-loop wet lab", phase: "P3", href: "/demo/w5-wet-lab" },
   { id: "W6", title: "Signed provenance", phase: "P3", href: "/demo/w6-provenance" },
   { id: "W7", title: "Licensing & benefit settlement", phase: "P5" },
-  { id: "W8", title: "Settlement in demo credits", phase: "P5" },
-  { id: "W9", title: "Quotas and budgets", phase: "P5" },
-  { id: "W10", title: "Custodian view", phase: "P5" },
+  { id: "W8", title: "Partner portal & controlled export", phase: "P5", href: "/demo/w8-partner" },
+  { id: "W9", title: "Campaign, quotas & cost", phase: "P5", href: "/demo/w9-campaign" },
+  { id: "W10", title: "Custodian view", phase: "P5", href: "/demo/w10-custodian" },
 ] as const satisfies readonly Workflow[]);

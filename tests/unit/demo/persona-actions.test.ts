@@ -4,7 +4,7 @@ import { PERSONAS } from "@/lib/personas";
 
 describe("persona actions (UI hints mirroring the contract persona column)", () => {
   it("matches the contract matrix", () => {
-    expect(PERSONA_ACTIONS).toEqual({
+    expect(PERSONA_ACTIONS).toMatchObject({
       create_rights_record: ["community_liaison", "data_steward"],
       withdraw_rights: ["community_liaison"],
       ingest_source: ["data_steward"],

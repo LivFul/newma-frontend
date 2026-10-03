@@ -165,3 +165,263 @@ export type Reconciliation = Schemas["ReconciliationOut"];
 export type Disposition = Schemas["DispositionRequest"]["disposition"];
 export type RetrainingProposal = Schemas["RetrainingProposalOut"];
 export type ElnEditResult = Schemas["ElnEditOut"];
+
+// ---------------------------------------------------------------------------------------------
+// P5b contract shapes (docs/plans/p5b.md Contract table, rows 1-17). Hand-derived until the backend
+// spec for each D-item lands; then the workflow switches to components["schemas"] (repin commits).
+// ---------------------------------------------------------------------------------------------
+export const EXPORT_PURPOSES = ["research", "commercial"] as const;
+export type ExportPurpose = (typeof EXPORT_PURPOSES)[number];
+export const FIELD_STATUSES = ["disclosed", "withheld"] as const;
+export type FieldStatus = (typeof FIELD_STATUSES)[number];
+export const WITHHELD_CODES = [
+  "no_rights_record",
+  "consent_withdrawn",
+  "rights_disputed",
+  "consent_expired",
+  "pic_mat_missing",
+  "purpose_not_permitted",
+  "jurisdiction_mismatch",
+  "restricted_field",
+  "stage_not_passed",
+] as const;
+export type WithheldCode = (typeof WITHHELD_CODES)[number];
+export const EXPORT_STATUSES = ["active", "expired", "suspended"] as const;
+export type ExportStatus = (typeof EXPORT_STATUSES)[number];
+export const LOCK_STATES = ["open", "locked"] as const;
+export type LockState = (typeof LOCK_STATES)[number];
+export const CHANGE_OUTCOMES = [
+  "updated_open_version",
+  "new_protocol_version",
+  "unchanged",
+] as const;
+export type ChangeOutcome = (typeof CHANGE_OUTCOMES)[number];
+export const OBLIGATION_STATUSES = ["fulfilled", "due", "overdue"] as const;
+export type ObligationStatus = (typeof OBLIGATION_STATUSES)[number];
+export const GRIEVANCE_CATEGORIES = [
+  "obligation_not_met",
+  "use_outside_agreement",
+  "consent_concern",
+  "benefit_not_received",
+  "other",
+] as const;
+export type GrievanceCategory = (typeof GRIEVANCE_CATEGORIES)[number];
+export const GRIEVANCE_STATUSES = ["open", "acknowledged"] as const;
+export type GrievanceStatus = (typeof GRIEVANCE_STATUSES)[number];
+
+export type FieldDisclosure = Readonly<{
+  path: string;
+  section: string;
+  label: string;
+  status: FieldStatus;
+  value: unknown;
+  withheld_reason: Readonly<{
+    code: WithheldCode;
+    message: string;
+    rights_record_id: string | null;
+  }> | null;
+  synthetic: true;
+}>;
+
+export type AssetEvidence = Readonly<{
+  asset_id: string;
+  display_id: string;
+  label: "Synthetic";
+  purpose: ExportPurpose;
+  requested_stage: GateStage | null;
+  stage: GateStage | null;
+  gate_status: GateStatus | null;
+  released: boolean;
+  not_released_reason: Readonly<{ code: string; message: string }> | null;
+  package_version: number | null;
+  content_sha256: string | null;
+  available_stages: readonly Readonly<{
+    stage: GateStage;
+    version: number;
+    gate_status: GateStatus;
+    released: boolean;
+  }>[];
+  policy: Readonly<{
+    decision: Decision;
+    reasons: readonly PolicyReason[];
+    rights_record_ids: readonly string[];
+    policy_version: string;
+  }>;
+  fields: readonly FieldDisclosure[];
+  generated_at: string;
+  synthetic: true;
+}>;
+
+export type ExportRecord = Readonly<{
+  id: string;
+  asset_id: string;
+  display_id: string;
+  stage: GateStage;
+  package_version: number;
+  recipient: string;
+  purpose: ExportPurpose;
+  expires_at: string;
+  status: ExportStatus;
+  created_at: string;
+  created_by_persona: string;
+  policy_decision_id: string;
+  event_id: string;
+  body_sha256: string;
+  disclosed: readonly FieldDisclosure[];
+  withheld: readonly FieldDisclosure[];
+  suspended_reasons: readonly PolicyReason[];
+  signature_label: string;
+  synthetic: true;
+}>;
+
+export type ExportSummary = Readonly<{
+  id: string;
+  asset_id: string;
+  display_id: string;
+  stage: GateStage;
+  recipient: string;
+  purpose: ExportPurpose;
+  expires_at: string;
+  status: ExportStatus;
+  created_at: string;
+  disclosed_count: number;
+  withheld_count: number;
+}>;
+
+export type Thresholds = Readonly<{
+  potency_um_max: number;
+  replicates_min: number;
+  controls_required: boolean;
+  note?: string;
+}>;
+
+export type CampaignSummary = Readonly<{
+  id: string;
+  name: string;
+  protocol_version: number;
+  lock_state: LockState;
+  credit_quota: number;
+  committed: number;
+  remaining: number;
+  exhausted: boolean;
+  unit: string;
+  synthetic: true;
+}>;
+
+export type CharterVersion = Readonly<{
+  version: number;
+  thresholds: Thresholds;
+  locked: boolean;
+  bound_candidate_count: number;
+  revision: number;
+  change_reason: string;
+  supersedes_version: number | null;
+  created_by_persona: string;
+  created_at: string;
+  event_id: string | null;
+}>;
+
+export type CharterOut = Readonly<{
+  id: string;
+  name: string;
+  protocol_version: number;
+  lock_state: LockState;
+  bound_candidate_count: number;
+  thresholds: Thresholds;
+  credit_quota: number;
+  versions: readonly CharterVersion[];
+  synthetic: true;
+}>;
+
+export type CharterChange = Readonly<{
+  outcome: ChangeOutcome;
+  previous_version: number;
+  charter: CharterOut;
+  event_id: string | null;
+}>;
+
+export type CreditUsage = Readonly<{
+  campaign_id: string;
+  unit: string;
+  credit_quota: number;
+  committed: number;
+  spent: number;
+  reserved: number;
+  remaining: number;
+  exhausted: boolean;
+  by_kind: readonly Readonly<{ kind: string; jobs: number; credits: number }>[];
+  jobs: readonly Readonly<{
+    job_id: string;
+    kind: string;
+    state: string;
+    credits: number;
+    counted_as: "spent" | "reserved";
+  }>[];
+  synthetic: true;
+}>;
+
+export type Grievance = Readonly<{
+  id: string;
+  rights_record_id: string;
+  subject_display_name: string;
+  obligation_id: string | null;
+  category: GrievanceCategory;
+  category_text: string;
+  description: string;
+  status: GrievanceStatus;
+  raised_by_persona: string;
+  raised_at: string;
+  acknowledged_at: string | null;
+  acknowledged_by_persona: string | null;
+  event_id: string;
+}>;
+
+export type CustodianObligation = Readonly<{
+  id: string;
+  text: string;
+  due_on: string | null;
+  status: ObligationStatus;
+  status_text: string;
+  fulfilled_on: string | null;
+}>;
+
+export type CustodianUse = Readonly<{ purpose: Purpose; text: string }>;
+
+export type CustodianAgreement = Readonly<{
+  rights_record_id: string;
+  title: string;
+  authority: string;
+  status: RightsStatus;
+  status_text: string;
+  validity_text: string;
+  uses_allowed: readonly CustodianUse[];
+  uses_not_allowed: readonly CustodianUse[];
+  obligations: readonly CustodianObligation[];
+  grievances: readonly Grievance[];
+  can_raise_grievance: boolean;
+}>;
+
+export type CustodianView = Readonly<{
+  generated_at: string;
+  summary: Readonly<{
+    agreements: number;
+    uses_allowed: number;
+    obligations: number;
+    obligations_fulfilled: number;
+    obligations_overdue: number;
+    open_grievances: number;
+  }>;
+  agreements: readonly CustodianAgreement[];
+  synthetic: true;
+}>;
+
+export type DemoConfig = Readonly<{
+  speed_factor: number;
+  speed_source: "server_default" | "tenant_override";
+  server_speed_factor: number;
+  min_speed_factor: 1;
+  max_speed_factor: 10;
+}>;
+
+/** A rights record as W1 reads it once the backend adds the grievance counter (row 15). */
+export type RightsRecordWithGrievances = RightsRecord & { open_grievance_count?: number };
