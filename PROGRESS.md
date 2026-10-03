@@ -265,9 +265,9 @@ Production `https://newma-frontend.vercel.app` (commit 1299d18) against Railway 
 
 ### P3 exit evidence (local, 2026-10-03)
 
-Frontend `main` against backend `68b1af2` (contract sha 30b9497f2b131168b0803e1527d3c33d46c758aca8734918888276efa26b2c92, vendored canonical vectors `cc50069260bf…`), API on :8010 with `SIM_SPEED_FACTOR=4`, worker, throwaway database:
+Frontend `main` against backend `acb54ba` (contract sha 30b9497f2b131168b0803e1527d3c33d46c758aca8734918888276efa26b2c92, vendored canonical vectors sha256 1b759d2c9b59…, also equal to the deployed `/canonical-vectors.json`), API on :8010 with `SIM_SPEED_FACTOR=4`, worker, throwaway database:
 
-- `pnpm check` green (59 files, 502 tests, 94 % statements); `rm -rf .next && pnpm build` green; `bundle:check` ok (130,731 B gzip root chunks).
+- `pnpm check` green (62 files, 567 tests, 94 % statements, `vectors:check` included); `rm -rf .next && pnpm build` green; `bundle:check` ok (130,731 B gzip root chunks).
 - Backend-free `pnpm test:e2e` 20 passed, `pnpm test:a11y` 16 passed.
 - `DEMO_E2E=1 PORT=3100 pnpm playwright test --workers=2` (e2e + a11y, desktop and mobile): 122 passed, 2 skipped (Vercel bypass spec, no secret); all twelve W1–W6 happy and failure paths and every axe scan green on both projects.
 - Not yet done: the same twelve on a Vercel preview against Railway `demo` (controller deploys; record the run URL here).
