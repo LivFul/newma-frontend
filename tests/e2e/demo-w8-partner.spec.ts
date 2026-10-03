@@ -114,7 +114,9 @@ test.describe("W8 partner portal and controlled export", { tag: "@needs-backend"
 
     await switchPersona(page, "scientist");
     await page.goto(ROUTE);
-    await expect(page.getByRole("note").first()).toContainText("Biopharma partner");
+    await expect(
+      page.getByRole("note").filter({ hasText: "Biopharma partner" }).first(),
+    ).toBeVisible();
     await expect(page.getByRole("alert").first()).toContainText("persona_forbidden");
     const forced = await page.request.post("/api/demo/exports", {
       headers: { origin: baseURL ?? "" },

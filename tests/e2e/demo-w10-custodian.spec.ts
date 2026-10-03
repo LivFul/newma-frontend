@@ -92,7 +92,7 @@ test.describe("W10 custodian view", { tag: "@needs-backend" }, () => {
     ).items[0].id;
     await switchPersona(page, "scientist");
     await page.goto(ROUTE);
-    await expect(page.getByRole("note")).toContainText("Community liaison");
+    await expect(page.getByRole("note").filter({ hasText: "Community liaison" })).toBeVisible();
     await expect(page.getByRole("article")).toHaveCount(0);
 
     // A forced post as partner redirects with an error code and creates nothing.
