@@ -1,11 +1,9 @@
 import { expect, test } from "../support/test";
 import { SLUGS } from "../support/hero";
+import { PRODUCTION_ORIGIN, targetKind, warmUp } from "../support/target";
 
 // The canonical origin is fixed at build time (A-P4-10); the build under test may set it explicitly.
-const ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://newma-frontend.vercel.app").replace(
-  /\/+$/,
-  "",
-);
+const ORIGIN = PRODUCTION_ORIGIN;
 
 test("robots.txt is plain text, lists the sitemap and disallows only /api/", async ({
   request,
@@ -58,16 +56,24 @@ test("Open Graph images are PNGs, found through the page's own og:image tag", as
 test("the sign-in, primitives and demo surfaces answer with X-Robots-Tag noindex", async ({
   request,
 }) => {
+  await warmUp(request);
   for (const path of ["/access", "/primitives", "/demo"]) {
     const response = await request.get(path, { maxRedirects: 0 });
     expect(response.headers()["x-robots-tag"], path).toMatch(/noindex/);
   }
 });
 
-test("the indexable pages carry no X-Robots-Tag", async ({ request }) => {
+test("the indexable pages carry no X-Robots-Tag, except behind a Vercel preview", async ({
+  request,
+  baseURL,
+}) => {
+  // Vercel adds `X-Robots-Tag: noindex` to every preview deployment at the edge; the app itself sends
+  // none on the indexable pages, so only a local or production target can prove that.
+  const kind = targetKind(baseURL);
   for (const path of ["/", "/ecosystem/interface"]) {
-    const response = await request.get(path);
-    expect(response.headers()["x-robots-tag"], path).toBeUndefined();
+    const header = (await request.get(path)).headers()["x-robots-tag"];
+    if (kind === "preview") expect(header, path).toMatch(/noindex/);
+    else expect(header, path).toBeUndefined();
   }
 });
 
@@ -82,6 +88,7 @@ for (const page of ["privacy", "terms"]) {
 
 test("the home page has one canonical on the production origin and one JSON-LD per type", async ({
   page,
+  baseURL,
 }) => {
   await page.goto("/");
   // Next prints the root URL without a trailing slash; both spellings are the same canonical URL.
@@ -90,7 +97,12 @@ test("the home page has one canonical on the production origin and one JSON-LD p
   const ogUrl = await page.locator('meta[property="og:url"]').getAttribute("content");
   expect(new URL(ogUrl!).href).toBe(`${ORIGIN}/`);
   const ogImage = await page.locator('meta[property="og:image"]').getAttribute("content");
-  expect(ogImage).toMatch(new RegExp(`^${ORIGIN}/opengraph-image`));
+  // Next resolves a static opengraph-image against the deployment's own host on Vercel previews (so the
+  // image is fetchable there) and against metadataBase elsewhere; canonical and og:url stay canonical.
+  const imageUrl = new URL(ogImage!);
+  expect(imageUrl.pathname).toMatch(/^\/opengraph-image/);
+  if (targetKind(baseURL) !== "preview") expect(imageUrl.origin).toBe(ORIGIN);
+  else expect(imageUrl.protocol).toBe("https:");
   await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
     "content",
     "summary_large_image",
@@ -121,6 +133,7 @@ test("a component page has its own canonical, title and a single TechArticle", a
 test("a trimmed /ecosystem URL redirects to the components list instead of a 404", async ({
   request,
 }) => {
+  await warmUp(request);
   const response = await request.get("/ecosystem", { maxRedirects: 0 });
   expect(response.status()).toBe(307);
   expect(response.headers()["location"]).toMatch(/\/#components$/);
