@@ -148,19 +148,41 @@ export { isSafeId } from "./safe-id";
 const MAX_JSON_BYTES = 256 * 1024;
 const JSON_CONTENT_TYPE = /^application\/json(\s*;|$)/i;
 
+const payloadTooLarge = () =>
+  new BffError(413, "payload_too_large", "The request body is too large.");
+
+/** Reads the body as text, aborting as soon as it passes the cap (chunked bodies included). */
+async function readCappedText(req: NextRequest): Promise<string> {
+  const declared = Number(req.headers.get("content-length"));
+  if (Number.isFinite(declared) && declared > MAX_JSON_BYTES) throw payloadTooLarge();
+  if (!req.body) return "";
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > MAX_JSON_BYTES) {
+      await reader.cancel().catch(() => undefined);
+      throw payloadTooLarge();
+    }
+    chunks.push(value);
+  }
+  const decoder = new TextDecoder();
+  return chunks.map((chunk) => decoder.decode(chunk, { stream: true })).join("") + decoder.decode();
+}
+
 /** Parses a JSON body; a missing or different Content-Type is a 415 before any parsing. */
 export async function readJson(req: NextRequest): Promise<unknown> {
   const contentType = req.headers.get("content-type") ?? "";
   if (!JSON_CONTENT_TYPE.test(contentType)) {
     throw new BffError(415, "unsupported_media_type", "Send application/json.");
   }
-  const text = await req.text().catch(() => "");
-  if (new TextEncoder().encode(text).length > MAX_JSON_BYTES) {
-    throw new BffError(413, "payload_too_large", "The request body is too large.");
-  }
   try {
-    return JSON.parse(text) as unknown;
-  } catch {
+    return JSON.parse(await readCappedText(req)) as unknown;
+  } catch (error) {
+    if (error instanceof BffError) throw error;
     return undefined;
   }
 }

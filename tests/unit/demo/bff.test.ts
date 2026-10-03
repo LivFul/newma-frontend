@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {
   clearSessionCookie,
   demoGuard,
@@ -169,12 +169,69 @@ describe("seeOther", () => {
 
 describe("readJson size cap", () => {
   afterEach(disarmBff);
+  const CAP = 256 * 1024;
+  const handler = withSession(async ({ req }) => noStore((await readJson(req)) ?? null));
+  const streamed = (chunks: Uint8Array[], headers: Record<string, string> = {}) => {
+    let pulled = 0;
+    let cancelled = false;
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        if (pulled >= chunks.length) return controller.close();
+        controller.enqueue(chunks[pulled]);
+        pulled += 1;
+      },
+      cancel() {
+        cancelled = true;
+      },
+    });
+    const request = new NextRequest("http://localhost:3100/x", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        cookie: "newma_demo_sid=sid-123",
+        "sec-fetch-site": "same-origin",
+        ...headers,
+      },
+      body,
+      duplex: "half",
+    } as unknown as ConstructorParameters<typeof NextRequest>[1]);
+    return { request, state: () => ({ pulled, cancelled }) };
+  };
+
   it("refuses a body over 256 KiB with 413", async () => {
     armBff([]);
-    const handler = withSession(async ({ req }) => noStore(await readJson(req)));
     const big = { blob: "x".repeat(300 * 1024) };
     const response = await handler(bffRequest("/x", { method: "POST", json: big }));
     expect(response.status).toBe(413);
     expect((await response.json()).code).toBe("payload_too_large");
+  });
+
+  it("rejects on Content-Length alone, before reading the body", async () => {
+    armBff([]);
+    const { request, state } = streamed([new Uint8Array(10)], {
+      "content-length": String(CAP + 1),
+    });
+    expect((await handler(request)).status).toBe(413);
+    // A ReadableStream prefetches one chunk by itself; the handler must not have read any.
+    expect(state().pulled).toBeLessThanOrEqual(1);
+    expect(request.bodyUsed).toBe(false);
+  });
+
+  it("aborts a chunked body at the cap instead of buffering all of it", async () => {
+    armBff([]);
+    const chunk = new Uint8Array(64 * 1024).fill(0x61);
+    const { request, state } = streamed(Array.from({ length: 100 }, () => chunk));
+    expect((await handler(request)).status).toBe(413);
+    expect(state().cancelled).toBe(true);
+    expect(state().pulled).toBeLessThan(10);
+  });
+
+  it("still parses a chunked body under the cap", async () => {
+    armBff([]);
+    const enc = new TextEncoder();
+    const { request } = streamed([enc.encode('{"a":'), enc.encode("1}")]);
+    const response = await handler(request);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ a: 1 });
   });
 });
