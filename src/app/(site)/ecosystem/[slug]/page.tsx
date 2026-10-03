@@ -52,7 +52,6 @@ export default async function EcosystemPage({ params }: Params) {
         <p className="mt-4 max-w-[62ch]">{entry.fit}</p>
       </section>
       <Body />
-      <p className="mt-12 max-w-[62ch] text-sm text-fg-muted">{DETAIL_COPY.proposed.text}</p>
       <SourcesList entry={entry} />
       <DemoLink entry={entry} />
       <RelatedComponents current={slug} />

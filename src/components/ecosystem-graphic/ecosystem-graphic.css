@@ -97,15 +97,12 @@
 .eco-edges {
   opacity: 0;
 }
+/* Edges, rail included, are 3:1 against the background (WCAG 1.4.11). */
 .eco-edges path {
   fill: none;
   stroke: var(--color-border-strong);
   stroke-width: 1.75px;
   stroke-linecap: round;
-}
-/* The rail carries "every component relies on Data & Knowledge", so it needs 3:1 (WCAG 1.4.11). */
-.eco-edges path[data-kind="rail"] {
-  stroke: var(--color-border-strong);
 }
 .eco-edges path[data-dashed] {
   stroke: var(--color-eco-optional);

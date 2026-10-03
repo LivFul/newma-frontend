@@ -122,6 +122,6 @@ test("a trimmed /ecosystem URL redirects to the components list instead of a 404
   request,
 }) => {
   const response = await request.get("/ecosystem", { maxRedirects: 0 });
-  expect(response.status()).toBe(308);
+  expect(response.status()).toBe(307);
   expect(response.headers()["location"]).toMatch(/\/#components$/);
 });

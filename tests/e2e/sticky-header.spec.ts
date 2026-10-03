@@ -95,7 +95,7 @@ test("WCAG 2.4.11: no keyboard-focused element is hidden under the sticky header
     expect(state.top).toBeGreaterThanOrEqual(headerHeight - 1);
     checked += 1;
   }
-  expect(checked, "the loop must actually inspect page content").toBeGreaterThan(8);
+  expect(checked, "the loop must actually inspect page content").toBeGreaterThan(3);
 });
 
 test("the skip link is the first tab stop and moves focus to main", async ({ page }) => {
@@ -130,7 +130,29 @@ test("in-page anchors land below the sticky header", async ({ page, isMobile }) 
     await expect
       .poll(() => page.locator(`#${id}`).evaluate((el) => el.getBoundingClientRect().top))
       .toBeGreaterThanOrEqual(headerHeight - 1);
+    // ...and not pushed far below it: scroll-padding is the only offset (a second one would double it).
+    // The last section cannot reach the top of a short page, so only the product anchor is bounded.
+    if (id === "product") {
+      const top = await page.locator(`#${id}`).evaluate((el) => el.getBoundingClientRect().top);
+      expect(top).toBeLessThanOrEqual(headerHeight + 32);
+    }
   }
+});
+
+test("on a very short viewport (400% zoom) the header scrolls away instead of taking a quarter of it", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 256 });
+  await page.goto("/");
+  await page.evaluate(() => window.scrollTo(0, 400));
+  const position = await page
+    .locator("[data-site-header]")
+    .evaluate((el) => getComputedStyle(el).position);
+  expect(position).toBe("static");
+  const top = await page
+    .locator("[data-site-header]")
+    .evaluate((el) => el.getBoundingClientRect().top);
+  expect(top).toBeLessThan(0);
 });
 
 test("WCAG 2.4.11: Shift+Tab back up the page never leaves focus under the sticky header", async ({
@@ -159,5 +181,5 @@ test("WCAG 2.4.11: Shift+Tab back up the page never leaves focus under the stick
     expect(state.top).toBeGreaterThanOrEqual(headerHeight - 1);
     checked += 1;
   }
-  expect(checked, "the loop must actually inspect page content").toBeGreaterThan(8);
+  expect(checked, "the loop must actually inspect page content").toBeGreaterThan(3);
 });

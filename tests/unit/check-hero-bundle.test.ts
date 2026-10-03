@@ -4,8 +4,10 @@ import os from "node:os";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 import { afterEach, describe, expect, it } from "vitest";
+import { HERO_CHUNK_MARKER } from "@/components/ecosystem-graphic/hero-marker";
 import {
   HERO_BUDGET_BYTES,
+  HERO_MARKER,
   HeroBundleError,
   measureHeroChunks,
 } from "../../scripts/check-hero-bundle.mjs";
@@ -112,6 +114,10 @@ describe("measureHeroChunks", () => {
     expect(() => measureHeroChunks(path.join(os.tmpdir(), "no-such-next-dir"))).toThrow(
       /pnpm build/,
     );
+  });
+
+  it("searches for the same marker the hero chunk carries", () => {
+    expect(HERO_MARKER).toBe(HERO_CHUNK_MARKER);
   });
 
   it("uses the 80 KiB budget from the sprint prompt", () => {

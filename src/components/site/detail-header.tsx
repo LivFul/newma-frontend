@@ -1,3 +1,4 @@
+import { DETAIL_COPY } from "@/content/ecosystem/detail-copy";
 import type { EcosystemEntry } from "@/content/ecosystem/registry";
 
 export function DetailHeader({ entry }: { entry: EcosystemEntry }) {
@@ -7,6 +8,7 @@ export function DetailHeader({ entry }: { entry: EcosystemEntry }) {
         {entry.title}
       </h1>
       <p className="max-w-[62ch] text-lg">{entry.summary}</p>
+      <p className="max-w-[62ch] text-sm text-fg-muted">{DETAIL_COPY.proposed.text}</p>
       {entry.callout ? (
         <p
           role="note"

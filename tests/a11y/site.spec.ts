@@ -38,6 +38,8 @@ test("forced colours keep a visible outline on the six components and the header
 }) => {
   await page.emulateMedia({ forcedColors: "active" });
   await page.goto("/");
+  // Wait for the idle swap, so the sampled elements are the ones that stay.
+  await page.waitForSelector('[data-hero-ready="true"]', { timeout: 30_000 });
   for (const slug of SLUGS) {
     const link = page.locator(`svg.eco-svg a[href="/ecosystem/${slug}"]`);
     await link.focus();

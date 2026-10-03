@@ -35,6 +35,8 @@ describe("lighthouserc", () => {
     ]);
     expect(collect.startServerCommand).toMatch(/pnpm build && pnpm start/);
     expect(collect.startServerReadyPattern).toBe("Ready");
+    // The build runs inside the start command, so the default 10 s readiness wait is far too short.
+    expect(collect.startServerReadyTimeout).toBeGreaterThanOrEqual(300_000);
     expect(upload).toEqual({ target: "temporary-public-storage" });
   });
   it("requires SEO >= 0.95 as an error locally and in production", () => {

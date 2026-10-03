@@ -9,7 +9,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <SiteHeader />
-      <main id="main" tabIndex={-1} className="scroll-mt-[var(--size-header)]">
+      <main id="main" tabIndex={-1}>
         {children}
       </main>
       <SiteFooter />

@@ -47,16 +47,11 @@ class StaticFallback extends Component<
   }
 }
 
-// Shows the static figure first. After idle, or on the first pointer, focus or touch intent, it loads
-// the interactive twin and swaps it in within one commit. Hover and focus present at that moment seed
-// the twin's state, so the view does not collapse at the swap. Under prefers-reduced-motion it never
-// loads Motion at all (assumption A-P4-15).
-export function HeroLoader({ children }: { children: ReactNode }) {
+// Load triggers: after idle, or on the first pointer, focus or touch intent; never under
+// prefers-reduced-motion, and switched off again if that preference turns on mid-session.
+function useLoadTrigger() {
   const [load, setLoad] = useState(false);
   const [ready, setReady] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const [hovering, setHovering] = useState(false);
-  const [focused, setFocused] = useState<EcosystemSlug | null>(null);
 
   useEffect(() => {
     const query = window.matchMedia(REDUCED_MOTION);
@@ -83,25 +78,38 @@ export function HeroLoader({ children }: { children: ReactNode }) {
     if (!window.matchMedia(REDUCED_MOTION).matches) setLoad(true);
   }, []);
   const onReady = useCallback(() => setReady(true), []);
-  const onPointerEnter = (event: PointerEvent) => {
-    if (event.pointerType !== "touch") setHovering(true);
+  return { load, ready, intent, onReady } as const;
+}
+
+// Shows the static figure first, then swaps in the interactive twin within one commit. Hover and focus
+// present at that moment seed the twin's state, so the view does not collapse at the swap
+// (assumption A-P4-15: under reduced motion Motion is never loaded).
+export function HeroLoader({ children }: { children: ReactNode }) {
+  const { load, ready, intent, onReady } = useLoadTrigger();
+  const [failed, setFailed] = useState(false);
+  const [hovering, setHovering] = useState(false);
+  const [focused, setFocused] = useState<EcosystemSlug | null>(null);
+
+  const onPointerOver = (event: PointerEvent) => {
+    // Only the diagram itself explodes by hover in the static layer, so only it seeds the twin.
+    const overDiagram = (event.target as Element).closest(".eco-frame") !== null;
+    setHovering(event.pointerType !== "touch" && overDiagram);
     intent();
   };
   const onFocus = (event: FocusEvent) => {
     setFocused(slugFrom(event.target));
     intent();
   };
-  const staticLayer = ready ? null : children;
 
   return (
     <div
-      onPointerEnter={onPointerEnter}
+      onPointerOver={onPointerOver}
       onPointerLeave={() => setHovering(false)}
       onTouchStart={intent}
       onFocus={onFocus}
       onBlur={() => setFocused(null)}
     >
-      {failed ? children : staticLayer}
+      {failed || !ready ? children : null}
       {load && !failed ? (
         <StaticFallback fallback={null} onError={() => setFailed(true)}>
           <Interactive

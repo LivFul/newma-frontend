@@ -88,8 +88,8 @@ export const ECOSYSTEM: Readonly<Record<EcosystemSlug, EcosystemEntry>> = Object
   interface: entry({
     slug: "interface",
     summary:
-      "The Interface is the web application through which scientists, biopharma partners and rights custodians reach NEWMA, each through a separate interface. It is where identity and rights policy are checked first.",
-    fit: "Every request from the Interface passes an API layer that checks identity, permissions and rights policy before any other component acts.",
+      "The Interface is the proposed web application through which scientists, biopharma partners and rights custodians reach NEWMA, each through a separate interface. Identity and rights policy are designed to be checked first.",
+    fit: "Every request from the Interface is designed to pass an API layer that checks identity, permissions and rights policy before any other component acts.",
     sources: [
       { doc: "TA", section: "1" },
       { doc: "ARCH", section: "2A" },
@@ -100,8 +100,8 @@ export const ECOSYSTEM: Readonly<Record<EcosystemSlug, EcosystemEntry>> = Object
   "agentic-compute": entry({
     slug: "agentic-compute",
     summary:
-      "Agentic Compute turns a scientist's query into ranked hypotheses: an agent loads qualified procedures, checks rights and requests durable screening. Outputs stay hypotheses.",
-    fit: "It receives requests from the Interface and passes reviewable computational evidence to Scientific Review; it never approves advancement.",
+      "Agentic Compute is designed to turn a scientist's query into ranked hypotheses: an agent loads qualified procedures, checks rights and requests screening. Outputs stay hypotheses.",
+    fit: "It is designed to receive requests from the Interface and pass reviewable computational evidence to Scientific Review; it never approves advancement.",
     sources: [
       { doc: "TA", section: "2" },
       { doc: "ARCH", section: "2B" },
@@ -117,8 +117,8 @@ export const ECOSYSTEM: Readonly<Record<EcosystemSlug, EcosystemEntry>> = Object
   "scientific-review": entry({
     slug: "scientific-review",
     summary:
-      "Scientific Review is where scientists, not software, decide: they approve or revise experimental work and accept or reject evidence before anything advances.",
-    fit: "It sits between computation and the laboratory and gates every step toward a confirmed hit with independent mandatory conditions.",
+      "Scientific Review is where scientists, not software, are designed to decide: they approve or revise experimental work and accept or reject evidence.",
+    fit: "It is designed to sit between computation and the laboratory and to gate every step toward a confirmed hit with independent mandatory conditions.",
     sources: [
       { doc: "TA", section: "2" },
       { doc: "TA", section: "3" },
@@ -134,8 +134,8 @@ export const ECOSYSTEM: Readonly<Record<EcosystemSlug, EcosystemEntry>> = Object
   "wet-lab": entry({
     slug: "wet-lab",
     summary:
-      "Wet Lab closes the loop: approved assay requests reach the laboratory through an eLabFTW adapter, and results return to scientists for review.",
-    fit: "Results flow back to Scientific Review, and only observations a scientist accepts become evidence that updates later prioritization.",
+      "Wet Lab is designed to close the loop: approved assay requests reach the laboratory through an eLabFTW adapter, and results return to scientists for review.",
+    fit: "Results are designed to flow back to Scientific Review, and only observations a scientist accepts become evidence that updates later prioritization.",
     sources: [
       { doc: "TA", section: "3" },
       { doc: "ARCH", section: "2D" },
@@ -147,8 +147,8 @@ export const ECOSYSTEM: Readonly<Record<EcosystemSlug, EcosystemEntry>> = Object
   "data-knowledge": entry({
     slug: "data-knowledge",
     summary:
-      "Data & Knowledge holds the authoritative records in a relational database and encrypted object storage, with search and graph views derived from them.",
-    fit: "Every other component reads and writes through it, and it keeps each record linked from its botanical source to the assay observation.",
+      "Data & Knowledge is designed to hold the authoritative records in a relational database and encrypted object storage, with derived search and graph views.",
+    fit: "Every other component is designed to read and write through it, and it keeps each record linked from its botanical source to the assay observation.",
     sources: [
       { doc: "TA", section: "1" },
       { doc: "ARCH", section: "2E" },
@@ -160,7 +160,7 @@ export const ECOSYSTEM: Readonly<Record<EcosystemSlug, EcosystemEntry>> = Object
   "provenance-dlt": entry({
     slug: "provenance-dlt",
     summary:
-      "Provenance & DLT records who decided what and when through signed, versioned manifests, with a permissioned ledger as an optional extension. Authoritative records stay off-chain.",
+      "Provenance & DLT is designed to record who decided what and when through signed, versioned manifests, with a permissioned ledger as an optional extension. Records stay off-chain.",
     fit: "It is optional: the signed-log baseline comes first, and ledger, scoped proofs and settlement contracts are added only for a defined need.",
     sources: [
       { doc: "TA", section: "4" },

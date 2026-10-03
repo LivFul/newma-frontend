@@ -129,6 +129,30 @@ describe("Interactive hero layer", () => {
     expect(fireEvent.click(links[1]!)).toBe(true); // programmatic click, no pointerdown
   });
 
+  it("does not swallow a later activation after a touch gesture that was cancelled (scroll or pan)", () => {
+    const { links } = mount();
+    fireEvent.pointerDown(links[0]!, { pointerType: "touch" });
+    fireEvent.pointerCancel(links[0]!, { pointerType: "touch" });
+    // No pointerdown: a keyboard or assistive-technology click on a touch laptop.
+    expect(fireEvent.click(links[0]!)).toBe(true);
+  });
+
+  it("announces the same first-tap sentence again after the layers were collapsed", async () => {
+    const user = userEvent.setup();
+    const { links } = mount();
+    const status = screen.getByRole("status");
+    const tap = () => {
+      fireEvent.pointerDown(links[3]!, { pointerType: "touch" });
+      fireEvent.click(links[3]!);
+    };
+    tap();
+    expect(status).toHaveTextContent("Components separated.");
+    await user.keyboard("{Escape}");
+    expect(status).toHaveTextContent("");
+    tap();
+    expect(status).toHaveTextContent("Components separated. Activate again to open Wet Lab.");
+  });
+
   it("announces the intercepted first touch tap in a polite status region", () => {
     const { links } = mount();
     const status = screen.getByRole("status");

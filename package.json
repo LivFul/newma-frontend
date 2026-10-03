@@ -24,7 +24,8 @@
     "vectors:check": "node scripts/sync-canonical-vectors.mjs --check",
     "claims:check": "node scripts/check-claims.mjs",
     "hero:check": "node scripts/check-hero-bundle.mjs",
-    "lhci:mobile": "lhci autorun --config=lighthouserc.mobile.cjs"
+    "lhci:mobile": "lhci autorun --config=lighthouserc.mobile.cjs",
+    "screenshots": "node scripts/screenshots.mjs"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",

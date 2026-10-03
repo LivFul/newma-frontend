@@ -70,7 +70,7 @@ describe("home copy modules", () => {
       expect(b.text, b.id).not.toMatch(/\bLV-?\d|DEMO-C|partner logo/i);
     }
   });
-  it("keeps design-intent wording for capabilities (no claim of achievement)", () => {
+  it("avoids superlatives and words that claim achievement", () => {
     const text = all.map((b) => b.text).join(" ");
     expect(text).not.toMatch(/\b(proven|guarantee[sd]?|best-in-class|outperform\w*)\b/i);
   });

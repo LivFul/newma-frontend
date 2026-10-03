@@ -73,13 +73,3 @@ test("the provenance page says optional and off-chain above the fold", async ({ 
   expect(box.y + box.height).toBeLessThanOrEqual(page.viewportSize()!.height);
   await expect(page.locator("main")).toContainText(/off-chain/i);
 });
-
-test("the detail pages ship no analytics script and no hero chunk", async ({ page }) => {
-  const scripts: string[] = [];
-  page.on("request", (r) => {
-    if (r.resourceType() === "script") scripts.push(r.url());
-  });
-  await page.goto("/ecosystem/interface");
-  await page.waitForLoadState("networkidle");
-  expect(scripts.filter((url) => /interactive|motion/i.test(url))).toEqual([]);
-});

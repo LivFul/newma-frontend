@@ -52,6 +52,8 @@ function buildConfig({ preset, env = process.env }) {
           : {
               startServerCommand: `pnpm build && pnpm start --port ${PORT}`,
               startServerReadyPattern: "Ready",
+              // The command builds before it starts; lhci waits 10 s by default, far less than a build.
+              startServerReadyTimeout: 600_000,
             }),
       },
       assert: {

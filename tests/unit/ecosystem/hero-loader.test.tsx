@@ -46,11 +46,16 @@ function stubMatchMedia(reduced: boolean) {
 }
 
 const Static = () => (
-  <svg>
-    <g data-slug="wet-lab">
-      <a href={WET_LAB_HREF}>static</a>
-    </g>
-  </svg>
+  <>
+    <div className="eco-frame">
+      <svg>
+        <g data-slug="wet-lab">
+          <a href={WET_LAB_HREF}>static</a>
+        </g>
+      </svg>
+    </div>
+    <p data-testid="controls">controls</p>
+  </>
 );
 
 async function flush() {
@@ -141,12 +146,12 @@ describe("HeroLoader", () => {
 
   it("loads earlier on pointer and touch intent", async () => {
     stubMatchMedia(false);
-    const { container } = render(
+    render(
       <HeroLoader>
         <Static />
       </HeroLoader>,
     );
-    fireEvent.touchStart(container.firstElementChild!);
+    fireEvent.touchStart(screen.getByText("static"));
     await flush();
     expect(await flushAndGet()).toBeInTheDocument();
   });
@@ -184,24 +189,42 @@ describe("HeroLoader", () => {
 
   it("seeds the interactive layer with the pointer hover present at the swap", async () => {
     stubMatchMedia(false);
-    const { container } = render(
+    render(
       <HeroLoader>
         <Static />
       </HeroLoader>,
     );
-    fireEvent.pointerEnter(container.firstElementChild!, { pointerType: "mouse" });
+    fireEvent.pointerOver(screen.getByText("static"), { pointerType: "mouse" });
     await flushAndGet();
     expect(mounted).toHaveBeenLastCalledWith(expect.objectContaining({ initialHovering: true }));
   });
 
   it("does not seed hover from a touch pointer", async () => {
     stubMatchMedia(false);
-    const { container } = render(
+    render(
       <HeroLoader>
         <Static />
       </HeroLoader>,
     );
-    fireEvent.pointerEnter(container.firstElementChild!, { pointerType: "touch" });
+    fireEvent.pointerOver(screen.getByText("static"), { pointerType: "touch" });
+    await flushAndGet();
+    expect(mounted).toHaveBeenLastCalledWith(expect.objectContaining({ initialHovering: false }));
+  });
+
+  it("does not seed hover from a pointer over the controls row, below the diagram", async () => {
+    stubMatchMedia(false);
+    render(
+      <HeroLoader>
+        <Static />
+      </HeroLoader>,
+    );
+    // Look both up first: the first event starts the swap and removes the static layer.
+    const diagram = screen.getByText("static");
+    const controls = screen.getByTestId("controls");
+    act(() => {
+      fireEvent.pointerOver(diagram, { pointerType: "mouse" });
+      fireEvent.pointerOver(controls, { pointerType: "mouse" });
+    });
     await flushAndGet();
     expect(mounted).toHaveBeenLastCalledWith(expect.objectContaining({ initialHovering: false }));
   });

@@ -71,6 +71,12 @@ export const ABOUT = Object.freeze({
 
 // Meta description of the home page (claim C-50, derived: no new claim).
 export const HOME_META = Object.freeze({
+  // Default for any route that sets no metadata of its own (the 404 page).
+  defaultDescription: block(
+    "home.meta.default",
+    "NEWMA is a proposed ethnobotanical drug-discovery platform by LivFul.",
+    ["C-50"],
+  ),
   title: block("home.meta.title", "NEWMA \u2014 evidence-led discovery from authorized knowledge", [
     "C-50",
   ]),
