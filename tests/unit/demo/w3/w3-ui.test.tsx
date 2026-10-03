@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { AgentSteps } from "@/app/(platform)/demo/w3-agent/_components/agent-steps";
 import { AgentView } from "@/app/(platform)/demo/w3-agent/_components/agent-view";
 import { AgentQueryForm } from "@/app/(platform)/demo/w3-agent/_components/agent-query-form";
+import { AgentConversation } from "@/app/(platform)/demo/w3-agent/_components/agent-conversation";
 import type { AgentQuery, AgentStepKey } from "@/lib/demo/types";
 
 const push = vi.fn();
@@ -145,3 +146,56 @@ describe("AgentQueryForm", () => {
     expect(push).toHaveBeenCalledWith("/demo/w3-agent?query=q-1");
   });
 });
+
+describe("W3 review fixes", () => {
+  it("mints a new key after a successful query and refuses submission for other personas", async () => {
+    const fetchMock = vi.fn<(url: string, init: RequestInit) => Promise<Response>>(async () =>
+      Response.json(query({ status: "running" }), { status: 202 }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <AgentQueryForm targets={[{ id: "t-a", display_name: "Target-α — fictional" }]} allowed />,
+    );
+    await user.click(screen.getByRole("button", { name: "Ask the simulated agent" }));
+    await user.click(screen.getByRole("button", { name: "Ask the simulated agent" }));
+    const keys = fetchMock.mock.calls.map((c) => JSON.parse(String(c[1].body)).idempotency_key);
+    expect(keys[0]).not.toBe(keys[1]);
+    rerender(
+      <AgentQueryForm
+        targets={[{ id: "t-a", display_name: "Target-α — fictional" }]}
+        allowed={false}
+      />,
+    );
+    fetchMock.mockClear();
+    screen.getByRole("form", { name: "Ask the simulated agent" }).requestSubmit();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("does not mistake retrieval details for a retry", () => {
+    const steps = query().steps.map((s) => ({
+      ...s,
+      detail: s.key === "retrieval" ? "retrieved 5 subjects" : "",
+    }));
+    render(<AgentConversationProbe initial={query({ status: "held", steps })} />);
+    expect(screen.queryByText("Retried after simulated failure")).toBeNull();
+  });
+
+  it("announces the query status in a live region", () => {
+    render(
+      <AgentView
+        query={query({ status: "held", remediation: ["x"], job_ids: [] })}
+        retried={false}
+      />,
+    );
+    expect(screen.getByRole("status", { name: "Agent status" })).toHaveTextContent("held");
+  });
+});
+
+function AgentConversationProbe({ initial }: { initial: AgentQuery }) {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () => Response.json(initial)),
+  );
+  return <AgentConversation id="q-1" initial={initial} />;
+}

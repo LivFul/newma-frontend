@@ -4,6 +4,7 @@ import { SimulatedLabel } from "../../_components/simulated-label";
 import { CopyValue } from "./copy-value";
 
 const SIGNATURE_PREVIEW = 24;
+export const SIGNED_DECISION_ID = "signed-decision";
 
 /** The signed result: hash, truncated signature (copyable), kid and the demo-key label. */
 export function SignedDecisionCard({
@@ -15,6 +16,8 @@ export function SignedDecisionCard({
 }) {
   return (
     <section
+      id={SIGNED_DECISION_ID}
+      tabIndex={-1}
       aria-label="Signed decision"
       className="space-y-2 rounded-md border border-success p-4 text-sm"
       data-testid="signed-decision"

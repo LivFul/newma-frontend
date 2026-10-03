@@ -22,7 +22,7 @@ export function AgentQueryForm({
   allowed: boolean;
 }) {
   const router = useRouter();
-  const { key } = useStableKey();
+  const { key, reset } = useStableKey();
   const [objective, setObjective] = useState(DEFAULT_OBJECTIVE);
   const [target, setTarget] = useState(targets[0]?.id ?? "");
   const [budget, setBudget] = useState(DEFAULT_BUDGET);
@@ -30,7 +30,7 @@ export function AgentQueryForm({
   const [pending, startTransition] = useTransition();
 
   const submit = () => {
-    if (pending) return;
+    if (pending || !allowed) return;
     setError(undefined);
     startTransition(async () => {
       const body = {
@@ -41,6 +41,7 @@ export function AgentQueryForm({
       };
       const result = await postJson<AgentQuery>("/api/demo/agent/queries", body);
       if (!result.ok) return setError(result.error);
+      reset();
       router.push(`/demo/w3-agent?query=${encodeURIComponent(result.data.id)}`);
     });
   };

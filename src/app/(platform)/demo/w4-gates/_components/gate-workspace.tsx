@@ -4,7 +4,7 @@ import type { EvidencePackage, Gate, GateDecision } from "@/lib/demo/types";
 import { PersonaForbiddenNotice } from "../../_components/persona-forbidden-notice";
 import { GateTracker } from "./gate-tracker";
 import { SignDecisionDialog } from "./sign-decision-dialog";
-import { SignedDecisionCard } from "./signed-decision-card";
+import { SIGNED_DECISION_ID, SignedDecisionCard } from "./signed-decision-card";
 
 type Props = Readonly<{
   gates: readonly Gate[];
@@ -34,7 +34,11 @@ export function GateWorkspace({ gates, packages, candidateDisplayId, allowed }: 
         candidateDisplayId={candidateDisplayId}
         versions={versionsFor(gate, packages)}
         allowed={allowed}
-        onSigned={(decision, replayed) => setSigned({ decision, replayed })}
+        onSigned={(decision, replayed) => {
+          setSigned({ decision, replayed });
+          // The trigger unmounts once the gate is decided: move focus to the result.
+          requestAnimationFrame(() => document.getElementById(SIGNED_DECISION_ID)?.focus());
+        }}
       />
     ) : null;
   return (

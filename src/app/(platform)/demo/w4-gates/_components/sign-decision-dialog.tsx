@@ -60,7 +60,9 @@ export function SignDecisionDialog({
     );
   }
 
+  // While a decision is in flight the dialog cannot close (and so cannot re-open with a new key).
   const onOpenChange = (next: boolean) => {
+    if (pending) return;
     setOpen(next);
     setError(undefined);
     if (next) {
@@ -83,7 +85,11 @@ export function SignDecisionDialog({
           idempotency_key: key,
         },
       );
-      if (!result.ok) return setError(result.error);
+      if (!result.ok) {
+        // A definite 4xx refusal committed nothing: an edited retry is a new request.
+        if (result.status >= 400 && result.status < 500) setKey(crypto.randomUUID());
+        return setError(result.error);
+      }
       onSigned(result.data, result.replayed);
       setOpen(false);
       router.refresh();

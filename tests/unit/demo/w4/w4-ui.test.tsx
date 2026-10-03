@@ -225,3 +225,44 @@ describe("GateTracker and cards", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("earlier_stage_not_passed");
   });
 });
+
+describe("W4 review fixes", () => {
+  it("cannot be closed and reopened (new key) while a decision is in flight", async () => {
+    let release: (r: Response) => void = () => undefined;
+    const fetchMock = vi.fn<(url: string, init: RequestInit) => Promise<Response>>(
+      () =>
+        new Promise<Response>((resolve) => {
+          release = resolve;
+        }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<SignDecisionDialog {...dialogProps} />);
+    await openAndFill(user, "DEMO-C-002");
+    await user.click(screen.getByRole("button", { name: "Sign decision" }));
+    await user.keyboard("{Escape}");
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    release(Response.json(signed, { status: 201 }));
+  });
+
+  it("re-keys after a definite 4xx refusal so an edited retry is a new request", async () => {
+    const fetchMock = vi
+      .fn<(url: string, init: RequestInit) => Promise<Response>>()
+      .mockResolvedValueOnce(
+        Response.json(
+          { code: "evidence_package_stale", message: "Stale.", details: { current_version: 2 } },
+          { status: 409 },
+        ),
+      )
+      .mockResolvedValueOnce(Response.json(signed, { status: 201 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<SignDecisionDialog {...dialogProps} />);
+    await openAndFill(user, "DEMO-C-002");
+    await user.click(screen.getByRole("button", { name: "Sign decision" }));
+    await screen.findByRole("alert");
+    await user.click(screen.getByRole("button", { name: "Sign decision" }));
+    const keys = fetchMock.mock.calls.map((c) => JSON.parse(String(c[1].body)).idempotency_key);
+    expect(keys[0]).not.toBe(keys[1]);
+  });
+});

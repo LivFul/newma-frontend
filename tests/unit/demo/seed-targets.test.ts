@@ -21,3 +21,9 @@ describe("uuid5", () => {
     );
   });
 });
+
+describe("seededTargets with a malformed tenant id", () => {
+  it("returns no targets instead of throwing", () => {
+    expect(seededTargets("not-a-uuid")).toEqual([]);
+  });
+});

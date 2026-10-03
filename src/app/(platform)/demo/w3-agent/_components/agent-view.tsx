@@ -24,7 +24,12 @@ export function AgentView({ query, retried }: { query: AgentQuery; retried: bool
     <div className="space-y-6">
       <p className="flex flex-wrap items-center gap-2">
         <SimulatedLabel label={query.label} />
-        <Badge data-testid="agent-status" data-status={query.status}>
+        <Badge
+          data-testid="agent-status"
+          data-status={query.status}
+          role="status"
+          aria-label="Agent status"
+        >
           {query.status}
         </Badge>
         <span className="text-sm text-fg-muted">{query.objective}</span>

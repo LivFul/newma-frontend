@@ -5,7 +5,9 @@ const PERCENT = 100;
 const JOB_STEPS = ["docking_job", "admet_job"] as const;
 const STEP_PROGRESS = { pending: 0, running: 0.5, held: 0, failed: 1, done: 1 } as const;
 
-export const RETRY_PATTERN = /retr/i;
+// Only the two job steps report retries; "retrieval" must never match.
+export const JOB_STEP_KEYS: ReadonlySet<string> = new Set(JOB_STEPS);
+export const RETRY_PATTERN = /\bretr(?:y|ying|ied)\b/i;
 
 /** Simulated jobs, derived from the query's steps so the page polls a single endpoint. */
 export function AgentJobs({ query, retried }: { query: AgentQuery; retried: boolean }) {

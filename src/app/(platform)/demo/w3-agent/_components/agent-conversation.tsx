@@ -4,10 +4,11 @@ import { useAgentPolling } from "@/lib/demo/use-agent-polling";
 import type { AgentQuery } from "@/lib/demo/types";
 import { ErrorNotice } from "../../_components/error-notice";
 import { AgentView } from "./agent-view";
-import { RETRY_PATTERN } from "./agent-jobs";
+import { JOB_STEP_KEYS, RETRY_PATTERN } from "./agent-jobs";
 
 const sawRetry = (query: AgentQuery | undefined) =>
-  query?.steps.some((step) => RETRY_PATTERN.test(step.detail)) ?? false;
+  query?.steps.some((step) => JOB_STEP_KEYS.has(step.key) && RETRY_PATTERN.test(step.detail)) ??
+  false;
 
 /** Live view: polls the query until completed/held/failed; stops on unmount. */
 export function AgentConversation({ id, initial }: { id: string; initial?: AgentQuery }) {
