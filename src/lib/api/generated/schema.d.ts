@@ -341,6 +341,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/demo/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Effective simulation speed for this tenant and where it comes from */
+        get: operations["demo_get_demo_config"];
+        /**
+         * Set (1-10) or clear (null) this tenant's simulation speed override
+         * @description No tenant transaction is held while the admin session runs (one pooled connection at a
+         *     time, so concurrent PUTs cannot starve the pool).
+         */
+        put: operations["demo_put_demo_config"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/demo/eln/records/{record_id}/edit": {
         parameters: {
             query?: never;
@@ -1526,6 +1548,30 @@ export interface components {
              * @constant
              */
             synthetic: true;
+        };
+        /** DemoConfigOut */
+        DemoConfigOut: {
+            /**
+             * Max Speed Factor
+             * @default 10
+             * @constant
+             */
+            max_speed_factor: 10;
+            /**
+             * Min Speed Factor
+             * @default 1
+             * @constant
+             */
+            min_speed_factor: 1;
+            /** Server Speed Factor */
+            server_speed_factor: number;
+            /** Speed Factor */
+            speed_factor: number;
+            /**
+             * Speed Source
+             * @enum {string}
+             */
+            speed_source: "server_default" | "tenant_override";
         };
         /** DemoKeys */
         DemoKeys: {
@@ -2877,6 +2923,14 @@ export interface components {
             synthetic: boolean;
             /** Title */
             title: string;
+        };
+        /** SpeedRequest */
+        SpeedRequest: {
+            /**
+             * Speed Factor
+             * @description 1-10; null clears the override
+             */
+            speed_factor: number | null;
         };
         /** TamperOut */
         TamperOut: {
@@ -4579,6 +4633,144 @@ export interface operations {
                 };
             };
             /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    demo_get_demo_config: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoConfigOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    demo_put_demo_config: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpeedRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoConfigOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: the demo tenant no longer exists */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description demo_template_tenant: the template tenant takes no override */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description validation_error: speed_factor must be 1-10 or null */
             422: {
                 headers: {
                     [name: string]: unknown;

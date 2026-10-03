@@ -168,7 +168,7 @@ export type ElnEditResult = Schemas["ElnEditOut"];
 
 // ---------------------------------------------------------------------------------------------
 // P5b contract shapes (docs/plans/p5b.md Contract table, rows 1-17). W8 and W9 are generated from
-// the pinned contract; the demo config stays hand-derived until its spec lands.
+// the pinned contract; all rows are generated from the pinned contract.
 // ---------------------------------------------------------------------------------------------
 export const EXPORT_PURPOSES = ["research", "commercial"] as const;
 export type ExportPurpose = (typeof EXPORT_PURPOSES)[number];
@@ -227,10 +227,4 @@ export type CustodianUse = Schemas["UseText"];
 export type CustodianAgreement = Schemas["CustodianAgreement"];
 export type CustodianView = Schemas["CustodianViewOut"];
 
-export type DemoConfig = Readonly<{
-  speed_factor: number;
-  speed_source: "server_default" | "tenant_override";
-  server_speed_factor: number;
-  min_speed_factor: 1;
-  max_speed_factor: 10;
-}>;
+export type DemoConfig = Schemas["DemoConfigOut"];
