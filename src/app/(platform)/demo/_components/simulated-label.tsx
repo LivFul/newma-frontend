@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui";
+import { Badge } from "@/components/ui/badge";
 
 // Verbatim prompt §3.1 labels wherever a simulated component appears.
 export type SimulatedComponentLabel =

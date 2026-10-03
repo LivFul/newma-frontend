@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui";
+import { Badge } from "@/components/ui/badge";
 import { DEMO_BANNER_TEXT } from "@/lib/demo/banner";
 
 // Shown on every /demo/* page by the demo layout.

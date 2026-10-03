@@ -1,7 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Button, Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 export function ResetButton() {
   const router = useRouter();

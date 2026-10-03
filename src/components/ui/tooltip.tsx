@@ -1,12 +1,12 @@
 "use client";
-import { Tooltip as RadixTooltip } from "radix-ui";
+import * as RadixTooltip from "radix-ui/tooltip";
 import type { ReactNode } from "react";
 
 const TOOLTIP_SIDE_OFFSET = 6;
 
 /**
- * App-level tooltip context. Rendered once in `src/app/providers.tsx` (mounted by the root
- * layout); Radix exposes no way to detect a missing provider, so every `Tooltip` must sit
+ * App-level tooltip context. Mounted by `src/app/primitives/layout.tsx`, the only route that uses a
+ * Tooltip; Radix exposes no way to detect a missing provider, so every `Tooltip` must sit
  * under it — tests wrap their render in `<TooltipProvider>`.
  */
 export const TooltipProvider = RadixTooltip.Provider;

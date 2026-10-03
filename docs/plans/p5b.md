@@ -157,7 +157,7 @@ Tests: pickers keep documented keys and drop everything else (table test over th
 
 **Files:** `tests/support/weight.ts` (`measureFirstLoad(page, url) -> {total, requests: {url, type, bytes}[]}` through a CDP session: `Network.enable`, cache disabled, sum `encodedDataLength` from `Network.loadingFinished` for every request including the document; `W10_WEIGHT_BUDGET_BYTES = 200 * 1024`; `assertLight(requests)` rejects Font and non-SVG Image resources), `tests/unit/support/weight.test.ts` (pure summing and `assertLight` on fixtures), `scripts/` untouched. Build with `pnpm build`, serve with `pnpm start` on port 3100, sign in and record the first-load bytes of `/demo/w1-rights` and of a throwaway server-rendered stub at `/demo/w10-custodian` (title and one table, no client components) with and without `NEXT_PUBLIC_SENTRY_DSN`; write the three numbers in the commit body. If the stub alone is over budget, apply the levers of A-P5B-16 in order (lazy-load the reset dialog's content with `next/dynamic` on first open; skip the browser Sentry SDK when the path is `/demo/w10-custodian`; a lighter header for this route) before building anything else, each with its own unit test.
 
-- [ ] Commit: `test(demo): first-load weight measurement helper and W10 baseline`
+- [x] Commit: `test(demo): first-load weight measurement helper and W10 baseline`
 
 ### Task 5: W1 grievance indicator, queue and acknowledgement (additive; a D-19 task)
 
