@@ -97,6 +97,8 @@ export const w2Curation: StepRun = async (page) => {
 export const w1Withdraw: StepRun = async (page, ctx) => {
   const subject = ctx.governingSubject;
   expect(subject, "step 12 recorded the governing subject").toBeTruthy();
+  await evaluate(page, `${subject} (valid)`, "research", "retrieve");
+  await expect(decision(page)).toHaveText(/allow/);
   const row = page.getByTestId("rights-row-valid").filter({ hasText: subject ?? "" });
   await row.getByRole("button", { name: /Withdraw consent/ }).click();
   await page.getByLabel("Reason").fill("The fictional community withdrew consent");

@@ -9,6 +9,12 @@ import { useTour } from "@/lib/demo/tour/use-tour";
 // its step texts and its controls as a separate chunk only when a tour is active.
 const TourPanel = dynamic(() => import("./tour-panel"), { ssr: false });
 
+const DISCARD_TEXT = {
+  tenant: "The guided tour was reset because its progress belonged to a different demo session.",
+  version: "The guided tour was reset because it was saved by another version of the demo.",
+  malformed: "The guided tour was reset because its saved progress could not be read.",
+} as const;
+
 type Props = Readonly<{ tenantId: string; persona: PersonaId }>;
 
 export function TourDock({ tenantId, persona }: Props) {
@@ -18,11 +24,18 @@ export function TourDock({ tenantId, persona }: Props) {
   return (
     <aside aria-label="Guided tour" className="border-b border-border px-4 py-2 text-sm">
       <p role="status">
-        The guided tour was reset because its progress belonged to a different demo session.{" "}
+        {DISCARD_TEXT[tour.discarded]}{" "}
         <Link href="/demo/tour" className="underline underline-offset-4">
           Start the tour again
         </Link>{" "}
-        <button type="button" onClick={tour.end} className="underline underline-offset-4">
+        <button
+          type="button"
+          onClick={() => {
+            tour.end();
+            document.getElementById("main")?.focus();
+          }}
+          className="inline-flex min-h-8 items-center underline underline-offset-4"
+        >
           Dismiss
         </button>
       </p>

@@ -64,7 +64,8 @@ export const serializeState = (state: TourState): string => JSON.stringify(state
 function readDone(value: unknown): TourStepId[] | undefined {
   if (!Array.isArray(value)) return undefined;
   const ids = value.filter((id): id is TourStepId => typeof id === "string" && STEP_IDS.has(id));
-  return ids.length === value.length && new Set(ids).size === ids.length ? ids : undefined;
+  if (ids.length !== value.length || new Set(ids).size !== ids.length) return undefined;
+  return TOUR_STEP_IDS.filter((id) => ids.includes(id));
 }
 
 function validate(value: Record<string, unknown>, tenantId: string): ParsedTour {

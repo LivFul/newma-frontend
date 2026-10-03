@@ -46,7 +46,8 @@ test.describe("Guided tour", { tag: "@needs-backend" }, () => {
       await completeStep(page, index);
     }
     const region = await expandDock(page);
-    await expect(region.getByRole("status")).toContainText("Tour complete");
+    await expect(region.getByRole("status").filter({ hasText: "Tour complete" })).toHaveCount(1);
+    await expect(region.getByText("Tour complete: every step is done. Restart")).toBeVisible();
     await region.getByRole("button", { name: "End tour" }).click();
     await expect(dock(page)).toHaveCount(0);
   });
@@ -88,7 +89,7 @@ test.describe("Guided tour", { tag: "@needs-backend" }, () => {
     await page.getByRole("dialog").getByRole("button", { name: "Reset", exact: true }).click();
     await expect(page.getByRole("dialog")).toBeHidden();
     await expect(dock(page)).toContainText(`step 1 of ${TOTAL}`);
-    await expect(dock(page).getByText("Done")).toHaveCount(0);
+    await expect(dock(page).getByText("Done", { exact: true })).toHaveCount(0);
     // The speed override survives a reset (A-P5B-17).
     await page.goto(TOUR_ROUTE);
     await expect(page.getByText("(your override)")).toBeVisible();
@@ -101,7 +102,7 @@ test.describe("Guided tour", { tag: "@needs-backend" }, () => {
     await signIn(page, "scientist");
     await startTourAtSpeed(page, "8");
     const ctx: TourContext = {};
-    for (const index of [1, 2]) {
+    for (const index of [0, 1, 2]) {
       await runStep(page, index, ctx);
       await completeStep(page, index);
     }
@@ -117,7 +118,10 @@ test.describe("Guided tour", { tag: "@needs-backend" }, () => {
       ((await (await page.request.get("/api/demo/grievances")).json()) as { items: unknown[] })
         .items,
     ).toHaveLength(0);
-    for (const index of [1, 2, 3]) await runStep(page, index, ctx);
+    for (const index of [0, 1, 2, 3]) {
+      await runStep(page, index, ctx);
+      if (index < 3) await completeStep(page, index);
+    }
   });
 
   test("tour progress from another demo session is discarded", async ({ page }) => {
@@ -137,20 +141,22 @@ test.describe("Guided tour", { tag: "@needs-backend" }, () => {
     context,
   }) => {
     await signIn(page, "scientist");
-    const scripts = async (path: string): Promise<string[]> => {
-      const fresh = await context.newPage();
+    // sessionStorage is per tab: the idle load uses a fresh tab, the active one this tab.
+    const scriptsOn = async (tab: Page): Promise<string[]> => {
       const urls: string[] = [];
-      fresh.on("response", (r) => {
+      tab.on("response", (r) => {
         if (r.request().resourceType() === "script") urls.push(r.url());
       });
-      await fresh.goto(path);
-      await fresh.waitForLoadState("networkidle");
-      await fresh.close();
+      await tab.goto("/demo/w1-rights");
+      await tab.waitForLoadState("networkidle");
       return urls;
     };
-    const idle = await scripts("/demo/w1-rights");
+    const fresh = await context.newPage();
+    const idle = await scriptsOn(fresh);
+    await fresh.close();
     await startTourAtSpeed(page, "4");
-    const active = await scripts("/demo/w1-rights");
+    const active = await scriptsOn(page);
+    await expect(dock(page)).toContainText(`step 1 of ${TOTAL}`);
     expect(active.length).toBeGreaterThan(idle.length);
     const stored = await page.evaluate(() => sessionStorage.getItem("newma.tour.v1"));
     expect(JSON.parse(stored ?? "{}")).toEqual({

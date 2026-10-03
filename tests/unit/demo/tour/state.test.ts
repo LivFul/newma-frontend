@@ -139,6 +139,13 @@ describe("tour state (A-P5B-18)", () => {
       expect(parse({ ...valid(), ...patch })).toEqual({ discarded: "malformed" });
     });
 
+    it("normalises done to script order", () => {
+      expect(parse({ ...valid(), done: ["w1-evaluate", "home"] }).state?.done).toEqual([
+        "home",
+        "w1-evaluate",
+      ]);
+    });
+
     it("ignores unknown extra fields so no token can ride along", () => {
       const parsed = parse({ ...valid(), token: "secret", session_id: "sid" });
       expect(parsed.state).toBeDefined();

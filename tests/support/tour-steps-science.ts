@@ -39,7 +39,7 @@ export const w3Agent: StepRun = async (page, ctx) => {
     .toBe("held");
   const hold = page.getByRole("region", { name: "Budget hold" });
   await expect(hold).toContainText("Held");
-  await expect(hold).toContainText("Remediation");
+  await expect(hold).toContainText("Raise budget_credits");
 };
 
 export const w4Gates: StepRun = async (page, ctx) => {

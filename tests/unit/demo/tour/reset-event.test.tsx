@@ -41,3 +41,16 @@ describe("reset dialog and the tour", () => {
     window.removeEventListener(DEMO_RESET_EVENT, heard);
   });
 });
+
+describe("reset dialog focus", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("returns focus to the Reset demo data button when the dialog is cancelled", async () => {
+    render(<ResetButton />);
+    const opener = screen.getByRole("button", { name: "Reset demo data" });
+    fireEvent.click(opener);
+    fireEvent.click(await screen.findByRole("button", { name: "Cancel" }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(opener).toHaveFocus();
+  });
+});

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { TOUR_STEPS } from "@/lib/demo/tour/steps";
 import { goTo, isComplete, markDone, resetTour, unmarkDone } from "@/lib/demo/tour/state";
@@ -48,6 +48,8 @@ function endTour(tour: UseTour): void {
 /** The expanded tour panel; loaded lazily by TourDock (see tour-dock.tsx). */
 export default function TourPanel({ tour, state, persona }: Props) {
   const [expanded, setExpanded] = useState(false);
+  const bodyId = useId();
+  const toggleRef = useRef<HTMLButtonElement>(null);
   const step = TOUR_STEPS[state.current]!;
   const complete = isComplete(state);
   // aria-disabled, not disabled: a pressed Previous must not drop keyboard focus.
@@ -85,7 +87,9 @@ export default function TourPanel({ tour, state, persona }: Props) {
           <Button
             variant="ghost"
             size="sm"
+            ref={toggleRef}
             aria-expanded={expanded}
+            aria-controls={expanded ? bodyId : undefined}
             onClick={() => setExpanded((open) => !open)}
           >
             {expanded ? "Collapse" : "Expand"}
@@ -96,7 +100,7 @@ export default function TourPanel({ tour, state, persona }: Props) {
         {complete ? "Tour complete: every step is done." : ""}
       </p>
       {expanded ? (
-        <div className="space-y-4">
+        <div id={bodyId} className="space-y-4">
           {complete ? (
             <p className="font-medium">
               Tour complete: every step is done. Restart it from step one or end the tour.

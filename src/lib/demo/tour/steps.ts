@@ -176,7 +176,8 @@ const steps: readonly TourStep[] = [
     title: "Withdraw consent",
     persona: "community_liaison",
     route: "/demo/w1-rights",
-    tryIt: "Withdraw consent for the record named in the W8 policy block.",
+    tryIt:
+      "Evaluate the record named under Governing records on the W8 page (research, retrieve), then withdraw consent for it.",
     expected: "The record shows withdrawn and its cache entries are invalidated.",
     minutes: 0.5,
   },

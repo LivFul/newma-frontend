@@ -42,8 +42,10 @@ export const dock = (page: Page): Locator =>
 /** Opens the dock panel if it is collapsed. */
 export async function expandDock(page: Page): Promise<Locator> {
   const region = dock(page);
-  const toggle = region.getByRole("button", { name: "Expand" });
-  if (await toggle.isVisible()) await toggle.click();
+  // The panel loads lazily: wait for its toggle before deciding whether it is collapsed.
+  const toggle = region.getByRole("button", { name: /^(Expand|Collapse)$/ });
+  await expect(toggle).toBeVisible();
+  if ((await toggle.textContent()) === "Expand") await toggle.click();
   await expect(region.getByRole("button", { name: "Collapse" })).toBeVisible();
   return region;
 }
@@ -81,8 +83,10 @@ export async function arriveAtStep(page: Page, index: number): Promise<void> {
 /** Marks the step done and moves on; the dock must show the next step number. */
 export async function completeStep(page: Page, index: number): Promise<void> {
   const region = await expandDock(page);
-  await region.getByRole("button", { name: "Mark step done" }).click();
-  await expect(region.getByText("Step done")).toBeVisible();
+  const mark = region.getByRole("button", { name: "Mark step done" });
+  if ((await mark.getAttribute("aria-pressed")) !== "true") await mark.click();
+  await expect(mark).toHaveAttribute("aria-pressed", "true");
+  await expect(region.getByText("Step done", { exact: true })).toBeVisible();
   if (index < TOUR_STEPS.length - 1) {
     await region.getByRole("button", { name: "Next" }).click();
     await expect(region).toContainText(`step ${index + 2} of ${TOUR_STEPS.length}`);

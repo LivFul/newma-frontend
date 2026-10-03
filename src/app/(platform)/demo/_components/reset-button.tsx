@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 // The dialog (Radix focus scope, portal, dismissable layer) is ~9 KB gzip: it loads on the first
@@ -11,10 +11,12 @@ export function ResetButton() {
   // Each opening is a new session of the dialog, so an earlier error never shows again.
   const [sessions, setSessions] = useState(0);
   const [open, setOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   return (
     <>
       <Button
+        ref={buttonRef}
         variant="secondary"
         size="sm"
         onClick={() => {
@@ -24,7 +26,9 @@ export function ResetButton() {
       >
         Reset demo data
       </Button>
-      {sessions > 0 ? <ResetDialog key={sessions} open={open} onOpenChange={setOpen} /> : null}
+      {sessions > 0 ? (
+        <ResetDialog key={sessions} open={open} onOpenChange={setOpen} returnFocusTo={buttonRef} />
+      ) : null}
     </>
   );
 }
