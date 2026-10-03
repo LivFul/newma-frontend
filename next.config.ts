@@ -1,3 +1,4 @@
+import createMDX from "@next/mdx";
 import { withSentryConfig } from "@sentry/nextjs/config";
 import type { NextConfig } from "next";
 
@@ -16,13 +17,18 @@ const nextConfig: NextConfig = {
   },
 };
 
+// MDX is imported by the ecosystem detail route, not routed, so pageExtensions stays at the default.
+// No remark or rehype plugins: Turbopack cannot take function options and the pages need none.
+const withMDX = createMDX({});
+const config = withMDX(nextConfig);
+
 // Source-map upload only when a token is present; the SDK itself is gated by NEXT_PUBLIC_SENTRY_DSN.
 export default process.env.SENTRY_AUTH_TOKEN
-  ? withSentryConfig(nextConfig, {
+  ? withSentryConfig(config, {
       silent: true,
       org: process.env.SENTRY_ORG,
       project: process.env.SENTRY_PROJECT,
       authToken: process.env.SENTRY_AUTH_TOKEN,
       bundleSizeOptimizations: { excludeDebugStatements: true },
     })
-  : nextConfig;
+  : config;

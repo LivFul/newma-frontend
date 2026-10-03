@@ -1,0 +1,13 @@
+{/* claims: C-40 */}
+
+## Separate interfaces for separate roles
+
+The web application is designed with separate interfaces for scientists, biopharma partners and rights custodians, so each group sees the controls and records suited to its role.
+
+## Checks before work
+
+Requests are designed to pass an API layer that checks identity, permissions and rights policy. Authorization is designed to evaluate the tenant, project, purpose, agreement, asset restrictions and user role, using Open Policy Agent.
+
+## State changes and events
+
+Scientific records and their pending events are designed to commit together in the relational database, a pattern known as a transactional outbox. An accepted request then stays recoverable even if a downstream service is briefly unavailable.

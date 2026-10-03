@@ -1,9 +1,11 @@
+import mdx from "@mdx-js/rollup";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 import path from "node:path";
 
 export default defineConfig({
-  plugins: [react()],
+  // MDX is compiled for the ecosystem detail pages, exactly as @next/mdx does at build time.
+  plugins: [{ enforce: "pre", ...mdx({ providerImportSource: "@mdx-js/react" }) }, react()],
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),

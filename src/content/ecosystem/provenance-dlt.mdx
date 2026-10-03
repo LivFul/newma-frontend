@@ -1,0 +1,13 @@
+{/* claims: C-45, C-46, C-47 */}
+
+## Signed log first
+
+The baseline is canonical manifests, hashes and an append-only event history, with each signature naming its signer and key version. It supports provenance without the operating burden of a consortium.
+
+## Optional extensions
+
+A permissioned ledger, scoped zero-knowledge proofs and settlement contracts are optional extensions, introduced progressively and only for a defined need. Public anchoring, if it were ever used, would carry only permitted commitments.
+
+## What never leaves the record
+
+Sensitive knowledge, structures, contracts and assay data are never published on a ledger. They stay in confidential off-chain records. A commitment is not a zero-knowledge proof: a proof verifies an encoded credential, while a commitment only fixes content.
