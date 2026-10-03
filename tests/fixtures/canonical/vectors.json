@@ -77,5 +77,43 @@
     },
     "canonical": "{\"arr\":[true,null,false],\"f\":false,\"n\":null,\"t\":true}",
     "sha256": "299d1cccc012cc19c53bbc117d101b49c1a009e0caf25606d503105a0ece06f5"
+  },
+  {
+    "name": "event_manifest_v1",
+    "input": {
+      "schema": "newma.event.v1",
+      "tenant_id": "3f2b1c7e-8a4d-5c61-9d0e-1b2a3c4d5e6f",
+      "entity_type": "gate",
+      "entity_id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+      "entity_version": 2,
+      "seq": 1,
+      "event_type": "gate.decided",
+      "actor_persona": "scientific_approver",
+      "authority": "Demo sign-in step-up — fictional authority ü",
+      "occurred_at": "2026-10-02T12:34:56.789012Z",
+      "policy_version": null,
+      "payload": {
+        "decision": "pass",
+        "status_after": "PASS",
+        "rationale": "Synthetic evidence reviewed — ünïcode",
+        "scores": [
+          1.5,
+          -0.25,
+          10
+        ],
+        "nested": {
+          "b": [
+            true,
+            null
+          ],
+          "a": {}
+        }
+      },
+      "references": [
+        "0b6c8f0e-2f4a-5a8e-9b1d-7e3f4a5b6c7d"
+      ]
+    },
+    "canonical": "{\"actor_persona\":\"scientific_approver\",\"authority\":\"Demo sign-in step-up — fictional authority ü\",\"entity_id\":\"7c9e6679-7425-40de-944b-e07fc1f90ae7\",\"entity_type\":\"gate\",\"entity_version\":2,\"event_type\":\"gate.decided\",\"occurred_at\":\"2026-10-02T12:34:56.789012Z\",\"payload\":{\"decision\":\"pass\",\"nested\":{\"a\":{},\"b\":[true,null]},\"rationale\":\"Synthetic evidence reviewed — ünïcode\",\"scores\":[1.5,-0.25,10],\"status_after\":\"PASS\"},\"policy_version\":null,\"references\":[\"0b6c8f0e-2f4a-5a8e-9b1d-7e3f4a5b6c7d\"],\"schema\":\"newma.event.v1\",\"seq\":1,\"tenant_id\":\"3f2b1c7e-8a4d-5c61-9d0e-1b2a3c4d5e6f\"}",
+    "sha256": "c2dbec9afa17a4b63048b9bc05d1532df74b880ca0c7607912ff50facaf4778f"
   }
 ]
