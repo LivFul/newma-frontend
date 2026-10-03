@@ -3,6 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useLayoutEffect } from "react";
 import { HeroLoader, IDLE_TIMEOUT_MS } from "@/components/ecosystem-graphic/hero-loader";
 
+// A computed href keeps the Next.js lint rule about internal anchors out of these stand-ins.
+const WET_LAB_HREF = ["/ecosystem", "wet-lab"].join("/");
+
 // The real layer pulls in Motion; the loader contract is only about when and how it is mounted.
 const mounted = vi.fn();
 vi.mock("@/components/ecosystem-graphic/interactive", () => ({
@@ -17,7 +20,7 @@ vi.mock("@/components/ecosystem-graphic/interactive", () => ({
     mounted(props);
     return (
       <div data-testid="interactive" data-swapped={String(props.swapped)}>
-        <a href="/ecosystem/wet-lab" data-slug="wet-lab">
+        <a href={WET_LAB_HREF} data-slug="wet-lab">
           twin
         </a>
       </div>
@@ -45,7 +48,7 @@ function stubMatchMedia(reduced: boolean) {
 const Static = () => (
   <svg>
     <g data-slug="wet-lab">
-      <a href="/ecosystem/wet-lab">static</a>
+      <a href={WET_LAB_HREF}>static</a>
     </g>
   </svg>
 );

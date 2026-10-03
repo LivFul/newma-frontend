@@ -29,7 +29,8 @@ function collect(value: unknown, found: CopyBlock[] = []): CopyBlock[] {
 }
 
 const modules = { about, chrome, copy, caption, help, how, personas, heroText };
-const blocks = Object.values(modules).flatMap((m) => collect(m));
+// A block may be re-exported from two modules (the footer reuses the hero disclaimer): count it once.
+const blocks = [...new Set(Object.values(modules).flatMap((m) => collect(m)))];
 // Hero labels live in the registry as plain title/descriptor pairs; wrap them for the same checks.
 const heroLabelBlocks: CopyBlock[] = Object.entries(registry.HERO_LABELS).flatMap(([slug, l]) => [
   { id: `hero.${slug}.title`, text: l.title, claims: registry.HERO_CLAIMS },

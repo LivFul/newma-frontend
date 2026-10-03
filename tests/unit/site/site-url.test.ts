@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { absoluteUrl, FALLBACK_SITE_URL, siteUrl, type SiteEnv } from "@/lib/site";
 
 const env = (partial: SiteEnv): SiteEnv => partial;
@@ -19,8 +19,15 @@ describe("siteUrl", () => {
     expect(siteUrl(env({}))).toBe(FALLBACK_SITE_URL);
     expect(FALLBACK_SITE_URL).toBe("https://newma-frontend.vercel.app");
   });
-  it("never uses the per-deployment VERCEL_URL (canonical origin only)", () => {
-    expect(siteUrl({ VERCEL_URL: "newma-abc123.vercel.app" } as SiteEnv)).toBe(FALLBACK_SITE_URL);
+  it("never uses the per-deployment VERCEL_URL, even when the process environment sets it", () => {
+    vi.stubEnv("VERCEL_URL", "newma-abc123.vercel.app");
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "");
+    vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "");
+    try {
+      expect(siteUrl()).toBe(FALLBACK_SITE_URL);
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
   it("trims trailing slashes and whitespace", () => {
     expect(siteUrl(env({ NEXT_PUBLIC_SITE_URL: " https://newma.example/// " }))).toBe(

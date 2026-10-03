@@ -18,6 +18,9 @@ test("both See the demo links land on /access", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("link", { name: "See the demo" }).nth(i).click();
     await expect(page).toHaveURL(/\/access$/);
+    // The destination really rendered (a 404 page would also match the URL).
+    await expect(page).toHaveTitle(/Demo sign-in/);
+    await expect(page.locator("main#main")).toBeVisible();
   }
 });
 

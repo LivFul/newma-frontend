@@ -32,7 +32,7 @@ export function AboutLivful() {
         </div>
         <div className="space-y-4">
           <h3 className="text-xl font-semibold">{APPROACH_HEADING.text}</h3>
-          <ul className="grid gap-x-8 gap-y-4 md:grid-cols-3">
+          <ul role="list" className="grid gap-x-8 gap-y-4 md:grid-cols-3">
             {APPROACH.map((item) => (
               <li key={item.id} className="border-t border-border pt-4 text-fg-muted">
                 {item.text}

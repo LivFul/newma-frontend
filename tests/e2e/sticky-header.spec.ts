@@ -43,6 +43,7 @@ for (const fraction of SCROLL_POSITIONS) {
     expect(hit).toBe(true);
     await link.click();
     await expect(page).toHaveURL(/\/access$/);
+    await expect(page).toHaveTitle(/Demo sign-in/);
   });
 }
 
@@ -77,6 +78,7 @@ test("WCAG 2.4.11: no keyboard-focused element is hidden under the sticky header
   const headerHeight = await page
     .locator("[data-site-header]")
     .evaluate((el) => el.getBoundingClientRect().height);
+  let checked = 0;
   for (let i = 0; i < 40; i += 1) {
     await page.keyboard.press("Tab");
     const state = await page.evaluate(() => {
@@ -91,7 +93,9 @@ test("WCAG 2.4.11: no keyboard-focused element is hidden under the sticky header
     if (!state) break; // Tab left the page content (browser UI, or the dev overlay in `next dev`).
     if (state.inHeader || state.isSkip) continue;
     expect(state.top).toBeGreaterThanOrEqual(headerHeight - 1);
+    checked += 1;
   }
+  expect(checked, "the loop must actually inspect page content").toBeGreaterThan(8);
 });
 
 test("the skip link is the first tab stop and moves focus to main", async ({ page }) => {
@@ -122,9 +126,10 @@ test("in-page anchors land below the sticky header", async ({ page, isMobile }) 
   ] as const) {
     await page.locator("[data-site-header]").getByRole("link", { name }).click();
     await expect(page).toHaveURL(new RegExp(`#${id}$`));
-    await page.waitForTimeout(300);
-    const top = await page.locator(`#${id}`).evaluate((el) => el.getBoundingClientRect().top);
-    expect(top).toBeGreaterThanOrEqual(headerHeight - 1);
+    // The anchor scroll is instant; poll rather than sleep until the section has settled below the header.
+    await expect
+      .poll(() => page.locator(`#${id}`).evaluate((el) => el.getBoundingClientRect().top))
+      .toBeGreaterThanOrEqual(headerHeight - 1);
   }
 });
 
@@ -137,6 +142,7 @@ test("WCAG 2.4.11: Shift+Tab back up the page never leaves focus under the stick
     .evaluate((el) => el.getBoundingClientRect().height);
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
   await page.getByRole("link", { name: "Terms" }).focus();
+  let checked = 0;
   for (let i = 0; i < 25; i += 1) {
     await page.keyboard.press("Shift+Tab");
     const state = await page.evaluate(() => {
@@ -149,7 +155,9 @@ test("WCAG 2.4.11: Shift+Tab back up the page never leaves focus under the stick
       };
     });
     if (!state) break;
-    if (!state.inHeader && !state.isSkip)
-      expect(state.top).toBeGreaterThanOrEqual(headerHeight - 1);
+    if (state.inHeader || state.isSkip) continue;
+    expect(state.top).toBeGreaterThanOrEqual(headerHeight - 1);
+    checked += 1;
   }
+  expect(checked, "the loop must actually inspect page content").toBeGreaterThan(8);
 });

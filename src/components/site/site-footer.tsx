@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   ACCESS_LABEL,
   FOOTER_CONTACT,
@@ -23,13 +24,13 @@ export function SiteFooter() {
           </AccessLink>
           <nav aria-label={FOOTER_NAV_LABEL.text} className="flex gap-6">
             {FOOTER_LEGAL_LINKS.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
                 className="inline-flex min-h-11 items-center text-sm text-fg-muted underline underline-offset-4 hover:text-fg"
               >
                 {link.block.text}
-              </a>
+              </Link>
             ))}
           </nav>
         </div>

@@ -1,4 +1,5 @@
 import type { CopyBlock } from "../types";
+import { HERO } from "./copy";
 
 const block = (id: string, text: string, claims: readonly string[]): CopyBlock =>
   Object.freeze({ id, text, claims: Object.freeze([...claims]) });
@@ -23,11 +24,7 @@ export const FOOTER_CONTACT = block(
   "Contact details to be supplied by LivFul.",
   ["C-29"],
 );
-export const FOOTER_DISCLAIMER = block(
-  "chrome.footer.disclaimer",
-  "The demo uses synthetic data and is not evidence of scientific performance, deployment or compliance.",
-  ["C-21"],
-);
+export const FOOTER_DISCLAIMER = HERO.disclaimer;
 export const FOOTER_LEGAL_LINKS = Object.freeze([
   Object.freeze({
     block: block("chrome.footer.privacy", "Privacy", ["C-30"]),

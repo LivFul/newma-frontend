@@ -17,12 +17,12 @@ export function ComponentIndex() {
           </h2>
           <p className="max-w-[58ch] text-fg-muted">{COMPONENTS_INDEX.intro.text}</p>
         </div>
-        <ul className="grid gap-x-8 md:grid-cols-2 lg:grid-cols-3">
+        <ul role="list" className="grid gap-x-8 md:grid-cols-2 lg:grid-cols-3">
           {ECOSYSTEM_SLUGS.map((slug) => (
             <li key={slug} className="border-t border-border">
               <ComponentLink
                 slug={slug}
-                className="block min-h-11 space-y-1 py-4 underline-offset-4 hover:bg-bg-elevated"
+                className="block min-h-11 space-y-1 py-4 hover:bg-bg-elevated"
               >
                 <span className="block font-display text-xl">{HERO_LABELS[slug].title}</span>
                 <span className="block text-fg-muted">{HERO_LABELS[slug].descriptor}</span>

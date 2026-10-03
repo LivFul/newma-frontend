@@ -1,5 +1,8 @@
+import "server-only";
+
 // Canonical site origin for metadata, sitemap, robots and JSON-LD (assumption A-P4-10).
-// NEXT_PUBLIC_* values are inlined at build, so the build-time value always drives metadata.
+// Server-only: metadata, sitemap, robots and JSON-LD read it at build or request time on the server.
+// NEXT_PUBLIC_SITE_URL is inlined at build; VERCEL_PROJECT_PRODUCTION_URL is read from the server env.
 export const SITE_NAME = "NEWMA";
 export const FALLBACK_SITE_URL = "https://newma-frontend.vercel.app";
 // Flip once privacy and terms text is approved at CP-2 (assumption A-P4-03): until then the legal
@@ -10,7 +13,6 @@ export type SiteEnv = Readonly<{
   NEXT_PUBLIC_SITE_URL?: string;
   VERCEL_PROJECT_PRODUCTION_URL?: string;
   NODE_ENV?: string;
-  VERCEL_URL?: string;
 }>;
 
 // Literal member accesses so the bundler can inline the values.

@@ -1,5 +1,10 @@
 import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const trackEvent = vi.fn();
+vi.mock("@/lib/analytics/events", () => ({ trackEvent: (e: unknown) => trackEvent(e) }));
+
 import { AboutLivful } from "@/components/site/about-livful";
 import { ComponentIndex } from "@/components/site/component-index";
 import { HeroSection } from "@/components/site/hero-section";
@@ -105,6 +110,19 @@ describe("ComponentIndex", () => {
     expect(links.map((l) => l.textContent)).toEqual(
       ECOSYSTEM_SLUGS.map((s) => `${HERO_LABELS[s].title}${HERO_LABELS[s].descriptor}`),
     );
+  });
+});
+
+describe("ComponentLink", () => {
+  beforeEach(() => trackEvent.mockClear());
+  it("counts component_open with only the slug when an index link is clicked", async () => {
+    const user = userEvent.setup();
+    render(<ComponentIndex />);
+    const link = screen.getByRole("link", { name: /^Wet Lab/ });
+    link.addEventListener("click", (e) => e.preventDefault());
+    await user.click(link);
+    expect(trackEvent).toHaveBeenCalledTimes(1);
+    expect(trackEvent).toHaveBeenCalledWith({ name: "component_open", slug: "wet-lab" });
   });
 });
 

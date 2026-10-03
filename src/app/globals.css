@@ -20,7 +20,6 @@ body {
 html:has([data-site-header]) {
   scroll-padding-top: calc(var(--size-header) + var(--space-4));
 }
-[id="product"],
-[id="about"] {
+section[id] {
   scroll-margin-top: calc(var(--size-header) + var(--space-4));
 }

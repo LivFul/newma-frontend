@@ -27,7 +27,7 @@ export function ProductIntro() {
           </div>
           <div className="space-y-6 md:col-span-7">
             <h3 className="text-xl font-semibold">{PRODUCT.howHeading.text}</h3>
-            <ol className="[counter-reset:step]">
+            <ol role="list" className="[counter-reset:step]">
               {HOW_IT_WORKS.map((step) => (
                 <li key={step.title.id} className={COUNTER_ITEM}>
                   <p className="font-display text-lg">{step.title.text}</p>
