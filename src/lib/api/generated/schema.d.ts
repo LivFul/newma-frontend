@@ -51,6 +51,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ranked candidates and their current gate stage (synthetic) */
+        get: operations["review_list_candidates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/candidates/{candidate_id}/evidence-packages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Versioned evidence packages for a candidate */
+        get: operations["review_list_evidence_packages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/candidates/{candidate_id}/evidence-packages/diff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Diff two evidence-package versions of the same stage */
+        get: operations["review_diff_evidence_packages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/candidates/{candidate_id}/gates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Gate tracker with live checks and missing requirements */
+        get: operations["review_get_candidate_gates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/compounds": {
         parameters: {
             query?: never;
@@ -216,6 +284,23 @@ export interface paths {
         put?: never;
         /** Switch persona while keeping the tenant */
         post: operations["demo_switch_persona"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/gates/{gate_id}/decisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sign a gate decision (scientific approver, step-up confirmed; signed event) */
+        post: operations["review_decide_gate"];
         delete?: never;
         options?: never;
         head?: never;
@@ -532,6 +617,39 @@ export interface components {
             /** Subject Type */
             subject_type: string;
         };
+        /** CandidateOut */
+        CandidateOut: {
+            /**
+             * Compound Id
+             * Format: uuid
+             */
+            compound_id: string;
+            /**
+             * Current Stage
+             * @enum {string}
+             */
+            current_stage: "H0" | "H1" | "H2" | "H3" | "L1" | "L2" | "D";
+            /** Display Id */
+            display_id: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Last Reviewed Update At */
+            last_reviewed_update_at: string | null;
+            /** Rank */
+            rank: number;
+        };
+        /** CheckOut */
+        CheckOut: {
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
+            /** Passed */
+            passed: boolean;
+        };
         /** ClaimDecisionRequest */
         ClaimDecisionRequest: {
             /**
@@ -632,6 +750,36 @@ export interface components {
             /** Message */
             message: string;
         };
+        /** EvidenceDiffOut */
+        EvidenceDiffOut: {
+            /** Added */
+            added: components["schemas"]["PathValue"][];
+            /** Changed */
+            changed: components["schemas"]["PathChange"][];
+            /** From Version */
+            from_version: number;
+            /** Removed */
+            removed: components["schemas"]["PathValue"][];
+            /** To Version */
+            to_version: number;
+        };
+        /** EvidencePackageSummary */
+        EvidencePackageSummary: {
+            /** Content Sha256 */
+            content_sha256: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "H0" | "H1" | "H2" | "H3" | "L1" | "L2" | "D";
+            /** Version */
+            version: number;
+        };
         /** EvidenceRefOut */
         EvidenceRefOut: {
             /** Claim Id */
@@ -643,6 +791,139 @@ export interface components {
             label: "literature_reported" | "tentative_annotation" | "computational_prediction" | "measured_observation" | "scientist_accepted" | "unresolved_conflicting";
             /** Source Ref */
             source_ref?: string | null;
+        };
+        /** GateDecisionOut */
+        GateDecisionOut: {
+            /**
+             * Candidate Id
+             * Format: uuid
+             */
+            candidate_id: string;
+            /**
+             * Decided At
+             * Format: date-time
+             */
+            decided_at: string;
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "pass" | "fail" | "hold";
+            /**
+             * Event Id
+             * Format: uuid
+             */
+            event_id: string;
+            /** Evidence Package Version */
+            evidence_package_version: number;
+            /**
+             * Gate Id
+             * Format: uuid
+             */
+            gate_id: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kid */
+            kid: string;
+            /** Manifest */
+            manifest: {
+                [key: string]: unknown;
+            };
+            /** Manifest Sha256 */
+            manifest_sha256: string;
+            /** Rationale */
+            rationale: string;
+            /** Signature */
+            signature: string;
+            /**
+             * Signature Label
+             * @constant
+             */
+            signature_label: "Demo signature, not production key";
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "H0" | "H1" | "H2" | "H3" | "L1" | "L2" | "D";
+            /**
+             * Status After
+             * @enum {string}
+             */
+            status_after: "NOT_STARTED" | "PENDING" | "PASS" | "FAIL" | "HOLD" | "INVALIDATED";
+        };
+        /** GateDecisionRequest */
+        GateDecisionRequest: {
+            /**
+             * Confirm Candidate Display Id
+             * @description "Demo sign-in step-up": re-type the display id
+             */
+            confirm_candidate_display_id: string;
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "pass" | "fail" | "hold";
+            /** Evidence Package Version */
+            evidence_package_version: number;
+            /**
+             * Idempotency Key
+             * @description Client-chosen replay key; must match ^[A-Za-z0-9._:-]{1,128}$.
+             */
+            idempotency_key: string;
+            /** Rationale */
+            rationale: string;
+        };
+        /** GateOut */
+        GateOut: {
+            /** Checks */
+            checks: components["schemas"]["CheckOut"][];
+            /** Decided At */
+            decided_at: string | null;
+            /** Evidence Package Version */
+            evidence_package_version: number | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kid */
+            kid: string | null;
+            /** Missing Requirements */
+            missing_requirements: string[];
+            /** Rationale */
+            rationale: string;
+            /** Signature */
+            signature: string | null;
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "H0" | "H1" | "H2" | "H3" | "L1" | "L2" | "D";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "NOT_STARTED" | "PENDING" | "PASS" | "FAIL" | "HOLD" | "INVALIDATED";
+        };
+        /** GateTracker */
+        GateTracker: {
+            /** Can Advance To */
+            can_advance_to: ("H0" | "H1" | "H2" | "H3" | "L1" | "L2" | "D") | null;
+            /**
+             * Candidate Id
+             * Format: uuid
+             */
+            candidate_id: string;
+            /**
+             * Current Stage
+             * @enum {string}
+             */
+            current_stage: "H0" | "H1" | "H2" | "H3" | "L1" | "L2" | "D";
+            /** Gates */
+            gates: components["schemas"]["GateOut"][];
         };
         /** HealthResponse */
         HealthResponse: {
@@ -737,10 +1018,20 @@ export interface components {
             /** Items */
             items: components["schemas"]["CacheEntryOut"][];
         };
+        /** ItemList[CandidateOut] */
+        ItemList_CandidateOut_: {
+            /** Items */
+            items: components["schemas"]["CandidateOut"][];
+        };
         /** ItemList[ClaimOut] */
         ItemList_ClaimOut_: {
             /** Items */
             items: components["schemas"]["ClaimOut"][];
+        };
+        /** ItemList[EvidencePackageSummary] */
+        ItemList_EvidencePackageSummary_: {
+            /** Items */
+            items: components["schemas"]["EvidencePackageSummary"][];
         };
         /** ItemList[RightsRecordOut] */
         ItemList_RightsRecordOut_: {
@@ -903,6 +1194,22 @@ export interface components {
             items: components["schemas"]["TaxonOut"][];
             /** Next Cursor */
             next_cursor: string | null;
+        };
+        /** PathChange */
+        PathChange: {
+            /** After */
+            after: unknown;
+            /** Before */
+            before: unknown;
+            /** Path */
+            path: string;
+        };
+        /** PathValue */
+        PathValue: {
+            /** Path */
+            path: string;
+            /** Value */
+            value: unknown;
         };
         /** PersonaRequest */
         PersonaRequest: {
@@ -1456,6 +1763,274 @@ export interface operations {
                 };
             };
             /** @description not_found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    review_list_candidates: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemList_CandidateOut_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    review_list_evidence_packages: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                candidate_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemList_EvidencePackageSummary_"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such candidate */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    review_diff_evidence_packages: {
+        parameters: {
+            query: {
+                from: number;
+                to: number;
+            };
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                candidate_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvidenceDiffOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such candidate */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description unknown version or validation_error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    review_get_candidate_gates: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                candidate_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GateTracker"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such candidate */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -2103,6 +2678,97 @@ export interface operations {
                 };
             };
             /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service token or tenant resolver not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    review_decide_gate: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Demo-Session"?: string | null;
+            };
+            path: {
+                gate_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GateDecisionRequest"];
+            };
+        };
+        responses: {
+            /** @description Replay of an existing idempotency key */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GateDecisionOut"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GateDecisionOut"];
+                };
+            };
+            /** @description Missing or invalid service token or session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description persona_forbidden: persona not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description not_found: no such gate */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description gate_requirements_missing, gate_not_decidable, evidence_package_stale, idempotency_conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description step_up_mismatch or validation_error */
             422: {
                 headers: {
                     [name: string]: unknown;
