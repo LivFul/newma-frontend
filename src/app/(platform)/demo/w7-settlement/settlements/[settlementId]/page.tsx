@@ -22,8 +22,9 @@ export default async function SettlementPage({ params }: { params: Params }) {
     load<EntityEvents>(`/v1/settlements/${settlementId}/events`),
   ]);
   const data = settlement.data;
-  // The seeded example has no signed events; the backend answers 404 (A-P5A-F04).
-  const seededWithoutEvents = data?.seeded_example === true && events.error?.code === "not_found";
+  // The seeded example has no signed events: the backend answers 404 or an empty list (A-P5A-F04).
+  const noEvents = events.error?.code === "not_found" || events.data?.events.length === 0;
+  const seededWithoutEvents = data?.seeded_example === true && noEvents;
   return (
     <>
       <WorkflowHeader

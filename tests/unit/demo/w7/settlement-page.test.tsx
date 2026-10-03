@@ -73,6 +73,12 @@ describe("settlement page", () => {
     expect(container.textContent).not.toContain("%");
   });
 
+  it("shows the same text when the seeded example answers an empty event list", async () => {
+    arm(seeded, { data: { entity_type: "settlement", entity_id: "x", events: [] } });
+    await renderPage();
+    expect(screen.getByText("No signed events: seeded example")).toBeInTheDocument();
+  });
+
   it("surfaces a failed settlement read as an error notice", async () => {
     arm(undefined, { data: { entity_type: "settlement", entity_id: "x", events: [] } });
     load.mockImplementation(async (path: string) =>
