@@ -1,9 +1,10 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useSyncExternalStore, useTransition } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui";
 import { type ClientError, postJson } from "@/lib/demo/client";
+import { useAction } from "@/lib/demo/use-action";
 import { canAct } from "@/lib/demo/persona-actions";
 import type { AssayImport, ElnEditResult, WorkPackage } from "@/lib/demo/types";
 import type { PersonaId } from "@/lib/personas";
@@ -82,7 +83,7 @@ export function LabWorkspace({ workPackage, candidateId, persona, onChanged }: P
   );
   const [revision, setRevision] = useState<number | undefined>();
   const [error, setError] = useState<ClientError | undefined>();
-  const [pending, startTransition] = useTransition();
+  const { busy, run } = useAction();
   const changed = () => {
     onChanged?.();
     router.refresh();
@@ -94,9 +95,9 @@ export function LabWorkspace({ workPackage, candidateId, persona, onChanged }: P
 
   const editEln = () => {
     const eln = workPackage.eln;
-    if (pending || !eln) return;
+    if (busy || !eln) return;
     setError(undefined);
-    startTransition(async () => {
+    void run(async () => {
       const result = await postJson<ElnEditResult>(
         `/api/demo/eln/records/${encodeURIComponent(eln.record_id)}/edit`,
         { change: "correct_value" },
@@ -135,7 +136,7 @@ export function LabWorkspace({ workPackage, candidateId, persona, onChanged }: P
         ) : null}
       </div>
       {canAct(persona, "edit_eln_record") && workPackage.eln ? (
-        <Button size="sm" variant="secondary" onClick={editEln} aria-busy={pending || undefined}>
+        <Button size="sm" variant="secondary" onClick={editEln} aria-busy={busy || undefined}>
           Edit Mock ELN record (correct a value)
         </Button>
       ) : null}

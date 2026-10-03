@@ -1,8 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui";
 import { type ClientError, postJson } from "@/lib/demo/client";
+import { useAction } from "@/lib/demo/use-action";
 import {
   type AssetType,
   POLICY_ACTIONS,
@@ -41,7 +42,7 @@ export function PolicyEvaluator({ records, tenantId, persona }: Props) {
   const [action, setAction] = useState<PolicyAction>("retrieve");
   const [decision, setDecision] = useState<PolicyDecision | undefined>();
   const [error, setError] = useState<ClientError | undefined>();
-  const [pending, startTransition] = useTransition();
+  const { busy, run } = useAction();
 
   // A decision belongs to the inputs it was evaluated for: changing any input clears it.
   const changed = (set: (value: string) => void) => (value: string) => {
@@ -53,9 +54,9 @@ export function PolicyEvaluator({ records, tenantId, persona }: Props) {
     const separator = asset.indexOf(":");
     const assetType = asset.slice(0, separator);
     const assetId = separator > 0 ? asset.slice(separator + 1) : "";
-    if (pending || !assetId) return;
+    if (busy || !assetId) return;
     setError(undefined);
-    startTransition(async () => {
+    void run(async () => {
       const body = { purpose, action, asset_type: assetType as AssetType, asset_id: assetId };
       const result = await postJson<PolicyDecision>("/api/demo/policy/evaluate", body);
       if (!result.ok) {
@@ -101,7 +102,7 @@ export function PolicyEvaluator({ records, tenantId, persona }: Props) {
           onChange={changed((v) => setAction(v as PolicyAction))}
         />
         <div className="flex items-end">
-          <Button type="submit" aria-busy={pending || undefined}>
+          <Button type="submit" aria-busy={busy || undefined}>
             Evaluate policy
           </Button>
         </div>

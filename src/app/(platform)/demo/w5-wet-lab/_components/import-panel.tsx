@@ -1,7 +1,8 @@
 "use client";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Badge, Button } from "@/components/ui";
 import { type ClientError, postJson } from "@/lib/demo/client";
+import { useAction } from "@/lib/demo/use-action";
 import type { AssayImport, WorkPackage } from "@/lib/demo/types";
 import { ErrorNotice } from "../../_components/error-notice";
 import { humanize } from "../../_components/fields";
@@ -16,13 +17,13 @@ type Props = Readonly<{
 /** Wet-lab/CRO imports Mock ELN results; a repeat is a duplicate with zero new observations. */
 export function ImportPanel({ workPackage, current, allowed, onImported }: Props) {
   const [error, setError] = useState<ClientError | undefined>();
-  const [pending, startTransition] = useTransition();
+  const { busy, run } = useAction();
   const eln = workPackage.eln;
 
   const importResults = () => {
-    if (pending || !eln || !allowed) return;
+    if (busy || !eln || !allowed) return;
     setError(undefined);
-    startTransition(async () => {
+    void run(async () => {
       const result = await postJson<AssayImport>("/api/demo/assay-imports", {
         work_package_id: workPackage.id,
         eln_record_id: eln.record_id,
@@ -37,7 +38,7 @@ export function ImportPanel({ workPackage, current, allowed, onImported }: Props
       {allowed ? (
         <Button
           onClick={importResults}
-          aria-busy={pending || undefined}
+          aria-busy={busy || undefined}
           aria-disabled={!eln || undefined}
           aria-describedby={eln ? undefined : "import-hint"}
         >
