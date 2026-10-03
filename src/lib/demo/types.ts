@@ -1,5 +1,4 @@
 import type { components } from "@/lib/api/generated/schema";
-import type { EvidenceLabel } from "@/lib/evidence";
 import type { PersonaId } from "@/lib/personas";
 
 type Schemas = components["schemas"];

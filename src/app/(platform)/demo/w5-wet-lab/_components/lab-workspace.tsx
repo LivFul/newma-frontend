@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useSyncExternalStore, useTransition } from "react";
 import { Button } from "@/components/ui";
 import { type ClientError, postJson } from "@/lib/demo/client";
 import { canAct } from "@/lib/demo/persona-actions";
@@ -23,26 +23,63 @@ type Props = Readonly<{
 // client state (it survives the in-page persona switch) and in sessionStorage per work package.
 const storageKey = (id: string) => `newma-demo:import:${id}`;
 
-function readStored(id: string): AssayImport | undefined {
+const isStoredImport = (value: unknown): value is AssayImport =>
+  typeof value === "object" &&
+  value !== null &&
+  typeof (value as AssayImport).id === "string" &&
+  typeof (value as AssayImport).status === "string" &&
+  typeof (value as AssayImport).eln_revision === "number" &&
+  Array.isArray((value as AssayImport).observation_ids);
+
+const CHANGE_EVENT = "newma-demo:import-change";
+
+function readRaw(id: string): string | null {
   try {
-    const raw = sessionStorage.getItem(storageKey(id));
-    return raw ? (JSON.parse(raw) as AssayImport) : undefined;
+    return sessionStorage.getItem(storageKey(id));
   } catch {
-    return undefined;
+    return null;
   }
 }
 
-function store(id: string, value: AssayImport): void {
+function writeRaw(id: string, value: AssayImport): void {
   try {
     sessionStorage.setItem(storageKey(id), JSON.stringify(value));
   } catch {
     // Per-viewer convenience only.
   }
+  window.dispatchEvent(new Event(CHANGE_EVENT));
+}
+
+function subscribe(notify: () => void): () => void {
+  window.addEventListener(CHANGE_EVENT, notify);
+  return () => window.removeEventListener(CHANGE_EVENT, notify);
+}
+
+/** A stored import is only trusted while the ELN record has not moved past its revision. */
+function parseStored(raw: string | null, elnRevision: number | undefined): AssayImport | undefined {
+  if (raw === null) return undefined;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!isStoredImport(parsed)) return undefined;
+    return elnRevision !== undefined && parsed.eln_revision < elnRevision ? undefined : parsed;
+  } catch {
+    return undefined;
+  }
 }
 
 export function LabWorkspace({ workPackage, candidateId, persona, onChanged }: Props) {
   const router = useRouter();
-  const [current, setCurrent] = useState<AssayImport | undefined>(() => readStored(workPackage.id));
+  // useSyncExternalStore: the server snapshot is null, so the first client render matches the
+  // server HTML and the stored import appears right after hydration.
+  const raw = useSyncExternalStore(
+    subscribe,
+    () => readRaw(workPackage.id),
+    () => null,
+  );
+  const current = useMemo(
+    () => parseStored(raw, workPackage.eln?.revision),
+    [raw, workPackage.eln?.revision],
+  );
   const [revision, setRevision] = useState<number | undefined>();
   const [error, setError] = useState<ClientError | undefined>();
   const [pending, startTransition] = useTransition();
@@ -51,14 +88,14 @@ export function LabWorkspace({ workPackage, candidateId, persona, onChanged }: P
     router.refresh();
   };
   const remember = (value: AssayImport) => {
-    setCurrent(value);
-    store(workPackage.id, value);
+    writeRaw(workPackage.id, value);
     changed();
   };
 
   const editEln = () => {
     const eln = workPackage.eln;
     if (pending || !eln) return;
+    setError(undefined);
     startTransition(async () => {
       const result = await postJson<ElnEditResult>(
         `/api/demo/eln/records/${encodeURIComponent(eln.record_id)}/edit`,
@@ -82,19 +119,21 @@ export function LabWorkspace({ workPackage, candidateId, persona, onChanged }: P
       {current && !accepted && canAct(persona, "accept_import") ? (
         <AcceptanceDialog assayImport={current} onAccepted={remember} />
       ) : null}
-      {accepted ? (
-        <div role="status" className="space-y-1 text-sm">
-          <p className="font-semibold">Accepted by NEWMA scientist</p>
-          {current.gate_effect ? (
-            <Link
-              href={`/demo/w4-gates/${encodeURIComponent(candidateId)}`}
-              className="underline underline-offset-4"
-            >
-              H2 is now decidable ({current.gate_effect.status_after}) — open W4
-            </Link>
-          ) : null}
-        </div>
-      ) : null}
+      <div role="status" aria-live="polite" className="space-y-1 text-sm">
+        {accepted ? (
+          <>
+            <p className="font-semibold">Accepted by NEWMA scientist</p>
+            {current.gate_effect ? (
+              <Link
+                href={`/demo/w4-gates/${encodeURIComponent(candidateId)}`}
+                className="underline underline-offset-4"
+              >
+                H2 is now decidable ({current.gate_effect.status_after}) — open W4
+              </Link>
+            ) : null}
+          </>
+        ) : null}
+      </div>
       {canAct(persona, "edit_eln_record") && workPackage.eln ? (
         <Button size="sm" variant="secondary" onClick={editEln} aria-busy={pending || undefined}>
           Edit Mock ELN record (correct a value)

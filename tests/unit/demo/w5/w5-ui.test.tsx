@@ -1,3 +1,4 @@
+import { renderToString } from "react-dom/server";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -274,5 +275,45 @@ describe("WorkPackageForm", () => {
       scenario: "standard",
     });
     expect(push).toHaveBeenCalledWith("/demo/w5-wet-lab/wp-9");
+  });
+});
+
+describe("W5 review fixes", () => {
+  it("does not read sessionStorage during the first render (no hydration mismatch)", async () => {
+    sessionStorage.setItem(
+      "newma-demo:import:wp-1",
+      JSON.stringify(imported({ status: "reconciled" })),
+    );
+    const html = renderToString(
+      <LabWorkspace workPackage={wp()} candidateId="c-1" persona="scientist" />,
+    );
+    expect(html).not.toContain("observations");
+    render(<LabWorkspace workPackage={wp()} candidateId="c-1" persona="scientist" />);
+    expect(await screen.findByTestId("observation-count")).toHaveTextContent("3 observations");
+    sessionStorage.clear();
+  });
+
+  it("ignores a stored import with the wrong shape or an older ELN revision", async () => {
+    sessionStorage.setItem("newma-demo:import:wp-1", JSON.stringify({ id: 5 }));
+    render(<LabWorkspace workPackage={wp()} candidateId="c-1" persona="scientist" />);
+    await Promise.resolve();
+    expect(screen.queryByTestId("observation-count")).toBeNull();
+    sessionStorage.setItem(
+      "newma-demo:import:wp-2",
+      JSON.stringify(imported({ work_package_id: "wp-2", eln_revision: 1 })),
+    );
+    render(
+      <LabWorkspace
+        workPackage={wp({
+          id: "wp-2",
+          eln: { adapter_label: "Mock ELN", record_id: "ELN-1", revision: 2 },
+        })}
+        candidateId="c-1"
+        persona="scientist"
+      />,
+    );
+    await Promise.resolve();
+    expect(screen.queryByTestId("observation-count")).toBeNull();
+    sessionStorage.clear();
   });
 });

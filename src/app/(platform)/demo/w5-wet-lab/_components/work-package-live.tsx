@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 import { usePolling } from "@/lib/demo/use-polling";
 import type { WorkPackage } from "@/lib/demo/types";
 import type { PersonaId } from "@/lib/personas";
@@ -26,11 +26,12 @@ export function WorkPackageLive({ initial, persona }: Props) {
   );
   const wp = data ?? initial;
   // Server parts (reconciliation, proposals) re-read when the package status moves on.
-  const [seenStatus, setSeenStatus] = useState(wp.status);
-  if (seenStatus !== wp.status) {
-    setSeenStatus(wp.status);
+  const seenStatus = useRef(initial.status);
+  useEffect(() => {
+    if (seenStatus.current === wp.status) return;
+    seenStatus.current = wp.status;
     router.refresh();
-  }
+  }, [wp.status, router]);
   return (
     <div className="space-y-6">
       <p className="text-sm" data-testid="work-package-status" data-status={wp.status}>

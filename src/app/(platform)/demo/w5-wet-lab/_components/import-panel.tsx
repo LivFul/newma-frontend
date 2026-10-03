@@ -39,10 +39,16 @@ export function ImportPanel({ workPackage, current, allowed, onImported }: Props
           onClick={importResults}
           aria-busy={pending || undefined}
           aria-disabled={!eln || undefined}
+          aria-describedby={eln ? undefined : "import-hint"}
         >
           Import results
         </Button>
       ) : null}
+      {eln ? null : (
+        <p id="import-hint" className="text-fg-muted">
+          Waiting for the Mock ELN record.
+        </p>
+      )}
       <ErrorNotice error={error} />
       <div role="status" aria-live="polite" className="space-y-1">
         {current?.duplicate ? (
