@@ -18,7 +18,7 @@ const enumOf = (schemaName: string, field: string): string[] => {
       .slice(start)
       .split("\n")
       .find((l) => l.includes("|") || /: "/.test(l)) ?? "";
-  return [...line.matchAll(/"([a-z_]+)"/g)].map((m) => m[1]);
+  return [...line.matchAll(/"([A-Za-z0-9_]+)"/g)].map((m) => m[1]);
 };
 
 describe("P3 contract — D-11 (W1)", () => {
