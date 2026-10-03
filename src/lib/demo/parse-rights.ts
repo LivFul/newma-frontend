@@ -1,4 +1,4 @@
-import { isNonEmptyString, isRecord, isStringArray, oneOf, pick } from "./guards";
+import { isNonEmptyString, isRecord, isStringArray, isUuid, oneOf, pick } from "./guards";
 import { ASSET_TYPES, POLICY_ACTIONS, PURPOSES, type PolicyRequest, SUBJECT_TYPES } from "./types";
 
 // W1 body guards at the BFF boundary; undefined means "reject with 422".
@@ -26,7 +26,7 @@ export function parseRightsRecord(body: unknown): Record<string, unknown> | unde
   const { subject_type, subject_id, authority, permitted_uses, restrictions } = body;
   const required =
     isSubjectType(subject_type) &&
-    isNonEmptyString(subject_id) &&
+    isUuid(subject_id) &&
     isNonEmptyString(authority) &&
     Array.isArray(permitted_uses) &&
     permitted_uses.every(isPurpose) &&
@@ -48,7 +48,7 @@ export function parsePolicyRequest(body: unknown): PolicyRequest | undefined {
   if (!isRecord(body)) return undefined;
   const { purpose, action, asset_type, asset_id, jurisdiction } = body;
   if (!isPurpose(purpose) || !isAction(action) || !isAssetType(asset_type)) return undefined;
-  if (!isNonEmptyString(asset_id) || !isOptionalString(jurisdiction)) return undefined;
+  if (!isUuid(asset_id) || !isOptionalString(jurisdiction)) return undefined;
   const base: PolicyRequest = { purpose, action, asset_type, asset_id };
   return jurisdiction ? { ...base, jurisdiction: jurisdiction as string } : base;
 }

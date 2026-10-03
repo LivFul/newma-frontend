@@ -23,7 +23,7 @@ export const PURPOSES = [
   "disclosure",
   "model_training",
   "onward_transfer",
-] as const;
+] as const satisfies readonly Schemas["PolicyEvaluateRequest"]["purpose"][];
 export type Purpose = (typeof PURPOSES)[number];
 export const POLICY_ACTIONS = [
   "ingest",
@@ -33,85 +33,31 @@ export const POLICY_ACTIONS = [
   "export",
   "train",
   "commercialise",
-] as const;
+] as const satisfies readonly Schemas["PolicyEvaluateRequest"]["action"][];
 export type PolicyAction = (typeof POLICY_ACTIONS)[number];
-export const ASSET_TYPES = ["taxon", "compound", "observation", "dataset"] as const;
+export const ASSET_TYPES = [
+  "taxon",
+  "compound",
+  "observation",
+  "dataset",
+] as const satisfies readonly Schemas["PolicyEvaluateRequest"]["asset_type"][];
 export type AssetType = (typeof ASSET_TYPES)[number];
-export const SUBJECT_TYPES = ["taxon", "compound", "dataset"] as const;
+export const SUBJECT_TYPES = [
+  "taxon",
+  "compound",
+  "dataset",
+] as const satisfies readonly Schemas["RightsRecordCreate"]["subject_type"][];
 export type SubjectType = (typeof SUBJECT_TYPES)[number];
-export type Decision = "allow" | "hold" | "deny";
-export type RightsStatus = "valid" | "expired" | "purpose_restricted" | "disputed" | "withdrawn";
+export type Decision = Schemas["PolicyDecisionOut"]["decision"];
+export type RightsStatus = Schemas["RightsRecordOut"]["status"];
 
-export type RightsRecord = Readonly<{
-  id: string;
-  subject_type: SubjectType;
-  subject_id: string;
-  subject_display_name: string;
-  authority: string;
-  permitted_uses: readonly Purpose[];
-  restrictions: readonly string[];
-  jurisdiction: string;
-  valid_from: string;
-  valid_until: string | null;
-  status: RightsStatus;
-  pic_reference: string | null;
-  mat_reference: string | null;
-  obligations: readonly object[];
-  synthetic: true;
-}>;
-
-export type CacheEntry = Readonly<{
-  id: string;
-  subject_type: string;
-  subject_id: string;
-  purpose: Purpose;
-  rights_record_id: string;
-  policy_decision_id: string;
-  created_at: string;
-  invalidated_at: string | null;
-  invalidation_reason: string | null;
-}>;
-
-export type PolicyReason = Readonly<{
-  code: string;
-  message: string;
-  rights_record_id: string | null;
-  remediation: string | null;
-}>;
-
-export type PolicyRequest = Readonly<{
-  purpose: Purpose;
-  action: PolicyAction;
-  asset_type: AssetType;
-  asset_id: string;
-  jurisdiction?: string;
-}>;
-
-export type PolicyDecision = Readonly<{
-  id: string;
-  decision: Decision;
-  reasons: readonly PolicyReason[];
-  rights_record_ids: readonly string[];
-  policy_version: string;
-  inputs: Readonly<{
-    tenant_id: string;
-    persona: string;
-    purpose: Purpose;
-    action: PolicyAction;
-    asset_type: AssetType;
-    asset_id: string;
-    jurisdiction: string | null;
-  }>;
-  cache_entry_id: string | null;
-  evaluated_at: string;
-  event_id: string;
-}>;
-
-export type WithdrawResult = Readonly<{
-  record: RightsRecord;
-  invalidated_cache_entries: readonly CacheEntry[];
-  event_id: string;
-}>;
+// W1 (D-11): generated from the pinned contract.
+export type RightsRecord = Schemas["RightsRecordOut"];
+export type CacheEntry = Schemas["CacheEntryOut"];
+export type PolicyReason = Schemas["PolicyReasonOut"];
+export type PolicyRequest = Schemas["PolicyEvaluateRequest"];
+export type PolicyDecision = Schemas["PolicyDecisionOut"];
+export type WithdrawResult = Schemas["WithdrawResult"];
 
 export type EvidenceRef = Readonly<{
   label: EvidenceLabel;
