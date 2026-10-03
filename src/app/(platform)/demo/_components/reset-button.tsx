@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 // click, so a page's first load does not pay for a control most visitors never open (A-P5B-16).
 const ResetDialog = dynamic(() => import("./reset-dialog"), { ssr: false });
 
-export function ResetButton() {
+/** `label` lets the tour dock offer the same dialog under its own name. */
+export function ResetButton({ label = "Reset demo data" }: Readonly<{ label?: string }>) {
   // Each opening is a new session of the dialog, so an earlier error never shows again.
   const [sessions, setSessions] = useState(0);
   const [open, setOpen] = useState(false);
@@ -22,7 +23,7 @@ export function ResetButton() {
           setOpen(true);
         }}
       >
-        Reset demo data
+        {label}
       </Button>
       {sessions > 0 ? <ResetDialog key={sessions} open={open} onOpenChange={setOpen} /> : null}
     </>

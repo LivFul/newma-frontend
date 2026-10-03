@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
+import { DEMO_RESET_EVENT } from "@/lib/demo/tour/reset-event";
 
 type Props = Readonly<{ open: boolean; onOpenChange: (open: boolean) => void }>;
 
@@ -20,6 +21,7 @@ export default function ResetDialog({ open, onOpenChange }: Props) {
         setError("Reset failed. Try again.");
         return;
       }
+      window.dispatchEvent(new Event(DEMO_RESET_EVENT));
       onOpenChange(false);
       router.refresh();
     });

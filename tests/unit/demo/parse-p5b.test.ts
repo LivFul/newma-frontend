@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseConfigUpdate } from "@/lib/demo/parse-config";
+import { parseConfigUpdate, parseSpeedChoice } from "@/lib/demo/parse-config";
 import {
   parseCharterEdit,
   parseQuotaEdit,
@@ -304,5 +304,18 @@ describe("parseConfigUpdate (demo speed)", () => {
 
   it.each([0, 11, -1, "4", Number.NaN, undefined])("rejects %s", (bad) => {
     expect(parseConfigUpdate({ speed_factor: bad })).toBeUndefined();
+  });
+});
+
+describe("parseSpeedChoice (speed control)", () => {
+  it("maps the select values", () => {
+    expect(parseSpeedChoice("server")).toBeNull();
+    expect(parseSpeedChoice("1")).toBe(1);
+    expect(parseSpeedChoice("8")).toBe(8);
+    expect(parseSpeedChoice("10")).toBe(10);
+  });
+
+  it.each(["0", "11", "-1", "", "4.5", "abc", "99", "1e1", " 4"])("rejects %j", (bad) => {
+    expect(parseSpeedChoice(bad)).toBeUndefined();
   });
 });

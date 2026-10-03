@@ -55,5 +55,6 @@ describe("/demo dashboard", () => {
       "href",
       "/demo/jobs",
     );
+    expect(screen.getByRole("link", { name: "Guided tour" })).toHaveAttribute("href", "/demo/tour");
   });
 });

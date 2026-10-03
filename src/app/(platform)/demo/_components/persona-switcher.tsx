@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useId, useState, useTransition } from "react";
+import { switchPersona } from "@/lib/demo/persona-client";
 import { PERSONAS, type PersonaId } from "@/lib/personas";
 
 // Native <select>: accessible and light. Talks to the BFF route only, never to the API client.
@@ -13,12 +14,7 @@ export function PersonaSwitcher({ persona }: { persona: PersonaId }) {
   const switchTo = (next: PersonaId) => {
     setError(undefined);
     startTransition(async () => {
-      const response = await fetch("/api/demo/sessions/persona", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ persona: next }),
-      }).catch(() => undefined);
-      if (!response?.ok) {
+      if (!(await switchPersona(next))) {
         setError("Could not switch persona. Try again.");
         return;
       }

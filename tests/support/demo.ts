@@ -14,10 +14,19 @@ export const WORKFLOW_ROUTES = [
   "/demo/w7-settlement",
 ] as const;
 
-// P5b workflow pages (W8-W10); the guided tour route joins DEMO_ROUTES with the tour itself.
+// P5b workflow pages (W8-W10).
 export const P5B_ROUTES = ["/demo/w8-partner", "/demo/w9-campaign", "/demo/w10-custodian"] as const;
 
-export const DEMO_ROUTES = ["/demo", "/demo/jobs", ...WORKFLOW_ROUTES, ...P5B_ROUTES] as const;
+// The guided-tour entry (D-20); the dock and its steps are driven by tests/e2e/demo-tour.spec.ts.
+export const TOUR_ROUTE = "/demo/tour";
+
+export const DEMO_ROUTES = [
+  "/demo",
+  "/demo/jobs",
+  ...WORKFLOW_ROUTES,
+  ...P5B_ROUTES,
+  TOUR_ROUTE,
+] as const;
 
 export const PERSONA_LABELS = {
   community_liaison: "Community liaison",

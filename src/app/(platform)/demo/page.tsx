@@ -4,9 +4,6 @@ import { requireSession } from "@/lib/demo/current-session";
 import { WORKFLOWS, type Workflow } from "@/lib/demo/workflows";
 import { personaLabel } from "@/lib/personas";
 
-// Task 8 (guided tour) flips this once /demo/tour exists.
-const TOUR_AVAILABLE = false;
-
 function formatInstant(iso: string): string {
   const date = new Date(iso);
   return Number.isNaN(date.getTime()) ? iso : date.toUTCString();
@@ -57,13 +54,11 @@ export default async function DemoDashboard() {
             Open simulated jobs
           </Link>
         </p>
-        {TOUR_AVAILABLE ? (
-          <p>
-            <Link href="/demo/tour" className="underline underline-offset-4">
-              Guided tour
-            </Link>
-          </p>
-        ) : null}
+        <p>
+          <Link href="/demo/tour" className="underline underline-offset-4">
+            Guided tour
+          </Link>
+        </p>
       </section>
       <section aria-labelledby="workflows-heading" className="space-y-3">
         <h2 id="workflows-heading" className="text-xl font-semibold">
