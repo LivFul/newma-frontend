@@ -1,5 +1,5 @@
 // P3 backend paths from the shared contract (docs/plans/p3.md), accepted by demoFetch until the
-// generated `paths` carry them. Each D-item's block is deleted when its spec is repinned (D-11 to D-14 done).
+// generated `paths` carry them. Each D-item's block is deleted when its spec is repinned (D-11 to D-14 and D-16 done).
 type Id = string;
 
 type W5Paths =
@@ -14,10 +14,4 @@ type W5Paths =
   | "/v1/retraining-proposals"
   | `/v1/retraining-proposals/${Id}/execute`;
 
-type W6Paths =
-  | `/v1/provenance/${Id}/${Id}`
-  | `/v1/provenance/events/${Id}/manifest`
-  | "/v1/provenance/verify"
-  | "/v1/demo/provenance/tamper";
-
-export type ContractPath = W5Paths | W6Paths;
+export type ContractPath = W5Paths;

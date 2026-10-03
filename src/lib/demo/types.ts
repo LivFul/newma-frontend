@@ -112,6 +112,7 @@ export type GateDecision = Schemas["GateDecisionOut"];
 export type EvidencePackage = Schemas["EvidencePackageSummary"];
 export type EvidenceDiff = Schemas["EvidenceDiffOut"];
 
+// W6 (D-16): generated from the pinned contract.
 export const ENTITY_TYPES = [
   "rights_record",
   "policy_decision",
@@ -121,50 +122,13 @@ export const ENTITY_TYPES = [
   "gate",
   "work_package",
   "assay_import",
-] as const;
-export type EntityType = (typeof ENTITY_TYPES)[number];
-
-export type ProvenanceEvent = Readonly<{
-  id: string;
-  seq: number;
-  event_type: string;
-  actor_persona: string;
-  authority: string;
-  occurred_at: string;
-  policy_version: string;
-  entity_version: number;
-  payload: unknown;
-  payload_sha256: string;
-  signature: string;
-  kid: string;
-}>;
-
-export type ProvenanceTimeline = Readonly<{
-  entity_type: EntityType;
-  entity_id: string;
-  events: readonly ProvenanceEvent[];
-}>;
-
-export type EventManifest = Readonly<{
-  event_id: string;
-  manifest: unknown;
-  canonical: string;
-  sha256: string;
-  signature: string;
-  kid: string;
-  signature_label: string;
-}>;
-
-export type VerifyResult = Readonly<{ valid: boolean; sha256: string; reasons: readonly string[] }>;
-
-export type TamperResult = Readonly<{
-  event_id: string;
-  manifest: unknown;
-  signature: string;
-  kid: string;
-  tampered_path: string;
-  label: "Demo tamper toggle";
-}>;
+] as const satisfies readonly Schemas["TimelineOut"]["entity_type"][];
+export type EntityType = Schemas["TimelineOut"]["entity_type"];
+export type ProvenanceEvent = Schemas["EventOut"];
+export type ProvenanceTimeline = Schemas["TimelineOut"];
+export type EventManifest = Schemas["ManifestOut"];
+export type VerifyResult = Schemas["VerifyOut"];
+export type TamperResult = Schemas["TamperOut"];
 
 export type MaterialBatch = Readonly<{
   id: string;

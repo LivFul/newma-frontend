@@ -188,6 +188,7 @@ describe("GateTracker and cards", () => {
       <EvidenceDiffView
         diff={{
           from_version: 1,
+          stage: "H2",
           to_version: 2,
           added: [{ path: "replicates[1]", value: 2 }],
           removed: [],

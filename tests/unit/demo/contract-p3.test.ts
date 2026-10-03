@@ -141,3 +141,26 @@ describe("P3 contract — D-14 (W4)", () => {
     expect([...GATE_STAGES]).toEqual(enumOf("GateOut", "stage"));
   });
 });
+
+describe("P3 contract — D-16 (W6)", () => {
+  it("pins the W6 paths and drops the hand-written block", () => {
+    for (const p of [
+      "/v1/provenance/{entity_type}/{entity_id}",
+      "/v1/provenance/events/{event_id}/manifest",
+      "/v1/provenance/verify",
+      "/v1/demo/provenance/tamper",
+    ]) {
+      expect(schema).toContain(`"${p}": {`);
+    }
+    expect(contractPaths).not.toMatch(/W6Paths/);
+  });
+
+  it("derives W6 types from the generated schema and keeps entity types equal to the enum", async () => {
+    for (const name of ["TimelineOut", "EventOut", "ManifestOut", "VerifyOut", "TamperOut"]) {
+      expect(types).toContain(`Schemas["${name}"]`);
+    }
+    const { ENTITY_TYPES } = await import("@/lib/demo/types");
+    const line = schema.split("\n").find((l) => l.includes('entity_type: "rights_record"')) ?? "";
+    expect([...ENTITY_TYPES]).toEqual([...line.matchAll(/"([a-z_]+)"/g)].map((m) => m[1]));
+  });
+});
