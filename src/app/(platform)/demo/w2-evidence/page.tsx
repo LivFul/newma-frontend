@@ -1,4 +1,5 @@
 import { requireSession } from "@/lib/demo/current-session";
+import { isCursor } from "@/lib/demo/parse-curation";
 import { WorkflowHeader } from "../_components/workflow-header";
 import { CurationTab } from "./_components/curation-tab";
 import { EvidenceLegend } from "./_components/evidence-legend";
@@ -14,7 +15,9 @@ const asTab = (value: string | undefined): W2Tab =>
 export default async function EvidencePage({ searchParams }: { searchParams: SearchParams }) {
   const [session, params] = await Promise.all([requireSession(), searchParams]);
   const tab = asTab(first(params.tab));
-  const cursor = first(params.cursor);
+  // Same opaque-cursor check as the BFF route; an invalid one falls back to the first page.
+  const rawCursor = first(params.cursor);
+  const cursor = rawCursor && isCursor(rawCursor) ? rawCursor : undefined;
   return (
     <>
       <WorkflowHeader id="W2" title="Ingestion & curation">

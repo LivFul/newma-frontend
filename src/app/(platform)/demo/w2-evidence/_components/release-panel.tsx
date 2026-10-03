@@ -24,7 +24,11 @@ export function ReleasePanel({ claims, allowed }: { claims: readonly Claim[]; al
         claim_ids: approved.map((claim) => claim.id),
         idempotency_key: key,
       });
-      if (!result.ok) return setError(result.error);
+      if (!result.ok) {
+        // The approved set may change before a retry: a new attempt gets a new key.
+        reset();
+        return setError(result.error);
+      }
       setRelease(result.data);
       reset();
       router.refresh();

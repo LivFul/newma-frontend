@@ -91,5 +91,19 @@ describe("W2 curation BFF", () => {
     expect(sentBody(fetchMock)).toEqual({ claim_ids: [ID], idempotency_key: "k-2" });
     expect((await RELEASE(post({ claim_ids: [] }))).status).toBe(422);
     expect((await RELEASE(post({ claim_ids: ["nope"] }))).status).toBe(422);
+    expect((await RELEASE(post({ claim_ids: Array.from({ length: 201 }, () => ID) }))).status).toBe(
+      422,
+    );
+  });
+
+  it("de-duplicates claim ids and caps the rationale", async () => {
+    const fetchMock = armBff([Response.json({ id: "rel" }, { status: 201 })]);
+    await RELEASE(post({ claim_ids: [ID, ID], idempotency_key: "k" }));
+    expect(sentBody(fetchMock)).toEqual({ claim_ids: [ID], idempotency_key: "k" });
+    const tooLong = await DECIDE(
+      post({ decision: "approve", rationale: "x".repeat(2001) }),
+      ctx(ID),
+    );
+    expect(tooLong.status).toBe(422);
   });
 });

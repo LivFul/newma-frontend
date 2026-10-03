@@ -199,6 +199,10 @@ describe("curation", () => {
     await user.click(screen.getByRole("button", { name: /Ingest Synthetic survey \(cleared\)/ }));
     expect(await screen.findByRole("status")).toHaveTextContent("1 claim extracted");
     expect(refresh).toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: /Ingest Synthetic survey/ })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
   });
 
   it("renders the claim_quarantined refusal", async () => {
@@ -242,5 +246,14 @@ describe("curation", () => {
     expect(body.idempotency_key).toMatch(/^[0-9a-f-]{36}$/);
     expect(await screen.findByRole("status")).toHaveTextContent("Release version 1");
     expect(screen.getByRole("status")).toHaveTextContent("ab".repeat(32));
+  });
+});
+
+describe("isCursor", () => {
+  it("accepts base64url only", async () => {
+    const { isCursor } = await import("@/lib/demo/parse-curation");
+    expect(isCursor("eyJrIjoiYSJ9")).toBe(true);
+    expect(isCursor("a b")).toBe(false);
+    expect(isCursor("x".repeat(513))).toBe(false);
   });
 });

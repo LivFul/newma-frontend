@@ -13,6 +13,11 @@ const isClaimStatus = oneOf([
 ] as const);
 const isClaimDecision = oneOf(["approve", "reject"] as const);
 
+const MAX_RATIONALE = 2000;
+const MAX_RELEASE_CLAIMS = 200;
+
+export const isCursor = (value: string): boolean => CURSOR.test(value);
+
 export type PageQuery = Readonly<Record<string, string | undefined>>;
 
 /** cursor stays opaque (never decoded here); limit 1–100; observation filters validated. */
@@ -47,15 +52,16 @@ export function parseClaimDecision(body: unknown) {
   if (!isRecord(body) || !isClaimDecision(body.decision) || !isNonEmptyString(body.rationale)) {
     return undefined;
   }
+  if (body.rationale.length > MAX_RATIONALE) return undefined;
   return { decision: body.decision, rationale: body.rationale.trim() };
 }
 
 export function parseRelease(body: unknown) {
   if (!isRecord(body) || !Array.isArray(body.claim_ids) || body.claim_ids.length === 0)
     return undefined;
-  if (!body.claim_ids.every(isUuid)) return undefined;
+  if (body.claim_ids.length > MAX_RELEASE_CLAIMS || !body.claim_ids.every(isUuid)) return undefined;
   return withIdempotencyKey({
-    claim_ids: body.claim_ids as string[],
+    claim_ids: [...new Set(body.claim_ids as string[])],
     idempotency_key: body.idempotency_key,
   });
 }

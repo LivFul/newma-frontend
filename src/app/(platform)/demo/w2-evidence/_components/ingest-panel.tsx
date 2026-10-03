@@ -21,8 +21,8 @@ function Rejected({ error }: { error: ClientError }) {
     <div role="alert" className="space-y-1 rounded-md border border-danger px-3 py-2 text-sm">
       <p className="font-medium">Rejected before ingestion</p>
       <ul>
-        {reasonsOf(error).map((reason) => (
-          <li key={reason.code}>
+        {reasonsOf(error).map((reason, index) => (
+          <li key={`${reason.code}:${index}`}>
             <span className="font-mono">{reason.code}</span>
             {reason.message ? `: ${reason.message}` : null}
           </li>
@@ -42,7 +42,7 @@ function SourceRow({ source }: { source: SourceRecord }) {
   const [key] = useState(() => crypto.randomUUID());
 
   const ingest = () => {
-    if (pending) return;
+    if (pending || run) return;
     setError(undefined);
     startTransition(async () => {
       const result = await postJson<IngestionRun>("/api/demo/ingestion/runs", {
@@ -66,6 +66,7 @@ function SourceRow({ source }: { source: SourceRecord }) {
           size="sm"
           onClick={ingest}
           aria-busy={pending || undefined}
+          aria-disabled={run ? true : undefined}
           aria-label={`Ingest ${source.title}`}
         >
           Ingest
