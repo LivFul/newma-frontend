@@ -79,9 +79,9 @@ test.describe("W10 custodian view", { tag: "@needs-backend" }, () => {
     await openForm(page, "");
     await sendConcern(page).first().click();
     await page.waitForURL(/\?error=validation_error/, { timeout: SLOW_MS });
-    await expect(page.getByRole("alert")).toContainText(
-      "Please describe your concern in at least 10 characters",
-    );
+    await expect(
+      page.getByRole("alert").filter({ hasText: "Please describe your concern" }),
+    ).toContainText("Please describe your concern in at least 10 characters");
     await expect(concerns(page)).toHaveCount(0);
 
     // A scientist sees the persona notice and no agreements.

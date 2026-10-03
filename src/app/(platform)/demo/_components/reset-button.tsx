@@ -1,58 +1,30 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import dynamic from "next/dynamic";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+
+// The dialog (Radix focus scope, portal, dismissable layer) is ~9 KB gzip: it loads on the first
+// click, so a page's first load does not pay for a control most visitors never open (A-P5B-16).
+const ResetDialog = dynamic(() => import("./reset-dialog"), { ssr: false });
 
 export function ResetButton() {
-  const router = useRouter();
+  // Each opening is a new session of the dialog, so an earlier error never shows again.
+  const [sessions, setSessions] = useState(0);
   const [open, setOpen] = useState(false);
-  const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | undefined>();
-
-  const onOpenChange = (next: boolean) => {
-    if (next) setError(undefined);
-    setOpen(next);
-  };
-
-  const reset = () => {
-    if (pending) return;
-    startTransition(async () => {
-      const response = await fetch("/api/demo/reset", { method: "POST" }).catch(() => undefined);
-      if (!response?.ok) {
-        setError("Reset failed. Try again.");
-        return;
-      }
-      setOpen(false);
-      router.refresh();
-    });
-  };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant="secondary" size="sm">
-          Reset demo data
-        </Button>
-      </DialogTrigger>
-      <DialogContent
-        title="Reset this tenant?"
-        description="Synthetic records for your demo tenant return to the seed. Other sessions are unaffected."
+    <>
+      <Button
+        variant="secondary"
+        size="sm"
+        onClick={() => {
+          setSessions((n) => n + 1);
+          setOpen(true);
+        }}
       >
-        {error ? (
-          <p role="alert" className="mb-3 text-sm text-danger">
-            {error}
-          </p>
-        ) : null}
-        <div className="flex justify-end gap-2">
-          <DialogClose asChild>
-            <Button variant="ghost">Cancel</Button>
-          </DialogClose>
-          <Button variant="danger" onClick={reset} aria-busy={pending || undefined}>
-            Reset
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+        Reset demo data
+      </Button>
+      {sessions > 0 ? <ResetDialog key={sessions} open={open} onOpenChange={setOpen} /> : null}
+    </>
   );
 }
