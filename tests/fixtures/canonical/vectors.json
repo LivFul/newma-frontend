@@ -1,0 +1,81 @@
+[
+  {
+    "name": "nested_objects",
+    "input": {
+      "z": {
+        "b": [
+          1,
+          {
+            "y": "x",
+            "a": null
+          }
+        ],
+        "a": 2
+      },
+      "a": {
+        "k": {
+          "j": []
+        }
+      }
+    },
+    "canonical": "{\"a\":{\"k\":{\"j\":[]}},\"z\":{\"a\":2,\"b\":[1,{\"a\":null,\"y\":\"x\"}]}}",
+    "sha256": "00c53776068ef3b6d480cb6dfbfe5a3d3e51f11178c2b20d052b9291d1a8d1bc"
+  },
+  {
+    "name": "unicode",
+    "input": {
+      "name": "Exemplaria viridis — fictional",
+      "emoji": "🌿",
+      "cjk": "植物"
+    },
+    "canonical": "{\"cjk\":\"植物\",\"emoji\":\"🌿\",\"name\":\"Exemplaria viridis — fictional\"}",
+    "sha256": "0ce94098f19cc7948ac774706730ae959463387395236a0de2388502d451619f"
+  },
+  {
+    "name": "integers",
+    "input": {
+      "zero": 0,
+      "neg": -42,
+      "big": 9007199254740991
+    },
+    "canonical": "{\"big\":9007199254740991,\"neg\":-42,\"zero\":0}",
+    "sha256": "2c94976a5419a37e61093c89e04772ce50c87ba9dfc421685a394a6a39dc54c9",
+    "note": "Integers must stay within ±(2^53-1) (JS Number.MAX_SAFE_INTEGER) so the frontend canonicaliser produces identical bytes."
+  },
+  {
+    "name": "floats",
+    "input": {
+      "half": 1.5,
+      "sci": 1e+21,
+      "tenth": 0.1,
+      "neg": -2.5
+    },
+    "canonical": "{\"half\":1.5,\"neg\":-2.5,\"sci\":1e+21,\"tenth\":0.1}",
+    "sha256": "0bb90871c758ca2cdffa16f13d3dfd517362a3efee46b6ee705c4171eb1de0eb"
+  },
+  {
+    "name": "empty_containers",
+    "input": {
+      "obj": {},
+      "arr": [],
+      "str": ""
+    },
+    "canonical": "{\"arr\":[],\"obj\":{},\"str\":\"\"}",
+    "sha256": "3232586cd023c34b39feb5ba31617ccceb01f5b984c35034a83c4d5b7765f0ce"
+  },
+  {
+    "name": "booleans_null",
+    "input": {
+      "t": true,
+      "f": false,
+      "n": null,
+      "arr": [
+        true,
+        null,
+        false
+      ]
+    },
+    "canonical": "{\"arr\":[true,null,false],\"f\":false,\"n\":null,\"t\":true}",
+    "sha256": "299d1cccc012cc19c53bbc117d101b49c1a009e0caf25606d503105a0ece06f5"
+  }
+]
