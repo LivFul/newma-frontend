@@ -473,7 +473,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Public demo signing key (JWK). Demo signature, not production key. */
+        /** Public demo signing keyset (JWKs). Demo signature, not production key. */
         get: operations["demo_demo_keys"];
         put?: never;
         post?: never;
@@ -2308,10 +2308,25 @@ export interface components {
         };
         /** DemoKeys */
         DemoKeys: {
+            /**
+             * Active Kid
+             * @description Key id that new signatures are made under.
+             */
+            active_kid: string;
             /** Keys */
             keys: components["schemas"]["PublicJwk"][];
+            /**
+             * Legacy Kids
+             * @description Key ids from before per-key ids. Each is published in `keys` once per key (oldest first); a signature under one is valid if any JWK with that kid verifies it.
+             */
+            legacy_kids: string[];
             /** Note */
             note: string;
+            /**
+             * Previous Kids
+             * @description Rotated-out key ids, newest first; they verify but never sign.
+             */
+            previous_kids: string[];
         };
         /** DispositionRequest */
         DispositionRequest: {
