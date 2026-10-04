@@ -91,7 +91,11 @@ test("/access gets a fresh nonce policy without 'unsafe-inline' for scripts @csp
     policies.push(response?.headers()[HEADER] ?? "");
   }
   const scriptSrc = (p: string) => p.split("; ").find((d) => d.startsWith("script-src ")) ?? "";
-  expect(scriptSrc(policies[0])).toMatch(/'nonce-[A-Za-z0-9+/=]{16,}' 'strict-dynamic'/);
+  // Production keeps 'strict-dynamic'; a Vercel preview swaps it for the toolbar's host source,
+  // because 'strict-dynamic' would make the browser ignore that host (src/lib/security/csp.ts).
+  expect(scriptSrc(policies[0])).toMatch(
+    /^script-src 'self' 'nonce-[A-Za-z0-9+/=]{16,}' ('strict-dynamic'|https:\/\/vercel\.live)$/,
+  );
   expect(scriptSrc(policies[0])).not.toContain("'unsafe-inline'");
   expect(policies[0]).not.toBe(policies[1]);
   // Next stamped the nonce on its scripts: a nonce policy with unstamped scripts reports violations.
