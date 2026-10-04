@@ -170,3 +170,14 @@ export async function readJson(req: NextRequest): Promise<unknown> {
     return undefined;
   }
 }
+
+const FORM_CONTENT_TYPE = /^application\/x-www-form-urlencoded(\s*;|$)/i;
+
+/** Parses a plain HTML form post (no-JS forms): capped like readJson; other types are a 415. */
+export async function readForm(req: NextRequest): Promise<URLSearchParams> {
+  const contentType = req.headers.get("content-type") ?? "";
+  if (!FORM_CONTENT_TYPE.test(contentType)) {
+    throw new BffError(415, "unsupported_media_type", "Send a form post.");
+  }
+  return new URLSearchParams(await readCappedText(req));
+}

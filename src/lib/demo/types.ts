@@ -165,3 +165,118 @@ export type Reconciliation = Schemas["ReconciliationOut"];
 export type Disposition = Schemas["DispositionRequest"]["disposition"];
 export type RetrainingProposal = Schemas["RetrainingProposalOut"];
 export type ElnEditResult = Schemas["ElnEditOut"];
+
+// ---------------------------------------------------------------------------------------------
+// W7 (D-17): every shape below is generated from the pinned contract (docs/plans/p5a.md Contract).
+// Money is an integer in demo credits, shares are integer basis points (always "Illustrative").
+// ---------------------------------------------------------------------------------------------
+// Settlements (A8–A20): generated from the pinned contract.
+export const SETTLEMENT_STATES = [
+  "submitted",
+  "reviewed",
+  "approved",
+  "disputed",
+  "receipts_reconciled",
+  "distribution_authorized",
+  "funded",
+  "paid",
+  "audited",
+  "paused",
+] as const satisfies readonly Schemas["SettlementOut"]["state"][];
+export type SettlementState = Schemas["SettlementOut"]["state"];
+// Licenses (A1–A7): generated from the pinned contract.
+export type LicenseState = Schemas["LicenseOut"]["status"];
+export type CredentialStatus = Schemas["CredentialOut"]["status"];
+export type LicenseAction = Schemas["LicenseOut"]["next_actions"][number];
+export type SettlementAction = Schemas["SettlementOut"]["next_actions"][number];
+export type ReceiptStatus = Schemas["ReceiptOut"]["status"];
+export type LedgerKind = Schemas["LedgerEntryOut"]["kind"];
+export type BenefitStatus = Schemas["BenefitItemOut"]["status"];
+export type AnchorStatus = Schemas["AnchorOut"]["status"];
+export type LicensePurpose = Schemas["LicenseOut"]["purpose"];
+
+export type AgreementRule = Schemas["RuleOut"];
+export type AgreementView = Schemas["AgreementView"];
+export type LicenseCredential = Schemas["CredentialOut"];
+export type LicenseDecision = Schemas["DecisionOut"];
+export type License = Schemas["LicenseOut"];
+export type LicenseOptions = Schemas["LicenseOptions"];
+
+export type Receipt = Schemas["ReceiptOut"];
+export type CalcLine = Schemas["CalcLineOut"];
+export type Calculation = Schemas["CalculationOut"];
+export type SettlementApproval = Schemas["ApprovalOut"];
+export type LedgerEntry = Schemas["LedgerEntryOut"];
+export type Commitment = Schemas["CommitmentOut"];
+export type Anchor = Schemas["AnchorOut"];
+export type SettlementHistoryEntry = Schemas["HistoryEntry"];
+export type Settlement = Schemas["SettlementOut"];
+export type SettlementSummary = Schemas["SettlementSummary"];
+export type ApprovalResult = Schemas["ApprovalCreated"];
+export type BenefitItem = Schemas["BenefitItemOut"];
+export type Beneficiary = Schemas["BeneficiaryOut"];
+export type OutageState = Schemas["OutageOut"];
+export type EntityEvents = Schemas["EntityEvents"];
+
+// ---------------------------------------------------------------------------------------------
+// P5b contract shapes (docs/plans/p5b.md Contract table, rows 1-17). W8 and W9 are generated from
+// the pinned contract; all rows are generated from the pinned contract.
+// ---------------------------------------------------------------------------------------------
+export const EXPORT_PURPOSES = ["research", "commercial"] as const;
+export type ExportPurpose = (typeof EXPORT_PURPOSES)[number];
+export const FIELD_STATUSES = ["disclosed", "withheld"] as const;
+export type FieldStatus = (typeof FIELD_STATUSES)[number];
+export const WITHHELD_CODES = [
+  "no_rights_record",
+  "consent_withdrawn",
+  "rights_disputed",
+  "consent_expired",
+  "pic_mat_missing",
+  "purpose_not_permitted",
+  "jurisdiction_mismatch",
+  "restricted_field",
+  "stage_not_passed",
+] as const;
+export type WithheldCode = (typeof WITHHELD_CODES)[number];
+export const EXPORT_STATUSES = ["active", "expired", "suspended"] as const;
+export type ExportStatus = (typeof EXPORT_STATUSES)[number];
+export const LOCK_STATES = ["open", "locked"] as const;
+export type LockState = (typeof LOCK_STATES)[number];
+export const CHANGE_OUTCOMES = [
+  "updated_open_version",
+  "new_protocol_version",
+  "unchanged",
+] as const;
+export type ChangeOutcome = (typeof CHANGE_OUTCOMES)[number];
+export const OBLIGATION_STATUSES = ["fulfilled", "due", "overdue"] as const;
+export type ObligationStatus = (typeof OBLIGATION_STATUSES)[number];
+export const GRIEVANCE_CATEGORIES = [
+  "obligation_not_met",
+  "use_outside_agreement",
+  "consent_concern",
+  "benefit_not_received",
+  "other",
+] as const;
+export type GrievanceCategory = (typeof GRIEVANCE_CATEGORIES)[number];
+export const GRIEVANCE_STATUSES = ["open", "acknowledged"] as const;
+export type GrievanceStatus = (typeof GRIEVANCE_STATUSES)[number];
+
+// Repinned (D-18): generated from the pinned contract.
+export type FieldDisclosure = Schemas["FieldDisclosureOut"];
+export type AssetEvidence = Schemas["AssetEvidenceOut"];
+export type ExportRecord = Schemas["ExportRecordOut"];
+export type ExportSummary = Schemas["ExportSummaryOut"];
+export type Thresholds = Schemas["Thresholds"];
+export type CampaignSummary = Schemas["CampaignSummaryOut"];
+export type CharterVersion = Schemas["CharterVersionOut"];
+export type CharterOut = Schemas["CharterOut"];
+export type CharterChange = Schemas["CharterChangeOut"];
+export type CreditUsage = Schemas["CreditUsageOut"];
+
+export type Grievance = Schemas["GrievanceOut"];
+export type CustodianObligation = Schemas["CustodianObligation"];
+export type CustodianUse = Schemas["UseText"];
+export type CustodianAgreement = Schemas["CustodianAgreement"];
+export type CustodianView = Schemas["CustodianViewOut"];
+
+export type DemoConfig = Schemas["DemoConfigOut"];

@@ -16,6 +16,7 @@ const load = async (dsn: string | undefined) => {
 
 describe("instrumentation-client", () => {
   afterEach(() => {
+    window.history.pushState({}, "", "/");
     vi.unstubAllEnvs();
     init.mockClear();
     captureRouterTransitionStart.mockClear();
@@ -33,5 +34,17 @@ describe("instrumentation-client", () => {
     );
     mod.onRouterTransitionStart("/x", "push");
     expect(captureRouterTransitionStart).toHaveBeenCalledWith("/x", "push");
+  });
+  it("does not load the SDK on a first load of the light custodian route (W10 budget)", async () => {
+    window.history.pushState({}, "", "/demo/w10-custodian");
+    const mod = await load("https://k@o.ingest.sentry.io/1");
+    expect(init).not.toHaveBeenCalled();
+    mod.onRouterTransitionStart("/x", "push");
+    expect(captureRouterTransitionStart).not.toHaveBeenCalled();
+  });
+  it("still loads the SDK on other demo routes with a DSN", async () => {
+    window.history.pushState({}, "", "/demo/w1-rights");
+    await load("https://k@o.ingest.sentry.io/1");
+    expect(init).toHaveBeenCalled();
   });
 });

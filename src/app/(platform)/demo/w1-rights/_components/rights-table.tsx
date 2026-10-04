@@ -1,4 +1,5 @@
-import { Badge, type BadgeProps, SyntheticBadge } from "@/components/ui";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
+import { SyntheticBadge } from "@/components/ui/synthetic-badge";
 import type { RightsRecord, RightsStatus } from "@/lib/demo/types";
 import { humanize } from "../../_components/fields";
 import { WithdrawDialog } from "./withdraw-dialog";
@@ -10,6 +11,8 @@ const STATUS_TONE = {
   disputed: "warning",
   withdrawn: "danger",
 } as const satisfies Record<RightsStatus, NonNullable<BadgeProps["tone"]>>;
+
+const grievanceText = (open: number | undefined): string => (open ? `${open} open` : "None");
 
 const list = (values: readonly string[]) =>
   values.length ? values.map(humanize).join(", ") : "none";
@@ -53,6 +56,9 @@ export function RightsTable({ records, canWithdraw }: Props) {
               PIC / MAT
             </th>
             <th scope="col" className="p-2">
+              Grievances
+            </th>
+            <th scope="col" className="p-2">
               Status
             </th>
             <th scope="col" className="p-2">
@@ -77,6 +83,9 @@ export function RightsTable({ records, canWithdraw }: Props) {
               <td className="p-2">{validity(record)}</td>
               <td className="p-2 font-mono text-xs">
                 {record.pic_reference ?? "no PIC"} / {record.mat_reference ?? "no MAT"}
+              </td>
+              <td className="p-2" data-testid="grievance-indicator">
+                {grievanceText(record.open_grievance_count)}
               </td>
               <td className="p-2">
                 <Badge tone={STATUS_TONE[record.status]}>{humanize(record.status)}</Badge>

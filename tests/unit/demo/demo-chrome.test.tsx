@@ -96,6 +96,18 @@ describe("SignOutButton", () => {
   });
 });
 
+describe("ResetButton lazy dialog (W10 weight, A-P5B-16)", () => {
+  it("renders only the button until the first click and has no static dialog import", async () => {
+    const { readFileSync } = await import("node:fs");
+    const source = readFileSync("src/app/(platform)/demo/_components/reset-button.tsx", "utf8");
+    expect(source).not.toMatch(/components\/ui\/dialog|from\s+["']@\/components\/ui["']/);
+    render(<ResetButton />);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Reset demo data" }));
+    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+  });
+});
+
 describe("ResetButton", () => {
   afterEach(() => {
     vi.unstubAllGlobals();

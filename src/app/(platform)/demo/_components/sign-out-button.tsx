@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Button } from "@/components/ui";
+import { Button } from "@/components/ui/button";
 
 export function SignOutButton() {
   const router = useRouter();

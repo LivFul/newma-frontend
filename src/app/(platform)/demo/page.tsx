@@ -54,6 +54,11 @@ export default async function DemoDashboard() {
             Open simulated jobs
           </Link>
         </p>
+        <p>
+          <Link href="/demo/tour" className="underline underline-offset-4">
+            Guided tour
+          </Link>
+        </p>
       </section>
       <section aria-labelledby="workflows-heading" className="space-y-3">
         <h2 id="workflows-heading" className="text-xl font-semibold">

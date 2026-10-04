@@ -50,6 +50,7 @@ const record = (status: RightsRecord["status"], id = "r-1"): RightsRecord => ({
   pic_reference: "PIC-DEMO-1",
   mat_reference: null,
   obligations: [],
+  open_grievance_count: 0,
   synthetic: true,
 });
 

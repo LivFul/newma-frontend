@@ -13,7 +13,7 @@ vi.mock("@/lib/demo/current-session", () => ({
 }));
 
 describe("/demo dashboard", () => {
-  it("shows the session facts, the W1–W10 index with W1–W6 links and a link to jobs", async () => {
+  it("shows the session facts, the W1–W10 index with linked workflows and a link to jobs", async () => {
     render(await DemoDashboard());
     expect(screen.getByText("Finance")).toBeInTheDocument();
     expect(screen.getByText("tenant-abc")).toBeInTheDocument();
@@ -32,8 +32,13 @@ describe("/demo dashboard", () => {
     for (const workflow of WORKFLOWS) {
       expect(screen.getByText(workflow.id)).toBeInTheDocument();
     }
-    expect(screen.getAllByText("Available")).toHaveLength(6);
-    expect(screen.getAllByText("Arrives in P5")).toHaveLength(4);
+    const linked = WORKFLOWS.filter((w) => w.href !== undefined).length;
+    expect(screen.getAllByText("Available")).toHaveLength(linked);
+    expect(screen.queryAllByText("Arrives in P5")).toHaveLength(WORKFLOWS.length - linked);
+    expect(screen.getByRole("link", { name: /Licensing & benefit settlement/ })).toHaveAttribute(
+      "href",
+      "/demo/w7-settlement",
+    );
     expect(screen.getByRole("link", { name: /Rights & use authorization/ })).toHaveAttribute(
       "href",
       "/demo/w1-rights",
@@ -42,10 +47,14 @@ describe("/demo dashboard", () => {
       "href",
       "/demo/w6-provenance",
     );
-    expect(screen.queryByRole("link", { name: /Custodian view/ })).toBeNull();
+    expect(screen.getByRole("link", { name: /Custodian view/ })).toHaveAttribute(
+      "href",
+      "/demo/w10-custodian",
+    );
     expect(screen.getByRole("link", { name: /simulated jobs/i })).toHaveAttribute(
       "href",
       "/demo/jobs",
     );
+    expect(screen.getByRole("link", { name: "Guided tour" })).toHaveAttribute("href", "/demo/tour");
   });
 });

@@ -5,6 +5,7 @@ import { requireSession } from "@/lib/demo/current-session";
 import { isDemoMode } from "@/lib/demo/mode";
 import { DemoBanner } from "./_components/demo-banner";
 import { DemoHeader } from "./_components/demo-header";
+import { TourDock } from "./_components/tour-dock";
 
 export const metadata: Metadata = {
   title: "NEWMA demo",
@@ -20,6 +21,7 @@ export default async function DemoLayout({ children }: { children: ReactNode }) 
     <div className="flex min-h-full flex-1 flex-col">
       <DemoBanner />
       <DemoHeader session={session} />
+      <TourDock tenantId={session.tenant_id} persona={session.persona} />
       <main id="main" tabIndex={-1} className="mx-auto w-full max-w-5xl flex-1 space-y-8 p-6">
         {children}
       </main>
