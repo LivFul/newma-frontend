@@ -6,6 +6,11 @@ export const SCAN_DIRS = {
   content: ["src/content"],
   /** UI code. No prose may be written inline here: copy must come from src/content. */
   ui: ["src/components/site", "src/components/ecosystem-graphic", "src/app/(site)"],
+  /**
+   * Demo pages and demo libraries (P6). Inline copy is expected here, so only NUM figures and names
+   * are checked: a figure needs a registered claim id in the same file, a listed name never passes.
+   */
+  demo: ["src/app/(platform)/demo", "src/lib/demo"],
 };
 
 /** Claim ids reserved for the public site (assumption A-P4 claim register: C-20 upward). */
@@ -25,6 +30,36 @@ export const UI_ATTRIBUTES = new Set([
 ]);
 /** Object properties that carry user-visible text (metadata, image alt). */
 export const UI_PROPERTIES = new Set(["title", "description", "alt", "label"]);
+
+/**
+ * Figures of the kind the canonical numbers sheet (NUM, DRAFT) holds: percentages, currency amounts,
+ * scaled quantities, royalty splits and basis points. A plain count ("step 3 of 16") or an amount in
+ * demo credits is not one. Demo pages may show a figure only under a registered claim id; copy under
+ * src/content may not show one at all (every digit is already refused there).
+ * @type {{ id: string; test: RegExp; message: string }[]}
+ */
+export const NUM_FIGURES = [
+  {
+    id: "percentage",
+    test: /\d[\d.,]*\s*(%|percent(age)?\b)/i,
+    message: "a percentage is a NUM figure",
+  },
+  {
+    id: "currency",
+    test: /[$€£¥]\s*\d|\d\s*[$€£¥]|\b\d[\d.,]*\s*(USD|EUR|GBP|JPY|CHF)\b|\b(USD|EUR|GBP|JPY|CHF)\s*\d/,
+    message: "a currency amount is a NUM figure",
+  },
+  {
+    id: "scaled-quantity",
+    test: /\b\d[\d.,]*\s*(thousand|million|billion|trillion|mn|bn)\b/i,
+    message: "a scaled quantity is a NUM figure",
+  },
+  {
+    id: "split",
+    test: /\b\d[\d.,]*\s*(royalty|royalties|revenue share|split|basis points?|bps)\b/i,
+    message: "a royalty split or share is a NUM figure",
+  },
+];
 
 /** Exact strings that may contain digits (citation titles); everything else may not. */
 export const DIGIT_ALLOW = new Set(["NEWMA Product Requirements Document v1.0"]);
