@@ -3,21 +3,24 @@ import { withSentryConfig } from "@sentry/nextjs/config";
 import type { NextConfig } from "next";
 import { buildCsp } from "./src/lib/security/csp";
 
-// Baseline security headers for every route. The Content-Security-Policy ships Report-Only first
-// (A-P4-16): violations show in the console and as securitypolicyviolation events, and there is no
-// report-uri because no collection endpoint exists. Rationale for each directive: src/lib/security/csp.ts.
+// The Content-Security-Policy ships Report-Only first (A-P4-16): violations show in the console and as
+// securitypolicyviolation events; there is no report-uri because no collection endpoint exists. This
+// static, nonce-free policy covers every path except /access and /demo/*, where src/proxy.ts sends a
+// per-request nonce policy instead. Rationale for each directive: src/lib/security/csp.ts.
+const CSP_STATIC_SOURCE = "/:path((?!access(?:/|$)|demo(?:/|$)).*)";
 const CSP_REPORT_ONLY = buildCsp({
   nodeEnv: process.env.NODE_ENV,
   sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 });
 
+// Baseline security headers for every route.
 const SECURITY_HEADERS = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
-  { key: "Content-Security-Policy-Report-Only", value: CSP_REPORT_ONLY },
 ];
+const CSP_HEADERS = [{ key: "Content-Security-Policy-Report-Only", value: CSP_REPORT_ONLY }];
 
 // Surfaces that must stay out of the index: robots metadata plus this header. robots.txt deliberately
 // does not disallow /access, /demo or /primitives (a crawler has to fetch a page to see its noindex;
@@ -33,6 +36,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/:path*", headers: SECURITY_HEADERS },
+      { source: CSP_STATIC_SOURCE, headers: CSP_HEADERS },
       ...NOINDEX_SOURCES.map((source) => ({ source, headers: NOINDEX_HEADERS })),
     ];
   },

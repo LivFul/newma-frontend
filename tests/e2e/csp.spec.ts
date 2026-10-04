@@ -1,7 +1,8 @@
 // Content-Security-Policy-Report-Only (A-P4-16): key pages load with zero `securitypolicyviolation`
 // events. Against this build the header must be present. Against a deployment that predates it, set
 // CSP_INJECT=1 to add the policy from src/lib/security/csp.ts to the document response instead (for
-// example PLAYWRIGHT_BASE_URL=https://demo.newmalabs.com CSP_INJECT=1 DEMO_E2E=1).
+// example PLAYWRIGHT_BASE_URL=https://demo.newmalabs.com CSP_INJECT=1 DEMO_E2E=1). The injected policy is
+// the static, nonce-free one: such a deployment has no proxy to stamp nonces on its scripts.
 import type { Page } from "@playwright/test";
 import { WORKFLOW_CONTROLS } from "../../src/content/home/workflow";
 import { buildCsp } from "../../src/lib/security/csp";
@@ -72,6 +73,25 @@ test("the three.js workflow view runs with zero CSP violations @csp", async ({ p
   });
   test.skip((await viewer.getAttribute("data-phase")) !== "ready", "no WebGL in this browser");
   await page.waitForTimeout(500);
+  expect(await read()).toEqual([]);
+});
+
+test("/access gets a fresh nonce policy without 'unsafe-inline' for scripts @csp", async ({
+  page,
+}) => {
+  test.skip(!!process.env.CSP_INJECT, "an injected policy carries no nonce");
+  const read = await collectViolations(page);
+  const policies: string[] = [];
+  for (let i = 0; i < 2; i += 1) {
+    const response = await page.goto("/access");
+    policies.push(response?.headers()[HEADER] ?? "");
+  }
+  const scriptSrc = (p: string) => p.split("; ").find((d) => d.startsWith("script-src ")) ?? "";
+  expect(scriptSrc(policies[0])).toMatch(/'nonce-[A-Za-z0-9+/=]{16,}' 'strict-dynamic'/);
+  expect(scriptSrc(policies[0])).not.toContain("'unsafe-inline'");
+  expect(policies[0]).not.toBe(policies[1]);
+  // Next stamped the nonce on its scripts: a nonce policy with unstamped scripts reports violations.
+  await page.waitForLoadState("networkidle");
   expect(await read()).toEqual([]);
 });
 

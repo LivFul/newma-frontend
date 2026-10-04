@@ -19,6 +19,13 @@ describe("buildCsp", () => {
     expect(d["frame-ancestors"]).toEqual(["'none'"]);
     expect(d["base-uri"]).toEqual(["'self'"]);
     expect(d["form-action"]).toEqual(["'self'"]);
+    // No scheme-only or wildcard sources anywhere.
+    expect(
+      Object.values(d)
+        .flat()
+        .filter((v) => /^(\*|[a-z-]+:)$/.test(v)),
+    ).toEqual([]);
+    expect(d["img-src"]).toEqual(["'self'"]);
     expect(Object.keys(d)).not.toContain("report-uri");
     expect(Object.keys(d)).not.toContain("report-to");
     // Ignored (with a console warning) in a report-only policy.
@@ -43,6 +50,17 @@ describe("buildCsp", () => {
     ]);
     expect(policy).not.toContain("publickey");
     expect(policy).not.toContain("/456");
+  });
+
+  it("uses the nonce with 'strict-dynamic' instead of 'unsafe-inline' when one is given", () => {
+    const d = directives(buildCsp({ nodeEnv: "production", nonce: "abc123DEF456ghi7+/=" }));
+    expect(d["script-src"]).toEqual(["'self'", "'nonce-abc123DEF456ghi7+/='", "'strict-dynamic'"]);
+    expect(d["script-src"]).not.toContain("'unsafe-inline'");
+  });
+
+  it("refuses a nonce that could break out of the directive", () => {
+    expect(() => buildCsp({ nonce: "x'; script-src *" })).toThrow(/nonce/);
+    expect(() => buildCsp({ nonce: "" })).toThrow(/nonce/);
   });
 
   it("defaults to the production policy when called without an environment", () => {
