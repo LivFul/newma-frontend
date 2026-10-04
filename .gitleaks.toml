@@ -1,0 +1,13 @@
+title = "newma-frontend gitleaks config"
+
+[extend]
+useDefault = true
+
+# Test fixtures pass descriptive idempotency keys (for example "e2e-second-finance-approval"). The
+# generic-api-key rule reads them as credentials; they are plain labels, not secrets.
+[[allowlists]]
+description = "Idempotency-key labels in end-to-end tests"
+condition = "AND"
+paths = ['''^tests/''']
+regexTarget = "line"
+regexes = ['''idempotency_key''']
