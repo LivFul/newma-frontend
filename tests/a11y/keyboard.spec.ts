@@ -109,7 +109,8 @@ test("dialog: Enter opens it, Tab stays inside, Escape closes and restores focus
   }
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  expect((await describeFocus(page))?.label).toBe(trigger.label);
+  // Radix returns focus once the close animation ends; poll instead of reading it once.
+  await expect.poll(async () => (await describeFocus(page))?.label).toBe(trigger.label);
 });
 
 test.describe("W10 custodian view, keyboard only", { tag: "@needs-backend" }, () => {

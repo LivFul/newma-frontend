@@ -1,11 +1,13 @@
 import { NextRequest } from "next/server";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { config, proxy } from "@/proxy";
 
 const HEADER = "content-security-policy-report-only";
 const nonceOf = (policy: string | null) => /'nonce-([^']+)'/.exec(policy ?? "")?.[1];
 
 describe("proxy: per-request CSP nonce on the dynamic surfaces", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
   it("sets a nonce-based Report-Only policy on the response and forwards it to rendering", () => {
     const response = proxy(new NextRequest("http://localhost/demo/w1-rights"));
     const policy = response.headers.get(HEADER);
@@ -23,6 +25,17 @@ describe("proxy: per-request CSP nonce on the dynamic surfaces", () => {
     const a = nonceOf(proxy(new NextRequest("http://localhost/access")).headers.get(HEADER));
     const b = nonceOf(proxy(new NextRequest("http://localhost/access")).headers.get(HEADER));
     expect(a).not.toBe(b);
+  });
+
+  it("adds the Vercel toolbar origins on a preview deployment and not in production", () => {
+    vi.stubEnv("VERCEL_ENV", "preview");
+    expect(proxy(new NextRequest("http://localhost/access")).headers.get(HEADER)).toContain(
+      "frame-src https://vercel.live",
+    );
+    vi.stubEnv("VERCEL_ENV", "production");
+    expect(proxy(new NextRequest("http://localhost/access")).headers.get(HEADER)).not.toContain(
+      "vercel.live",
+    );
   });
 
   it("runs only on the dynamically rendered pages: /access and /demo/*", () => {

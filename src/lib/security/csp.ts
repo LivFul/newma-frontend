@@ -14,8 +14,9 @@
 //   leaves 'unsafe-inline' exploitable, so the residual risk is accepted (A-P6H-F-03).
 //
 // style-src keeps 'unsafe-inline' on both: Motion and the hero write style attributes, which a nonce
-// cannot cover. There is no scheme-only or wildcard source anywhere. There is no report-uri or
-// report-to directive: no collection endpoint exists. Violations surface in the browser console and as
+// cannot cover. No scheme-only or wildcard source exists outside preview deployments (the Vercel
+// toolbar needs img data: and blob: there). There is no report-uri or report-to directive: no
+// collection endpoint exists. Violations surface in the browser console and as
 // `securitypolicyviolation` events (tests/e2e/csp.spec.ts listens for them).
 
 export type CspEnv = Readonly<{
@@ -25,6 +26,8 @@ export type CspEnv = Readonly<{
   sentryDsn?: string;
   /** Per-request nonce from src/proxy.ts (base64); replaces 'unsafe-inline' in script-src. */
   nonce?: string;
+  /** VERCEL_ENV; "preview" adds the Vercel toolbar and comments origins (never in production). */
+  vercelEnv?: string;
 }>;
 
 const NONCE = /^[A-Za-z0-9+/=]{16,}$/;
@@ -32,6 +35,18 @@ const NONCE = /^[A-Za-z0-9+/=]{16,}$/;
 // Vercel Analytics serves /_vercel/insights/script.js first-party in production; in development the
 // package loads its debug script from this origin instead.
 const ANALYTICS_DEV_ORIGIN = "https://va.vercel-scripts.com";
+
+// Vercel injects its toolbar and comments (vercel.live) into preview deployments only. The sources
+// below are Vercel's documented CSP list (vercel.com/docs/vercel-toolbar/managing-toolbar, "Using a
+// Content Security Policy"); production and local builds never get them.
+const TOOLBAR = {
+  script: ["https://vercel.live"],
+  frame: ["https://vercel.live"],
+  connect: ["https://vercel.live", "wss://ws-us3.pusher.com"],
+  img: ["https://vercel.live", "https://vercel.com", "data:", "blob:"],
+  style: ["https://vercel.live"],
+  font: ["https://vercel.live", "https://assets.vercel.com"],
+} as const;
 
 /** The DSN's origin, or undefined for an empty or malformed value (never the DSN's key). */
 export function sentryOrigin(dsn: string | undefined): string | undefined {
@@ -48,25 +63,40 @@ export function sentryOrigin(dsn: string | undefined): string | undefined {
 const join = (sources: readonly (string | undefined | false)[]) =>
   sources.filter((s): s is string => typeof s === "string" && s.length > 0).join(" ");
 
-function scriptSources(isDev: boolean, nonce: string | undefined): string {
+// 'strict-dynamic' makes browsers ignore host sources, so a preview (where Vercel injects the toolbar
+// script without our nonce) drops it and lists vercel.live instead; 'self' still covers Next's chunks.
+function scriptSources(isDev: boolean, preview: boolean, nonce: string | undefined): string {
   if (nonce !== undefined && !NONCE.test(nonce)) throw new Error("CSP nonce must be base64");
-  const inline = nonce ? [`'nonce-${nonce}'`, "'strict-dynamic'"] : ["'unsafe-inline'"];
-  return join(["'self'", ...inline, isDev && "'unsafe-eval'", isDev && ANALYTICS_DEV_ORIGIN]);
+  const nonceSources = preview ? [`'nonce-${nonce}'`] : [`'nonce-${nonce}'`, "'strict-dynamic'"];
+  const inline = nonce ? nonceSources : ["'unsafe-inline'"];
+  return join([
+    "'self'",
+    ...inline,
+    isDev && "'unsafe-eval'",
+    isDev && ANALYTICS_DEV_ORIGIN,
+    ...(preview ? TOOLBAR.script : []),
+  ]);
 }
+
+const withToolbar = (preview: boolean, base: readonly string[], extra: readonly string[]) =>
+  join([...base, ...(preview ? extra : [])]);
 
 /** Builds the policy as a single header value, directives separated by "; ". */
 export function buildCsp(env: CspEnv = {}): string {
   const isDev = env.nodeEnv === "development";
+  const preview = env.vercelEnv === "preview";
   const sentry = sentryOrigin(env.sentryDsn);
+  const connect = join(["'self'", sentry, isDev && ANALYTICS_DEV_ORIGIN]).split(" ");
   const directives: readonly (readonly [string, string])[] = [
     ["default-src", "'self'"],
-    ["script-src", scriptSources(isDev, env.nonce)],
+    ["script-src", scriptSources(isDev, preview, env.nonce)],
     // Motion and the hero set style attributes; Tailwind and next/font ship self-hosted stylesheets.
-    ["style-src", "'self' 'unsafe-inline'"],
-    // No remote, data: or blob: images: the three.js view draws to a canvas (probed in P6 hardening).
-    ["img-src", "'self'"],
-    ["font-src", "'self'"],
-    ["connect-src", join(["'self'", sentry, isDev && ANALYTICS_DEV_ORIGIN])],
+    ["style-src", withToolbar(preview, ["'self'", "'unsafe-inline'"], TOOLBAR.style)],
+    // No remote, data: or blob: images of ours: the three.js view draws to a canvas (P6 hardening).
+    ["img-src", withToolbar(preview, ["'self'"], TOOLBAR.img)],
+    ["font-src", withToolbar(preview, ["'self'"], TOOLBAR.font)],
+    ["connect-src", withToolbar(preview, connect, TOOLBAR.connect)],
+    ...(preview ? [["frame-src", join(TOOLBAR.frame)] as const] : []),
     ["worker-src", "'self'"],
     ["manifest-src", "'self'"],
     ["object-src", "'none'"],

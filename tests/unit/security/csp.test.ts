@@ -63,6 +63,41 @@ describe("buildCsp", () => {
     expect(() => buildCsp({ nonce: "" })).toThrow(/nonce/);
   });
 
+  it("allows the Vercel toolbar origins on preview deployments only (Vercel's documented list)", () => {
+    const d = directives(buildCsp({ nodeEnv: "production", vercelEnv: "preview" }));
+    expect(d["script-src"]).toContain("https://vercel.live");
+    expect(d["frame-src"]).toEqual(["https://vercel.live"]);
+    expect(d["connect-src"]).toEqual(["'self'", "https://vercel.live", "wss://ws-us3.pusher.com"]);
+    expect(d["img-src"]).toEqual([
+      "'self'",
+      "https://vercel.live",
+      "https://vercel.com",
+      "data:",
+      "blob:",
+    ]);
+    expect(d["style-src"]).toEqual(["'self'", "'unsafe-inline'", "https://vercel.live"]);
+    expect(d["font-src"]).toEqual(["'self'", "https://vercel.live", "https://assets.vercel.com"]);
+  });
+
+  it.each([undefined, "production", "development"])(
+    "keeps the toolbar out of the policy when VERCEL_ENV is %j",
+    (vercelEnv) => {
+      const policy = buildCsp({ nodeEnv: "production", vercelEnv });
+      expect(policy).not.toMatch(/vercel\.live|vercel\.com|pusher/);
+      expect(directives(policy)["frame-src"]).toBeUndefined();
+    },
+  );
+
+  it("drops 'strict-dynamic' from the nonce policy on previews so the toolbar script can load", () => {
+    const nonce = "abc123DEF456ghi7+/=";
+    const preview = directives(buildCsp({ nodeEnv: "production", vercelEnv: "preview", nonce }));
+    expect(preview["script-src"]).toEqual(["'self'", `'nonce-${nonce}'`, "https://vercel.live"]);
+    const production = directives(
+      buildCsp({ nodeEnv: "production", vercelEnv: "production", nonce }),
+    );
+    expect(production["script-src"]).toEqual(["'self'", `'nonce-${nonce}'`, "'strict-dynamic'"]);
+  });
+
   it("defaults to the production policy when called without an environment", () => {
     expect(buildCsp()).toBe(buildCsp({ nodeEnv: "production" }));
   });

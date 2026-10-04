@@ -11,6 +11,7 @@ const CSP_STATIC_SOURCE = "/:path((?!access(?:/|$)|demo(?:/|$)).*)";
 const CSP_REPORT_ONLY = buildCsp({
   nodeEnv: process.env.NODE_ENV,
   sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  vercelEnv: process.env.VERCEL_ENV,
 });
 
 // Baseline security headers for every route.

@@ -17,6 +17,7 @@ export function proxy(request: NextRequest): NextResponse {
   const policy = buildCsp({
     nodeEnv: process.env.NODE_ENV,
     sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    vercelEnv: process.env.VERCEL_ENV,
     nonce: newNonce(),
   });
   const headers = new Headers(request.headers);

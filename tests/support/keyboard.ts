@@ -5,12 +5,17 @@ import type { Page } from "@playwright/test";
 /** One focus stop: the element's walk index (or -1 for an unmarked element) and how it looks. */
 export type FocusStop = Readonly<{
   idx: number;
+  /** Focus sits in host chrome that is not ours (the Vercel preview toolbar); walks step over it. */
+  foreign: boolean;
   label: string;
   indicator: boolean;
   obscured: boolean;
 }>;
 
 const MARK = "data-kb-idx";
+// Vercel injects its toolbar and comments into preview deployments as this custom element; focus
+// inside its shadow root reports the host as document.activeElement.
+const FOREIGN_HOSTS = "vercel-live-feedback";
 
 /**
  * Marks every element a keyboard user should be able to reach and returns how many there are.
@@ -18,58 +23,69 @@ const MARK = "data-kb-idx";
  * (closed <details> content and display:none are excluded; the sr-only skip link is included).
  */
 export async function markTabbables(page: Page): Promise<number> {
-  return page.evaluate((mark) => {
-    const selector = [
-      "a[href]",
-      "area[href]",
-      "button",
-      "input:not([type=hidden])",
-      "select",
-      "textarea",
-      "summary",
-      "iframe",
-      "[tabindex]",
-      "[contenteditable=true]",
-    ].join(",");
-    const candidates = [...document.querySelectorAll<HTMLElement>(selector)].filter((el) => {
-      if (el.tabIndex < 0 || el.closest("[inert]")) return false;
-      if ((el as HTMLButtonElement).disabled) return false;
-      if (el.tagName === "SUMMARY" && el.parentElement?.firstElementChild !== el) return false;
-      return el.checkVisibility({ visibilityProperty: true, opacityProperty: false });
-    });
-    document.querySelectorAll(`[${mark}]`).forEach((el) => el.removeAttribute(mark));
-    candidates.forEach((el, i) => el.setAttribute(mark, String(i)));
-    return candidates.length;
-  }, MARK);
+  return page.evaluate(
+    ({ mark, foreign }) => {
+      const selector = [
+        "a[href]",
+        "area[href]",
+        "button",
+        "input:not([type=hidden])",
+        "select",
+        "textarea",
+        "summary",
+        "iframe",
+        "[tabindex]",
+        "[contenteditable=true]",
+      ].join(",");
+      const candidates = [...document.querySelectorAll<HTMLElement>(selector)].filter((el) => {
+        if (el.tabIndex < 0 || el.closest("[inert]") || el.closest(foreign)) return false;
+        if ((el as HTMLButtonElement).disabled) return false;
+        if (el.tagName === "SUMMARY" && el.parentElement?.firstElementChild !== el) return false;
+        return el.checkVisibility({ visibilityProperty: true, opacityProperty: false });
+      });
+      document.querySelectorAll(`[${mark}]`).forEach((el) => el.removeAttribute(mark));
+      candidates.forEach((el, i) => el.setAttribute(mark, String(i)));
+      return candidates.length;
+    },
+    { mark: MARK, foreign: FOREIGN_HOSTS },
+  );
 }
 
 /** Describes document.activeElement: its mark, a readable label and whether focus is visible. */
 export async function describeFocus(page: Page): Promise<FocusStop | undefined> {
-  return page.evaluate((mark) => {
-    const el = document.activeElement as HTMLElement | null;
-    if (!el || el === document.body || el === document.documentElement) return undefined;
-    const style = getComputedStyle(el);
-    const outline = style.outlineStyle !== "none" && parseFloat(style.outlineWidth) > 0;
-    const shadow = style.boxShadow !== "none" && style.boxShadow !== "";
-    // SVG links draw their focus ring on a stroked child (the hero's .eco-hit), not an outline.
-    const stroked = [...el.querySelectorAll("*")].some((child) => {
-      const s = getComputedStyle(child);
-      return s.stroke !== "none" && parseFloat(s.strokeWidth) >= 2 && s.strokeOpacity !== "0";
-    });
-    const rect = el.getBoundingClientRect();
-    const x = Math.min(Math.max(rect.left + rect.width / 2, 0), innerWidth - 1);
-    const y = Math.min(Math.max(rect.top + Math.min(rect.height / 2, 8), 0), innerHeight - 1);
-    const hit = document.elementFromPoint(x, y);
-    const obscured =
-      rect.width > 1 && !!hit && !el.contains(hit) && !hit.contains(el) && !!hit.closest("header");
-    const label = `${el.tagName.toLowerCase()} "${(el.getAttribute("aria-label") ?? el.textContent ?? "").trim().slice(0, 40)}"`;
-    return {
-      idx: Number(el.getAttribute(mark) ?? -1),
-      label,
-      indicator: outline || shadow || (el.closest("svg") !== null && stroked),
-      obscured,
-    };
-  }, MARK);
+  return page.evaluate(
+    ({ mark, foreign }) => {
+      const el = document.activeElement as HTMLElement | null;
+      if (!el || el === document.body || el === document.documentElement) return undefined;
+      const style = getComputedStyle(el);
+      const outline = style.outlineStyle !== "none" && parseFloat(style.outlineWidth) > 0;
+      const shadow = style.boxShadow !== "none" && style.boxShadow !== "";
+      // SVG links draw their focus ring on a stroked child (the hero's .eco-hit), not an outline.
+      const stroked = [...el.querySelectorAll("*")].some((child) => {
+        const s = getComputedStyle(child);
+        return s.stroke !== "none" && parseFloat(s.strokeWidth) >= 2 && s.strokeOpacity !== "0";
+      });
+      const rect = el.getBoundingClientRect();
+      const x = Math.min(Math.max(rect.left + rect.width / 2, 0), innerWidth - 1);
+      const y = Math.min(Math.max(rect.top + Math.min(rect.height / 2, 8), 0), innerHeight - 1);
+      const hit = document.elementFromPoint(x, y);
+      const obscured =
+        rect.width > 1 &&
+        !!hit &&
+        !el.contains(hit) &&
+        !hit.contains(el) &&
+        !!hit.closest("header");
+      const label = `${el.tagName.toLowerCase()} "${(el.getAttribute("aria-label") ?? el.textContent ?? "").trim().slice(0, 40)}"`;
+      return {
+        idx: Number(el.getAttribute(mark) ?? -1),
+        foreign: el.closest(foreign) !== null,
+        label,
+        indicator: outline || shadow || (el.closest("svg") !== null && stroked),
+        obscured,
+      };
+    },
+    { mark: MARK, foreign: FOREIGN_HOSTS },
+  );
 }
 
 const MAX_EXTRA_STOPS = 10;
@@ -84,6 +100,11 @@ export async function walk(page: Page, key: "Tab" | "Shift+Tab", total: number) 
     await page.keyboard.press(key);
     const stop = await describeFocus(page);
     if (!stop) return { stops, escaped: true };
+    // Host chrome after our content means Tab left the page; before any stop it is stepped over.
+    if (stop.foreign) {
+      if (stops.length > 0) return { stops, escaped: true };
+      continue;
+    }
     if (stops.length > 0 && stop.idx === stops[0].idx && stop.idx !== -1) {
       return { stops, escaped: true };
     }

@@ -67,6 +67,7 @@ describe("next.config security headers", () => {
         value: buildCsp({
           nodeEnv: process.env.NODE_ENV,
           sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+          vercelEnv: process.env.VERCEL_ENV,
         }),
       },
     ]);
