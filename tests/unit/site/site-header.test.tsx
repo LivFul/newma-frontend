@@ -30,6 +30,18 @@ describe("SiteHeader", () => {
     expect(product.closest("nav")?.className).toMatch(/md:flex/);
     expect(screen.getByRole("link", { name: "Access NEWMA" }).closest("nav")).toBeNull();
   });
+  it("links staff to Aveloz just before Access NEWMA, at every breakpoint", () => {
+    render(<SiteHeader />);
+    const header = screen.getByRole("banner");
+    const aveloz = within(header).getByRole("link", { name: "Aveloz (LivFul staff)" });
+    expect(aveloz).toHaveAttribute("href", "https://aveloz.livful.com");
+    expect(aveloz).toHaveAttribute("rel", "noopener");
+    expect(aveloz).not.toHaveAttribute("target");
+    expect(aveloz.className).toMatch(/min-h-11/);
+    expect(aveloz.closest("nav")).toBeNull();
+    const access = within(header).getByRole("link", { name: "Access NEWMA" });
+    expect(aveloz.compareDocumentPosition(access) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
   it("is axe clean", async () => {
     const { container } = render(<SiteHeader />);
     await expectNoAxeViolations(container);
