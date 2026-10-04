@@ -10,7 +10,7 @@ const issue = (page: Page) => page.getByRole("button", { name: "Issue export" })
 const status = (page: Page, text: string | RegExp) =>
   page.getByRole("status").filter({ hasText: text });
 
-async function rankOnePack(page: Page): Promise<void> {
+export async function rankOnePack(page: Page): Promise<void> {
   await page.goto(W8);
   const href = await page.locator('[data-rank="1"] a').getAttribute("href");
   await page.goto(href ?? W8);

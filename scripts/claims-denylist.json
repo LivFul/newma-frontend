@@ -1,0 +1,10 @@
+{
+  "description": "Plain-text deny-list of names that must never appear in published copy or demo pages. Generic placeholders only: real names live in the hashed list (scripts/claims/denylist.hashes.json). Whole-word, case-insensitive phrase match.",
+  "terms": [
+    "Example Pharma Corporation",
+    "Placeholder Biotech Limited",
+    "Sample Research Foundation",
+    "Generic Indigenous Council",
+    "Template Community Trust"
+  ]
+}

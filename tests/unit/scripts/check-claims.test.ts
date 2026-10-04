@@ -183,6 +183,110 @@ describe("runClaimsCheck on fixtures", () => {
   });
 });
 
+const DEMO_PAGE = "src/app/(platform)/demo/w9-campaign/page.tsx";
+const withDemoPage = (body: string) => ({ root: repo((write) => write(DEMO_PAGE, body)) });
+const demoRules = (body: string, extra: object = {}) => {
+  const { root } = withDemoPage(body);
+  return rules(root, extra);
+};
+
+describe("NUM figures (P6 extension)", () => {
+  it.each([
+    ["a percentage", "<p>Quota used: 40%</p>"],
+    ["a spelled percentage", "<p>About 40 percent of the quota.</p>"],
+    ["a currency amount", "<p>Cost: $5 per job</p>"],
+    ["a currency code amount", "<p>Cost: 5 EUR per job</p>"],
+    ["a scaled quantity", "<p>Market of 3 million compounds</p>"],
+    ["a royalty split", "<p>A 5 royalty applies</p>"],
+    ["basis points", "<p>Share of 250 basis points</p>"],
+  ])("fails on %s in a demo page without a claim id", (_label, jsx) => {
+    expect(demoRules(`export const P = () => ${jsx};\n`)).toContain("num-figure");
+  });
+
+  it("passes the same figure in a demo page that cites a registered claim id", () => {
+    const body = `// claims: C-01\nexport const P = () => <p>Quota used: 40%</p>;\n`;
+    expect(demoRules(body)).toEqual([]);
+  });
+
+  it("waives only the figure next to the marker, not every figure in the file", () => {
+    const body = `// claims: C-01\nexport const A = () => <p>Quota used: 40%</p>;\n\nexport const B = () => <p>Cost: 5 EUR per job</p>;\n`;
+    expect(demoRules(body)).toEqual(["num-figure"]);
+  });
+
+  it("fails when the cited claim id is not in the register", () => {
+    const body = `// claims: C-77\nexport const P = () => <p>Quota used: 40%</p>;\n`;
+    expect(demoRules(body)).toContain("unknown-claim");
+  });
+
+  it("allows demo credits and plain counts, which are not NUM figures", () => {
+    const body = `export const P = () => <p>Quota set to 10 demo credits, step 3 of 16</p>;\n`;
+    expect(demoRules(body)).toEqual([]);
+  });
+
+  it("allows capitalised labels and inline prose in a demo page (only figures and names are checked)", () => {
+    const body = `export const P = () => <p>Mock ELN and Simulated agent run Here.</p>;\n`;
+    expect(demoRules(body)).toEqual([]);
+  });
+
+  it("fails on a NUM figure in src/content even when the file has a claim id", () => {
+    expect(rules(withCopy("Results improved by 40 percent in tests."))).toContain("num-figure");
+  });
+
+  it("scans string literals under src/lib/demo", () => {
+    const root = repo((write) =>
+      write("src/lib/demo/copy.ts", 'export const T = "Quota used 40% of the total";\n'),
+    );
+    expect(rules(root)).toContain("num-figure");
+  });
+
+  it("reports file, line and rule for a demo finding", () => {
+    const { root } = withDemoPage("export const P = () => (\n  <p>Quota used: 40%</p>\n);\n");
+    const hit = run(root).findings.find((f) => f.rule === "num-figure");
+    expect(hit).toMatchObject({ file: DEMO_PAGE, line: 2 });
+  });
+});
+
+describe("explicit deny-list (P6 extension)", () => {
+  const terms = ["Zorblax Biotech"];
+
+  it("fails on a listed organisation in a demo page, without printing it", () => {
+    const { root } = withDemoPage("export const P = () => <p>Supplied by zorblax biotech.</p>;\n");
+    const { findings, ok } = run(root, { denyTerms: terms });
+    expect(ok).toBe(false);
+    expect(findings.map((f) => f.rule)).toContain("denylist");
+    expect(JSON.stringify(findings).toLowerCase()).not.toContain("zorblax");
+  });
+
+  it("fails on a listed organisation in src/content and in site UI", () => {
+    expect(rules(withCopy("Built with Zorblax Biotech tools."), { denyTerms: terms })).toContain(
+      "denylist",
+    );
+    const ui = repo((write) =>
+      write("src/components/site/x.tsx", 'export const X = () => <b title="Zorblax Biotech" />;\n'),
+    );
+    expect(rules(ui, { denyTerms: terms })).toContain("denylist");
+  });
+
+  it("matches whole words only", () => {
+    expect(rules(withCopy("A zorblaxed biotechnology result."), { denyTerms: terms })).toEqual([]);
+  });
+
+  it("ships a generic placeholder list that is valid and free of digits", () => {
+    const file = path.join(REPO_ROOT, "scripts/claims-denylist.json");
+    const parsed = JSON.parse(readFileSync(file, "utf8")) as { terms: string[] };
+    expect(parsed.terms.length).toBeGreaterThanOrEqual(3);
+    for (const term of parsed.terms) expect(term).toMatch(/^[A-Za-z][A-Za-z ]+$/);
+  });
+
+  it("uses the shipped list by default", () => {
+    const { terms: shipped } = JSON.parse(
+      readFileSync(path.join(REPO_ROOT, "scripts/claims-denylist.json"), "utf8"),
+    ) as { terms: string[] };
+    const body = `export const P = () => <p>Run with ${shipped[0]} here.</p>;\n`;
+    expect(demoRules(body)).toContain("denylist");
+  });
+});
+
 describe("extraction", () => {
   it("extractUiStrings finds JSX text, listed attributes, metadata properties and alt consts", () => {
     const source = `

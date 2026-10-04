@@ -3,9 +3,13 @@
 // wording, with no numbers, no partner or community names, and no prose written outside src/content.
 // Usage: node scripts/check-claims.mjs [root]      (also run by `pnpm check` and CI)
 //
-// Rules reported as `file:line rule message`: forbidden-pattern, proper-noun, denylist,
+// Rules reported as `file:line rule message`: forbidden-pattern, num-figure, proper-noun, denylist,
 // no-inline-prose, missing-claims-declaration, unknown-claim, orphan-register-row.
-// The hashed deny-list is never printed: findings name the rule, never the matched name.
+// Demo pages and src/lib/demo (P6) are checked for NUM figures (allowed only under a registered claim
+// id marker on the same or the previous line) and for the deny-lists; their inline copy is otherwise expected.
+// Two deny-lists apply everywhere: the hashed list of real names (scripts/claims/denylist.hashes.json)
+// and the explicit placeholder list (scripts/claims-denylist.json). Findings name the rule, never the
+// matched name.
 import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
@@ -15,6 +19,7 @@ import {
   ALLOWED_TERMS,
   DIGIT_ALLOW,
   FORBIDDEN,
+  NUM_FIGURES,
   P4_CLAIM_RANGE,
   PROSE_LETTERS,
   SCAN_DIRS,
@@ -23,6 +28,7 @@ import { claimRefs, mdxClaimDeclaration, parseRegister } from "./claims/register
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_DENYLIST = path.join(HERE, "claims", "denylist.hashes.json");
+const DEFAULT_DENY_TERMS = path.join(HERE, "claims-denylist.json");
 const MAX_NGRAM = 4;
 const SOURCE_FILE = /\.(ts|tsx|mdx)$/;
 const TEST_FILE = /\.(test|spec)\.[jt]sx?$/;
@@ -54,7 +60,21 @@ function properNounHit(text) {
   });
 }
 
-function denylistHit(text, deny) {
+const hasSequence = (words, phrase) =>
+  phrase.length > 0 &&
+  words.some((_, i) => phrase.every((word, offset) => words[i + offset] === word));
+
+/** True when the text holds a whole-word, case-insensitive match of an explicit deny-list term. */
+function termsHit(text, terms) {
+  const words = tokens(text);
+  return terms.some((term) => hasSequence(words, tokens(term)));
+}
+
+/** The first NUM figure kind in the text, or null. */
+const numFigure = (text) => NUM_FIGURES.find(({ test }) => test.test(text)) ?? null;
+
+function denylistHit(text, { deny, terms }) {
+  if (termsHit(text, terms)) return true;
   if (deny.size === 0) return false;
   const words = tokens(text);
   for (let n = 1; n <= MAX_NGRAM; n += 1) {
@@ -75,6 +95,8 @@ function denylistHit(text, deny) {
 /** All prose rules for one extracted string. */
 function checkText(entry, file, deny, findings) {
   const report = (rule, message) => findings.push({ file, line: entry.line, rule, message });
+  const figure = numFigure(entry.text);
+  if (figure) report("num-figure", `${figure.message}; copy may not state one`);
   for (const { id, test, message } of FORBIDDEN) {
     if (id === "digit" && DIGIT_ALLOW.has(entry.text)) continue;
     if (test.test(entry.text)) report("forbidden-pattern", `${id}: ${message}`);
@@ -85,8 +107,7 @@ function checkText(entry, file, deny, findings) {
       "capitalised proper noun outside the allowed list (scripts/claims/policy.mjs)",
     );
   }
-  if (denylistHit(entry.text, deny))
-    report("denylist", "matches the hashed deny-list of real names");
+  if (denylistHit(entry.text, deny)) report("denylist", "matches the deny-list of real names");
 }
 
 const readJson = (file) => JSON.parse(readFileSync(file, "utf8"));
@@ -142,6 +163,48 @@ function scanUi(root, deny, findings) {
   return strings;
 }
 
+const CLAIM_MARKER = /claims:\s*C-\d{2}\b/;
+
+/** Lines that carry a `claims: C-nn` marker; a figure is waived on that line or the next one. */
+const markerLines = (text) =>
+  new Set(
+    text
+      .split("\n")
+      .flatMap((raw, index) => (CLAIM_MARKER.test(raw) ? [index + 1, index + 2] : [])),
+  );
+
+const demoStrings = (source, file) =>
+  file.endsWith(".tsx") ? extractUiStrings(source, file) : extractContentStrings(source, file);
+
+/** Demo pages: a NUM figure needs a registered claim id marker on its own or the previous line; listed names never pass. */
+function scanDemo(root, deny, findings, refs) {
+  let strings = 0;
+  for (const dir of SCAN_DIRS.demo) {
+    for (const file of walk(path.join(root, dir)).filter((f) => !f.endsWith(".mdx"))) {
+      const text = readFileSync(file, "utf8");
+      const name = rel(root, file);
+      const fileRefs = claimRefs(text);
+      refs.push(...fileRefs.map((r) => ({ ...r, file: name })));
+      const waived = markerLines(text);
+      for (const entry of demoStrings(text, file)) {
+        strings += 1;
+        const report = (rule, message) =>
+          findings.push({ file: name, line: entry.line, rule, message });
+        const figure = numFigure(entry.text);
+        if (figure && !waived.has(entry.line)) {
+          report(
+            "num-figure",
+            `${figure.message}; cite a claim id on this or the previous line (// claims: C-nn)`,
+          );
+        }
+        if (denylistHit(entry.text, deny))
+          report("denylist", "matches the deny-list of real names");
+      }
+    }
+  }
+  return strings;
+}
+
 function checkClaims({ root, registerPath, matrixPath }, refs, findings) {
   const registerFile = path.join(root, registerPath);
   const register = existsSync(registerFile)
@@ -178,20 +241,24 @@ function checkClaims({ root, registerPath, matrixPath }, refs, findings) {
 }
 
 /**
- * @param {{ root: string; denylist?: string[]; registerPath?: string; matrixPath?: string }} options
+ * @param {{ root: string; denylist?: string[]; denyTerms?: string[]; registerPath?: string; matrixPath?: string }} options
  * @returns {{ ok: boolean; findings: { file: string; line: number; rule: string; message: string }[]; stats: object }}
  */
 export function runClaimsCheck({
   root,
   denylist,
+  denyTerms,
   registerPath = "PROGRESS.md",
   matrixPath = "docs/CONTENT_MATRIX.md",
 }) {
-  const deny = new Set(denylist ?? readJson(DEFAULT_DENYLIST));
+  const deny = {
+    deny: new Set(denylist ?? readJson(DEFAULT_DENYLIST)),
+    terms: denyTerms ?? readJson(DEFAULT_DENY_TERMS).terms,
+  };
   const findings = [];
   const refs = [];
   const contentStrings = scanContent(root, deny, findings, refs);
-  const uiStrings = scanUi(root, deny, findings);
+  const uiStrings = scanUi(root, deny, findings) + scanDemo(root, deny, findings, refs);
   const registerRows = checkClaims({ root, registerPath, matrixPath }, refs, findings);
   return {
     ok: findings.length === 0,
