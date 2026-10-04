@@ -1,10 +1,10 @@
 import * as THREE from "three";
 import { wrapLabel } from "@/lib/workflow/footprints";
-import { planRoute, type Footprint, type Point } from "@/lib/workflow/geometry";
+import { filletSegments, planRoute, type Footprint, type Point } from "@/lib/workflow/geometry";
 import type { WorkflowEdge } from "@/lib/workflow/graph";
 import { createLabelSprite, type LabelSprite } from "./labels";
 import { portHeight, type NodeVisual } from "./nodes";
-import { cssHex, SCENE_COLORS, TONE_COLORS } from "./palette";
+import { cssHex, cssRgba, SCENE_COLORS, TONE_COLORS } from "./palette";
 
 const TUBE_RADIUS = 0.06;
 const TUBE_SEGMENTS_PER_UNIT = 8;
@@ -33,7 +33,7 @@ export interface EdgeVisual {
   readonly color: THREE.Color;
   /** Picks one of a few port heights so crossing tubes do not merge into each other. */
   readonly variant: number;
-  /** Rebuilt on every layout change; particles and label placement read it each frame. */
+  /** Rebuilt when the edges are laid out again; particles read it each frame. */
   path: THREE.Curve<THREE.Vector3>;
 }
 
@@ -54,7 +54,7 @@ export function createEdgeVisual(
     ? createLabelSprite(wrapLabel(label, LABEL_WRAP_CHARS), {
         fontPx: 20,
         color: cssHex(SCENE_COLORS.text),
-        background: "rgba(11, 16, 32, 0.9)",
+        background: cssRgba(SCENE_COLORS.ink, 0.9),
         border: cssHex(TONE_COLORS[def.tone]),
         padding: 8,
         weight: 500,
@@ -122,31 +122,57 @@ export function trimForArrow(points: readonly THREE.Vector3[]): {
   };
 }
 
-/** Straight runs joined by quadratic arcs at every corner. */
+/**
+ * Rounds the corners of a lifted polyline with the same fillet the static diagram uses: the plan
+ * is filleted on the ground, then every point gets the height the polyline has at that distance
+ * along it. Heights slide linearly along the route, so the arcs ramp exactly like the straight runs.
+ */
 export function filletedPath(
   points: readonly THREE.Vector3[],
   radius: number,
 ): THREE.CurvePath<THREE.Vector3> {
+  const plan = points.map((point): Point => ({ x: point.x, z: point.z }));
+  const segments = filletSegments(plan, radius);
+  const startY = points[0]!.y;
+  const endY = points[points.length - 1]!.y;
+  const total = plan.reduce(
+    (sum, point, i) =>
+      i === 0 ? 0 : sum + Math.hypot(point.x - plan[i - 1]!.x, point.z - plan[i - 1]!.z),
+    0,
+  );
+
+  // Segments are visited in order and each arc's legs run along the polyline to its corner, so the
+  // distance walked from point to point is the distance along the original polyline.
+  let along = 0;
+  let previous = plan[0]!;
+  const lift = (point: Point): THREE.Vector3 => {
+    along += Math.hypot(point.x - previous.x, point.z - previous.z);
+    previous = point;
+    const y = startY + (endY - startY) * (total > EPSILON ? along / total : 0);
+    return new THREE.Vector3(point.x, y, point.z);
+  };
+
   const path = new THREE.CurvePath<THREE.Vector3>();
-  let cursor = points[0]!.clone();
-
-  for (let i = 1; i < points.length - 1; i += 1) {
-    const corner = points[i]!;
-    const toPrev = points[i - 1]!.clone().sub(corner);
-    const toNext = points[i + 1]!.clone().sub(corner);
-    const reach = Math.min(radius, toPrev.length() / 2, toNext.length() / 2);
-    const arcStart = corner.clone().addScaledVector(toPrev.normalize(), reach);
-    const arcEnd = corner.clone().addScaledVector(toNext.normalize(), reach);
-    if (cursor.distanceTo(arcStart) > EPSILON) path.add(new THREE.LineCurve3(cursor, arcStart));
-    path.add(new THREE.QuadraticBezierCurve3(arcStart, corner.clone(), arcEnd));
-    cursor = arcEnd;
+  for (const segment of segments) {
+    if (segment.kind === "line") {
+      path.add(new THREE.LineCurve3(lift(segment.from), lift(segment.to)));
+    } else {
+      path.add(
+        new THREE.QuadraticBezierCurve3(
+          lift(segment.from),
+          lift(segment.control),
+          lift(segment.to),
+        ),
+      );
+    }
   }
-
-  const last = points[points.length - 1]!;
-  if (cursor.distanceTo(last) > EPSILON) path.add(new THREE.LineCurve3(cursor, last));
   return path;
 }
 
+/**
+ * Re-plans the route between the two nodes at their current heights: the path the particles ride,
+ * the arrowhead and the label. The tube mesh is rebuilt separately by `rebuildTube`.
+ */
 export function layoutEdge(visual: EdgeVisual, from: NodeVisual, to: NodeVisual): void {
   const plan = planRoute(visual.def.route, footprintOf(from), footprintOf(to));
   const startY = from.group.position.y + portHeight(from, visual.variant);
@@ -157,19 +183,22 @@ export function layoutEdge(visual: EdgeVisual, from: NodeVisual, to: NodeVisual)
   path.updateArcLengths();
   visual.path = path;
 
-  const segments = Math.min(
-    MAX_TUBE_SEGMENTS,
-    Math.max(MIN_TUBE_SEGMENTS, Math.round(path.getLength() * TUBE_SEGMENTS_PER_UNIT)),
-  );
-  visual.tube.geometry.dispose();
-  visual.tube.geometry = new THREE.TubeGeometry(path, segments, TUBE_RADIUS, 8, false);
-
   visual.arrow.position.copy(tip).addScaledVector(heading, -ARROW_LENGTH / 2);
   visual.arrow.quaternion.setFromUnitVectors(UP, heading);
 
   if (visual.label) {
     visual.label.sprite.position.copy(path.getPointAt(0.5)).y += LABEL_LIFT;
   }
+}
+
+/** Replaces the tube mesh with one built along the current path; the old geometry is freed. */
+export function rebuildTube(visual: EdgeVisual): void {
+  const segments = Math.min(
+    MAX_TUBE_SEGMENTS,
+    Math.max(MIN_TUBE_SEGMENTS, Math.round(visual.path.getLength() * TUBE_SEGMENTS_PER_UNIT)),
+  );
+  visual.tube.geometry.dispose();
+  visual.tube.geometry = new THREE.TubeGeometry(visual.path, segments, TUBE_RADIUS, 8, false);
 }
 
 export function applyEdgeState(visual: EdgeVisual, state: EdgeState): void {

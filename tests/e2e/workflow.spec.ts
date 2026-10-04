@@ -30,8 +30,10 @@ async function openScene(page: Page, how: "click" | "keyboard" = "click"): Promi
     await button.click();
   }
   const viewer = page.locator("[data-workflow-viewer]");
-  await expect(viewer).toHaveAttribute("data-phase", /^(ready|failed)$/, { timeout: 30_000 });
-  if ((await viewer.getAttribute("data-phase")) === "failed") {
+  await expect(viewer).toHaveAttribute("data-phase", /^(ready|failed|unavailable)$/, {
+    timeout: 30_000,
+  });
+  if ((await viewer.getAttribute("data-phase")) !== "ready") {
     const contextWorks = await page.evaluate(() =>
       Boolean(document.createElement("canvas").getContext("webgl2", { antialias: true })),
     );

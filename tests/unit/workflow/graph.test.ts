@@ -8,7 +8,7 @@ import {
 } from "@/content/home/workflow";
 import {
   node3dBox,
-  note3dBox,
+  NOTE_3D_HALF,
   svgNodeSize,
   svgNoteSize,
   SVG_SCALE,
@@ -44,7 +44,7 @@ const layout3d: Layout = {
       { center: { x: node.x, z: node.z }, box: node3dBox(node.kind, label(node.id)) },
     ]),
   ),
-  notes: WORKFLOW_NOTES.map((note) => ({ center: { x: note.x, z: note.z }, box: note3dBox() })),
+  notes: WORKFLOW_NOTES.map((note) => ({ center: { x: note.x, z: note.z }, box: NOTE_3D_HALF })),
   minArrow: { x: MIN_ARROW_3D, z: MIN_ARROW_3D },
 };
 

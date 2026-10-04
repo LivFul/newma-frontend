@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import {
   WORKFLOW_CONTROLS,
   WORKFLOW_EDGE_LABELS,
@@ -8,7 +7,7 @@ import {
 } from "@/content/home/workflow";
 import { textsOf } from "@/lib/workflow/copy";
 import { SVG_TEXT } from "@/lib/workflow/footprints";
-import type { EdgeTone } from "@/lib/workflow/graph";
+import { EDGE_TONES, type EdgeTone } from "@/lib/workflow/graph";
 import { buildSvgLayout, type SvgNodeShape } from "@/lib/workflow/svg-layout";
 import { ScrollRegion } from "./scroll-region";
 import "./workflow-diagram.css";
@@ -20,11 +19,11 @@ export const WORKFLOW_SVG_LAYOUT = buildSvgLayout({
   noteText: textsOf(WORKFLOW_NOTE_TEXT),
 });
 
-const TONES: readonly EdgeTone[] = ["pass", "remediate", "fail", "learn"];
 const TITLE_ID = "workflow-svg-title";
 const DESC_ID = "workflow-svg-desc";
 const NODE_RADIUS = 6;
 const NOTE_RADIUS = 6;
+const TAG_RADIUS = 4;
 
 const arrowId = (tone: EdgeTone) => `workflow-arrow-${tone}`;
 
@@ -44,7 +43,7 @@ function Lines({
 }) {
   const top = y - ((lines.length - 1) * SVG_TEXT.linePx) / 2;
   return (
-    <text className={className} textAnchor={anchor}>
+    <text className={className} textAnchor={anchor} fontSize={SVG_TEXT.fontPx}>
       {lines.map((line, index) => (
         <tspan key={index} x={x} y={top + index * SVG_TEXT.linePx} dominantBaseline="central">
           {line}
@@ -101,11 +100,7 @@ export function WorkflowDiagram() {
   const layout = WORKFLOW_SVG_LAYOUT;
   return (
     <ScrollRegion className="wf-scroll" label={WORKFLOW_CONTROLS.region.text}>
-      <div
-        className="wf-frame"
-        style={{ "--wf-aspect": layout.aspect } as CSSProperties}
-        data-workflow-frame
-      >
+      <div className="wf-frame" data-workflow-frame>
         <svg
           className="wf-svg"
           viewBox={`0 0 ${layout.width} ${layout.height}`}
@@ -116,7 +111,7 @@ export function WorkflowDiagram() {
           <title id={TITLE_ID}>{WORKFLOW_SECTION.svgTitle.text}</title>
           <desc id={DESC_ID}>{WORKFLOW_SECTION.svgDesc.text}</desc>
           <defs>
-            {TONES.map((tone) => (
+            {EDGE_TONES.map((tone) => (
               <marker
                 key={tone}
                 id={arrowId(tone)}
@@ -143,6 +138,28 @@ export function WorkflowDiagram() {
                 {edge.label ? <title>{edge.label}</title> : null}
               </path>
             ))}
+          </g>
+          <g>
+            {layout.edges.map((edge) =>
+              edge.tag ? (
+                <g key={edge.id}>
+                  <rect
+                    className="wf-tag"
+                    x={edge.tag.x}
+                    y={edge.tag.y}
+                    width={edge.tag.width}
+                    height={edge.tag.height}
+                    rx={TAG_RADIUS}
+                  />
+                  <Lines
+                    lines={edge.tag.lines}
+                    x={edge.tag.x + edge.tag.width / 2}
+                    y={edge.tag.y + edge.tag.height / 2}
+                    className="wf-tag-text"
+                  />
+                </g>
+              ) : null,
+            )}
           </g>
           <g>
             {layout.notes.map((note) => (

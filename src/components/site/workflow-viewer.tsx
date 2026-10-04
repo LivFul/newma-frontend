@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { Button } from "@/components/ui/button";
-import type { WorkflowSceneProps } from "@/components/workflow-3d/workflow-scene";
+import type { SceneFailure, WorkflowSceneProps } from "@/components/workflow-3d/workflow-scene";
 
 export interface WorkflowViewerLabels {
   readonly explore: string;
@@ -18,12 +18,27 @@ export interface WorkflowViewerLabels {
   readonly loading: string;
   readonly ready: string;
   readonly failed: string;
+  readonly unavailable: string;
 }
 
-type Phase = "idle" | "loading" | "ready" | "failed";
+// "starting" has the scene mounted while its renderer starts, but still reads as loading: only a
+// renderer that really started is announced as ready. "unavailable" means the renderer could not
+// start in this browser (no WebGL), which a retry would not fix.
+type Phase = "idle" | "loading" | "starting" | "ready" | "failed" | "unavailable";
 type SceneModule = typeof import("@/components/workflow-3d/workflow-scene");
 
+const STATUS: Readonly<Record<Phase, keyof WorkflowViewerLabels | null>> = {
+  idle: null,
+  loading: "loading",
+  starting: "loading",
+  ready: "ready",
+  failed: "failed",
+  unavailable: "failed",
+};
+
 let pending: Promise<SceneModule> | null = null;
+// Set once the renderer has failed in this page; the browser will not grow WebGL on a second click.
+let rendererUnavailable = false;
 
 // False on the server and during hydration, true afterwards, with no effect and no flash of the
 // wrong state. Without JavaScript the explore button therefore never appears, as on the hero.
@@ -58,6 +73,17 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 const prefersSavedData = (): boolean =>
   (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
 
+// True when any part of the element is inside the viewport.
+function isOnScreen(element: Element): boolean {
+  const rect = element.getBoundingClientRect();
+  return (
+    rect.bottom >= 0 &&
+    rect.right >= 0 &&
+    rect.top <= window.innerHeight &&
+    rect.left <= window.innerWidth
+  );
+}
+
 // The three-dimensional scene is a separate chunk that loads only on the visitor's intent (a click,
 // or the pointer or keyboard focus reaching the button). It is a plain import(), not next/dynamic:
 // scripts/check-hero-bundle.mjs counts every next/dynamic chunk on the home route against the 80 KiB
@@ -74,6 +100,24 @@ function loadScene(): Promise<SceneModule> {
   return pending;
 }
 
+/** The smallest the scene box gets when it cannot simply take the diagram's height. */
+const MIN_SCENE_PX = 416;
+const MAX_SCENE_VIEWPORT_SHARE = 0.8;
+
+// Measured just before the swap, so the scene takes the diagram's block size and nothing below it
+// moves. Where the diagram scrolls sideways (phones) it is far taller than the screen is wide, so the
+// scene is capped to most of the viewport instead.
+function sceneHeightFor(diagram: HTMLElement | null): number | undefined {
+  const height = diagram?.getBoundingClientRect().height;
+  if (!diagram || !height) return undefined;
+  const region = diagram.firstElementChild;
+  const scrolls = region instanceof HTMLElement && region.scrollWidth > region.clientWidth + 1;
+  if (!scrolls) return height;
+  return Math.min(height, Math.max(MIN_SCENE_PX, window.innerHeight * MAX_SCENE_VIEWPORT_SHARE));
+}
+
+const sceneShown = (phase: Phase) => phase === "starting" || phase === "ready";
+
 export function WorkflowViewer({
   children,
   labels,
@@ -84,71 +128,79 @@ export function WorkflowViewer({
   aspect: string;
 }) {
   const hydrated = useHydrated();
-  const [phase, setPhase] = useState<Phase>("idle");
+  const [phase, setPhase] = useState<Phase>(() => (rendererUnavailable ? "unavailable" : "idle"));
   const [Scene, setScene] = useState<ComponentType<WorkflowSceneProps> | null>(null);
-  const mounted = useRef(true);
-
-  useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
+  const [sceneHeight, setSceneHeight] = useState<number | undefined>(undefined);
+  const wrapper = useRef<HTMLDivElement>(null);
+  const diagram = useRef<HTMLDivElement>(null);
+  const toggle = useRef<HTMLButtonElement>(null);
 
   const open = useCallback(async () => {
     setPhase("loading");
     try {
       const loaded = await loadScene();
-      if (!mounted.current) return;
+      setSceneHeight(sceneHeightFor(diagram.current));
       setScene(() => loaded.WorkflowScene);
-      setPhase("ready");
+      setPhase("starting");
     } catch {
-      if (mounted.current) setPhase("failed");
+      setPhase("failed");
     }
   }, []);
 
   const close = useCallback(() => setPhase("idle"), []);
-  const fail = useCallback(() => setPhase("failed"), []);
+  const ready = useCallback(
+    () => setPhase((current) => (current === "starting" ? "ready" : current)),
+    [],
+  );
+  // Only a missing WebGL context is remembered; any other start-up error stays retryable.
+  const sceneFailed = useCallback((reason: SceneFailure) => {
+    if (reason === "no-webgl") rendererUnavailable = true;
+    setPhase(reason === "no-webgl" ? "unavailable" : "failed");
+  }, []);
   // Warm the chunk on intent so the click feels instant. Nothing loads until the pointer or focus
   // reaches the button, and not at all for visitors who asked the browser to save data.
   const prefetch = useCallback(() => {
-    if (prefersSavedData()) return;
+    if (prefersSavedData() || rendererUnavailable) return;
     loadScene().catch(() => undefined);
   }, []);
 
-  const wrapper = useRef<HTMLDivElement>(null);
-  const toggle = useRef<HTMLButtonElement>(null);
-
-  // Escape closes the scene, but only when it was meant for the viewer: focus is inside it (or on the
-  // page itself), and no other widget has already handled the key.
+  // Escape closes the scene, but only when it was meant for the viewer: focus is inside it, or on the
+  // page itself while the viewer is at least partly on screen, and no other widget has handled the key.
   useEffect(() => {
     if (phase !== "ready") return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape" || event.defaultPrevented) return;
+      const viewer = wrapper.current;
+      if (!viewer) return;
       const focused = document.activeElement;
-      if (focused === document.body || wrapper.current?.contains(focused)) close();
+      if (viewer.contains(focused) || (focused === document.body && isOnScreen(viewer))) close();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [phase, close]);
 
   // Leaving the scene unmounts whatever had focus inside it, which would drop focus to the page top
-  // (WCAG 2.4.3). The explore button is always still there, so focus goes back to it.
-  const previousPhase = useRef<Phase>("idle");
+  // (WCAG 2.4.3). The explore button is always still there, so focus goes back to it, without pulling
+  // the page back to it when the visitor has scrolled away.
+  const previousPhase = useRef<Phase>(phase);
   useEffect(() => {
-    if (previousPhase.current === "ready" && phase !== "ready") toggle.current?.focus();
+    const button = toggle.current;
+    if (button && sceneShown(previousPhase.current) && !sceneShown(phase)) {
+      button.focus({ preventScroll: !isOnScreen(button) });
+    }
     previousPhase.current = phase;
   }, [phase]);
 
-  const status =
-    phase === "loading"
-      ? labels.loading
-      : phase === "ready"
-        ? labels.ready
-        : phase === "failed"
-          ? labels.failed
-          : "";
-  const busy = phase === "loading";
+  const statusKey = STATUS[phase];
+  const status = statusKey ? labels[statusKey] : "";
+  const busy = phase === "loading" || phase === "starting";
+  const inert = busy || phase === "unavailable";
+  const buttonLabel =
+    phase === "ready"
+      ? labels.close
+      : phase === "unavailable"
+        ? labels.unavailable
+        : labels.explore;
 
   return (
     <div ref={wrapper} data-workflow-viewer data-phase={phase} className="space-y-3">
@@ -162,20 +214,24 @@ export function WorkflowViewer({
             ref={toggle}
             variant="secondary"
             className="min-h-11"
-            aria-disabled={busy || undefined}
+            aria-disabled={inert || undefined}
             onClick={() => {
-              if (busy) return;
+              if (inert) return;
               if (phase === "ready") close();
               else void open();
             }}
             onPointerEnter={prefetch}
             onFocus={prefetch}
           >
-            {phase === "ready" ? labels.close : labels.explore}
+            {buttonLabel}
           </Button>
         ) : null}
       </div>
-      {phase === "ready" && Scene ? <Scene aspect={aspect} onFailure={fail} /> : children}
+      {sceneShown(phase) && Scene ? (
+        <Scene aspect={aspect} height={sceneHeight} onReady={ready} onFailure={sceneFailed} />
+      ) : (
+        <div ref={diagram}>{children}</div>
+      )}
     </div>
   );
 }

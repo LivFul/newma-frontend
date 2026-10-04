@@ -17,8 +17,6 @@ export interface LabelStyle {
 
 export interface LabelSprite {
   readonly sprite: THREE.Sprite;
-  readonly width: number;
-  readonly height: number;
 }
 
 /** A text sprite that always faces the camera: the label is drawn once to a canvas texture. */
@@ -75,5 +73,5 @@ export function createLabelSprite(lines: readonly string[], style: LabelStyle): 
   sprite.scale.set(width, height, 1);
   sprite.renderOrder = 10;
 
-  return { sprite, width, height };
+  return { sprite };
 }

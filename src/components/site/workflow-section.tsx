@@ -30,6 +30,7 @@ export function WorkflowSection() {
               loading: WORKFLOW_CONTROLS.loading.text,
               ready: WORKFLOW_CONTROLS.ready.text,
               failed: WORKFLOW_CONTROLS.failed.text,
+              unavailable: WORKFLOW_CONTROLS.unavailable.text,
             }}
           >
             <WorkflowDiagram />

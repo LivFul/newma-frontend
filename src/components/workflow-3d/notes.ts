@@ -1,9 +1,9 @@
 import * as THREE from "three";
-import { note3dBox, wrapLabel } from "@/lib/workflow/footprints";
+import { NOTE_3D_HALF, wrapLabel } from "@/lib/workflow/footprints";
 import type { WorkflowNote } from "@/lib/workflow/graph";
 import { createLabelSprite, type LabelSprite } from "./labels";
 import { nodeTop, type NodeVisual } from "./nodes";
-import { cssHex, SCENE_COLORS } from "./palette";
+import { cssHex, cssRgba, SCENE_COLORS } from "./palette";
 
 const PLATE_HEIGHT = 0.1;
 const LABEL_WRAP_CHARS = 24;
@@ -20,7 +20,7 @@ export interface NoteVisual {
 }
 
 export function createNoteVisual(def: WorkflowNote, text: string): NoteVisual {
-  const box = note3dBox();
+  const box = NOTE_3D_HALF;
   const root = new THREE.Group();
   const panel = new THREE.Group();
   root.add(panel);
@@ -41,7 +41,7 @@ export function createNoteVisual(def: WorkflowNote, text: string): NoteVisual {
   const label = createLabelSprite(wrapLabel(text, LABEL_WRAP_CHARS), {
     fontPx: 21,
     color: cssHex(SCENE_COLORS.textMuted),
-    background: "rgba(11, 16, 32, 0.86)",
+    background: cssRgba(SCENE_COLORS.ink, 0.86),
     border: cssHex(SCENE_COLORS.success),
     padding: 10,
     weight: 500,

@@ -14,10 +14,14 @@ import { NavPad } from "./nav-pad";
 import { createWorkflowScene, type SceneController } from "./scene";
 
 export interface WorkflowSceneProps {
-  /** CSS aspect-ratio of the static diagram, so the scene fills exactly the same box. */
+  /** CSS aspect-ratio of the static diagram, the box size when no measured height is given. */
   readonly aspect: string;
+  /** Height of the static diagram as measured before the swap, so the page does not shift. */
+  readonly height?: number;
+  /** Called once the renderer has started, so the viewer announces a view that really works. */
+  readonly onReady: () => void;
   /** Called when the scene cannot start (for example, no WebGL), so the page keeps the diagram. */
-  readonly onFailure: () => void;
+  readonly onFailure: (reason: SceneFailure) => void;
 }
 
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
@@ -30,7 +34,13 @@ const SCENE_COPY = {
 
 // The three-dimensional twin of the static diagram. This module, three.js included, is a separate
 // chunk that the viewer fetches only when a visitor asks for it.
-export function WorkflowScene({ aspect, onFailure }: WorkflowSceneProps) {
+/** "no-webgl" when the browser cannot create a WebGL context, which a retry would not fix. */
+export type SceneFailure = "no-webgl" | "error";
+
+const failureOf = (error: unknown): SceneFailure =>
+  error instanceof Error && /webgl/i.test(error.message) ? "no-webgl" : "error";
+
+export function WorkflowScene({ aspect, height, onReady, onFailure }: WorkflowSceneProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const controllerRef = useRef<SceneController | null>(null);
   const [separated, setSeparated] = useState(false);
@@ -43,15 +53,16 @@ export function WorkflowScene({ aspect, onFailure }: WorkflowSceneProps) {
         copy: SCENE_COPY,
         reducedMotion: window.matchMedia(REDUCED_MOTION).matches,
       });
-    } catch {
-      onFailure();
+    } catch (error) {
+      onFailure(failureOf(error));
       return;
     }
+    onReady();
     return () => {
       controllerRef.current?.dispose();
       controllerRef.current = null;
     };
-  }, [onFailure]);
+  }, [onFailure, onReady]);
 
   const toggleSeparated = () => {
     const next = !separated;
@@ -61,8 +72,8 @@ export function WorkflowScene({ aspect, onFailure }: WorkflowSceneProps) {
 
   return (
     <div
-      className="relative min-h-[26rem] w-full overflow-hidden rounded-lg border border-border bg-bg-elevated"
-      style={{ aspectRatio: aspect }}
+      className="relative w-full overflow-hidden rounded-lg border border-border bg-bg-elevated"
+      style={height ? { height } : { aspectRatio: aspect }}
       data-workflow-scene
     >
       <div
@@ -76,7 +87,13 @@ export function WorkflowScene({ aspect, onFailure }: WorkflowSceneProps) {
         {WORKFLOW_SECTION.svgDesc.text}
       </span>
       <div className="absolute left-3 top-3">
-        <Button size="sm" variant="secondary" aria-pressed={separated} onClick={toggleSeparated}>
+        <Button
+          size="sm"
+          variant="secondary"
+          className="min-h-11"
+          aria-pressed={separated}
+          onClick={toggleSeparated}
+        >
           {WORKFLOW_CONTROLS.separate.text}
         </Button>
       </div>

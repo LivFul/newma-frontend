@@ -1,4 +1,4 @@
-import { SVG_SCALE, SVG_TEXT, svgNodeSize, svgNoteSize } from "./footprints";
+import { SVG_SCALE, SVG_TEXT, svgNodeSize, svgNoteSize, wrapLabel } from "./footprints";
 import { filletSegments, planRoute, type Footprint, type Point, type Segment } from "./geometry";
 import {
   WORKFLOW_EDGES,
@@ -34,13 +34,26 @@ export interface SvgNodeShape {
   readonly hexagon?: string;
 }
 
+/** An axis-aligned box in view-box pixels; `x` and `y` are its top-left corner. */
+export interface SvgRect {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+/** A transition's condition drawn on or beside its route, on a halo so it reads over lines. */
+export interface SvgEdgeTag extends SvgRect {
+  readonly lines: readonly string[];
+}
+
 export interface SvgEdgeShape {
   readonly id: string;
-  readonly from: string;
-  readonly to: string;
   readonly tone: EdgeTone;
   readonly d: string;
   readonly label?: string;
+  /** Where the label is drawn; absent only when no free spot exists (the tooltip still carries it). */
+  readonly tag?: SvgEdgeTag;
 }
 
 export interface SvgNoteShape {
@@ -69,6 +82,9 @@ export interface SvgLayout {
 }
 
 const round = (value: number): number => Math.round(value * 100) / 100;
+
+const longestLine = (lines: readonly string[]): number =>
+  lines.reduce((max, line) => Math.max(max, line.length), 0);
 
 const toPx = (point: Point): Point => ({ x: point.x * SVG_SCALE.x, z: point.z * SVG_SCALE.z });
 
@@ -114,6 +130,131 @@ function hexagonPoints(cx: number, cy: number, width: number, height: number): s
     .join(" ");
 }
 
+// ---- Edge label placement -----------------------------------------------------------------------
+// Each condition is placed greedily, most constrained transition first. A candidate sits on one
+// straight run of its own route (centred on the line, or just beside it) and may not touch a node, a
+// note, another label or the drawing's edge; among the rest, the one hiding the fewest other lines
+// wins. Everything is in unshifted pixels, like the routes.
+
+/** Character limits tried for each label, narrowest first. */
+const TAG_WRAPS = [16, 20, 26, 34] as const;
+/** Positions along a run, as fractions of its length, in order of preference. */
+const TAG_STOPS = [0.5, 0.35, 0.65, 0.2, 0.8] as const;
+const TAG_PAD_X_PX = 4;
+const TAG_PAD_Y_PX = 2;
+/** Room left free at both ends of the run, for its rounded corner or arrowhead. */
+const TAG_RUN_CLEAR_PX = 12;
+/** Gap between a run and a label placed beside it. */
+const TAG_BESIDE_GAP_PX = 4;
+/** Clearance kept around nodes (their arrowheads included) and notes. */
+const TAG_SHAPE_CLEAR_PX = 6;
+/** Clearance kept between two labels. */
+const TAG_TAG_CLEAR_PX = 3;
+
+interface TagCandidate {
+  readonly box: SvgRect;
+  readonly lines: readonly string[];
+  readonly cost: number;
+}
+
+const grown = (r: SvgRect, by: number): SvgRect => ({
+  x: r.x - by,
+  y: r.y - by,
+  width: r.width + by * 2,
+  height: r.height + by * 2,
+});
+
+const overlaps = (a: SvgRect, b: SvgRect): boolean =>
+  a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+
+const contains = (outer: SvgRect, inner: SvgRect): boolean =>
+  inner.x >= outer.x &&
+  inner.y >= outer.y &&
+  inner.x + inner.width <= outer.x + outer.width &&
+  inner.y + inner.height <= outer.y + outer.height;
+
+const centred = (cx: number, cy: number, width: number, height: number): SvgRect => ({
+  x: cx - width / 2,
+  y: cy - height / 2,
+  width,
+  height,
+});
+
+/** True when an axis-aligned segment passes through the box interior. */
+const runCrosses = (a: Point, b: Point, r: SvgRect): boolean =>
+  Math.max(a.x, b.x) > r.x &&
+  Math.min(a.x, b.x) < r.x + r.width &&
+  Math.max(a.z, b.z) > r.y &&
+  Math.min(a.z, b.z) < r.y + r.height;
+
+const runsOf = (points: readonly Point[]): (readonly [Point, Point])[] =>
+  points.slice(1).map((to, i) => [points[i]!, to] as const);
+
+/** Every on-line and beside-the-line spot for one label, before other labels are considered. */
+function tagCandidates(
+  text: string,
+  own: readonly Point[],
+  allRuns: readonly (readonly [Point, Point])[],
+  blocked: readonly SvgRect[],
+  bounds: SvgRect,
+): TagCandidate[] {
+  const candidates: TagCandidate[] = [];
+  TAG_WRAPS.forEach((wrap, wrapIndex) => {
+    const lines = wrapLabel(text, wrap);
+    const width = longestLine(lines) * SVG_TEXT.charPx + TAG_PAD_X_PX * 2;
+    const height = lines.length * SVG_TEXT.linePx + TAG_PAD_Y_PX * 2;
+    for (const [a, b] of runsOf(own)) {
+      const horizontal = Math.abs(a.z - b.z) < Math.abs(a.x - b.x);
+      const length = Math.hypot(b.x - a.x, b.z - a.z);
+      const along = horizontal ? width : height;
+      const across = (horizontal ? height : width) / 2 + TAG_BESIDE_GAP_PX;
+      TAG_STOPS.forEach((stop, stopIndex) => {
+        const reach = Math.min(stop, 1 - stop) * length;
+        if (reach < along / 2 + TAG_RUN_CLEAR_PX) return;
+        const px = a.x + (b.x - a.x) * stop;
+        const pz = a.z + (b.z - a.z) * stop;
+        // Centred on the line first, then beside it on either side.
+        ([0, -1, 1] as const).forEach((side) => {
+          const box = horizontal
+            ? centred(px, pz + side * across, width, height)
+            : centred(px + side * across, pz, width, height);
+          if (!contains(bounds, box) || blocked.some((r) => overlaps(r, box))) return;
+          const hidden = allRuns.filter(([p, q]) => runCrosses(p, q, box)).length;
+          const cost =
+            (hidden - (side === 0 ? 1 : 0)) * 100 +
+            (side === 0 ? 0 : 2) +
+            stopIndex +
+            wrapIndex * 1.5 -
+            Math.min(length, 400) / 200;
+          candidates.push({ box, lines, cost });
+        });
+      });
+    }
+  });
+  return candidates.sort((p, q) => p.cost - q.cost);
+}
+
+function placeTags(
+  labelled: readonly { readonly id: string; readonly text: string; readonly points: Point[] }[],
+  allRuns: readonly (readonly [Point, Point])[],
+  blocked: readonly SvgRect[],
+  bounds: SvgRect,
+): Map<string, TagCandidate> {
+  const options = labelled
+    .map((entry) => ({
+      id: entry.id,
+      candidates: tagCandidates(entry.text, entry.points, allRuns, blocked, bounds),
+    }))
+    .sort((p, q) => p.candidates.length - q.candidates.length);
+  const placed = new Map<string, TagCandidate>();
+  for (const { id, candidates } of options) {
+    const taken = [...placed.values()].map((tag) => grown(tag.box, TAG_TAG_CLEAR_PX));
+    const pick = candidates.find((candidate) => !taken.some((r) => overlaps(r, candidate.box)));
+    if (pick) placed.set(id, pick);
+  }
+  return placed;
+}
+
 export function buildSvgLayout(copy: SvgCopy): SvgLayout {
   const sizes = new Map(
     WORKFLOW_NODES.map((node) => [node.id, svgNodeSize(node.kind, copy.nodeLabels[node.id] ?? "")]),
@@ -142,6 +283,8 @@ export function buildSvgLayout(copy: SvgCopy): SvgLayout {
     maxX = Math.max(maxX, x);
     maxY = Math.max(maxY, y);
   };
+  // Shapes a label must keep clear of: every node with its beside-text, and every note.
+  const blocked: SvgRect[] = [];
   for (const node of WORKFLOW_NODES) {
     const size = sizes.get(node.id)!;
     const c = toPx({ x: node.x, z: node.z });
@@ -151,14 +294,37 @@ export function buildSvgLayout(copy: SvgCopy): SvgLayout {
         : 0;
     grow(c.x - size.widthPx / 2, c.z - size.heightPx / 2);
     grow(c.x + size.widthPx / 2 + beside, c.z + size.heightPx / 2);
+    blocked.push(
+      grown(
+        {
+          x: c.x - size.widthPx / 2,
+          y: c.z - size.heightPx / 2,
+          width: size.widthPx + beside,
+          height: size.heightPx,
+        },
+        TAG_SHAPE_CLEAR_PX,
+      ),
+    );
   }
   WORKFLOW_NOTES.forEach((note, i) => {
     const c = toPx({ x: note.x, z: note.z });
     const size = noteSizes[i]!;
     grow(c.x - size.widthPx / 2, c.z - size.heightPx / 2);
     grow(c.x + size.widthPx / 2, c.z + size.heightPx / 2);
+    blocked.push(grown(centred(c.x, c.z, size.widthPx, size.heightPx), TAG_SHAPE_CLEAR_PX));
   });
   for (const { points } of routes) for (const p of points) grow(p.x, p.z);
+
+  // Labels fit inside the drawing as it stands, so they never widen the view box.
+  const tags = placeTags(
+    routes.flatMap(({ edge, points }) => {
+      const text = copy.edgeLabels[edge.id];
+      return text ? [{ id: edge.id, text, points }] : [];
+    }),
+    routes.flatMap(({ points }) => runsOf(points)),
+    blocked,
+    { x: minX, y: minY, width: maxX - minX, height: maxY - minY },
+  );
 
   const shift: Point = { x: minX - MARGIN_PX, z: minY - MARGIN_PX };
   const width = Math.ceil(maxX - minX + MARGIN_PX * 2);
@@ -183,14 +349,22 @@ export function buildSvgLayout(copy: SvgCopy): SvgLayout {
     };
   });
 
-  const edges: SvgEdgeShape[] = routes.map(({ edge, points }) => ({
-    id: edge.id,
-    from: edge.from,
-    to: edge.to,
-    tone: edge.tone,
-    d: pathData(filletSegments(points, CORNER_RADIUS_PX), shift),
-    label: copy.edgeLabels[edge.id],
-  }));
+  const edges: SvgEdgeShape[] = routes.map(({ edge, points }) => {
+    const tag = tags.get(edge.id);
+    return {
+      id: edge.id,
+      tone: edge.tone,
+      d: pathData(filletSegments(points, CORNER_RADIUS_PX), shift),
+      label: copy.edgeLabels[edge.id],
+      tag: tag && {
+        x: round(tag.box.x - shift.x),
+        y: round(tag.box.y - shift.z),
+        width: round(tag.box.width),
+        height: round(tag.box.height),
+        lines: tag.lines,
+      },
+    };
+  });
 
   const notes: SvgNoteShape[] = WORKFLOW_NOTES.map((note, i) => {
     const size = noteSizes[i]!;

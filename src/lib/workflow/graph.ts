@@ -7,6 +7,14 @@ export type LaneId = "learning" | "confirmation" | "governance" | "execution" | 
 export type NodeKind = "start" | "end" | "state" | "hold" | "success" | "failure";
 /** How a transition reads at a glance: advances, loops back for remediation, fails, or feeds learning. */
 export type EdgeTone = "pass" | "remediate" | "fail" | "learn";
+
+/** Every transition kind, in the order the legend lists them. */
+export const EDGE_TONES: readonly EdgeTone[] = Object.freeze([
+  "pass",
+  "remediate",
+  "fail",
+  "learn",
+]);
 /** Compass side of a node. N is the top of the diagram (smaller z), S the bottom. */
 export type Side = "N" | "S" | "E" | "W";
 

@@ -1,16 +1,19 @@
 import * as THREE from "three";
-import { NODE_3D_WRAP_CHARS, node3dBox, wrapLabel } from "@/lib/workflow/footprints";
+import { NODE_3D_SHAPE, NODE_3D_WRAP_CHARS, node3dBox, wrapLabel } from "@/lib/workflow/footprints";
 import type { Box } from "@/lib/workflow/geometry";
 import type { WorkflowNode } from "@/lib/workflow/graph";
 import { createLabelSprite, type LabelSprite } from "./labels";
-import { cssHex, LANE_COLORS, SCENE_COLORS } from "./palette";
+import { cssHex, cssRgba, LANE_COLORS, SCENE_COLORS } from "./palette";
 
 const BLOCK_HEIGHT = 0.7;
-const BEVEL = 0.07;
-const HOLD_RADIUS = 1.5;
-const START_RADIUS = 0.4;
+// Shared with the footprints the routes are planned against, so a tube always meets its mesh.
+const {
+  bevel: BEVEL,
+  holdRadius: HOLD_RADIUS,
+  startRadius: START_RADIUS,
+  endRadius: END_RING_RADIUS,
+} = NODE_3D_SHAPE;
 const END_CORE_RADIUS = 0.28;
-const END_RING_RADIUS = 0.5;
 const LABEL_LIFT = 0.8;
 /** Node labels are drawn larger than their blocks so they stay legible from the overview camera. */
 const LABEL_SCALE = 1.4;
@@ -34,7 +37,6 @@ export interface NodeVisual {
   readonly root: THREE.Group;
   /** Child of `root`, lifted to the lane height in the separated view. */
   readonly group: THREE.Group;
-  readonly body: THREE.Mesh;
   readonly material: THREE.MeshStandardMaterial;
   readonly outline: THREE.LineBasicMaterial;
   readonly label: LabelSprite;
@@ -44,7 +46,6 @@ export interface NodeVisual {
   readonly topY: number;
   readonly elevation: number;
   readonly stem: THREE.Mesh;
-  readonly sprites: readonly THREE.Sprite[];
 }
 
 interface BodyShape {
@@ -153,7 +154,7 @@ export function createNodeVisual(def: WorkflowNode, text: string, elevation: num
   const label = createLabelSprite(lines, {
     fontPx: terminal ? 20 : 24,
     color: cssHex(SCENE_COLORS.text),
-    background: "rgba(11, 16, 32, 0.82)",
+    background: cssRgba(SCENE_COLORS.ink, 0.82),
     border: cssHex(glow),
     padding: 8,
     worldScale: LABEL_SCALE,
@@ -183,7 +184,6 @@ export function createNodeVisual(def: WorkflowNode, text: string, elevation: num
     def,
     root,
     group,
-    body,
     material,
     outline,
     label,
@@ -191,7 +191,6 @@ export function createNodeVisual(def: WorkflowNode, text: string, elevation: num
     topY: shape.topY,
     elevation,
     stem,
-    sprites: [label.sprite],
   };
 }
 

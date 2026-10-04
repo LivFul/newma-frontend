@@ -9,6 +9,7 @@ import {
   applyEdgeState,
   createEdgeVisual,
   layoutEdge,
+  rebuildTube,
   type EdgeState,
   type EdgeVisual,
 } from "./edges";
@@ -31,8 +32,8 @@ const GRID_SIZE = 90;
 /** How quickly the lane height eases towards its target, per second. */
 const SPREAD_RATE = 6;
 const SPREAD_SNAP = 0.002;
-/** Share of the lane-height move after which the tubes are rebuilt while it is still easing. */
-const EDGE_REBUILD_STEP = 0.05;
+/** Minimum time between tube rebuilds while the lanes are still easing. */
+const TUBE_REBUILD_INTERVAL_SECONDS = 0.1;
 const MAX_STEP_SECONDS = 0.1;
 
 export interface SceneCopy {
@@ -53,7 +54,8 @@ export interface WorkflowModel {
   /** 0 keeps every lane on the ground as drawn; 1 lifts each lane to its own height. */
   setSpread(target: number): void;
   setActive(hovered: string | null, selected: string | null): void;
-  update(timeSeconds: number): void;
+  /** Advances the animation; returns true when anything moved, so the frame needs drawing. */
+  update(timeSeconds: number): boolean;
   dispose(): void;
 }
 
@@ -170,34 +172,41 @@ export function createWorkflowModel(copy: SceneCopy, options: ModelOptions): Wor
     });
   }
 
-  // Rebuilding every tube is the expensive part of a layout pass, so while the lanes ease the tubes
-  // are rebuilt only every few percent of the move (and always once it settles). Nodes and notes,
-  // which are cheap, follow every frame.
-  let edgeSpread = 0;
-  function refreshLayout(): void {
+  // Rebuilding the tube meshes is the expensive part of a layout pass, so while the lanes ease the
+  // tubes are rebuilt at most once per interval (and always once the move settles). Nodes, notes,
+  // arrowheads and the paths the particles ride are cheap and follow every frame.
+  let tubesBuiltAt: number | null = null;
+  function refreshLayout(timeSeconds: number): void {
     nodes.forEach((visual) => layoutNode(visual, spread));
     notes.forEach((note) => layoutNote(note, nodeOf(note.def.attachTo)));
-    if (spread === spreadTarget || Math.abs(spread - edgeSpread) >= EDGE_REBUILD_STEP) {
-      edges.forEach((edge) => layoutEdge(edge, nodeOf(edge.def.from), nodeOf(edge.def.to)));
-      edgeSpread = spread;
+    edges.forEach((edge) => layoutEdge(edge, nodeOf(edge.def.from), nodeOf(edge.def.to)));
+    const settled = spread === spreadTarget;
+    const due =
+      tubesBuiltAt === null || timeSeconds - tubesBuiltAt >= TUBE_REBUILD_INTERVAL_SECONDS;
+    if (settled || due) {
+      edges.forEach(rebuildTube);
+      tubesBuiltAt = settled ? null : timeSeconds;
     }
     applyHighlight();
   }
 
-  refreshLayout();
+  refreshLayout(0);
 
-  function stepSpread(seconds: number): void {
-    if (spread === spreadTarget) return;
+  /** Eases the lanes towards their target height; returns true when they moved this frame. */
+  function stepSpread(timeSeconds: number, seconds: number): boolean {
+    if (spread === spreadTarget) return false;
     const gap = spreadTarget - spread;
     spread =
       Math.abs(gap) < SPREAD_SNAP
         ? spreadTarget
         : spread + gap * Math.min(1, seconds * SPREAD_RATE);
-    refreshLayout();
+    refreshLayout(timeSeconds);
+    return true;
   }
 
-  function stepParticles(timeSeconds: number): void {
-    if (!particles) return;
+  /** Moves the flowing particles; returns true whenever there are particles to move. */
+  function stepParticles(timeSeconds: number): boolean {
+    if (!particles) return false;
     edges.forEach((edge, edgeIndex) => {
       const speed = FLOW_SPEED / edge.path.getLength();
       const scale = edgeStates[edgeIndex] === "dim" ? 0 : 1;
@@ -212,6 +221,7 @@ export function createWorkflowModel(copy: SceneCopy, options: ModelOptions): Wor
       }
     });
     particles.instanceMatrix.needsUpdate = true;
+    return true;
   }
 
   return {
@@ -221,7 +231,8 @@ export function createWorkflowModel(copy: SceneCopy, options: ModelOptions): Wor
       spreadTarget = Math.min(1, Math.max(0, target));
       if (options.reducedMotion) {
         spread = spreadTarget;
-        refreshLayout();
+        // Settled at once, so the tubes are rebuilt and the clock value does not matter.
+        refreshLayout(0);
       }
     },
     setActive(nextHovered, nextSelected) {
@@ -231,9 +242,10 @@ export function createWorkflowModel(copy: SceneCopy, options: ModelOptions): Wor
     },
     update(timeSeconds) {
       const seconds = lastTime === null ? 0 : Math.min(timeSeconds - lastTime, MAX_STEP_SECONDS);
+      const easing = stepSpread(timeSeconds, seconds);
+      const flowing = stepParticles(timeSeconds);
       lastTime = timeSeconds;
-      stepSpread(seconds);
-      stepParticles(timeSeconds);
+      return easing || flowing;
     },
     dispose() {
       // The instanced mesh owns matrix and colour buffers that a plain traversal does not free.

@@ -52,6 +52,37 @@ describe("buildSvgLayout", () => {
     }
   });
 
+  // Value: protects=branch-condition tags stay inside the drawing and clear of steps, notes and each other; fails_when=tag placement overlaps a shape or another tag, or a label is dropped; why_new=no test covered drawn edge labels; seam=none
+  it("places a tag for every labelled transition, inside the view box and clear of every shape", () => {
+    type Rect = { x: number; y: number; width: number; height: number };
+    const overlaps = (a: Rect, b: Rect) =>
+      a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+    const shapes: Rect[] = [
+      ...layout.nodes.map((n) => ({
+        x: n.cx - n.width / 2,
+        y: n.cy - n.height / 2,
+        width: n.width,
+        height: n.height,
+      })),
+      ...layout.notes.map((n) => ({ x: n.x, y: n.y, width: n.width, height: n.height })),
+    ];
+    const tags = layout.edges.filter((edge) => edge.label).map((edge) => ({ edge, tag: edge.tag }));
+    for (const { edge, tag } of tags) {
+      expect(tag, edge.id).toBeDefined();
+      expect(tag!.lines.join(" "), edge.id).toBe(edge.label);
+      expect(tag!.x >= 0 && tag!.y >= 0, edge.id).toBe(true);
+      expect(
+        tag!.x + tag!.width <= layout.width && tag!.y + tag!.height <= layout.height,
+        edge.id,
+      ).toBe(true);
+      for (const shape of shapes) expect(overlaps(tag!, shape), edge.id).toBe(false);
+    }
+    tags.forEach(({ edge, tag }, i) => {
+      for (const other of tags.slice(i + 1))
+        expect(overlaps(tag!, other.tag!), `${edge.id}/${other.edge.id}`).toBe(false);
+    });
+  });
+
   it("writes every route as a finite path that starts with a move command", () => {
     for (const edge of layout.edges) {
       expect(edge.d.startsWith("M"), edge.id).toBe(true);

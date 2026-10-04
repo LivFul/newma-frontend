@@ -53,8 +53,6 @@ export const SVG_TEXT = Object.freeze({
   charPx: SVG_CHAR_PX,
   padX: SVG_PAD_X_PX,
   besideGapPx: SVG_BESIDE_GAP_PX,
-  wrapChars: SVG_WRAP_CHARS,
-  noteWrapChars: SVG_NOTE_WRAP_CHARS,
 });
 
 export interface SvgSize {
@@ -101,17 +99,23 @@ export function svgNoteSize(text: string): SvgSize {
 
 // ---- 3D scene -----------------------------------------------------------------------------------
 
-const BEVEL = 0.07;
+/** Mesh dimensions the 3D nodes are built from; routes are planned against the same numbers. */
+export const NODE_3D_SHAPE = Object.freeze({
+  bevel: 0.07,
+  holdRadius: 1.5,
+  startRadius: 0.4,
+  endRadius: 0.5,
+});
+const { bevel: BEVEL, holdRadius: HOLD_RADIUS, startRadius: START_RADIUS } = NODE_3D_SHAPE;
+const END_RADIUS = NODE_3D_SHAPE.endRadius;
 const BLOCK_DEPTH = 1;
 const BLOCK_MIN_WIDTH = 2.4;
 const BLOCK_MAX_WIDTH = 3.2;
 const BLOCK_CHAR_WIDTH = 0.14;
 const BLOCK_WIDTH_PAD = 0.5;
-const HOLD_RADIUS = 1.5;
-const START_RADIUS = 0.4;
-const END_RADIUS = 0.5;
 export const NODE_3D_WRAP_CHARS = 18;
-const NOTE_3D_HALF = Object.freeze({ halfW: 2.1, halfD: 0.7 });
+/** Half-extents of a guardrail note plate in the 3D scene. */
+export const NOTE_3D_HALF: Box = Object.freeze({ halfW: 2.1, halfD: 0.7 });
 
 export function node3dBox(kind: NodeKind, label: string): Box {
   if (kind === "start") return { halfW: START_RADIUS, halfD: START_RADIUS };
@@ -126,8 +130,4 @@ export function node3dBox(kind: NodeKind, label: string): Box {
     ),
   );
   return { halfW: width / 2 + BEVEL, halfD: BLOCK_DEPTH / 2 + BEVEL };
-}
-
-export function note3dBox(): Box {
-  return NOTE_3D_HALF;
 }

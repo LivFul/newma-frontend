@@ -1,25 +1,47 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ReactNode } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useEffect, type ReactNode } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const SCENE_MODULE = "@/components/workflow-3d/workflow-scene";
 const sceneLoaded = vi.fn();
 
+interface FakeSceneProps {
+  aspect: string;
+  height?: number;
+  onReady: () => void;
+  onFailure: (reason: "no-webgl" | "error") => void;
+}
+
 // Registered per test with doMock: Vitest caches a mock factory's result across resetModules, so a
-// factory registered once would count only the first test's load.
-function sceneFactory() {
-  sceneLoaded();
-  return {
-    WorkflowScene: ({ aspect, onFailure }: { aspect: string; onFailure: () => void }) => (
-      <div data-testid="scene" data-aspect={aspect}>
-        <button type="button" onClick={onFailure}>
-          scene failed
-        </button>
-      </div>
-    ),
+// factory registered once would count only the first test's load. By default the fake renderer starts
+// at once, as a working WebGL one would; with autoReady off it waits for its "scene ready" button.
+function makeSceneFactory({ autoReady = true } = {}) {
+  return () => {
+    sceneLoaded();
+    return {
+      WorkflowScene: ({ aspect, height, onReady, onFailure }: FakeSceneProps) => {
+        useEffect(() => {
+          if (autoReady) onReady();
+        }, [onReady]);
+        return (
+          <div data-testid="scene" data-aspect={aspect} data-height={height ?? ""}>
+            <button type="button" onClick={onReady}>
+              scene ready
+            </button>
+            <button type="button" onClick={() => onFailure("no-webgl")}>
+              scene failed
+            </button>
+            <button type="button" onClick={() => onFailure("error")}>
+              scene errored
+            </button>
+          </div>
+        );
+      },
+    };
   };
 }
+const sceneFactory = makeSceneFactory();
 
 const LABELS = {
   explore: "Explore it",
@@ -27,6 +49,7 @@ const LABELS = {
   loading: "Loading it",
   ready: "It is ready",
   failed: "It failed",
+  unavailable: "Not available",
 };
 
 async function renderViewer(
@@ -37,13 +60,33 @@ async function renderViewer(
   vi.resetModules();
   vi.doMock(SCENE_MODULE, factory);
   const { WorkflowViewer } = await import("@/components/site/workflow-viewer");
-  return render(
+  const view = render(
     <WorkflowViewer labels={LABELS} aspect="4 / 3">
       {children}
     </WorkflowViewer>,
   );
+  return { ...view, WorkflowViewer };
 }
 
+// A rect far below the viewport, as for an element the visitor has scrolled well past.
+const OFF_SCREEN = {
+  top: 5000,
+  bottom: 5400,
+  left: 0,
+  right: 800,
+  x: 0,
+  y: 5000,
+  width: 800,
+  height: 400,
+};
+const offScreen = (element: Element) =>
+  vi
+    .spyOn(element, "getBoundingClientRect")
+    .mockReturnValue({ ...OFF_SCREEN, toJSON: () => OFF_SCREEN });
+
+const viewerOf = (container: HTMLElement) => container.querySelector("[data-workflow-viewer]")!;
+
+afterEach(() => vi.restoreAllMocks());
 beforeEach(() => sceneLoaded.mockClear());
 
 describe("WorkflowViewer", () => {
@@ -117,10 +160,13 @@ describe("WorkflowViewer", () => {
     const outside = document.createElement("input");
     outside.setAttribute("aria-label", "outside the viewer");
     document.body.append(outside);
-    outside.focus();
-    await user.keyboard("{Escape}");
-    expect(screen.getByTestId("scene")).toBeInTheDocument();
-    outside.remove();
+    try {
+      outside.focus();
+      await user.keyboard("{Escape}");
+      expect(screen.getByTestId("scene")).toBeInTheDocument();
+    } finally {
+      outside.remove();
+    }
   });
 
   it("does not fetch ahead of a click for visitors who ask to save data", async () => {
@@ -171,8 +217,122 @@ describe("WorkflowViewer", () => {
 
     expect(screen.getByText("static diagram")).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent(LABELS.failed);
-    // The visitor can try again.
-    expect(screen.getByRole("button", { name: LABELS.explore })).toBeInTheDocument();
+    // A browser without WebGL will not gain it on a second click, so the button says so instead.
+    expect(screen.getByRole("button", { name: LABELS.unavailable })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
+
+  // Value: protects=a start-up error that is not a missing WebGL context stays retryable; fails_when=every scene failure is remembered as no WebGL and locks the button; why_new=only the no-WebGL failure was covered; seam=none
+  it("keeps other start-up errors retryable instead of marking the view unavailable", async () => {
+    const user = userEvent.setup();
+    await renderViewer();
+    await user.click(await screen.findByRole("button", { name: LABELS.explore }));
+    await user.click(await screen.findByRole("button", { name: "scene errored" }));
+    expect(screen.getByRole("status")).toHaveTextContent(LABELS.failed);
+    expect(screen.getByRole("button", { name: LABELS.explore })).not.toHaveAttribute(
+      "aria-disabled",
+    );
+    expect(screen.queryByRole("button", { name: LABELS.unavailable })).toBeNull();
+  });
+
+  // Value: protects=a no-WebGL visitor is not sent round the load, ready, failed loop on every click; fails_when=the renderer failure is forgotten on remount or the unavailable button still loads; why_new=no test rendered the viewer a second time after a renderer failure; seam=none
+  it("remembers a renderer failure, and the unavailable button loads nothing", async () => {
+    const user = userEvent.setup();
+    const { WorkflowViewer, unmount } = await renderViewer();
+    await user.click(await screen.findByRole("button", { name: LABELS.explore }));
+    await user.click(await screen.findByRole("button", { name: "scene failed" }));
+    unmount();
+
+    // The same page renders the viewer again, as after a client-side navigation.
+    const { container } = render(
+      <WorkflowViewer labels={LABELS} aspect="4 / 3">
+        <p>static diagram</p>
+      </WorkflowViewer>,
+    );
+    const button = await screen.findByRole("button", { name: LABELS.unavailable });
+    expect(button).toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByRole("status")).toHaveTextContent(LABELS.failed);
+
+    await user.click(button);
+    expect(screen.queryByTestId("scene")).toBeNull();
+    expect(screen.getByText("static diagram")).toBeInTheDocument();
+    expect(viewerOf(container)).toHaveAttribute("data-phase", "unavailable");
+    expect(screen.getByRole("status")).toHaveTextContent(LABELS.failed);
+  });
+
+  // Value: protects=ready is announced only for a renderer that really started; fails_when=the viewer announces ready as soon as the chunk arrives; why_new=the old fake scene could not delay its start, so ready and mounted were indistinguishable; seam=none
+  it("reads as loading while the renderer starts, and announces ready only once it has", async () => {
+    const user = userEvent.setup();
+    await renderViewer(<p>static diagram</p>, makeSceneFactory({ autoReady: false }));
+    await user.click(await screen.findByRole("button", { name: LABELS.explore }));
+
+    await screen.findByTestId("scene");
+    expect(screen.getByRole("status")).toHaveTextContent(LABELS.loading);
+    expect(screen.getByRole("button", { name: LABELS.explore })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+
+    await user.click(screen.getByRole("button", { name: "scene ready" }));
+    expect(screen.getByRole("status")).toHaveTextContent(LABELS.ready);
+    expect(screen.getByRole("button", { name: LABELS.close })).toBeInTheDocument();
+  });
+
+  // Value: protects=the scene takes the static diagram's exact height, so the swap shifts nothing; fails_when=the viewer stops measuring the diagram or stops passing the height; why_new=no test checked the scene's size against the diagram's; seam=none
+  it("hands the scene the height the diagram had just before the swap", async () => {
+    const user = userEvent.setup();
+    const rect = { top: 0, bottom: 640, left: 0, right: 800, x: 0, y: 0, width: 800, height: 640 };
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+      ...rect,
+      toJSON: () => rect,
+    });
+    await renderViewer();
+    await user.click(await screen.findByRole("button", { name: LABELS.explore }));
+    expect(await screen.findByTestId("scene")).toHaveAttribute("data-height", "640");
+  });
+
+  // Value: protects=Escape on the page body does not close a scene the visitor has scrolled away from; fails_when=a body-focused Escape closes the viewer wherever it is; why_new=the Escape tests only ran with the viewer in view; seam=none
+  it("ignores an Escape on the page when the viewer is scrolled out of view", async () => {
+    const user = userEvent.setup();
+    const { container } = await renderViewer();
+    await user.click(await screen.findByRole("button", { name: LABELS.explore }));
+    await screen.findByTestId("scene");
+    offScreen(viewerOf(container));
+    (document.activeElement as HTMLElement).blur();
+    expect(document.activeElement).toBe(document.body);
+
+    await user.keyboard("{Escape}");
+    expect(screen.getByTestId("scene")).toBeInTheDocument();
+  });
+
+  // Value: protects=a body-focused Escape still closes a viewer that is on screen; fails_when=the on-screen check rejects a visible viewer; why_new=the scope check is new; seam=none
+  it("closes on an Escape on the page while the viewer is on screen", async () => {
+    const user = userEvent.setup();
+    await renderViewer();
+    await user.click(await screen.findByRole("button", { name: LABELS.explore }));
+    await screen.findByTestId("scene");
+    (document.activeElement as HTMLElement).blur();
+
+    await user.keyboard("{Escape}");
+    expect(screen.queryByTestId("scene")).toBeNull();
+  });
+
+  // Value: protects=closing the scene moves focus back without scrolling the page to an off-screen button; fails_when=focus is restored with a plain focus() call; why_new=focus-return tests never looked at how focus was moved; seam=none
+  it("returns focus to an off-screen button without scrolling the page", async () => {
+    const user = userEvent.setup();
+    await renderViewer();
+    await user.click(await screen.findByRole("button", { name: LABELS.explore }));
+    const inside = await screen.findByRole("button", { name: "scene failed" });
+    const toggle = screen.getByRole("button", { name: LABELS.close });
+    offScreen(toggle);
+    const focus = vi.spyOn(toggle, "focus");
+    inside.focus();
+
+    await user.keyboard("{Escape}");
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+    expect(toggle).toHaveFocus();
   });
 
   it("starts fetching when the pointer reaches the button, but still renders nothing", async () => {
@@ -186,6 +346,29 @@ describe("WorkflowViewer", () => {
     await user.click(button);
     await screen.findByTestId("scene");
     expect(sceneLoaded).toHaveBeenCalledTimes(1);
+  });
+
+  // Value: protects=a failed chunk load can really be retried by the visitor; fails_when=loadScene keeps the rejected request cached so every retry fails again, or a chunk failure is treated as a missing renderer; why_new=failure tests only check the button reappears, never press it; seam=none
+  it("loads the scene on a second try after the first load failed", async () => {
+    let attempts = 0;
+    await renderViewer(<p>static diagram</p>, () => {
+      attempts += 1;
+      if (attempts === 1) throw new Error("chunk failed to load");
+      return sceneFactory();
+    });
+
+    // Plain clicks, so no hover or focus prefetch spends the failing first attempt.
+    fireEvent.click(await screen.findByRole("button", { name: LABELS.explore }));
+    expect(await screen.findByText(LABELS.failed)).toBeInTheDocument();
+
+    // A lost chunk is not a missing renderer: the button stays live for another try.
+    expect(screen.getByRole("button", { name: LABELS.explore })).not.toHaveAttribute(
+      "aria-disabled",
+    );
+    fireEvent.click(screen.getByRole("button", { name: LABELS.explore }));
+    expect(await screen.findByTestId("scene")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent(LABELS.ready));
+    expect(attempts).toBe(2);
   });
 
   it("starts fetching when keyboard focus reaches the button", async () => {

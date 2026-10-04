@@ -13,6 +13,7 @@ const LABELS = {
   loading: "Loading it",
   ready: "It is ready",
   failed: "It failed",
+  unavailable: "Not available",
 };
 
 describe("WorkflowViewer when the scene chunk fails to load", () => {

@@ -28,6 +28,9 @@ export interface CameraPose {
   readonly target: THREE.Vector3;
 }
 
+/** Returns true when it changed the scene this frame, so the frame is drawn and another follows. */
+export type FrameCallback = (timeSeconds: number) => boolean;
+
 export interface StageOptions {
   /** Camera moves jump instead of gliding, and orbit damping is off. */
   readonly reducedMotion: boolean;
@@ -39,7 +42,13 @@ export interface Stage {
   readonly canvas: HTMLCanvasElement;
   /** Width over height of the canvas. */
   aspect(): number;
-  onFrame(callback: (timeSeconds: number) => void): void;
+  /**
+   * Runs before each frame. A callback returns true when it moved something, which draws the frame
+   * and asks for the next; once a frame moves nothing the stage idles until invalidated.
+   */
+  onFrame(callback: FrameCallback): void;
+  /** Asks for one more frame because something in the scene changed. */
+  invalidate(): void;
   setPose(pose: CameraPose): void;
   flyTo(pose: CameraPose): void;
   /** Moves the camera continuously while a command is set; null stops. */
@@ -75,7 +84,6 @@ export function createStage(container: HTMLElement, options: StageOptions): Stag
   // releases the renderer, the render loop, the observers and the listeners instead of leaking them.
   const cleanups: Array<() => void> = [
     () => {
-      renderer.setAnimationLoop(null);
       renderer.dispose();
       // dispose() frees buffers but not the context, and browsers cap live contexts.
       renderer.forceContextLoss();
@@ -114,11 +122,32 @@ export function createStage(container: HTMLElement, options: StageOptions): Stag
     container.addEventListener("wheel", guardWheel, { capture: true });
     cleanups.push(() => container.removeEventListener("wheel", guardWheel, { capture: true }));
 
-    const frameCallbacks: Array<(timeSeconds: number) => void> = [];
+    const frameCallbacks: FrameCallback[] = [];
     let flight: Flight | null = null;
     let navigation: NavCommand | null = null;
-    let lastFrameMs = 0;
     let onScreen = true;
+
+    // Frames are drawn on demand: a change asks for one frame, and frames keep coming only while
+    // something is moving (a flight, held navigation, orbit damping or a callback still animating).
+    // The flowing particles count as moving, so the loop truly idles under reduced motion (no
+    // particles) and, like before, whenever the scene is off screen or the tab is hidden.
+    let frameId: number | null = null;
+    /** Null while idle, so the first frame after a pause takes no time step. */
+    let lastFrameMs: number | null = null;
+    let needsRender = true;
+    cleanups.push(() => {
+      if (frameId !== null) cancelAnimationFrame(frameId);
+      frameId = null;
+    });
+    const requestFrame = () => {
+      if (frameId === null) frameId = requestAnimationFrame(drawFrame);
+    };
+    const invalidate = () => {
+      needsRender = true;
+      requestFrame();
+    };
+    controls.addEventListener("change", invalidate);
+    cleanups.push(() => controls.removeEventListener("change", invalidate));
 
     const resize = () => {
       const { clientWidth, clientHeight } = container;
@@ -126,18 +155,26 @@ export function createStage(container: HTMLElement, options: StageOptions): Stag
       renderer.setSize(clientWidth, clientHeight);
       camera.aspect = clientWidth / clientHeight;
       camera.updateProjectionMatrix();
+      // Resizing clears the drawing buffer, so the frame must be drawn again.
+      invalidate();
     };
     const sizeObserver = new ResizeObserver(resize);
     cleanups.push(() => sizeObserver.disconnect());
     sizeObserver.observe(container);
     resize();
 
-    // Nothing is drawn while the scene is off screen or the tab is hidden.
+    // Nothing is drawn while the scene is off screen or the tab is hidden; coming back draws again.
     const visibilityObserver = new IntersectionObserver(([entry]) => {
       onScreen = entry?.isIntersecting ?? true;
+      if (onScreen) invalidate();
     });
     cleanups.push(() => visibilityObserver.disconnect());
     visibilityObserver.observe(container);
+    const onVisibilityChange = () => {
+      if (!document.hidden) invalidate();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    cleanups.push(() => document.removeEventListener("visibilitychange", onVisibilityChange));
 
     const stepFlight = (now: number) => {
       if (!flight) return;
@@ -188,23 +225,42 @@ export function createStage(container: HTMLElement, options: StageOptions): Stag
       controls.target.add(move);
     };
 
-    renderer.setAnimationLoop((now) => {
-      const seconds = Math.min((now - lastFrameMs) / 1000, MAX_FRAME_SECONDS);
+    function drawFrame(now: number): void {
+      frameId = null;
+      if (!onScreen || document.hidden) {
+        // Paused: the visibility handlers ask for a frame again when the scene comes back.
+        lastFrameMs = null;
+        return;
+      }
+      const seconds =
+        lastFrameMs === null ? 0 : Math.min((now - lastFrameMs) / 1000, MAX_FRAME_SECONDS);
       lastFrameMs = now;
-      if (!onScreen || document.hidden) return;
+
       stepFlight(now);
       if (navigation) applyNavigation(navigation, seconds);
-      controls.update();
-      frameCallbacks.forEach((callback) => callback(now / 1000));
-      renderer.render(scene, camera);
-    });
+      // True while the camera is still moving, which includes orbit damping after a drag.
+      const cameraMoved = controls.update();
+      let animating = false;
+      for (const callback of frameCallbacks) {
+        if (callback(now / 1000)) animating = true;
+      }
+
+      const moving = cameraMoved || animating || flight !== null || navigation !== null;
+      if (needsRender || moving) renderer.render(scene, camera);
+      needsRender = false;
+      if (moving) requestFrame();
+      else lastFrameMs = null;
+    }
 
     const setPose = (pose: CameraPose) => {
       flight = null;
       camera.position.copy(pose.position);
       controls.target.copy(pose.target);
       controls.update();
+      invalidate();
     };
+
+    requestFrame();
 
     return {
       scene,
@@ -213,7 +269,9 @@ export function createStage(container: HTMLElement, options: StageOptions): Stag
       aspect: () => camera.aspect,
       onFrame: (callback) => {
         frameCallbacks.push(callback);
+        invalidate();
       },
+      invalidate,
       setPose,
       flyTo: (pose) => {
         if (options.reducedMotion) {
@@ -226,11 +284,13 @@ export function createStage(container: HTMLElement, options: StageOptions): Stag
           pose,
           startedAt: performance.now(),
         };
+        requestFrame();
       },
       setNavigation: (command) => {
         navigation = command;
         // Manual control wins over any glide still in flight.
         if (command) flight = null;
+        requestFrame();
       },
       dispose: release,
     };

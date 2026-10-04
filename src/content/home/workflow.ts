@@ -46,6 +46,7 @@ export const WORKFLOW_CONTROLS = Object.freeze({
     "The three-dimensional view could not start. The diagram below still works.",
     ["C-55"],
   ),
+  unavailable: block("home.workflow.unavailable", "Three-dimensional view unavailable", ["C-55"]),
   separate: block("home.workflow.separate", "Separate lanes", ["C-55"]),
   legend: block("home.workflow.legend", "Transition kinds", ["C-55"]),
   navLabel: block("home.workflow.nav", "View navigation", ["C-55"]),
@@ -66,7 +67,7 @@ export const WORKFLOW_CONTROLS = Object.freeze({
   textEnds: block("home.workflow.text.ends", "No further steps", ["C-55"]),
 });
 
-// Lane names group the steps and key the colours; the order is the reading order of the text version.
+// Lane names group the steps and key the colours. The text version sets the reading order.
 export const WORKFLOW_LANE_NAMES: Readonly<Record<string, CopyBlock>> = Object.freeze({
   governance: block("home.workflow.lane.governance", "Rights, governance and prioritization", NODE),
   execution: block("home.workflow.lane.execution", "Material, eLab and wet lab", NODE),

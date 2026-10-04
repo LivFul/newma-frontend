@@ -42,3 +42,7 @@ export const TONE_COLORS: Readonly<Record<EdgeTone, number>> = Object.freeze({
 });
 
 export const cssHex = (hex: number): string => `#${hex.toString(16).padStart(6, "0")}`;
+
+/** A palette colour at the given opacity, for canvas fills that must track the tested tokens. */
+export const cssRgba = (hex: number, alpha: number): string =>
+  `rgba(${(hex >> 16) & 0xff}, ${(hex >> 8) & 0xff}, ${hex & 0xff}, ${alpha})`;

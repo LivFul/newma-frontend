@@ -63,7 +63,10 @@ function assembleScene(stage: Stage, options: SceneOptions): SceneController {
   let separated = false;
   let hovered: string | null = null;
   let selected: string | null = null;
-  const sync = () => model.setActive(hovered, selected);
+  const sync = () => {
+    model.setActive(hovered, selected);
+    stage.invalidate();
+  };
   stage.setPose(poseFor(false, stage.aspect()));
 
   const raycaster = new THREE.Raycaster();
@@ -120,6 +123,8 @@ function assembleScene(stage: Stage, options: SceneOptions): SceneController {
     setSeparated: (next) => {
       separated = next;
       model.setSpread(next ? 1 : 0);
+      // The model reports its easing from update(), which only runs once a frame is asked for.
+      stage.invalidate();
       stage.flyTo(poseFor(next, stage.aspect()));
     },
     dispose: () => {

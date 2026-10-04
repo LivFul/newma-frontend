@@ -54,26 +54,37 @@ describe("ScrollRegion", () => {
     expect(screen.getByRole("region", { name: "Diagram" })).toHaveAttribute("tabindex", "0");
   });
 
-  it("leaves the tab order once the content fits", () => {
+  // Value: protects=content that fits is not announced as a region that scrolls sideways; fails_when=only the tab stop is dropped and the role and name stay; why_new=the old test only checked tabindex; seam=none
+  it("becomes a plain container, with no role, name or tab stop, once the content fits", () => {
     vi.stubGlobal("ResizeObserver", FakeResizeObserver);
     vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(300);
     vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(300);
     render(<ScrollRegion label="Diagram">content</ScrollRegion>);
-    expect(screen.getByRole("region", { name: "Diagram" })).toHaveAttribute("tabindex", "-1");
+    expect(screen.queryByRole("region")).toBeNull();
+    const plain = screen.getByText("content");
+    expect(plain).not.toHaveAttribute("role");
+    expect(plain).not.toHaveAttribute("aria-label");
+    expect(plain).not.toHaveAttribute("tabindex");
   });
 
+  // Value: protects=role, name and tab stop come and go together as the width changes; fails_when=a resize restores the tab stop but not the role or name; why_new=the old test followed tabindex alone; seam=none
   it("re-measures when the region is resized", () => {
     vi.stubGlobal("ResizeObserver", FakeResizeObserver);
     render(<ScrollRegion label="Diagram">content</ScrollRegion>);
-    const region = screen.getByRole("region", { name: "Diagram" });
+    const region = screen.getByText("content");
 
     sizeOf(region, 900, 300);
     observers.forEach((callback) => callback());
-    expect(region).toHaveAttribute("tabindex", "0");
+    expect(screen.getByRole("region", { name: "Diagram" })).toHaveAttribute("tabindex", "0");
 
     sizeOf(region, 300, 300);
     observers.forEach((callback) => callback());
-    expect(region).toHaveAttribute("tabindex", "-1");
+    expect(screen.queryByRole("region")).toBeNull();
+    expect(region).not.toHaveAttribute("tabindex");
+
+    sizeOf(region, 900, 300);
+    observers.forEach((callback) => callback());
+    expect(screen.getByRole("region", { name: "Diagram" })).toHaveAttribute("tabindex", "0");
   });
 
   it("stops observing when it unmounts", () => {

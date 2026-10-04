@@ -6,6 +6,7 @@ vi.mock("@/lib/analytics/events", () => ({ trackEvent: vi.fn() }));
 
 import HomePage from "@/app/(site)/page";
 import { WORKFLOW_SVG_LAYOUT, WorkflowDiagram } from "@/components/site/workflow-diagram";
+import { WorkflowLegend } from "@/components/site/workflow-legend";
 import { WorkflowSection } from "@/components/site/workflow-section";
 import { WorkflowText } from "@/components/site/workflow-text";
 import {
@@ -13,6 +14,7 @@ import {
   WORKFLOW_EDGE_LABELS,
   WORKFLOW_NODE_LABELS,
   WORKFLOW_SECTION,
+  WORKFLOW_TONE_NAMES,
 } from "@/content/home/workflow";
 import { WORKFLOW_EDGES, WORKFLOW_NODES } from "@/lib/workflow/graph";
 import { expectNoAxeViolations } from "../ui/axe";
@@ -91,13 +93,36 @@ describe("WorkflowDiagram", () => {
     );
   });
 
-  it("reserves its box with the layout's aspect ratio", () => {
+  // Value: protects=every branch condition is visible in the drawing, not only in a hover tooltip; fails_when=a labelled transition loses its drawn tag or tags stop rendering; why_new=layout tests check placement, never what the component draws; seam=none
+  it("draws each transition's condition on the diagram, not only in a tooltip", () => {
     const { container } = render(<WorkflowDiagram />);
-    const frame = container.querySelector<HTMLElement>("[data-workflow-frame]")!;
-    // The wide-screen stylesheet turns this variable into the frame's aspect-ratio.
-    expect(frame.style.getPropertyValue("--wf-aspect").replace(/\s/g, "")).toBe(
-      WORKFLOW_SVG_LAYOUT.aspect.replace(/\s/g, ""),
+    const drawn = [...container.querySelectorAll(".wf-tag-text")].map((text) =>
+      text.textContent?.trim(),
     );
+    for (const [id, { text }] of Object.entries(WORKFLOW_EDGE_LABELS)) {
+      expect(
+        drawn.some((line) => line && text.replace(/\s+/g, "").includes(line.replace(/\s+/g, ""))),
+        id,
+      ).toBe(true);
+    }
+    expect(container.querySelectorAll(".wf-tag")).toHaveLength(
+      WORKFLOW_SVG_LAYOUT.edges.filter((edge) => edge.tag).length,
+    );
+  });
+});
+
+describe("WorkflowLegend", () => {
+  // Value: protects=every line style the diagram draws has a named key with its own stroke pattern; fails_when=a tone is added to the graph or dropped from the legend's list; why_new=only the copy for tones is checked, never the rendered key; seam=none
+  it("keys every transition kind the diagram draws, named by the copy", () => {
+    const { container } = render(<WorkflowLegend />);
+    const list = screen.getByRole("list", { name: WORKFLOW_CONTROLS.legend.text });
+    const items = within(list).getAllByRole("listitem");
+    const tones = [...new Set(WORKFLOW_EDGES.map((edge) => edge.tone))];
+    expect(items).toHaveLength(tones.length);
+    for (const tone of tones) {
+      expect(within(list).getByText(WORKFLOW_TONE_NAMES[tone]!.text), tone).toBeInTheDocument();
+      expect(container.querySelector(`line.wf-edge[data-tone="${tone}"]`), tone).not.toBeNull();
+    }
   });
 });
 
