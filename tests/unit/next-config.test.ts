@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import { describe, expect, it, vi } from "vitest";
 import nextConfig from "../../next.config";
+import { buildCsp } from "@/lib/security/csp";
 
 const EXPECTED_HEADERS: Record<string, string> = {
   "X-Content-Type-Options": "nosniff",
@@ -15,7 +16,11 @@ describe("next.config security headers", () => {
     const rules = await config.headers!();
     const allRoutes = rules.find((rule) => rule.source === "/:path*");
     expect(allRoutes).toBeDefined();
-    const received = Object.fromEntries(allRoutes!.headers.map((h) => [h.key, h.value]));
+    const received = Object.fromEntries(
+      allRoutes!.headers
+        .filter((h) => h.key !== "Content-Security-Policy-Report-Only")
+        .map((h) => [h.key, h.value]),
+    );
     expect(received).toEqual(EXPECTED_HEADERS);
   });
   it("is wrapped for MDX: a loader rule exists for .mdx files and pages stay unrouted", async () => {
@@ -50,9 +55,19 @@ describe("next.config security headers", () => {
       "/primitives/:path*",
     ]);
   });
-  it("sets no Content-Security-Policy: it is deferred to the deploy-hardening item (A-P4-16)", async () => {
+  it("ships the CSP as Report-Only on every route and does not enforce one yet (A-P4-16)", async () => {
     const rules = await (nextConfig as NextConfig).headers!();
     const keys = rules.flatMap((rule) => rule.headers.map((h) => h.key));
     expect(keys).not.toContain("Content-Security-Policy");
+    const allRoutes = rules.find((rule) => rule.source === "/:path*")!;
+    const csp = allRoutes.headers.find((h) => h.key === "Content-Security-Policy-Report-Only");
+    expect(csp?.value).toBe(
+      buildCsp({
+        nodeEnv: process.env.NODE_ENV,
+        sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+      }),
+    );
+    expect(csp?.value).toContain("default-src 'self'");
+    expect(csp?.value).toContain("frame-ancestors 'none'");
   });
 });
