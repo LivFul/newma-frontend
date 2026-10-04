@@ -1,4 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
+import { HERO_CHUNK_MARKER } from "../../src/components/ecosystem-graphic/hero-marker";
 import { expect } from "./test";
 
 export const SLUGS = [
@@ -88,4 +89,35 @@ export async function center(locator: Locator): Promise<{ x: number; y: number }
   const box = await locator.boundingBox();
   if (!box) throw new Error("no bounding box");
   return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+}
+
+const NEXT_CHUNK = /\/_next\/static\/(?:.+\/)?chunks\/[^?]+\.js(\?.*)?$/;
+
+export type HeldHeroChunk = Readonly<{
+  /** Resolves once the loader has asked for the hero chunk (so it is hydrated and listening). */
+  requested: Promise<void>;
+  /** Lets the held chunk through, which starts the swap. */
+  release: () => void;
+}>;
+
+/**
+ * Hold the lazily loaded hero chunk (the one carrying the marker) until release(). The loader asks
+ * for it after idle, which on a slow page can come before `page.goto` resolves; holding it lets a test
+ * put input on the static layer first, so "input present at the swap" is a fact, not a race.
+ */
+export async function holdHeroChunk(page: Page): Promise<HeldHeroChunk> {
+  let release!: () => void;
+  let markRequested!: () => void;
+  const gate = new Promise<void>((resolve) => (release = resolve));
+  const requested = new Promise<void>((resolve) => (markRequested = resolve));
+  await page.route(NEXT_CHUNK, async (route) => {
+    const response = await route.fetch();
+    const body = await response.text();
+    if (body.includes(HERO_CHUNK_MARKER)) {
+      markRequested();
+      await gate;
+    }
+    await route.fulfill({ response, body });
+  });
+  return { requested, release };
 }
