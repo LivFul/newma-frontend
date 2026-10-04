@@ -6,6 +6,7 @@ import * as caption from "@/content/home/hero-caption";
 import * as help from "@/content/home/hero-help";
 import * as how from "@/content/home/how-it-works";
 import * as personas from "@/content/home/personas";
+import * as workflow from "@/content/home/workflow";
 import * as heroText from "@/content/ecosystem/hero-text";
 import * as registry from "@/content/ecosystem/registry";
 import type { CopyBlock } from "@/content/types";
@@ -28,7 +29,7 @@ function collect(value: unknown, found: CopyBlock[] = []): CopyBlock[] {
   return found;
 }
 
-const modules = { about, chrome, copy, caption, help, how, personas, heroText };
+const modules = { about, chrome, copy, caption, help, how, personas, heroText, workflow };
 // A block may be re-exported from two modules (the footer reuses the hero disclaimer): count it once.
 const blocks = [...new Set(Object.values(modules).flatMap((m) => collect(m)))];
 // Hero labels live in the registry as plain title/descriptor pairs; wrap them for the same checks.

@@ -19,6 +19,7 @@ only); the sprint plan is cited for the demo labels. Status values: `draft` (age
 | The problem                 | `src/content/home/copy.ts` (`PRODUCT.problem`)            | BC §1.1                            | C-23             | sourced              | CP-2 pending |
 | How it works and guardrail  | `src/content/home/how-it-works.ts`, `copy.ts` (guardrail) | TA §1–3                            | C-24             | sourced              | CP-2 pending |
 | Personas                    | `src/content/home/personas.ts`, `copy.ts` (supporting)    | PRD §2                             | C-25             | sourced (paraphrase) | CP-2 pending |
+| Workflow section            | `src/content/home/workflow.ts`                            | user workflow diagram (A-W-01)     | C-53, C-54, C-55 | [Recommendation]     | CP-2 pending |
 | Components index            | `src/content/home/copy.ts` (`COMPONENTS_INDEX`), registry | registry; TA §1                    | C-48             | sourced              | CP-2 pending |
 | About LivFul: mission       | `src/content/home/about.ts` (`MISSION`)                   | PRD §1.1                           | C-26             | [Recommendation]     | CP-2 pending |
 | About LivFul: vision        | `src/content/home/about.ts` (`VISION`)                    | BC §1.2                            | C-27             | [Recommendation]     | CP-2 pending |

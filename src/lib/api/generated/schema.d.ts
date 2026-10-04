@@ -6338,6 +6338,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description config_cooldown: speed changed again too soon (Retry-After set) */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Service token or tenant resolver not configured */
             503: {
                 headers: {
@@ -6578,6 +6587,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description reset_cooldown: reset again too soon (Retry-After set) */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Service token or tenant resolver not configured */
             503: {
                 headers: {
@@ -6629,7 +6647,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Service token or tenant resolver not configured */
+            /** @description demo_capacity_reached (Retry-After set) or service_not_configured */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -6909,7 +6927,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description export_denied or export_held (details: policy_decision_id, decision, reasons); idempotency_conflict: same key, different body */
+            /** @description export_denied or export_held (details: policy_decision_id, decision, reasons); idempotency_conflict: same key, different body; tenant_limit_reached: the export cap is reached (details: resource, limit) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -7219,7 +7237,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description idempotency_conflict: same key, different body */
+            /** @description idempotency_conflict: same key, different body; tenant_limit_reached: the grievance cap is reached (details: resource, limit) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -7510,7 +7528,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description idempotency_conflict (same key, different body) or quota_exhausted (details: credit_quota, committed, requested, remaining) */
+            /** @description idempotency_conflict (same key, different body), quota_exhausted (details: credit_quota, committed, requested, remaining) or active_job_limit (details: limit, active) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -9011,6 +9029,15 @@ export interface operations {
             };
             /** @description subject_not_found: subject does not exist in this tenant */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description tenant_limit_reached: the rights-record cap is reached (details: resource, limit) */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

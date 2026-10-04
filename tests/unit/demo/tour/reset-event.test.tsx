@@ -1,10 +1,17 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { configure, fireEvent, getConfig, render, screen, waitFor } from "@testing-library/react";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { ResetButton } from "@/app/(platform)/demo/_components/reset-button";
 import { DEMO_RESET_EVENT } from "@/lib/demo/tour/reset-event";
 
 const refresh = vi.fn();
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh, push: vi.fn() }) }));
+
+// Lazily imported dialogs and panels resolve after a dynamic import; under a full parallel run that
+// can exceed Testing Library's default 1 s wait. A longer ceiling only slows a genuine failure, and
+// it is scoped to this file so other suites keep the default.
+const defaultAsyncTimeout = getConfig().asyncUtilTimeout;
+beforeAll(() => configure({ asyncUtilTimeout: 5_000 }));
+afterAll(() => configure({ asyncUtilTimeout: defaultAsyncTimeout }));
 
 describe("reset dialog and the tour", () => {
   afterEach(() => {
