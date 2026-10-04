@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 import { describe, expect, it, vi } from "vitest";
 import nextConfig from "../../next.config";
+import { buildCsp } from "@/lib/security/csp";
+import { pathToRegexp } from "next/dist/compiled/path-to-regexp";
 
 const EXPECTED_HEADERS: Record<string, string> = {
   "X-Content-Type-Options": "nosniff",
@@ -50,9 +52,32 @@ describe("next.config security headers", () => {
       "/primitives/:path*",
     ]);
   });
-  it("sets no Content-Security-Policy: it is deferred to the deploy-hardening item (A-P4-16)", async () => {
+  it("ships the CSP as Report-Only, statically everywhere except the proxy's nonce routes (A-P4-16)", async () => {
     const rules = await (nextConfig as NextConfig).headers!();
     const keys = rules.flatMap((rule) => rule.headers.map((h) => h.key));
     expect(keys).not.toContain("Content-Security-Policy");
+    const cspRules = rules.filter((r) =>
+      r.headers.some((h) => h.key === "Content-Security-Policy-Report-Only"),
+    );
+    expect(cspRules).toHaveLength(1);
+    const [rule] = cspRules;
+    expect(rule.headers).toEqual([
+      {
+        key: "Content-Security-Policy-Report-Only",
+        value: buildCsp({
+          nodeEnv: process.env.NODE_ENV,
+          sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+          vercelEnv: process.env.VERCEL_ENV,
+        }),
+      },
+    ]);
+    // Next compiles `source` with path-to-regexp; the same library decides which paths match here.
+    const matches = (path: string) => pathToRegexp(rule.source).test(path);
+    for (const path of ["/", "/ecosystem/wet-lab", "/legal/privacy", "/api/demo/me", "/demos"]) {
+      expect(matches(path), path).toBe(true);
+    }
+    for (const path of ["/access", "/demo", "/demo/w1-rights", "/demo/w6-provenance/a/b"]) {
+      expect(matches(path), path).toBe(false);
+    }
   });
 });

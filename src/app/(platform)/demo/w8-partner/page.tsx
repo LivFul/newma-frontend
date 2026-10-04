@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { requireSession } from "@/lib/demo/current-session";
 import { canAct } from "@/lib/demo/persona-actions";
+import { isSafeId } from "@/lib/demo/safe-id";
 import { load } from "@/lib/demo/server-data";
 import {
   EXPORT_PURPOSES,
@@ -109,8 +110,11 @@ export default async function PartnerPage({ searchParams }: { searchParams: Sear
   ]);
   const items = [...(candidates.data?.items ?? [])].sort((a, b) => a.rank - b.rank);
   const purpose = asPurpose(first(params.purpose));
-  // Only an id from the candidate list is ever sent on: a hand-edited ?asset falls back to rank 1.
-  const asset = items.find((c) => c.id === first(params.asset))?.id ?? items[0]?.id;
+  // Only a safe id from the candidate list is ever sent on: a hand-edited or unsafe ?asset falls
+  // back to the first safe candidate, and with none the page shows the picker's empty state.
+  const safeIds = items.map((c) => c.id).filter(isSafeId);
+  const requested = first(params.asset);
+  const asset = safeIds.find((id) => id === requested) ?? safeIds[0];
   const workspace = {
     asset: asset ?? "",
     stage: asStage(first(params.stage)),
