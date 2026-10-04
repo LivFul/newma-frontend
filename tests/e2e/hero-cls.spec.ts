@@ -1,5 +1,5 @@
 import { expect, test } from "../support/test";
-import { heroSvg } from "../support/hero";
+import { heroSvg, holdHeroChunk } from "../support/hero";
 
 const MAX_HERO_SHIFT = 0.02;
 const SAME_PIXEL = 0.5;
@@ -51,8 +51,15 @@ test("hover present at the swap keeps the view exploded (no collapse flash)", as
       if (svg) w.__views.push(`${svg.getAttribute("data-layer")}:${svg.getAttribute("data-view")}`);
     }).observe(document, { subtree: true, attributes: true, childList: true });
   });
-  await page.goto("/");
+  // Without the hold, a page whose idle callback fires before `goto` resolves swaps first and the
+  // hover lands on the interactive layer, which proves nothing (seen against production).
+  // The held chunk can delay the load event, so do not wait for it.
+  const chunk = await holdHeroChunk(page);
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await chunk.requested;
   await heroSvg(page).hover();
+  await expect(heroSvg(page)).toHaveAttribute("data-layer", "static");
+  chunk.release();
   await page.waitForSelector('[data-hero-ready="true"]', { timeout: 30_000 });
   await expect(heroSvg(page)).toHaveAttribute("data-view", "exploded");
   await page.waitForTimeout(500);
