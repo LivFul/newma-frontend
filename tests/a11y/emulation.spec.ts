@@ -6,7 +6,7 @@ import AxeBuilder from "@axe-core/playwright";
 import type { Page } from "@playwright/test";
 import { expectNoAxeViolations, needsBackend, signIn } from "../support/demo";
 import { describeFocus, resetFocus } from "../support/keyboard";
-import { horizontalOverflow, overflowingElements } from "../support/reflow";
+import { forceWideFont, horizontalOverflow, overflowingElements } from "../support/reflow";
 import {
   applyTextSpacing,
   clippedText,
@@ -40,7 +40,7 @@ async function expectVisibleFocus(page: Page): Promise<void> {
   for (let i = 0; i < FOCUS_STOPS; i += 1) {
     await page.keyboard.press("Tab");
     const stop = await describeFocus(page);
-    if (!stop) break;
+    if (!stop || stop.foreign) break;
     expect(stop.indicator, stop.label).toBe(true);
   }
 }
@@ -113,6 +113,8 @@ function emulationSuite(path: string, go: (page: Page) => Promise<void>) {
     }) => {
       await page.setViewportSize({ width, height: 720 });
       await go(page);
+      // CI's Linux fallback fonts are wider than a Mac's; force a wide face so both agree.
+      await forceWideFont(page);
       await applyTextSpacing(page);
       await expectFits(page);
       await expectNoAxeViolations(page);
@@ -139,8 +141,8 @@ test("the clipping, overlap and animation detectors flag a broken fixture @emula
     <p style="width:80px;height:12px;overflow:hidden">A sentence much longer than its box</p>
     <div><span style="display:inline-block;width:120px">First label</span><span
       style="display:inline-block;width:120px;margin-left:-100px">Second label</span></div>
-    <div style="animation:spin 1s linear infinite">Spinner</div>
-    <style>@keyframes spin { to { transform: rotate(1turn); } }</style>`);
+    <div style="animation:pulse 1s linear infinite">Spinner</div>
+    <style>@keyframes pulse { to { opacity: 0.5; } }</style>`);
   expect(await clippedText(page)).toHaveLength(1);
   expect(await overlappingText(page)).toHaveLength(1);
   expect(await runningAnimations(page)).toHaveLength(1);

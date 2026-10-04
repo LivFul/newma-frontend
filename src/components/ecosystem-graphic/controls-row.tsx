@@ -5,12 +5,15 @@ import { cn } from "@/lib/cn";
 
 // Shared by both layers: the same hint on the left and a toggle-sized slot on the right, so the row
 // wraps identically before and after the swap and the content below never moves.
-export const TOGGLE_CLASS = "min-h-11 min-w-11 shrink-0";
+// The hint takes the space left by the toggle (flex-basis 0, so it never pushes the toggle); the toggle
+// keeps its one-line width when it fits and wraps its label rather than overflow at 320 px with WCAG
+// 1.4.12 text spacing (it used to be shrink-0 and pushed the page 4 px sideways).
+export const TOGGLE_CLASS = "min-h-11 min-w-11 text-center";
 
 export function ControlsRow({ children }: { children: ReactNode }) {
   return (
     <div className="eco-controls mx-auto flex min-h-11 max-w-[34rem] items-center justify-between gap-3">
-      <p className="text-sm text-fg-muted">{HERO_HINT.text}</p>
+      <p className="flex-[1_1_0%] text-sm text-fg-muted">{HERO_HINT.text}</p>
       {children}
     </div>
   );
