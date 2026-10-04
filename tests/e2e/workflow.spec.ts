@@ -6,8 +6,11 @@ import { horizontalOverflow } from "../support/reflow";
 const EXPLORE = WORKFLOW_CONTROLS.explore.text;
 const BACK = WORKFLOW_CONTROLS.close.text;
 const DIAGRAM = WORKFLOW_SECTION.svgTitle.text;
-/** The three-dimensional chunk is hundreds of KB; anything the page loads at idle is far smaller. */
-const SCENE_CHUNK_MIN_BYTES = 300_000;
+/**
+ * Only the three.js scene chunk carries three's renderer messages. Size alone is no test: a hosting
+ * build can split framework chunks differently, and one of those passed 300 KB on a preview.
+ */
+const SCENE_CHUNK_MARKER = "THREE.WebGLRenderer";
 
 async function hasWebGL(page: Page): Promise<boolean> {
   return page.evaluate(() => {
@@ -85,10 +88,13 @@ test("nothing of the three-dimensional view loads until it is asked for", async 
   await page.goto("/", { waitUntil: "networkidle" });
   // Past the hero's own idle swap, so only what the section itself pulls in could appear.
   await page.waitForTimeout(3_000);
-  const bodies = await Promise.all(
-    loaded.map((response) => response.body().catch(() => Buffer.alloc(0))),
+  const sceneChunks = await Promise.all(
+    loaded.map(async (response) => {
+      const body = await response.body().catch(() => Buffer.alloc(0));
+      return body.includes(SCENE_CHUNK_MARKER) ? response.url() : null;
+    }),
   );
-  expect(bodies.filter((body) => body.length >= SCENE_CHUNK_MIN_BYTES)).toEqual([]);
+  expect(sceneChunks.filter(Boolean)).toEqual([]);
   await expect(page.locator("[data-workflow-scene]")).toHaveCount(0);
 });
 
