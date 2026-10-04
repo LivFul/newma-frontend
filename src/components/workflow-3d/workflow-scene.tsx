@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   WORKFLOW_CONTROLS,
@@ -20,7 +20,10 @@ export interface WorkflowSceneProps {
   readonly height?: number;
   /** Called once the renderer has started, so the viewer announces a view that really works. */
   readonly onReady: () => void;
-  /** Called when the scene cannot start (for example, no WebGL), so the page keeps the diagram. */
+  /**
+   * Called when the scene cannot start (for example, no WebGL) or later loses its WebGL context, so
+   * the page keeps or restores the diagram.
+   */
   readonly onFailure: (reason: SceneFailure) => void;
 }
 
@@ -45,13 +48,17 @@ export function WorkflowScene({ aspect, height, onReady, onFailure }: WorkflowSc
   const controllerRef = useRef<SceneController | null>(null);
   const [separated, setSeparated] = useState(false);
 
-  useEffect(() => {
+  // A layout effect, so teardown runs while the canvas is still in the document: OrbitControls
+  // unregisters its keydown listener from the canvas's root node, which after removal is the
+  // detached subtree instead of the document it registered on.
+  useLayoutEffect(() => {
     const container = stageRef.current;
     if (!container) return;
     try {
       controllerRef.current = createWorkflowScene(container, {
         copy: SCENE_COPY,
         reducedMotion: window.matchMedia(REDUCED_MOTION).matches,
+        onContextLost: () => onFailure("error"),
       });
     } catch (error) {
       onFailure(failureOf(error));

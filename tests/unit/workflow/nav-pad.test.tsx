@@ -120,7 +120,8 @@ describe("NavPad", () => {
     act(() => {
       vi.advanceTimersByTime(400);
     });
-    fireEvent.pointerUp(window);
+    // Released on the button, which is what makes the browser follow up with a click.
+    fireEvent.pointerUp(button);
     fireEvent.click(button, { detail: 1 });
     expect(onCommand).toHaveBeenLastCalledWith(null);
     expect(onCommand.mock.calls.filter(([cmd]) => cmd === "zoom-out")).toHaveLength(1);
@@ -133,7 +134,7 @@ describe("NavPad", () => {
     render(<NavPad onCommand={onCommand} onReset={vi.fn()} />);
     const button = screen.getByRole("button", { name: c.panUp.text });
     fireEvent.pointerDown(button);
-    fireEvent.pointerUp(window);
+    fireEvent.pointerUp(button);
     fireEvent.click(button, { detail: 1 });
     // One press call, one top-up nudge.
     expect(onCommand.mock.calls.filter(([cmd]) => cmd === "pan-up")).toHaveLength(2);
@@ -158,7 +159,7 @@ describe("NavPad", () => {
     act(() => {
       vi.advanceTimersByTime(100);
     });
-    fireEvent.pointerUp(window);
+    fireEvent.pointerUp(button);
     fireEvent.click(button, { detail: 1 });
     act(() => {
       vi.advanceTimersByTime(149);
@@ -246,6 +247,49 @@ describe("NavPad", () => {
     onCommand.mockClear();
     unmount();
     expect(onCommand).toHaveBeenLastCalledWith(null);
+  });
+
+  // Value: protects=a hold released off the button leaves no stale hold time, so a later click with no press behind it (TalkBack, switch access) still nudges; fails_when=heldMs survives a release that no click follows; why_new=the stale hold was found in review; seam=none
+  it("nudges a later pointerless click after a hold that ended off the button", () => {
+    vi.useFakeTimers();
+    const onCommand = vi.fn();
+    render(<NavPad onCommand={onCommand} onReset={vi.fn()} />);
+    const button = screen.getByRole("button", { name: c.zoomOut.text });
+    fireEvent.pointerDown(button);
+    act(() => {
+      vi.advanceTimersByTime(400);
+    });
+    // Dragged off and released elsewhere, so the browser sends no click for this hold.
+    fireEvent.pointerUp(window);
+    onCommand.mockClear();
+
+    fireEvent.click(button, { detail: 1 });
+
+    expect(onCommand.mock.calls).toEqual([["zoom-out"]]);
+    act(() => {
+      vi.advanceTimersByTime(250);
+    });
+    expect(onCommand).toHaveBeenLastCalledWith(null);
+  });
+
+  // Value: protects=closing the scene mid-hold (Escape during a press) removes the hold's window listeners; fails_when=the pointerup, pointercancel or blur listener outlives the pad; why_new=the listeners were removed only on release; seam=none
+  it("removes the hold's window listeners when the pad unmounts mid-hold", () => {
+    const added = vi.spyOn(window, "addEventListener");
+    const removed = vi.spyOn(window, "removeEventListener");
+    const { unmount } = render(<NavPad onCommand={vi.fn()} onReset={vi.fn()} />);
+    fireEvent.pointerDown(screen.getByRole("button", { name: c.panDown.text }));
+    const holdListeners = added.mock.calls.filter(([type]) =>
+      ["pointerup", "pointercancel", "blur"].includes(type),
+    );
+    expect(holdListeners).toHaveLength(3);
+
+    unmount();
+
+    for (const [type, listener] of holdListeners) {
+      expect(removed).toHaveBeenCalledWith(type, listener);
+    }
+    added.mockRestore();
+    removed.mockRestore();
   });
 
   it("resets the view from the centre button", () => {

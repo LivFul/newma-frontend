@@ -5,7 +5,7 @@
 // Value: protects=without WebGL createStage throws and leaves nothing in the container; fails_when=the canvas is appended before the context is known or the error is swallowed; why_new=proves the no-WebGL fallback at the stage itself; seam=none
 import * as THREE from "three";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { Stage } from "@/components/workflow-3d/stage";
+import type { Stage, StageOptions } from "@/components/workflow-3d/stage";
 import type { WorkflowModel } from "@/components/workflow-3d/model";
 
 const STAGE = "@/components/workflow-3d/stage";
@@ -14,12 +14,12 @@ const CANVAS_SIZE = 100;
 const CENTRE = CANVAS_SIZE / 2;
 
 const { createStage, createWorkflowModel } = vi.hoisted(() => ({
-  createStage: vi.fn<(container: HTMLElement) => Stage>(),
+  createStage: vi.fn<(container: HTMLElement, options: StageOptions) => Stage>(),
   createWorkflowModel: vi.fn<() => WorkflowModel>(),
 }));
 
 vi.mock("@/components/workflow-3d/stage", () => ({
-  createStage: (container: HTMLElement) => createStage(container),
+  createStage: (container: HTMLElement, options: StageOptions) => createStage(container, options),
 }));
 vi.mock("@/components/workflow-3d/model", () => ({
   createWorkflowModel: () => createWorkflowModel(),
@@ -110,6 +110,24 @@ describe("createWorkflowScene start-up", () => {
     expect(frame(2)).toBe(true);
     expect(model.update).toHaveBeenCalledWith(2);
   });
+
+  // Value: protects=a lost WebGL context reaches the caller of createWorkflowScene; fails_when=onContextLost is not passed through to the stage; why_new=context loss was unhandled; seam=none
+  it("hands the context-lost callback and the motion preference to the stage", () => {
+    fakeStage();
+    fakeModel();
+    const onContextLost = vi.fn();
+
+    createWorkflowScene(document.createElement("div"), {
+      copy: COPY,
+      reducedMotion: true,
+      onContextLost,
+    });
+
+    expect(createStage).toHaveBeenCalledWith(expect.any(HTMLElement), {
+      reducedMotion: true,
+      onContextLost,
+    });
+  });
 });
 
 describe("createWorkflowScene pointer picking", () => {
@@ -156,6 +174,22 @@ describe("createWorkflowScene pointer picking", () => {
     click(canvas, [2, 2]);
 
     expect(model.setActive).toHaveBeenLastCalledWith(null, null);
+  });
+
+  // Value: protects=only the primary button selects, so a right-click menu or a short middle-button pan leaves the selection alone; fails_when=onDown or onUp stop checking event.button; why_new=any button toggled selection before; seam=none
+  it("ignores right and middle clicks", () => {
+    const { model, canvas } = setup();
+
+    for (const button of [1, 2]) {
+      canvas.dispatchEvent(
+        new MouseEvent("pointerdown", { clientX: CENTRE, clientY: CENTRE, button, bubbles: true }),
+      );
+      canvas.dispatchEvent(
+        new MouseEvent("pointerup", { clientX: CENTRE, clientY: CENTRE, button, bubbles: true }),
+      );
+    }
+
+    expect(model.setActive).not.toHaveBeenCalled();
   });
 
   it("ignores a release that had no matching press", () => {

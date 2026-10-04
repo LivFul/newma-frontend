@@ -3,6 +3,8 @@
 // Value: protects=nothing is drawn off screen or in a hidden tab and the scene redraws on return; fails_when=the visibility pause leaks frames or never resumes; why_new=pausing now has to restart an idle loop; seam=none
 // Value: protects=camera flights glide to the pose (or jump under reduced motion) and held navigation moves the camera; fails_when=a flight stops early or navigation stops drawing; why_new=no unit test drove the stage camera; seam=none
 // Value: protects=dispose cancels the pending frame and frees the renderer and its canvas; fails_when=a frame fires after dispose or the GL context leaks; why_new=frame scheduling moved from setAnimationLoop to requestAnimationFrame; seam=none
+// Value: protects=a lost WebGL context is reported (and kept restorable) instead of leaving a blank canvas announced as ready; fails_when=the webglcontextlost listener is missing, does not preventDefault, or outlives dispose; why_new=context loss was unhandled; seam=none
+// Value: protects=the overview of a tall narrow canvas (pose beyond the default zoom-out cap) is reachable by reset, flights and zoom out; fails_when=maxDistance stays fixed below the requested pose distance; why_new=OrbitControls clamped the overview pose; seam=none
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 interface FakeRenderer {
@@ -107,9 +109,9 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-function start(reducedMotion = false) {
+function start(reducedMotion = false, onContextLost?: () => void) {
   const element = container();
-  const stage = createStage(element, { reducedMotion });
+  const stage = createStage(element, { reducedMotion, onContextLost });
   const renderer = renderers[0]!;
   return { element, stage, renderer };
 }
@@ -310,6 +312,61 @@ describe("createStage camera", () => {
     stage.canvas.dispatchEvent(new WheelEvent("wheel", { bubbles: true, ctrlKey: true }));
     expect(reached).toHaveBeenCalledTimes(1);
     stage.dispose();
+  });
+});
+
+describe("createStage zoom-out limit", () => {
+  /** Farther than the default cap of 140, as the overview of a 320 by 900 canvas asks for. */
+  const FAR_POSE = {
+    position: new THREE.Vector3(0, 160, 120),
+    target: new THREE.Vector3(0, 0, 0),
+  };
+  const distance = (stage: ReturnType<typeof start>["stage"]) =>
+    stage.camera.position.distanceTo(new THREE.Vector3());
+
+  it("reaches a pose beyond the default cap and can still zoom out past it", () => {
+    const { stage } = start(true);
+
+    stage.setPose(FAR_POSE);
+    tick();
+    expect(distance(stage)).toBeCloseTo(200, 6);
+
+    stage.setNavigation("zoom-out");
+    for (let i = 0; i < 40; i += 1) tick(50);
+    expect(distance(stage)).toBeGreaterThan(200);
+    stage.dispose();
+  });
+
+  it("lands a flight on a pose beyond the default cap", () => {
+    const { stage } = start(false);
+    stage.setPose(POSE);
+    tick();
+
+    stage.flyTo(FAR_POSE);
+    for (let i = 0; i < 120 && frames.size > 0; i += 1) tick(50);
+
+    expect(stage.camera.position.distanceTo(FAR_POSE.position)).toBeLessThan(1e-6);
+    stage.dispose();
+  });
+});
+
+describe("createStage context loss", () => {
+  it("keeps the context restorable and reports the loss until disposed", () => {
+    const onContextLost = vi.fn();
+    const { stage } = start(true, onContextLost);
+    const lose = () => {
+      const event = new Event("webglcontextlost", { cancelable: true });
+      stage.canvas.dispatchEvent(event);
+      return event;
+    };
+
+    expect(lose().defaultPrevented).toBe(true);
+    expect(onContextLost).toHaveBeenCalledTimes(1);
+
+    // dispose() forces a context loss of its own, which is not a failure to report.
+    stage.dispose();
+    lose();
+    expect(onContextLost).toHaveBeenCalledTimes(1);
   });
 });
 

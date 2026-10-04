@@ -13,10 +13,11 @@ import {
   WORKFLOW_CONTROLS,
   WORKFLOW_EDGE_LABELS,
   WORKFLOW_NODE_LABELS,
+  WORKFLOW_NOTE_TEXT,
   WORKFLOW_SECTION,
   WORKFLOW_TONE_NAMES,
 } from "@/content/home/workflow";
-import { WORKFLOW_EDGES, WORKFLOW_NODES } from "@/lib/workflow/graph";
+import { WORKFLOW_EDGES, WORKFLOW_NODES, WORKFLOW_NOTES } from "@/lib/workflow/graph";
 import { expectNoAxeViolations } from "../ui/axe";
 
 describe("WorkflowSection", () => {
@@ -145,6 +146,20 @@ describe("WorkflowText", () => {
     // One visible arrow per transition, hidden from assistive technology.
     const arrows = container.querySelectorAll("span[aria-hidden='true']");
     expect(arrows).toHaveLength(WORKFLOW_EDGES.length);
+  });
+
+  // Value: protects=the guardrail notes drawn on the diagram are in the text version too, beside the step they qualify; fails_when=the text version drops a note or files it under another step; why_new=the text version only listed steps and transitions; seam=none
+  it("gives every guardrail note beside the step it is attached to", () => {
+    render(<WorkflowText />);
+    expect(WORKFLOW_NOTES.length).toBeGreaterThan(0);
+    for (const note of WORKFLOW_NOTES) {
+      const text = screen.getByText(WORKFLOW_NOTE_TEXT[note.id]!.text);
+      expect(text.tagName, note.id).toBe("P");
+      const step = text.closest("li")!;
+      expect(within(step).getByText(WORKFLOW_NODE_LABELS[note.attachTo]!.text), note.id).toBe(
+        step.querySelector("p"),
+      );
+    }
   });
 
   it("says that the last step has no further steps", () => {

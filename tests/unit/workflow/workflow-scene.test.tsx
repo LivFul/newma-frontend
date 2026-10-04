@@ -1,11 +1,15 @@
 // Value: protects=no-WebGL visitors get the diagram back with a failure notice from the real scene chunk; fails_when=WorkflowScene stops catching createStage errors or onFailure is unwired; why_new=viewer tests fake the scene and e2e skips without WebGL; seam=none
 // Value: protects=Separate lanes toggle state, pad commands and scene teardown reach the controller; fails_when=aria-pressed or setSeparated drifts, pad is unwired, or dispose is skipped on close; why_new=e2e never presses Separate lanes, reset or a pad button and no unit test renders WorkflowScene; seam=none
-import { fireEvent, render, screen } from "@testing-library/react";
+// Value: protects=a WebGL context lost after start-up reports a retryable failure so the viewer restores the diagram; fails_when=onContextLost is not wired to onFailure("error"); why_new=context loss left a blank canvas announced as ready; seam=none
+// Value: protects=closing the scene removes OrbitControls' document keydown listener; fails_when=teardown moves back to a passive effect, which runs after the canvas has left the document; why_new=each close leaked a listener and the controls in review; seam=none
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import type { SceneOptions } from "@/components/workflow-3d/scene";
 import { WORKFLOW_CONTROLS } from "@/content/home/workflow";
 
 const SCENE = "@/components/workflow-3d/scene";
+const STAGE = "@/components/workflow-3d/stage";
 const VIEWER = "@/components/site/workflow-viewer";
 
 const LABELS = {
@@ -19,6 +23,9 @@ const LABELS = {
 
 afterEach(() => {
   vi.doUnmock(SCENE);
+  vi.doUnmock("three");
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
   vi.resetModules();
 });
 
@@ -49,6 +56,61 @@ describe("WorkflowScene without WebGL (the real chunk, the real renderer)", () =
   });
 });
 
+describe("WorkflowScene teardown with the real stage and orbit controls", () => {
+  it("removes the orbit controls' document keydown listener on close", async () => {
+    vi.resetModules();
+    // Only the renderer is faked (jsdom has no WebGL); the stage and OrbitControls are real.
+    vi.doMock("three", async (importOriginal) => {
+      const actual = await importOriginal<typeof import("three")>();
+      class WebGLRenderer {
+        domElement = document.createElement("canvas");
+        toneMapping = 0;
+        render() {}
+        setSize() {}
+        dispose() {}
+        forceContextLoss() {}
+        setPixelRatio() {}
+      }
+      return { ...actual, WebGLRenderer };
+    });
+    vi.doMock(SCENE, async () => {
+      const { createStage } = await import(STAGE);
+      return {
+        createWorkflowScene: (container: HTMLElement, options: SceneOptions) => {
+          const stage = createStage(container, options);
+          return {
+            setNavigation: () => {},
+            resetView: () => {},
+            setSeparated: () => {},
+            dispose: () => stage.dispose(),
+          };
+        },
+      };
+    });
+    const observer = class {
+      observe() {}
+      disconnect() {}
+    };
+    vi.stubGlobal("ResizeObserver", observer);
+    vi.stubGlobal("IntersectionObserver", observer);
+    const added = vi.spyOn(document, "addEventListener");
+    const removed = vi.spyOn(document, "removeEventListener");
+    const { WorkflowScene } = await import("@/components/workflow-3d/workflow-scene");
+
+    const { container, unmount } = render(
+      <WorkflowScene aspect="4 / 3" onReady={vi.fn()} onFailure={vi.fn()} />,
+    );
+    expect(container.querySelector("canvas")).not.toBeNull();
+    const keydown = added.mock.calls.filter(([type]) => type === "keydown");
+    expect(keydown).toHaveLength(1);
+
+    unmount();
+
+    const [, listener] = keydown[0]!;
+    expect(removed).toHaveBeenCalledWith("keydown", listener, { capture: true });
+  });
+});
+
 describe("WorkflowScene wiring to the scene controller", () => {
   async function renderScene(height?: number) {
     const controller = {
@@ -57,16 +119,28 @@ describe("WorkflowScene wiring to the scene controller", () => {
       setSeparated: vi.fn(),
       dispose: vi.fn(),
     };
+    const createWorkflowScene = vi.fn<
+      (container: HTMLElement, options: SceneOptions) => typeof controller
+    >(() => controller);
     vi.resetModules();
-    vi.doMock(SCENE, () => ({ createWorkflowScene: vi.fn(() => controller) }));
+    vi.doMock(SCENE, () => ({ createWorkflowScene }));
     const { WorkflowScene } = await import("@/components/workflow-3d/workflow-scene");
     const onFailure = vi.fn();
     const onReady = vi.fn();
     const view = render(
       <WorkflowScene aspect="4 / 3" height={height} onReady={onReady} onFailure={onFailure} />,
     );
-    return { controller, onFailure, onReady, ...view };
+    return { controller, createWorkflowScene, onFailure, onReady, ...view };
   }
+
+  it("reports a lost WebGL context as a retryable failure", async () => {
+    const { createWorkflowScene, onFailure } = await renderScene();
+    const options = createWorkflowScene.mock.calls[0]![1];
+
+    act(() => options.onContextLost?.());
+
+    expect(onFailure).toHaveBeenCalledExactlyOnceWith("error");
+  });
 
   // Value: protects=the viewer hears ready only from a renderer that started, and the scene keeps the diagram's measured height; fails_when=onReady is skipped or called before createWorkflowScene, or the measured height is ignored; why_new=onReady and the height prop are new; seam=none
   it("reports ready once the scene exists and takes the measured height", async () => {

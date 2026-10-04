@@ -18,6 +18,7 @@ const LABELS = {
 
 describe("WorkflowViewer when the scene chunk fails to load", () => {
   it("keeps the diagram, reports the failure, and offers another try", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
     const user = userEvent.setup();
     const { WorkflowViewer } = await import("@/components/site/workflow-viewer");
     render(

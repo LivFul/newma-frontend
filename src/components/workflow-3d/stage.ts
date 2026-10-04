@@ -10,6 +10,13 @@ const TILT_RATE_RAD_PER_SEC = 0.9;
 /** Zoom speed in natural-log distance units per second. */
 const ZOOM_RATE = 1.2;
 const MIN_POLAR_ANGLE = 0.02;
+const MIN_DISTANCE = 6;
+/** Zoom-out limit for a typical canvas; tall narrow canvases raise it so their overview fits. */
+const BASE_MAX_DISTANCE = 140;
+/** Room to zoom out past the farthest pose the scene has asked for. */
+const MAX_DISTANCE_MARGIN = 1.15;
+const FOG_NEAR = 90;
+const FOG_FAR = 190;
 /** Caps the step after a stalled frame so a held button never jumps. */
 const MAX_FRAME_SECONDS = 0.1;
 
@@ -34,6 +41,11 @@ export type FrameCallback = (timeSeconds: number) => boolean;
 export interface StageOptions {
   /** Camera moves jump instead of gliding, and orbit damping is off. */
   readonly reducedMotion: boolean;
+  /**
+   * Called when the browser takes the WebGL context away (GPU reset, too many contexts). The canvas
+   * stays blank from then on, so the caller should give up on the scene.
+   */
+  readonly onContextLost?: () => void;
 }
 
 export interface Stage {
@@ -97,7 +109,8 @@ export function createStage(container: HTMLElement, options: StageOptions): Stag
   try {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(SCENE_COLORS.background);
-    scene.fog = new THREE.Fog(SCENE_COLORS.background, 90, 190);
+    const fog = new THREE.Fog(SCENE_COLORS.background, FOG_NEAR, FOG_FAR);
+    scene.fog = fog;
     scene.add(new THREE.AmbientLight(0xffffff, 0.55));
     scene.add(new THREE.HemisphereLight(0xbcd0ff, 0x1a1c24, 0.6));
     const sun = new THREE.DirectionalLight(0xffffff, 1.1);
@@ -109,8 +122,8 @@ export function createStage(container: HTMLElement, options: StageOptions): Stag
     cleanups.push(() => controls.dispose());
     controls.enableDamping = !options.reducedMotion;
     controls.dampingFactor = 0.08;
-    controls.minDistance = 6;
-    controls.maxDistance = 140;
+    controls.minDistance = MIN_DISTANCE;
+    controls.maxDistance = BASE_MAX_DISTANCE;
     controls.maxPolarAngle = Math.PI * 0.495;
     // One-finger vertical drags scroll the page instead of being captured by the scene.
     renderer.domElement.style.touchAction = "pan-y";
@@ -121,6 +134,15 @@ export function createStage(container: HTMLElement, options: StageOptions): Stag
     };
     container.addEventListener("wheel", guardWheel, { capture: true });
     cleanups.push(() => container.removeEventListener("wheel", guardWheel, { capture: true }));
+
+    // A lost context leaves a blank canvas that would still be announced as working. preventDefault
+    // keeps the context restorable, but the caller is told so it can bring the diagram back.
+    const onContextLost = (event: Event) => {
+      event.preventDefault();
+      options.onContextLost?.();
+    };
+    renderer.domElement.addEventListener("webglcontextlost", onContextLost);
+    cleanups.push(() => renderer.domElement.removeEventListener("webglcontextlost", onContextLost));
 
     const frameCallbacks: FrameCallback[] = [];
     let flight: Flight | null = null;
@@ -252,7 +274,22 @@ export function createStage(container: HTMLElement, options: StageOptions): Stag
       else lastFrameMs = null;
     }
 
+    // OrbitControls clamps every update to maxDistance, so a pose farther out than the cap (the
+    // overview on a tall narrow canvas) raises it first; the fog moves out with it.
+    const allowDistance = (pose: CameraPose) => {
+      const cap = Math.max(
+        BASE_MAX_DISTANCE,
+        pose.position.distanceTo(pose.target) * MAX_DISTANCE_MARGIN,
+      );
+      if (cap <= controls.maxDistance) return;
+      const scale = cap / BASE_MAX_DISTANCE;
+      controls.maxDistance = cap;
+      fog.near = FOG_NEAR * scale;
+      fog.far = FOG_FAR * scale;
+    };
+
     const setPose = (pose: CameraPose) => {
+      allowDistance(pose);
       flight = null;
       camera.position.copy(pose.position);
       controls.target.copy(pose.target);
@@ -278,6 +315,7 @@ export function createStage(container: HTMLElement, options: StageOptions): Stag
           setPose(pose);
           return;
         }
+        allowDistance(pose);
         flight = {
           fromPosition: camera.position.clone(),
           fromTarget: controls.target.clone(),

@@ -1,5 +1,14 @@
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  act,
+  configure,
+  fireEvent,
+  getConfig,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { TourDock } from "@/app/(platform)/demo/_components/tour-dock";
 import { TOUR_STEPS } from "@/lib/demo/tour/steps";
 import { TOUR_STORAGE_KEY, goTo, markDone, serializeState, startTour } from "@/lib/demo/tour/state";
@@ -24,6 +33,13 @@ const dock = (persona: "scientist" | "scientific_approver" = "scientist") =>
       <main id="main" tabIndex={-1} />
     </>,
   );
+
+// Lazily imported dialogs and panels resolve after a dynamic import; under a full parallel run that
+// can exceed Testing Library's default 1 s wait. A longer ceiling only slows a genuine failure, and
+// it is scoped to this file so other suites keep the default.
+const defaultAsyncTimeout = getConfig().asyncUtilTimeout;
+beforeAll(() => configure({ asyncUtilTimeout: 5_000 }));
+afterAll(() => configure({ asyncUtilTimeout: defaultAsyncTimeout }));
 
 describe("TourDock", () => {
   beforeEach(() => {

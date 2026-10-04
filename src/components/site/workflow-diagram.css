@@ -16,10 +16,11 @@
   display: block;
   width: 100%;
   height: auto;
-  /* Never narrower than the content column, so labels keep the size they have on a desktop; the
-     svg, not its frame, overflows on narrower screens, the scroll region carries it, and the page
-     itself never scrolls sideways. */
-  min-width: 68rem;
+  /* A floor for label size: below this width the svg, not its frame, overflows, the scroll region
+     carries it and the page never scrolls sideways. It stays under the desktop column, so the region
+     only becomes a tab stop where it really scrolls, and the region stays shorter than a phone screen
+     so a focused region is never hidden under the sticky header (WCAG 2.4.11). */
+  min-width: 52rem;
 }
 
 .wf-edge {

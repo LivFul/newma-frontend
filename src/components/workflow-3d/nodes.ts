@@ -205,7 +205,12 @@ export function layoutNode(visual: NodeVisual, spread: number): void {
 
 export function applyNodeState(visual: NodeVisual, state: NodeState): void {
   visual.material.emissiveIntensity = EMISSIVE[state];
-  visual.material.transparent = state === "dim";
+  const transparent = state === "dim";
+  if (visual.material.transparent !== transparent) {
+    visual.material.transparent = transparent;
+    // three compiles opaque and transparent materials differently, so the switch needs a rebuild.
+    visual.material.needsUpdate = true;
+  }
   visual.material.opacity = OPACITY[state];
   visual.outline.opacity = state === "dim" ? 0.2 : 0.9;
   visual.label.sprite.material.opacity = state === "dim" ? 0.25 : 1;

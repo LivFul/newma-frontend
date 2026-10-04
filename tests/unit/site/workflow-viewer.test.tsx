@@ -190,6 +190,7 @@ describe("WorkflowViewer", () => {
   });
 
   it("gives up on a chunk that never arrives, says so, and allows another try", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
     vi.useFakeTimers({ shouldAdvanceTime: true });
     try {
       await renderViewer(
@@ -350,6 +351,7 @@ describe("WorkflowViewer", () => {
 
   // Value: protects=a failed chunk load can really be retried by the visitor; fails_when=loadScene keeps the rejected request cached so every retry fails again, or a chunk failure is treated as a missing renderer; why_new=failure tests only check the button reappears, never press it; seam=none
   it("loads the scene on a second try after the first load failed", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
     let attempts = 0;
     await renderViewer(<p>static diagram</p>, () => {
       attempts += 1;
@@ -369,6 +371,101 @@ describe("WorkflowViewer", () => {
     expect(await screen.findByTestId("scene")).toBeInTheDocument();
     await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent(LABELS.ready));
     expect(attempts).toBe(2);
+  });
+
+  // Value: protects=a scene that throws while rendering puts the diagram back instead of taking the home page down, and stays retryable; fails_when=the scene has no error boundary, the crash is remembered as no WebGL, or the boundary is not reset on the next open; why_new=only failures the scene reported itself were covered; seam=none
+  it("puts the diagram back when the scene crashes, and lets the visitor try again", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const crash = { now: true };
+    const { WorkflowScene: WorkingScene } = sceneFactory();
+    function CrashingScene(props: FakeSceneProps) {
+      if (crash.now) throw new Error("scene render failed");
+      return <WorkingScene {...props} />;
+    }
+    const user = userEvent.setup();
+    const { container } = await renderViewer(<p>static diagram</p>, () => ({
+      WorkflowScene: CrashingScene,
+    }));
+    await user.click(await screen.findByRole("button", { name: LABELS.explore }));
+
+    expect(await screen.findByText("static diagram")).toBeInTheDocument();
+    expect(screen.queryByTestId("scene")).toBeNull();
+    expect(screen.getByRole("status")).toHaveTextContent(LABELS.failed);
+    expect(viewerOf(container)).toHaveAttribute("data-phase", "failed");
+    expect(consoleError).toHaveBeenCalledWith(
+      "workflow scene crashed",
+      expect.any(Error),
+      expect.anything(),
+    );
+    const retry = screen.getByRole("button", { name: LABELS.explore });
+    expect(retry).not.toHaveAttribute("aria-disabled");
+
+    crash.now = false;
+    await user.click(retry);
+    expect(await screen.findByTestId("scene")).toBeInTheDocument();
+  });
+
+  // Value: protects=a viewport-capped scene is re-capped when the window is resized or the phone rotated; fails_when=the height is computed once at open and never again, or the listener is not attached; why_new=the cap was only checked at open; seam=none
+  it("re-caps a sideways-scrolling diagram's scene when the viewport changes", async () => {
+    const user = userEvent.setup();
+    const rect = {
+      top: 0,
+      bottom: 1200,
+      left: 0,
+      right: 400,
+      x: 0,
+      y: 0,
+      width: 400,
+      height: 1200,
+    };
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+      ...rect,
+      toJSON: () => rect,
+    });
+    const initialHeight = window.innerHeight;
+    const setViewport = (height: number) =>
+      Object.defineProperty(window, "innerHeight", { value: height, configurable: true });
+    try {
+      setViewport(1000);
+      await renderViewer(
+        <div data-testid="region">
+          <p>static diagram</p>
+        </div>,
+      );
+      const region = screen.getByTestId("region");
+      Object.defineProperty(region, "scrollWidth", { value: 2000, configurable: true });
+      Object.defineProperty(region, "clientWidth", { value: 400, configurable: true });
+
+      await user.click(await screen.findByRole("button", { name: LABELS.explore }));
+      // Capped to most of the viewport: the smaller of the diagram and 0.8 of the window.
+      expect(await screen.findByTestId("scene")).toHaveAttribute("data-height", "800");
+
+      setViewport(600);
+      fireEvent(window, new Event("resize"));
+      await waitFor(() =>
+        expect(screen.getByTestId("scene")).toHaveAttribute("data-height", "480"),
+      );
+
+      setViewport(300);
+      fireEvent(window, new Event("orientationchange"));
+      // Never below the floor, however short the screen.
+      await waitFor(() =>
+        expect(screen.getByTestId("scene")).toHaveAttribute("data-height", "416"),
+      );
+    } finally {
+      setViewport(initialHeight);
+    }
+  });
+
+  // Value: protects=a lost chunk is logged, not swallowed; fails_when=the load catch drops the error silently again; why_new=failure tests only checked what the visitor sees; seam=none
+  it("logs a chunk that fails to load", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    await renderViewer(<p>static diagram</p>, () => {
+      throw new Error("chunk failed to load");
+    });
+    fireEvent.click(await screen.findByRole("button", { name: LABELS.explore }));
+    expect(await screen.findByText(LABELS.failed)).toBeInTheDocument();
+    expect(consoleError).toHaveBeenCalledWith("workflow scene failed to load", expect.any(Error));
   });
 
   it("starts fetching when keyboard focus reaches the button", async () => {

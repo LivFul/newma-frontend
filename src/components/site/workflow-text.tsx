@@ -3,8 +3,9 @@ import {
   WORKFLOW_EDGE_LABELS,
   WORKFLOW_LANE_NAMES,
   WORKFLOW_NODE_LABELS,
+  WORKFLOW_NOTE_TEXT,
 } from "@/content/home/workflow";
-import { WORKFLOW_EDGES, WORKFLOW_NODES, type LaneId } from "@/lib/workflow/graph";
+import { WORKFLOW_EDGES, WORKFLOW_NODES, WORKFLOW_NOTES, type LaneId } from "@/lib/workflow/graph";
 
 // Reading order of the text version: the path a piece of work takes, lane by lane.
 const LANE_ORDER: readonly LaneId[] = [
@@ -17,8 +18,9 @@ const LANE_ORDER: readonly LaneId[] = [
 
 const labelOf = (id: string) => WORKFLOW_NODE_LABELS[id]?.text ?? id;
 
-// The text twin of the diagram: every step with the steps it leads to, readable without sight of the
-// drawing. A native details element keeps it working with no JavaScript.
+// The text twin of the diagram: every step with the steps it leads to, and the guardrail notes the
+// drawing pins to a step, readable without sight of the drawing. A native details element keeps it
+// working with no JavaScript.
 export function WorkflowText() {
   return (
     <details className="border-t border-border pt-4">
@@ -34,6 +36,7 @@ export function WorkflowText() {
             <ul role="list" aria-labelledby={`workflow-text-${lane}`} className="space-y-4">
               {WORKFLOW_NODES.filter((node) => node.lane === lane).map((node) => {
                 const outgoing = WORKFLOW_EDGES.filter((edge) => edge.from === node.id);
+                const notes = WORKFLOW_NOTES.filter((note) => note.attachTo === node.id);
                 return (
                   <li key={node.id} className="space-y-1">
                     <p className="font-display text-lg">{labelOf(node.id)}</p>
@@ -55,6 +58,14 @@ export function WorkflowText() {
                         ))}
                       </ul>
                     )}
+                    {notes.map((note) => (
+                      <p
+                        key={note.id}
+                        className="mt-2 border-l-2 border-success pl-3 text-sm text-fg-muted"
+                      >
+                        {WORKFLOW_NOTE_TEXT[note.id]?.text}
+                      </p>
+                    ))}
                   </li>
                 );
               })}

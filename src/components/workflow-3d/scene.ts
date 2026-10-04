@@ -9,6 +9,8 @@ const VERTICAL_FIT = 44;
 /** Extra distance for the view that also spans the lane heights. */
 const RAISED_SCALE = 1.15;
 const CLICK_DRAG_TOLERANCE_PX = 5;
+/** The main mouse button, and what touch contact and a pen tip report. */
+const PRIMARY_BUTTON = 0;
 
 const FLAT_TARGET = new THREE.Vector3(-0.6, 0, 0.3);
 const FLAT_DIRECTION = new THREE.Vector3(0, 0.927, 0.375).normalize();
@@ -18,6 +20,8 @@ const RAISED_DIRECTION = new THREE.Vector3(-0.128, 0.384, 0.914).normalize();
 export interface SceneOptions {
   readonly copy: SceneCopy;
   readonly reducedMotion: boolean;
+  /** Called when the browser takes the WebGL context away, leaving the canvas blank. */
+  readonly onContextLost?: () => void;
 }
 
 export interface SceneController {
@@ -44,7 +48,10 @@ export function createWorkflowScene(
   container: HTMLElement,
   options: SceneOptions,
 ): SceneController {
-  const stage = createStage(container, { reducedMotion: options.reducedMotion });
+  const stage = createStage(container, {
+    reducedMotion: options.reducedMotion,
+    onContextLost: options.onContextLost,
+  });
   // If building the model fails, the stage is already running (canvas, render loop, observers), so
   // it must be released before the failure reaches the caller.
   try {
@@ -97,11 +104,13 @@ function assembleScene(stage: Stage, options: SceneOptions): SceneController {
     hovered = null;
     sync();
   };
+  // Only the primary button picks: right-click opens a menu and the middle button pans.
   const onDown = (event: PointerEvent) => {
+    if (event.button !== PRIMARY_BUTTON) return;
     pressedAt = { x: event.clientX, y: event.clientY };
   };
   const onUp = (event: PointerEvent) => {
-    if (!pressedAt) return;
+    if (!pressedAt || event.button !== PRIMARY_BUTTON) return;
     const moved = Math.hypot(event.clientX - pressedAt.x, event.clientY - pressedAt.y);
     pressedAt = null;
     if (moved > CLICK_DRAG_TOLERANCE_PX) return;

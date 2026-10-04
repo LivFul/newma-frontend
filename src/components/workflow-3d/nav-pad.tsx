@@ -40,6 +40,16 @@ function HoldButton({ command, label, className, onHold, onRelease, onNudge }: H
   const ref = useRef<HTMLButtonElement>(null);
   // How long the last pointer press lasted, kept for the click that follows its release.
   const heldMs = useRef<number | null>(null);
+  // Window listeners of the holds still in progress, removed on release or when the pad unmounts.
+  const detachers = useRef(new Set<() => void>());
+
+  useEffect(() => {
+    const active = detachers.current;
+    return () => {
+      active.forEach((detach) => detach());
+      active.clear();
+    };
+  }, []);
 
   const press = (event: ReactPointerEvent) => {
     // Only the primary button, touch contact or pen tip holds; a right-click opens a menu that
@@ -54,20 +64,30 @@ function HoldButton({ command, label, className, onHold, onRelease, onNudge }: H
 
     // Release is heard on the window, so it fires even when the pointer leaves the button, and a
     // lost window focus ends the hold as well.
-    const finish = () => {
+    const detach = () => {
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);
-      window.removeEventListener("blur", finish);
+      window.removeEventListener("blur", onBlur);
+      detachers.current.delete(detach);
+    };
+    // Only a release on the button is followed by a click, so only then is the hold kept for it;
+    // otherwise a later click with no press behind it would find a stale hold and not nudge.
+    const finish = (onButton: boolean) => {
+      detach();
       ref.current?.setAttribute("data-active", "false");
-      heldMs.current = Date.now() - pressedAt;
+      heldMs.current = onButton ? Date.now() - pressedAt : null;
       onRelease(pointerId);
     };
     const onUp = (up: PointerEvent) => {
-      if (up.pointerId === pointerId) finish();
+      if (up.pointerId !== pointerId) return;
+      const target = up.target instanceof Node ? up.target : null;
+      finish(up.type === "pointerup" && (ref.current?.contains(target) ?? false));
     };
+    const onBlur = () => finish(false);
     window.addEventListener("pointerup", onUp);
     window.addEventListener("pointercancel", onUp);
-    window.addEventListener("blur", finish);
+    window.addEventListener("blur", onBlur);
+    detachers.current.add(detach);
   };
 
   // A keyboard click (detail 0) has no hold. A screen reader double-tap or switch access sends a

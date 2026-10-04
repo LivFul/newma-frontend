@@ -9,6 +9,7 @@ import {
   type ComponentType,
   type ReactNode,
 } from "react";
+import { SceneBoundary } from "@/components/site/scene-boundary";
 import { Button } from "@/components/ui/button";
 import type { SceneFailure, WorkflowSceneProps } from "@/components/workflow-3d/workflow-scene";
 
@@ -104,16 +105,27 @@ function loadScene(): Promise<SceneModule> {
 const MIN_SCENE_PX = 416;
 const MAX_SCENE_VIEWPORT_SHARE = 0.8;
 
+interface DiagramSize {
+  readonly height: number;
+  readonly scrolls: boolean;
+}
+
 // Measured just before the swap, so the scene takes the diagram's block size and nothing below it
-// moves. Where the diagram scrolls sideways (phones) it is far taller than the screen is wide, so the
-// scene is capped to most of the viewport instead.
-function sceneHeightFor(diagram: HTMLElement | null): number | undefined {
+// moves. The diagram is unmounted while the scene shows, so this measurement is kept for resizes.
+function measureDiagram(diagram: HTMLElement | null): DiagramSize | undefined {
   const height = diagram?.getBoundingClientRect().height;
   if (!diagram || !height) return undefined;
   const region = diagram.firstElementChild;
   const scrolls = region instanceof HTMLElement && region.scrollWidth > region.clientWidth + 1;
-  if (!scrolls) return height;
-  return Math.min(height, Math.max(MIN_SCENE_PX, window.innerHeight * MAX_SCENE_VIEWPORT_SHARE));
+  return { height, scrolls };
+}
+
+// Where the diagram scrolls sideways (phones) it is far taller than the screen is wide, so the
+// scene is capped to most of the viewport instead.
+function sceneHeightFor(size: DiagramSize | undefined, viewportHeight: number): number | undefined {
+  if (!size) return undefined;
+  if (!size.scrolls) return size.height;
+  return Math.min(size.height, Math.max(MIN_SCENE_PX, viewportHeight * MAX_SCENE_VIEWPORT_SHARE));
 }
 
 const sceneShown = (phase: Phase) => phase === "starting" || phase === "ready";
@@ -130,7 +142,10 @@ export function WorkflowViewer({
   const hydrated = useHydrated();
   const [phase, setPhase] = useState<Phase>(() => (rendererUnavailable ? "unavailable" : "idle"));
   const [Scene, setScene] = useState<ComponentType<WorkflowSceneProps> | null>(null);
-  const [sceneHeight, setSceneHeight] = useState<number | undefined>(undefined);
+  const [diagramSize, setDiagramSize] = useState<DiagramSize | undefined>(undefined);
+  const [viewportHeight, setViewportHeight] = useState(0);
+  // Bumped on every open, so a scene that crashed last time gets a fresh error boundary.
+  const [attempt, setAttempt] = useState(0);
   const wrapper = useRef<HTMLDivElement>(null);
   const diagram = useRef<HTMLDivElement>(null);
   const toggle = useRef<HTMLButtonElement>(null);
@@ -139,10 +154,13 @@ export function WorkflowViewer({
     setPhase("loading");
     try {
       const loaded = await loadScene();
-      setSceneHeight(sceneHeightFor(diagram.current));
+      setDiagramSize(measureDiagram(diagram.current));
+      setViewportHeight(window.innerHeight);
+      setAttempt((count) => count + 1);
       setScene(() => loaded.WorkflowScene);
       setPhase("starting");
-    } catch {
+    } catch (error: unknown) {
+      console.error("workflow scene failed to load", error);
       setPhase("failed");
     }
   }, []);
@@ -161,8 +179,30 @@ export function WorkflowViewer({
   // reaches the button, and not at all for visitors who asked the browser to save data.
   const prefetch = useCallback(() => {
     if (prefersSavedData() || rendererUnavailable) return;
-    loadScene().catch(() => undefined);
+    loadScene().catch((error: unknown) => console.error("workflow scene prefetch failed", error));
   }, []);
+  // A crash inside the scene is a retryable failure, never a missing renderer.
+  const sceneCrashed = useCallback(() => sceneFailed("error"), [sceneFailed]);
+
+  // A scene capped to the viewport is re-capped when the viewport changes (a resize or a phone
+  // rotated), at most once a frame. A scene that simply takes the diagram's height needs nothing.
+  const shown = sceneShown(phase);
+  const capped = diagramSize?.scrolls === true;
+  useEffect(() => {
+    if (!shown || !capped) return;
+    let frame = 0;
+    const onResize = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => setViewportHeight(window.innerHeight));
+    };
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
+    };
+  }, [shown, capped]);
 
   // Escape closes the scene, but only when it was meant for the viewer: focus is inside it, or on the
   // page itself while the viewer is at least partly on screen, and no other widget has handled the key.
@@ -227,8 +267,15 @@ export function WorkflowViewer({
           </Button>
         ) : null}
       </div>
-      {sceneShown(phase) && Scene ? (
-        <Scene aspect={aspect} height={sceneHeight} onReady={ready} onFailure={sceneFailed} />
+      {shown && Scene ? (
+        <SceneBoundary key={attempt} onError={sceneCrashed}>
+          <Scene
+            aspect={aspect}
+            height={sceneHeightFor(diagramSize, viewportHeight)}
+            onReady={ready}
+            onFailure={sceneFailed}
+          />
+        </SceneBoundary>
       ) : (
         <div ref={diagram}>{children}</div>
       )}
