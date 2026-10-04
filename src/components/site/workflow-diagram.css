@@ -1,0 +1,145 @@
+/* Static workflow diagram. Everything takes its colour from the site tokens, and hue is never the
+   only carrier: node text names the step, and transition kinds differ by stroke pattern as well as
+   colour. Transforms and opacity are the only things that ever change, and nothing animates. */
+.wf-scroll {
+  /* Narrow screens scroll the diagram sideways instead of shrinking its text to nothing. */
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+}
+.wf-frame {
+  position: relative;
+  width: 100%;
+}
+.wf-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* The svg, not its frame, is what overflows on narrow screens: the scroll region carries it, and
+     the page itself never scrolls sideways. */
+  min-width: 46rem;
+}
+@media (min-width: 52rem) {
+  .wf-frame {
+    /* On wide screens the box is reserved up front, and the 3D view fills the same box, so the
+       swap shifts nothing. */
+    aspect-ratio: var(--wf-aspect);
+  }
+  .wf-svg {
+    height: 100%;
+    min-width: 0;
+  }
+}
+
+.wf-edge {
+  fill: none;
+  stroke-width: 1.75px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.wf-edge[data-tone="pass"] {
+  stroke: var(--color-accent);
+}
+.wf-edge[data-tone="remediate"] {
+  stroke: var(--color-warning);
+  stroke-dasharray: 6 4;
+}
+.wf-edge[data-tone="fail"] {
+  stroke: var(--color-danger);
+  stroke-dasharray: 2 4;
+}
+.wf-edge[data-tone="learn"] {
+  stroke: var(--color-eco-compute);
+}
+.wf-arrow[data-tone="pass"] {
+  fill: var(--color-accent);
+}
+.wf-arrow[data-tone="remediate"] {
+  fill: var(--color-warning);
+}
+.wf-arrow[data-tone="fail"] {
+  fill: var(--color-danger);
+}
+.wf-arrow[data-tone="learn"] {
+  fill: var(--color-eco-compute);
+}
+
+.wf-node {
+  --wf-tone: var(--color-fg-muted);
+  stroke: var(--wf-tone);
+  stroke-width: 1.5px;
+  fill: color-mix(in srgb, var(--wf-tone) 14%, var(--color-bg));
+}
+.wf-node[data-lane="governance"] {
+  --wf-tone: var(--color-warning);
+}
+.wf-node[data-lane="execution"] {
+  --wf-tone: var(--color-success);
+}
+.wf-node[data-lane="learning"] {
+  --wf-tone: var(--color-eco-compute);
+}
+.wf-node[data-lane="confirmation"] {
+  --wf-tone: var(--color-accent);
+}
+.wf-node[data-kind="success"] {
+  --wf-tone: var(--color-success);
+}
+.wf-node[data-kind="failure"] {
+  --wf-tone: var(--color-danger);
+}
+.wf-node[data-kind="start"],
+.wf-node[data-kind="end"] {
+  fill: var(--color-fg);
+  stroke: var(--color-fg);
+}
+.wf-node[data-kind="end"] {
+  fill: var(--color-bg);
+}
+.wf-node-core {
+  fill: var(--color-fg);
+}
+
+.wf-label {
+  fill: var(--color-fg);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+}
+.wf-note {
+  fill: color-mix(in srgb, var(--color-success) 12%, var(--color-bg));
+  stroke: var(--color-success);
+  stroke-width: 1.2px;
+}
+.wf-note-text {
+  fill: var(--color-fg-muted);
+  font-family: var(--font-sans);
+  font-size: 11px;
+}
+.wf-leader {
+  stroke: var(--color-success);
+  stroke-width: 1.2px;
+  stroke-dasharray: 4 3;
+}
+
+@media (forced-colors: active) {
+  .wf-edge,
+  .wf-node,
+  .wf-note,
+  .wf-leader {
+    stroke: CanvasText;
+  }
+  .wf-node,
+  .wf-note {
+    fill: Canvas;
+  }
+  .wf-arrow,
+  .wf-node-core {
+    fill: CanvasText;
+  }
+  .wf-label,
+  .wf-note-text {
+    fill: CanvasText;
+  }
+}
