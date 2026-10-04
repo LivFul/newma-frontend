@@ -46,6 +46,13 @@ branch host and have demo mode on), build with Vercel's variables set and point 
       BFF_SERVICE_TOKEN=dummy pnpm build && pnpm start --port 3100
     PLAYWRIGHT_BASE_URL=http://localhost:3100 PLAYWRIGHT_EMULATE_VERCEL_PREVIEW=1 pnpm exec playwright test
 
+Service token per environment (names only): the BFF sends `BFF_SERVICE_TOKEN` to the backend, which
+checks it against its stored hashes. Give the Vercel Preview environment its own `BFF_SERVICE_TOKEN`,
+separate from Production, as soon as the backend accepts several token hashes (that backend change is
+tracked there); a leaked preview token can then be revoked without rotating production. Until the
+backend ships it, Preview and Production share one token. The variable name and its meaning stay the
+same in every environment; only the value differs.
+
 See `docs/ARCHITECTURE.md` and `PROGRESS.md`.
 
 ## Demo end-to-end run (`@needs-backend` specs)
