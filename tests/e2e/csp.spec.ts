@@ -26,8 +26,12 @@ async function collectViolations(page: Page): Promise<() => Promise<Violation[]>
   });
   if (process.env.CSP_INJECT) {
     await page.route("**/*", async (route) => {
-      if (route.request().resourceType() !== "document") return route.fallback();
-      const response = await route.fetch();
+      const request = route.request();
+      if (request.resourceType() !== "document" || request.method() !== "GET") {
+        return route.fallback();
+      }
+      // Keep redirects visible to the browser so it navigates (and stores cookies) as usual.
+      const response = await route.fetch({ maxRedirects: 0 });
       const headers = { ...response.headers(), [HEADER]: buildCsp({ nodeEnv: "production" }) };
       return route.fulfill({ response, headers });
     });
