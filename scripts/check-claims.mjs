@@ -6,7 +6,7 @@
 // Rules reported as `file:line rule message`: forbidden-pattern, num-figure, proper-noun, denylist,
 // no-inline-prose, missing-claims-declaration, unknown-claim, orphan-register-row.
 // Demo pages and src/lib/demo (P6) are checked for NUM figures (allowed only under a registered claim
-// id in the same file) and for the deny-lists; their inline copy is otherwise expected.
+// id marker on the same or the previous line) and for the deny-lists; their inline copy is otherwise expected.
 // Two deny-lists apply everywhere: the hashed list of real names (scripts/claims/denylist.hashes.json)
 // and the explicit placeholder list (scripts/claims-denylist.json). Findings name the rule, never the
 // matched name.
@@ -163,10 +163,20 @@ function scanUi(root, deny, findings) {
   return strings;
 }
 
+const CLAIM_MARKER = /claims:\s*C-\d{2}\b/;
+
+/** Lines that carry a `claims: C-nn` marker; a figure is waived on that line or the next one. */
+const markerLines = (text) =>
+  new Set(
+    text
+      .split("\n")
+      .flatMap((raw, index) => (CLAIM_MARKER.test(raw) ? [index + 1, index + 2] : [])),
+  );
+
 const demoStrings = (source, file) =>
   file.endsWith(".tsx") ? extractUiStrings(source, file) : extractContentStrings(source, file);
 
-/** Demo pages: a NUM figure needs a registered claim id in the same file; listed names never pass. */
+/** Demo pages: a NUM figure needs a registered claim id marker on its own or the previous line; listed names never pass. */
 function scanDemo(root, deny, findings, refs) {
   let strings = 0;
   for (const dir of SCAN_DIRS.demo) {
@@ -175,13 +185,17 @@ function scanDemo(root, deny, findings, refs) {
       const name = rel(root, file);
       const fileRefs = claimRefs(text);
       refs.push(...fileRefs.map((r) => ({ ...r, file: name })));
+      const waived = markerLines(text);
       for (const entry of demoStrings(text, file)) {
         strings += 1;
         const report = (rule, message) =>
           findings.push({ file: name, line: entry.line, rule, message });
         const figure = numFigure(entry.text);
-        if (figure && fileRefs.length === 0) {
-          report("num-figure", `${figure.message}; cite a claim id in this file (// claims: C-nn)`);
+        if (figure && !waived.has(entry.line)) {
+          report(
+            "num-figure",
+            `${figure.message}; cite a claim id on this or the previous line (// claims: C-nn)`,
+          );
         }
         if (denylistHit(entry.text, deny))
           report("denylist", "matches the deny-list of real names");

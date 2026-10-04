@@ -8,7 +8,7 @@ export const SCAN_DIRS = {
   ui: ["src/components/site", "src/components/ecosystem-graphic", "src/app/(site)"],
   /**
    * Demo pages and demo libraries (P6). Inline copy is expected here, so only NUM figures and names
-   * are checked: a figure needs a registered claim id in the same file, a listed name never passes.
+   * are checked: a figure needs a `claims: C-nn` marker on its line or the line before, a listed name never passes.
    */
   demo: ["src/app/(platform)/demo", "src/lib/demo"],
 };

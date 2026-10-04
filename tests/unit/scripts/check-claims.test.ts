@@ -184,10 +184,7 @@ describe("runClaimsCheck on fixtures", () => {
 });
 
 const DEMO_PAGE = "src/app/(platform)/demo/w9-campaign/page.tsx";
-const withDemoPage = (body: string, extra: object = {}) => ({
-  root: repo((write) => write(DEMO_PAGE, body)),
-  extra,
-});
+const withDemoPage = (body: string) => ({ root: repo((write) => write(DEMO_PAGE, body)) });
 const demoRules = (body: string, extra: object = {}) => {
   const { root } = withDemoPage(body);
   return rules(root, extra);
@@ -209,6 +206,11 @@ describe("NUM figures (P6 extension)", () => {
   it("passes the same figure in a demo page that cites a registered claim id", () => {
     const body = `// claims: C-01\nexport const P = () => <p>Quota used: 40%</p>;\n`;
     expect(demoRules(body)).toEqual([]);
+  });
+
+  it("waives only the figure next to the marker, not every figure in the file", () => {
+    const body = `// claims: C-01\nexport const A = () => <p>Quota used: 40%</p>;\n\nexport const B = () => <p>Cost: 5 EUR per job</p>;\n`;
+    expect(demoRules(body)).toEqual(["num-figure"]);
   });
 
   it("fails when the cited claim id is not in the register", () => {

@@ -45,8 +45,8 @@ Do this 15 minutes before, on the URL you will present from, in a desktop browse
 - [ ] The persona select in the header (label "Persona") shows all eight personas.
 - [ ] Window at least 1280 px wide, default zoom, notifications off, one tab only.
 - [ ] Optional rehearsal: `DEMO_E2E=1 PLAYWRIGHT_BASE_URL=<url> pnpm playwright test tests/e2e/demo-script.spec.ts --project=desktop-chromium`.
-      It walks these seven steps at demo speed 8 and leaves the demo in a used state: reset again
-      afterwards.
+      It walks these seven steps at demo speed 8, sets the speed back to the server default, and
+      leaves the demo in a used state: reset again afterwards and recheck the Demo speed line.
 - [ ] Keep the guided tour (`/demo/tour`) closed; this script replaces it for the review.
 
 Between steps you may switch persona with the header select. After a step that changes data

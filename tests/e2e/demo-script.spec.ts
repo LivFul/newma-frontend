@@ -10,6 +10,7 @@ import {
   homepage,
   liaison,
   provenance,
+  restoreServerSpeed,
   scientist,
   useDemoSpeed,
 } from "../support/script-steps";
@@ -30,15 +31,19 @@ test.describe("Sprint-review demo script", { tag: "@needs-backend" }, () => {
     await test.step("1 Homepage: scroll, hover, Tab and Enter into Wet Lab, See it in the demo", () =>
       homepage(page));
     await useDemoSpeed(page, SCRIPT_SPEED);
-    await test.step("2 Community liaison: W1 allow, hold, withdrawal; W10 concern", () =>
-      liaison(page, ctx));
-    await test.step("3 Scientist: W2 evidence labels; W3 agent, retry, hypotheses, hold", () =>
-      scientist(page, ctx));
-    await test.step("4 Scientific approver: W4 H0 to H1, H2 hold", () => approver(page, ctx));
-    await test.step("5 Wet-lab / CRO: W5 package, missing sample, acceptance, blocked retraining", () =>
-      wetLab(page, ctx));
-    await test.step("6 W6: verify a signature, then tamper", () => provenance(page, ctx));
-    await test.step("7 Partner and Finance: W8 export; W7 license to reconciliation; outage", () =>
-      partnerAndFinance(page, ctx));
+    try {
+      await test.step("2 Community liaison: W1 allow, hold, withdrawal; W10 concern", () =>
+        liaison(page, ctx));
+      await test.step("3 Scientist: W2 evidence labels; W3 agent, retry, hypotheses, hold", () =>
+        scientist(page, ctx));
+      await test.step("4 Scientific approver: W4 H0 to H1, H2 hold", () => approver(page, ctx));
+      await test.step("5 Wet-lab / CRO: W5 package, missing sample, acceptance, blocked retraining", () =>
+        wetLab(page, ctx));
+      await test.step("6 W6: verify a signature, then tamper", () => provenance(page, ctx));
+      await test.step("7 Partner and Finance: W8 export; W7 license to reconciliation; outage", () =>
+        partnerAndFinance(page, ctx));
+    } finally {
+      await restoreServerSpeed(page);
+    }
   });
 });

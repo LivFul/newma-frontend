@@ -4,6 +4,7 @@
 // tour cannot drift apart.
 import type { Page } from "@playwright/test";
 import { EVIDENCE_LABEL_TEXT } from "../../src/lib/evidence";
+import { SERVER_DEFAULT_CHOICE } from "../../src/lib/demo/parse-config";
 import { PERSONA_LABELS, TOUR_ROUTE, banner, DEMO_BANNER_TEXT, switchPersona } from "./demo";
 import { focusedHref, gotoHeroReady, heroSvg, tabToFirstComponent } from "./hero";
 import { expect } from "./test";
@@ -50,6 +51,13 @@ export async function useDemoSpeed(page: Page, speed: string): Promise<void> {
   await page.goto(TOUR_ROUTE);
   await page.getByLabel("Set demo speed").selectOption(speed);
   await expect(page.getByText(`Demo speed: ${speed}×`)).toBeVisible();
+}
+
+/** Puts the tenant back on the server default speed, as the presenter's pre-flight expects. */
+export async function restoreServerSpeed(page: Page): Promise<void> {
+  await page.goto(TOUR_ROUTE);
+  await page.getByLabel("Set demo speed").selectOption(SERVER_DEFAULT_CHOICE);
+  await expect(page.getByText("(server default)")).toBeVisible();
 }
 
 /** The subjects named under "Governing records" for the top-ranked partner pack. */
