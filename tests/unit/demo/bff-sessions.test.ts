@@ -124,6 +124,20 @@ describe("POST /api/demo/sessions", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("refuses a form post over 256 KiB with 413 before touching the backend", async () => {
+    const fetchMock = armBff([]);
+    const response = await POST(
+      bffRequest("/api/demo/sessions", {
+        method: "POST",
+        cookie: false,
+        form: { persona: "scientist", pad: "x".repeat(300 * 1024) },
+      }),
+    );
+    expect(response.status).toBe(413);
+    expect((await response.json()).code).toBe("payload_too_large");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("rejects an unknown persona: 400 for JSON, 303 to /access?reason=invalid for forms", async () => {
     const fetchMock = armBff([]);
     const json = await POST(

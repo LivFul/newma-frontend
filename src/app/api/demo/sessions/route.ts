@@ -5,6 +5,7 @@ import {
   clearSessionCookie,
   errorJson,
   noStore,
+  readForm,
   readJson,
   seeOther,
   withDemo,
@@ -21,7 +22,8 @@ const isFormPost = (req: NextRequest) =>
   (req.headers.get("content-type") ?? "").startsWith(FORM_CONTENT_TYPE);
 
 async function readPersona(req: NextRequest, form: boolean): Promise<unknown> {
-  if (form) return (await req.formData()).get("persona");
+  // Both readers cap the body at 256 KiB (413), like every other demo BFF route.
+  if (form) return (await readForm(req)).get("persona");
   const body = await readJson(req);
   return typeof body === "object" && body !== null
     ? (body as { persona?: unknown }).persona
