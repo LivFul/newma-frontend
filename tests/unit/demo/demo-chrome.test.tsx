@@ -1,5 +1,5 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { configure, fireEvent, getConfig, render, screen, waitFor } from "@testing-library/react";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { DEMO_BANNER_TEXT, DemoBanner } from "@/app/(platform)/demo/_components/demo-banner";
 import { DemoHeader } from "@/app/(platform)/demo/_components/demo-header";
 import { PersonaSwitcher } from "@/app/(platform)/demo/_components/persona-switcher";
@@ -18,6 +18,13 @@ const session = {
   expires_at: "2030-01-01T00:00:00.000Z",
   created_at: "2029-12-31T00:00:00.000Z",
 };
+
+// Lazily imported dialogs and panels resolve after a dynamic import; under a full parallel run that
+// can exceed Testing Library's default 1 s wait. A longer ceiling only slows a genuine failure, and
+// it is scoped to this file so other suites keep the default.
+const defaultAsyncTimeout = getConfig().asyncUtilTimeout;
+beforeAll(() => configure({ asyncUtilTimeout: 5_000 }));
+afterAll(() => configure({ asyncUtilTimeout: defaultAsyncTimeout }));
 
 describe("DemoBanner", () => {
   it("renders the verbatim notice as a labelled note with the Synthetic badge", async () => {
