@@ -4,7 +4,7 @@ export function BudgetHold({ query }: { query: AgentQuery }) {
   return (
     <section
       aria-label="Budget hold"
-      className="space-y-2 rounded-md border border-warning p-4 text-sm"
+      className="space-y-2 rounded-md border border-warning-ink bg-warning/15 p-4 text-sm"
     >
       <p className="font-semibold">Held: the budget check did not pass.</p>
       <p>

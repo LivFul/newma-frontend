@@ -27,15 +27,26 @@ const HIT = Object.freeze({
   width: LABEL_BOX.offsetX + LABEL_BOX.width + PLATE.halfWidth + 6,
   height: PLATE.halfHeight * 2 + PLATE.thickness + 12,
 });
-const PLATE_TOP = `M0 ${-PLATE.halfHeight}L${PLATE.halfWidth} 0L0 ${PLATE.halfHeight}L${-PLATE.halfWidth} 0Z`;
-const PLATE_SIDE =
+export const PLATE_TOP = `M0 ${-PLATE.halfHeight}L${PLATE.halfWidth} 0L0 ${PLATE.halfHeight}L${-PLATE.halfWidth} 0Z`;
+export const PLATE_SIDE =
   `M${-PLATE.halfWidth} 0L0 ${PLATE.halfHeight}L${PLATE.halfWidth} 0` +
   `V${PLATE.thickness}L0 ${PLATE.halfHeight + PLATE.thickness}L${-PLATE.halfWidth} ${PLATE.thickness}Z`;
 
-// Data & Knowledge draws its strokes in slate and its ink in the muted foreground.
-function toneStyle(part: PartGeometry): CSSProperties {
-  const ink = part.tone === "--color-border-strong" ? "--color-fg-muted" : part.tone;
-  return { "--eco-tone": `var(${part.tone})`, "--eco-ink": `var(${ink})` } as CSSProperties;
+// Light fills keep their hue for the plate but stroke and print in a darker ink of the same family,
+// so every outline and glyph holds 3:1 on the survey paper (WCAG 1.4.11). Data & Knowledge is the one
+// exception: it strokes in --color-border-strong (already 3:1) and prints in --color-fg-muted.
+const STROKE_INK: Partial<Record<PartGeometry["tone"], string>> = {
+  "--color-warning": "--color-warning-ink",
+  "--color-success": "--color-success-ink",
+  "--color-border-strong": "--color-fg-muted",
+};
+export function toneStyle(part: PartGeometry): CSSProperties {
+  const ink = STROKE_INK[part.tone] ?? part.tone;
+  return {
+    "--eco-tone": `var(${part.tone})`,
+    "--eco-stroke": `var(${part.tone === "--color-border-strong" ? part.tone : ink})`,
+    "--eco-ink": `var(${ink})`,
+  } as CSSProperties;
 }
 
 function PartBody({ part }: { part: PartGeometry }) {

@@ -17,16 +17,17 @@ function token(name: string): number {
 
 describe("scene palette", () => {
   it("matches the site tokens, so a token change cannot leave the scene in the old colours", () => {
-    expect(SCENE_COLORS.background).toBe(token("bg-elevated"));
-    expect(SCENE_COLORS.ink).toBe(token("bg"));
-    expect(SCENE_COLORS.text).toBe(token("fg"));
-    expect(SCENE_COLORS.textMuted).toBe(token("fg-muted"));
-    expect(SCENE_COLORS.accent).toBe(token("accent"));
-    expect(SCENE_COLORS.border).toBe(token("border"));
-    expect(SCENE_COLORS.warning).toBe(token("warning"));
-    expect(SCENE_COLORS.success).toBe(token("success"));
-    expect(SCENE_COLORS.danger).toBe(token("danger"));
-    expect(SCENE_COLORS.compute).toBe(token("eco-compute"));
+    // The diagram the scene replaces sits on .plate-surface, so the scene mirrors the plate inks.
+    expect(SCENE_COLORS.background).toBe(token("plate-elevated"));
+    expect(SCENE_COLORS.ink).toBe(token("plate"));
+    expect(SCENE_COLORS.text).toBe(token("plate-fg"));
+    expect(SCENE_COLORS.textMuted).toBe(token("plate-muted"));
+    expect(SCENE_COLORS.accent).toBe(token("plate-accent"));
+    expect(SCENE_COLORS.border).toBe(token("plate-border"));
+    expect(SCENE_COLORS.warning).toBe(token("plate-warning"));
+    expect(SCENE_COLORS.success).toBe(token("plate-success"));
+    expect(SCENE_COLORS.danger).toBe(token("plate-danger"));
+    expect(SCENE_COLORS.compute).toBe(token("plate-compute"));
   });
 
   it("colours every lane and every transition kind in use", () => {

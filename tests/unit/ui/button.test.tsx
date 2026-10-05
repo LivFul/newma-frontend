@@ -30,11 +30,14 @@ describe("Button", () => {
     expect(buttonVariants({ variant: "danger" })).toContain("bg-danger");
     expect(buttonVariants()).toContain("bg-accent");
   });
-  it("uses a strong border on secondary and merges away the transparent base border", () => {
-    render(<Button variant="secondary">Secondary</Button>);
-    const button = screen.getByRole("button");
-    expect(button).toHaveClass("border", "border-border-strong");
-    expect(button).not.toHaveClass("border-transparent");
+  // Value: protects=filled variants keep border-transparent (forced-colors still draws an outline) while secondary draws an ink border; fails_when=a variant loses its border colour so no outline shows in forced colours; why_new=old negative assertion became vacuous when the base class dropped border-transparent; seam=none
+  it("gives filled variants a transparent border and secondary an ink border", () => {
+    for (const variant of ["primary", "danger", "ghost"] as const) {
+      expect(buttonVariants({ variant }), variant).toContain("border-transparent");
+    }
+    const secondary = buttonVariants({ variant: "secondary" });
+    expect(secondary).toContain("border-fg");
+    expect(secondary).not.toContain("border-transparent");
   });
   it("sizes with min-height and padding and styles aria-disabled like disabled", () => {
     render(<Button aria-disabled="true">Pending</Button>);

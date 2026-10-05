@@ -1,3 +1,4 @@
+import { Mark } from "@/components/ui/mark";
 import { humanize } from "../../_components/fields";
 import type { SettlementState } from "@/lib/demo/types";
 
@@ -31,7 +32,7 @@ export function StateStepper({ state }: { state: SettlementState }) {
             aria-current={step === state ? "step" : undefined}
             className={ITEM}
           >
-            {i < index ? <span aria-hidden="true">✓ </span> : null}
+            {i < index ? <Mark kind="check" className="mr-1 size-3.5" /> : null}
             <span>{humanize(step)}</span>
             {i < index ? <span className="sr-only"> (completed)</span> : null}
             {step === state ? <span className="sr-only"> (current state)</span> : null}

@@ -6,6 +6,7 @@ import * as caption from "@/content/home/hero-caption";
 import * as help from "@/content/home/hero-help";
 import * as how from "@/content/home/how-it-works";
 import * as personas from "@/content/home/personas";
+import * as survey from "@/content/home/survey";
 import * as workflow from "@/content/home/workflow";
 import * as heroText from "@/content/ecosystem/hero-text";
 import * as registry from "@/content/ecosystem/registry";
@@ -29,7 +30,8 @@ function collect(value: unknown, found: CopyBlock[] = []): CopyBlock[] {
   return found;
 }
 
-const modules = { about, chrome, copy, caption, help, how, personas, heroText, workflow };
+// Value: protects=survey map labels obey the claim-register shape (unique ids, claim ids, no digits or superlatives); fails_when=a label is added without ids or with a number; why_new=survey.ts was missing from this registry; seam=none
+const modules = { about, chrome, copy, caption, help, how, personas, survey, heroText, workflow };
 // A block may be re-exported from two modules (the footer reuses the hero disclaimer): count it once.
 const blocks = [...new Set(Object.values(modules).flatMap((m) => collect(m)))];
 // Hero labels live in the registry as plain title/descriptor pairs; wrap them for the same checks.

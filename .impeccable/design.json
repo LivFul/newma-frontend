@@ -1,0 +1,631 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-04T21:47:13+00:00",
+  "title": "Design System: NEWMA",
+  "extensions": {
+    "colorMeta": {
+      "bg": {
+        "role": "neutral",
+        "displayName": "Survey Paper",
+        "canonical": "#e8f2ef",
+        "oklch": "oklch(95.3% 0.011 176.3)",
+        "cssVar": "--color-bg",
+        "tonalRamp": [
+          "oklch(15.0% 0.011 176.3)",
+          "oklch(26.4% 0.011 176.3)",
+          "oklch(37.9% 0.011 176.3)",
+          "oklch(49.3% 0.011 176.3)",
+          "oklch(60.7% 0.011 176.3)",
+          "oklch(72.1% 0.011 176.3)",
+          "oklch(83.6% 0.011 176.3)",
+          "oklch(95.0% 0.011 176.3)"
+        ]
+      },
+      "bg-elevated": {
+        "role": "neutral",
+        "displayName": "Fresh Sheet",
+        "canonical": "#f6faf8",
+        "oklch": "oklch(98.2% 0.005 165.0)",
+        "cssVar": "--color-bg-elevated",
+        "tonalRamp": [
+          "oklch(15.0% 0.005 165.0)",
+          "oklch(26.4% 0.005 165.0)",
+          "oklch(37.9% 0.005 165.0)",
+          "oklch(49.3% 0.005 165.0)",
+          "oklch(60.7% 0.005 165.0)",
+          "oklch(72.1% 0.005 165.0)",
+          "oklch(83.6% 0.005 165.0)",
+          "oklch(95.0% 0.005 165.0)"
+        ]
+      },
+      "bg-deep": {
+        "role": "neutral",
+        "displayName": "Paper Band",
+        "canonical": "#dce9e4",
+        "oklch": "oklch(92.3% 0.015 171.0)",
+        "cssVar": "--color-bg-deep",
+        "tonalRamp": [
+          "oklch(15.0% 0.015 171.0)",
+          "oklch(26.4% 0.015 171.0)",
+          "oklch(37.9% 0.015 171.0)",
+          "oklch(49.3% 0.015 171.0)",
+          "oklch(60.7% 0.015 171.0)",
+          "oklch(72.1% 0.015 171.0)",
+          "oklch(83.6% 0.015 171.0)",
+          "oklch(95.0% 0.015 171.0)"
+        ]
+      },
+      "fg": {
+        "role": "neutral",
+        "displayName": "Ink-Teal",
+        "canonical": "#09191f",
+        "oklch": "oklch(20.2% 0.025 224.5)",
+        "cssVar": "--color-fg",
+        "tonalRamp": [
+          "oklch(15.0% 0.025 224.5)",
+          "oklch(26.4% 0.025 224.5)",
+          "oklch(37.9% 0.025 224.5)",
+          "oklch(49.3% 0.025 224.5)",
+          "oklch(60.7% 0.025 224.5)",
+          "oklch(72.1% 0.025 224.5)",
+          "oklch(83.6% 0.025 224.5)",
+          "oklch(95.0% 0.025 224.5)"
+        ]
+      },
+      "fg-muted": {
+        "role": "neutral",
+        "displayName": "Faded Ink",
+        "canonical": "#4a6467",
+        "oklch": "oklch(48.4% 0.031 205.0)",
+        "cssVar": "--color-fg-muted",
+        "tonalRamp": [
+          "oklch(15.0% 0.031 205.0)",
+          "oklch(26.4% 0.031 205.0)",
+          "oklch(37.9% 0.031 205.0)",
+          "oklch(49.3% 0.031 205.0)",
+          "oklch(60.7% 0.031 205.0)",
+          "oklch(72.1% 0.031 205.0)",
+          "oklch(83.6% 0.031 205.0)",
+          "oklch(95.0% 0.031 205.0)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Field Green",
+        "canonical": "#1d5c52",
+        "oklch": "oklch(43.2% 0.066 180.6)",
+        "cssVar": "--color-accent",
+        "tonalRamp": [
+          "oklch(15.0% 0.066 180.6)",
+          "oklch(26.4% 0.066 180.6)",
+          "oklch(37.9% 0.066 180.6)",
+          "oklch(49.3% 0.066 180.6)",
+          "oklch(60.7% 0.066 180.6)",
+          "oklch(72.1% 0.066 180.6)",
+          "oklch(83.6% 0.066 180.6)",
+          "oklch(95.0% 0.066 180.6)"
+        ]
+      },
+      "accent-fg": {
+        "role": "neutral",
+        "displayName": "Fresh Sheet (on accent)",
+        "canonical": "#f6faf8",
+        "oklch": "oklch(98.2% 0.005 165.0)",
+        "cssVar": "--color-accent-fg",
+        "tonalRamp": [
+          "oklch(15.0% 0.005 165.0)",
+          "oklch(26.4% 0.005 165.0)",
+          "oklch(37.9% 0.005 165.0)",
+          "oklch(49.3% 0.005 165.0)",
+          "oklch(60.7% 0.005 165.0)",
+          "oklch(72.1% 0.005 165.0)",
+          "oklch(83.6% 0.005 165.0)",
+          "oklch(95.0% 0.005 165.0)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Grid Line",
+        "canonical": "#c3d5d0",
+        "oklch": "oklch(85.8% 0.021 177.4)",
+        "cssVar": "--color-border",
+        "tonalRamp": [
+          "oklch(15.0% 0.021 177.4)",
+          "oklch(26.4% 0.021 177.4)",
+          "oklch(37.9% 0.021 177.4)",
+          "oklch(49.3% 0.021 177.4)",
+          "oklch(60.7% 0.021 177.4)",
+          "oklch(72.1% 0.021 177.4)",
+          "oklch(83.6% 0.021 177.4)",
+          "oklch(95.0% 0.021 177.4)"
+        ]
+      },
+      "border-strong": {
+        "role": "neutral",
+        "displayName": "Pencil Outline",
+        "canonical": "#6e8986",
+        "oklch": "oklch(60.8% 0.031 188.1)",
+        "cssVar": "--color-border-strong",
+        "tonalRamp": [
+          "oklch(15.0% 0.031 188.1)",
+          "oklch(26.4% 0.031 188.1)",
+          "oklch(37.9% 0.031 188.1)",
+          "oklch(49.3% 0.031 188.1)",
+          "oklch(60.7% 0.031 188.1)",
+          "oklch(72.1% 0.031 188.1)",
+          "oklch(83.6% 0.031 188.1)",
+          "oklch(95.0% 0.031 188.1)"
+        ]
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "Madder",
+        "canonical": "#a3352b",
+        "oklch": "oklch(48.9% 0.147 28.8)",
+        "cssVar": "--color-danger",
+        "tonalRamp": [
+          "oklch(15.0% 0.120 28.8)",
+          "oklch(26.4% 0.120 28.8)",
+          "oklch(37.9% 0.120 28.8)",
+          "oklch(49.3% 0.120 28.8)",
+          "oklch(60.7% 0.120 28.8)",
+          "oklch(72.1% 0.120 28.8)",
+          "oklch(83.6% 0.120 28.8)",
+          "oklch(95.0% 0.120 28.8)"
+        ]
+      },
+      "warning": {
+        "role": "tertiary",
+        "displayName": "Ochre",
+        "canonical": "#f2c46b",
+        "oklch": "oklch(84.3% 0.120 82.4)",
+        "cssVar": "--color-warning",
+        "tonalRamp": [
+          "oklch(15.0% 0.120 82.4)",
+          "oklch(26.4% 0.120 82.4)",
+          "oklch(37.9% 0.120 82.4)",
+          "oklch(49.3% 0.120 82.4)",
+          "oklch(60.7% 0.120 82.4)",
+          "oklch(72.1% 0.120 82.4)",
+          "oklch(83.6% 0.120 82.4)",
+          "oklch(95.0% 0.120 82.4)"
+        ]
+      },
+      "warning-ink": {
+        "role": "tertiary",
+        "displayName": "Ochre Ink",
+        "canonical": "#8a5a00",
+        "oklch": "oklch(50.8% 0.108 73.3)",
+        "cssVar": "--color-warning-ink",
+        "tonalRamp": [
+          "oklch(15.0% 0.108 73.3)",
+          "oklch(26.4% 0.108 73.3)",
+          "oklch(37.9% 0.108 73.3)",
+          "oklch(49.3% 0.108 73.3)",
+          "oklch(60.7% 0.108 73.3)",
+          "oklch(72.1% 0.108 73.3)",
+          "oklch(83.6% 0.108 73.3)",
+          "oklch(95.0% 0.108 73.3)"
+        ]
+      },
+      "success": {
+        "role": "tertiary",
+        "displayName": "Sage",
+        "canonical": "#8dbab3",
+        "oklch": "oklch(75.5% 0.049 184.4)",
+        "cssVar": "--color-success",
+        "tonalRamp": [
+          "oklch(15.0% 0.049 184.4)",
+          "oklch(26.4% 0.049 184.4)",
+          "oklch(37.9% 0.049 184.4)",
+          "oklch(49.3% 0.049 184.4)",
+          "oklch(60.7% 0.049 184.4)",
+          "oklch(72.1% 0.049 184.4)",
+          "oklch(83.6% 0.049 184.4)",
+          "oklch(95.0% 0.049 184.4)"
+        ]
+      },
+      "success-ink": {
+        "role": "tertiary",
+        "displayName": "Sage Ink",
+        "canonical": "#3f7a70",
+        "oklch": "oklch(53.6% 0.064 181.5)",
+        "cssVar": "--color-success-ink",
+        "tonalRamp": [
+          "oklch(15.0% 0.064 181.5)",
+          "oklch(26.4% 0.064 181.5)",
+          "oklch(37.9% 0.064 181.5)",
+          "oklch(49.3% 0.064 181.5)",
+          "oklch(60.7% 0.064 181.5)",
+          "oklch(72.1% 0.064 181.5)",
+          "oklch(83.6% 0.064 181.5)",
+          "oklch(95.0% 0.064 181.5)"
+        ]
+      },
+      "focus": {
+        "role": "secondary",
+        "displayName": "Surveyor's Sienna (focus)",
+        "canonical": "#b8643a",
+        "oklch": "oklch(59.2% 0.122 45.9)",
+        "cssVar": "--color-focus",
+        "tonalRamp": [
+          "oklch(15.0% 0.120 45.9)",
+          "oklch(26.4% 0.120 45.9)",
+          "oklch(37.9% 0.120 45.9)",
+          "oklch(49.3% 0.120 45.9)",
+          "oklch(60.7% 0.120 45.9)",
+          "oklch(72.1% 0.120 45.9)",
+          "oklch(83.6% 0.120 45.9)",
+          "oklch(95.0% 0.120 45.9)"
+        ]
+      },
+      "route": {
+        "role": "secondary",
+        "displayName": "Apricot Route",
+        "canonical": "#fbd699",
+        "oklch": "oklch(89.4% 0.088 79.7)",
+        "cssVar": "--color-route",
+        "tonalRamp": [
+          "oklch(15.0% 0.088 79.7)",
+          "oklch(26.4% 0.088 79.7)",
+          "oklch(37.9% 0.088 79.7)",
+          "oklch(49.3% 0.088 79.7)",
+          "oklch(60.7% 0.088 79.7)",
+          "oklch(72.1% 0.088 79.7)",
+          "oklch(83.6% 0.088 79.7)",
+          "oklch(95.0% 0.088 79.7)"
+        ]
+      },
+      "route-edge": {
+        "role": "secondary",
+        "displayName": "Surveyor's Sienna",
+        "canonical": "#b8643a",
+        "oklch": "oklch(59.2% 0.122 45.9)",
+        "cssVar": "--color-route-edge",
+        "tonalRamp": [
+          "oklch(15.0% 0.120 45.9)",
+          "oklch(26.4% 0.120 45.9)",
+          "oklch(37.9% 0.120 45.9)",
+          "oklch(49.3% 0.120 45.9)",
+          "oklch(60.7% 0.120 45.9)",
+          "oklch(72.1% 0.120 45.9)",
+          "oklch(83.6% 0.120 45.9)",
+          "oklch(95.0% 0.120 45.9)"
+        ]
+      },
+      "contour": {
+        "role": "tertiary",
+        "displayName": "Sage Contour",
+        "canonical": "#8dbab3",
+        "oklch": "oklch(75.5% 0.049 184.4)",
+        "cssVar": "--color-contour",
+        "tonalRamp": [
+          "oklch(15.0% 0.049 184.4)",
+          "oklch(26.4% 0.049 184.4)",
+          "oklch(37.9% 0.049 184.4)",
+          "oklch(49.3% 0.049 184.4)",
+          "oklch(60.7% 0.049 184.4)",
+          "oklch(72.1% 0.049 184.4)",
+          "oklch(83.6% 0.049 184.4)",
+          "oklch(95.0% 0.049 184.4)"
+        ]
+      },
+      "plate": {
+        "role": "neutral",
+        "displayName": "Legend Plate",
+        "canonical": "#09191f",
+        "oklch": "oklch(20.2% 0.025 224.5)",
+        "cssVar": "--color-plate",
+        "tonalRamp": [
+          "oklch(15.0% 0.025 224.5)",
+          "oklch(26.4% 0.025 224.5)",
+          "oklch(37.9% 0.025 224.5)",
+          "oklch(49.3% 0.025 224.5)",
+          "oklch(60.7% 0.025 224.5)",
+          "oklch(72.1% 0.025 224.5)",
+          "oklch(83.6% 0.025 224.5)",
+          "oklch(95.0% 0.025 224.5)"
+        ]
+      },
+      "plate-fg": {
+        "role": "neutral",
+        "displayName": "Plate Paper Text",
+        "canonical": "#e8f2ef",
+        "oklch": "oklch(95.3% 0.011 176.3)",
+        "cssVar": "--color-plate-fg",
+        "tonalRamp": [
+          "oklch(15.0% 0.011 176.3)",
+          "oklch(26.4% 0.011 176.3)",
+          "oklch(37.9% 0.011 176.3)",
+          "oklch(49.3% 0.011 176.3)",
+          "oklch(60.7% 0.011 176.3)",
+          "oklch(72.1% 0.011 176.3)",
+          "oklch(83.6% 0.011 176.3)",
+          "oklch(95.0% 0.011 176.3)"
+        ]
+      },
+      "plate-muted": {
+        "role": "neutral",
+        "displayName": "Plate Sage Text",
+        "canonical": "#8dbab3",
+        "oklch": "oklch(75.5% 0.049 184.4)",
+        "cssVar": "--color-plate-muted",
+        "tonalRamp": [
+          "oklch(15.0% 0.049 184.4)",
+          "oklch(26.4% 0.049 184.4)",
+          "oklch(37.9% 0.049 184.4)",
+          "oklch(49.3% 0.049 184.4)",
+          "oklch(60.7% 0.049 184.4)",
+          "oklch(72.1% 0.049 184.4)",
+          "oklch(83.6% 0.049 184.4)",
+          "oklch(95.0% 0.049 184.4)"
+        ]
+      },
+      "eco-compute": {
+        "role": "tertiary",
+        "displayName": "Deepened Sienna",
+        "canonical": "#9a5230",
+        "oklch": "oklch(51.8% 0.107 44.8)",
+        "cssVar": "--color-eco-compute",
+        "tonalRamp": [
+          "oklch(15.0% 0.107 44.8)",
+          "oklch(26.4% 0.107 44.8)",
+          "oklch(37.9% 0.107 44.8)",
+          "oklch(49.3% 0.107 44.8)",
+          "oklch(60.7% 0.107 44.8)",
+          "oklch(72.1% 0.107 44.8)",
+          "oklch(83.6% 0.107 44.8)",
+          "oklch(95.0% 0.107 44.8)"
+        ]
+      },
+      "eco-optional": {
+        "role": "tertiary",
+        "displayName": "Provenance Madder",
+        "canonical": "#a8442a",
+        "oklch": "oklch(51.7% 0.138 35.6)",
+        "cssVar": "--color-eco-optional",
+        "tonalRamp": [
+          "oklch(15.0% 0.120 35.6)",
+          "oklch(26.4% 0.120 35.6)",
+          "oklch(37.9% 0.120 35.6)",
+          "oklch(49.3% 0.120 35.6)",
+          "oklch(60.7% 0.120 35.6)",
+          "oklch(72.1% 0.120 35.6)",
+          "oklch(83.6% 0.120 35.6)",
+          "oklch(95.0% 0.120 35.6)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero headline in the title block only; SHRP 60."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section h2s; 3rem from md; SHRP 60."
+      },
+      "statement": {
+        "displayName": "Statement",
+        "purpose": "One declarative line under a headline; 1.875rem from md; SHRP 60."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Sentence-case sub-headings inside a section."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Prose and ledes (1.125rem), 38-52ch on the site."
+      },
+      "label": {
+        "displayName": "Place Label",
+        "purpose": "Tracked caps for place names, legend heads, nav group and form labels."
+      },
+      "gridref": {
+        "displayName": "Grid Reference",
+        "purpose": "Martian Mono for sheet refs, ticks, codes, measurements and map notes only."
+      }
+    },
+    "shadows": [
+      {
+        "name": "focus-halo",
+        "value": "0 0 0 2px var(--color-bg)",
+        "purpose": "Inner halo of the two-tone focus ring (with outline: 2px solid var(--color-focus); outline-offset: 3px). The only shadow in the system."
+      }
+    ],
+    "motion": [
+      {
+        "name": "duration-fast",
+        "value": "150ms",
+        "purpose": "Default transition: hovers, colour changes."
+      },
+      {
+        "name": "duration-base",
+        "value": "250ms",
+        "purpose": "Plate isolation dimming."
+      },
+      {
+        "name": "duration-slow",
+        "value": "450ms",
+        "purpose": "Reserved longer transitions."
+      },
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.2, 0, 0, 1)",
+        "purpose": "Default easing for state transitions."
+      },
+      {
+        "name": "ease-emphasized",
+        "value": "cubic-bezier(0.3, 0, 0, 1)",
+        "purpose": "Emphasized transitions."
+      },
+      {
+        "name": "route-draw",
+        "value": "2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s",
+        "purpose": "Hero signature: the route draws once via stroke-dashoffset; the patient marker fades in at 1.9s. Shown complete under reduced motion. Hero-local, not a token."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "durations 0ms",
+        "purpose": "prefers-reduced-motion zeroes all duration tokens and clamps stray animations."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "md",
+        "value": "48rem"
+      },
+      {
+        "name": "lg",
+        "value": "64rem"
+      },
+      {
+        "name": "xl",
+        "value": "80rem"
+      },
+      {
+        "name": "short-viewport",
+        "value": "max-height: 32rem"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Field green filled action; hovers to ink-teal.",
+      "html": "<button class=\"ds-btn-primary\">See the demo</button>",
+      "css": ".ds-btn-primary { font-family: var(--font-sans); display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:40px; padding:8px 16px; font-size:1rem; font-weight:500; background:var(--color-accent); color:var(--color-accent-fg); border:1px solid transparent; border-radius:var(--radius-md); cursor:pointer; transition:background-color var(--motion-duration-fast) var(--motion-ease-standard), transform var(--motion-duration-fast) var(--motion-ease-standard); } .ds-btn-primary:hover { background:var(--color-fg); } .ds-btn-primary:active { transform:translateY(1px); } .ds-btn-primary:focus-visible { outline:2px solid var(--color-focus); outline-offset:3px; box-shadow:0 0 0 2px var(--color-bg); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ink-outlined companion to primary; inverts to ink on hover.",
+      "html": "<button class=\"ds-btn-secondary\">How it works</button>",
+      "css": ".ds-btn-secondary { font-family: var(--font-sans); display:inline-flex; align-items:center; justify-content:center; min-height:40px; padding:8px 16px; font-size:1rem; font-weight:500; background:transparent; color:var(--color-fg); border:1px solid var(--color-fg); border-radius:var(--radius-md); cursor:pointer; transition:background-color var(--motion-duration-fast) var(--motion-ease-standard), color var(--motion-duration-fast) var(--motion-ease-standard); } .ds-btn-secondary:hover { background:var(--color-fg); color:var(--color-bg); } .ds-btn-secondary:active { transform:translateY(1px); } .ds-btn-secondary:focus-visible { outline:2px solid var(--color-focus); outline-offset:3px; box-shadow:0 0 0 2px var(--color-bg); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost-hover",
+      "description": "Low-emphasis action; paper band and underline on hover.",
+      "html": "<button class=\"ds-btn-ghost\">View details</button>",
+      "css": ".ds-btn-ghost { font-family: var(--font-sans); display:inline-flex; align-items:center; min-height:40px; padding:8px 16px; font-size:1rem; font-weight:500; background:transparent; color:var(--color-fg); border:1px solid transparent; border-radius:var(--radius-md); text-underline-offset:4px; cursor:pointer; } .ds-btn-ghost:hover { background:var(--color-bg-deep); text-decoration:underline; } .ds-btn-ghost:focus-visible { outline:2px solid var(--color-focus); outline-offset:3px; box-shadow:0 0 0 2px var(--color-bg); }"
+    },
+    {
+      "name": "Status Badges",
+      "kind": "chip",
+      "refersTo": "badge-success",
+      "description": "Stamped tags: fill plus a darker ink edge; vocabulary is the gate status enum.",
+      "html": "<span class=\"ds-badge ds-badge-pass\">PASS</span> <span class=\"ds-badge ds-badge-hold\">HOLD</span> <span class=\"ds-badge ds-badge-fail\">FAIL</span> <span class=\"ds-badge\">NOT_STARTED</span>",
+      "css": ".ds-badge { font-family: var(--font-sans); display:inline-flex; align-items:center; min-height:24px; padding:2px 8px; font-size:0.75rem; font-weight:500; letter-spacing:0.01em; border:1px solid var(--color-border-strong); border-radius:var(--radius-sm); background:var(--color-bg-elevated); color:var(--color-fg); } .ds-badge-pass { background:var(--color-success); border-color:var(--color-success-ink); } .ds-badge-hold { background:var(--color-warning); border-color:var(--color-warning-ink); } .ds-badge-fail { background:var(--color-danger); border-color:var(--color-danger); color:var(--color-danger-fg); }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "description": "Native control on fresh sheet with a square inked edge.",
+      "html": "<input class=\"ds-input\" placeholder=\"Batch reference\">",
+      "css": ".ds-input { font-family: var(--font-sans); min-height:40px; padding:8px 12px; font-size:1rem; background:var(--color-bg-elevated); color:var(--color-fg); border:1px solid var(--color-border-strong); border-radius:var(--radius-md); } .ds-input:hover { border-color:var(--color-fg); } .ds-input:focus-visible { outline:2px solid var(--color-focus); outline-offset:3px; box-shadow:0 0 0 2px var(--color-bg); }"
+    },
+    {
+      "name": "Workflow Rail",
+      "kind": "nav",
+      "refersTo": "rail-item-current",
+      "description": "Numbered legend keys; current page is a solid ink fill.",
+      "html": "<nav class=\"ds-rail\"><span class=\"ds-rail-label\">Workflows</span><a class=\"ds-rail-item\" href=\"#\"><span class=\"ds-rail-code\">W3</span>Agent jobs</a><a class=\"ds-rail-item\" aria-current=\"page\" href=\"#\"><span class=\"ds-rail-code\">W4</span>Gates</a><a class=\"ds-rail-item\" href=\"#\"><span class=\"ds-rail-code\">W5</span>Wet lab</a></nav>",
+      "css": ".ds-rail { font-family: var(--font-sans); display:flex; flex-direction:column; gap:2px; width:16rem; padding:24px 12px; background:var(--color-bg); border-right:1px solid color-mix(in srgb, var(--color-fg) 15%, transparent); } .ds-rail-label { padding:20px 12px 8px; font-size:0.75rem; font-weight:500; letter-spacing:0.14em; text-transform:uppercase; color:var(--color-fg-muted); } .ds-rail-item { display:flex; align-items:center; gap:12px; min-height:40px; padding:6px 12px; font-size:0.875rem; color:var(--color-fg-muted); text-decoration:none; transition:background-color var(--motion-duration-fast) var(--motion-ease-standard); } .ds-rail-item:hover { background:var(--color-bg-deep); color:var(--color-fg); } .ds-rail-item[aria-current=page] { background:var(--color-fg); color:var(--color-bg); } .ds-rail-item:focus-visible { outline:2px solid var(--color-focus); outline-offset:3px; box-shadow:0 0 0 2px var(--color-bg); } .ds-rail-code { width:2rem; font-family:var(--font-mono); font-size:0.75rem; }"
+    },
+    {
+      "name": "Survey Sheet with Map Key",
+      "kind": "card",
+      "refersTo": "sheet",
+      "description": "Fresh sheet in a 1px ink neatline with corner ticks; a map key runs along the bottom.",
+      "html": "<div class=\"ds-sheet\"><div class=\"ds-sheet-body\"><h3 class=\"ds-sheet-title\">Origin parcel</h3><p class=\"ds-sheet-text\">Sheet interior on fresh paper.</p></div><div class=\"ds-mapkey\"><span class=\"ds-gridref\">SHEET 1 / 6</span><span class=\"ds-place\">Legend</span><span class=\"ds-key\"><span class=\"ds-swatch ds-swatch-route\"></span>Route</span><span class=\"ds-key\"><span class=\"ds-swatch ds-swatch-hatch\"></span>Restricted</span><span class=\"ds-scale\"><span></span><span></span><span></span><span></span></span></div></div>",
+      "css": ".ds-sheet { font-family: var(--font-sans); --t:linear-gradient(var(--color-fg),var(--color-fg)); position:relative; max-width:34rem; color:var(--color-fg); background-color:var(--color-bg-elevated); border:1px solid var(--color-fg); background-image:var(--t),var(--t),var(--t),var(--t),var(--t),var(--t),var(--t),var(--t); background-size:10px 1.5px,1.5px 10px,10px 1.5px,1.5px 10px,10px 1.5px,1.5px 10px,10px 1.5px,1.5px 10px; background-position:top 5px left 5px,top 5px left 5px,top 5px right 5px,top 5px right 5px,bottom 5px left 5px,bottom 5px left 5px,bottom 5px right 5px,bottom 5px right 5px; background-repeat:no-repeat; } .ds-sheet-body { padding:40px; } .ds-sheet-title { margin:0 0 8px; font-size:1.5rem; font-weight:500; letter-spacing:-0.015em; } .ds-sheet-text { margin:0; color:var(--color-fg-muted); line-height:1.625; } .ds-mapkey { display:flex; flex-wrap:wrap; align-items:center; gap:12px 24px; padding:16px 40px; border-top:1px solid var(--color-fg); font-size:0.875rem; } .ds-gridref { font-family:var(--font-mono); font-size:0.6875rem; letter-spacing:0.02em; font-variant-numeric:tabular-nums; } .ds-place { font-size:0.75rem; font-weight:500; letter-spacing:0.14em; text-transform:uppercase; } .ds-key { display:flex; align-items:center; gap:8px; color:var(--color-fg-muted); } .ds-swatch { display:inline-block; width:2rem; height:0.75rem; } .ds-swatch-route { background:var(--color-route); border-block:2px solid var(--color-route-edge); } .ds-swatch-hatch { border:1px solid var(--color-fg); background-image:repeating-linear-gradient(-45deg, color-mix(in srgb, var(--color-danger) 28%, transparent) 0 1px, transparent 1px 7px); } .ds-scale { display:inline-grid; grid-template-columns:repeat(4,1.5rem); height:0.4rem; margin-left:auto; border:1px solid var(--color-fg); } .ds-scale > span:nth-child(odd) { background:var(--color-fg); }"
+    },
+    {
+      "name": "Legend Plate Key",
+      "kind": "custom",
+      "refersTo": "legend-plate",
+      "description": "Numbered legend row on the deep ink-teal plate.",
+      "html": "<ul class=\"ds-plate\"><li class=\"ds-plate-row\"><span class=\"ds-plate-num\">1</span><a class=\"ds-plate-link\" href=\"#\"><span class=\"ds-plate-title\">Interface</span><span class=\"ds-plate-desc\">Descriptor line</span></a></li><li class=\"ds-plate-row\"><span class=\"ds-plate-num\">2</span><a class=\"ds-plate-link\" href=\"#\"><span class=\"ds-plate-title\">Agentic Compute</span><span class=\"ds-plate-desc\">Descriptor line</span></a></li></ul>",
+      "css": ".ds-plate { font-family: var(--font-sans); list-style:none; margin:0; padding:24px 20px; background:var(--color-plate); color:var(--color-plate-fg); } .ds-plate-row { position:relative; border-top:1px solid color-mix(in srgb, var(--color-plate-muted) 40%, transparent); } .ds-plate-num { position:absolute; top:28px; left:0; font-family:var(--font-mono); font-size:0.75rem; color:var(--color-plate-muted); } .ds-plate-link { display:grid; gap:8px; padding:24px 24px 24px 32px; color:inherit; text-decoration:none; transition:background-color var(--motion-duration-fast) var(--motion-ease-standard); } .ds-plate-link:hover { background:color-mix(in srgb, var(--color-plate-fg) 6%, transparent); } .ds-plate-link:focus-visible { outline:2px solid var(--color-focus); outline-offset:3px; box-shadow:0 0 0 2px var(--color-bg); } .ds-plate-title { font-size:1.5rem; font-weight:500; letter-spacing:-0.015em; } .ds-plate-desc { color:var(--color-plate-muted); } .ds-plate-link:hover .ds-plate-desc { color:var(--color-plate-fg); }"
+    },
+    {
+      "name": "Benchmark Tracker",
+      "kind": "custom",
+      "description": "Gates as surveyed benchmarks on a vertical route; walked segments are the apricot band.",
+      "html": "<ol class=\"ds-track\"><li class=\"ds-step\"><span class=\"ds-bm ds-bm-pass\"><svg viewBox=\"0 0 16 16\" width=\"14\" height=\"14\"><path d=\"M3.5 8.5l3 3 6-7\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\"/></svg></span><span class=\"ds-seg ds-seg-walked\"></span>L0 Sourcing <span class=\"ds-tag\">PASS</span></li><li class=\"ds-step\"><span class=\"ds-bm ds-bm-held\"></span><span class=\"ds-seg ds-seg-open\"></span>L1 Review <span class=\"ds-tag\">HOLD</span></li><li class=\"ds-step\"><span class=\"ds-bm ds-bm-out\"></span>L2 Out of scope</li></ol>",
+      "css": ".ds-track { font-family: var(--font-sans); list-style:none; margin:0; padding:0; color:var(--color-fg); } .ds-step { position:relative; padding:4px 0 32px 44px; } .ds-bm { position:absolute; top:2px; left:0; display:grid; place-items:center; width:28px; height:28px; border-radius:50%; border:1.5px solid var(--color-fg); background:var(--color-bg); } .ds-bm-pass { background:var(--color-success); border-color:var(--color-success-ink); } .ds-bm-held { background-color:var(--color-bg-elevated); border-color:var(--color-warning-ink); background-image:repeating-linear-gradient(45deg, color-mix(in srgb, var(--color-warning) 70%, transparent) 0 2px, transparent 2px 8px); } .ds-bm-out { border-style:dashed; border-color:var(--color-fg-muted); } .ds-seg { position:absolute; top:32px; bottom:0; } .ds-seg-walked { left:11px; width:6px; border-inline:1.5px solid var(--color-route-edge); background:var(--color-route); } .ds-seg-open { left:13px; border-left:1.5px dashed var(--color-fg-muted); } .ds-tag { margin-left:8px; font-size:0.75rem; font-weight:500; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Field Survey Sheet",
+    "overview": "Every NEWMA surface is a printed survey sheet: mint survey paper carrying a small set of spot inks, framed by an ink neatline with corner ticks, lettered like a map. Farm to patient is drawn as a real route, an apricot band edged in sienna, and each check along it is a surveyed benchmark. The public site uses the sheet to persuade; the demo workspace uses the same sheet in its working register, with legend keys, ruled tables and title-block fields. There is no second visual language for the product.\n\nThe density is printed, not decorated. Structure comes from ink rules (1px hairlines, 1.5–2px heavier rules for heads and section tops), hatching for parcels whose data is restricted or held, and numbered legend keys. Hue never carries meaning by itself: a glyph shape, a stroke pattern (dashed for optional or out of scope, hatched for restricted or held) or a text label always says the same thing.\n\nThe world refuses the dark biotech hero with a glowing diagram and the leafy wellness landing. Surfaces are flat paper; the only breaks in the paper rhythm are the three deep ink-teal plates: the hero terrain half, the workflow diagram (and its 3D twin) and the legend plate.",
+    "keyCharacteristics": [
+      "Mint paper, ink-teal linework, spot inks only; every text and stroke pair is contrast-tested.",
+      "Geologica with its sharpness axis raised for display lettering; Martian Mono only for grid references, coordinates, hashes and measured values.",
+      "Neatlines, corner ticks, grid references, hatched parcels, numbered legend keys and benchmark markers as the recurring vocabulary.",
+      "Square corners (1–2px) everywhere a surface or control has an edge; circles only for benchmarks and waypoints.",
+      "Flat: depth comes from paper tones and the deep plate, never from soft shadows."
+    ],
+    "rules": [
+      {
+        "name": "The Spot Ink Rule",
+        "body": "Every colour is a named ink with a job. A new colour enters only with a pair in `contrast-pairs.json` that the token test verifies; no ad-hoc hex in components.",
+        "section": "colors"
+      },
+      {
+        "name": "The Fill-and-Ink Rule",
+        "body": "Light fills (ochre, sage, apricot) never carry meaning as a stroke on paper. Where a line must be seen, use the matching ink (warning-ink, success-ink, route-edge).",
+        "section": "colors"
+      },
+      {
+        "name": "The Never-Hue-Alone Rule",
+        "body": "Status, plate identity and restriction are always doubled by a glyph, a dash or hatch pattern, or text. Status badges read \"Status: PASS\" to screen readers.",
+        "section": "colors"
+      },
+      {
+        "name": "The Instrument Mono Rule",
+        "body": "Martian Mono is for grid references, coordinates, hashes, codes and measured values. Never for headings, buttons or body copy.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sharp Display Rule",
+        "body": "Display, headline and statement lettering carry `font-variation-settings: \"SHRP\" 60`; UI and body text stay at the default axis.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Rule",
+        "body": "Tables and anything tagged tabular use tabular numerals.",
+        "section": "typography"
+      },
+      {
+        "name": "The Printed Sheet Rule",
+        "body": "Nothing floats. No drop shadows, glass or blur on any surface; separation is an ink rule, a paper tone or the plate.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** frame primary surfaces as sheets: a 1px ink neatline, corner ticks, and a map key or grid references where the surface warrants them.",
+      "**Do** use field green (accent) for action and nothing else; hover filled actions to ink-teal.",
+      "**Do** pair every light fill with its ink (warning-ink, success-ink, route-edge) whenever a stroke carries meaning.",
+      "**Do** double hue with a glyph, dash, hatch or label; dashed means optional or out of scope, hatched means restricted or held.",
+      "**Do** set place names and table heads in tracked caps (0.12–0.14em) and reserve Martian Mono for references, codes and measurements.",
+      "**Do** add a contrast pair to `contrast-pairs.json` for any new colour pairing before it ships.",
+      "**Do** use drawn SVG marks (16-unit box, 1.6px stroke, currentColor) instead of text glyphs for status.",
+      "**Do** honour reduced motion: the route is shown complete and token durations drop to 0ms."
+    ],
+    "donts": [
+      "**Don't** use soft drop shadows, glass or backdrop blur; the focus halo is the only shadow.",
+      "**Don't** use colour-fade gradients; hard-stop gradients for ticks, hatching and grids are the only gradients.",
+      "**Don't** wrap content in rounded card shells or exceed 4px corners; circles are for benchmarks and waypoints only.",
+      "**Don't** set headings, buttons or body copy in Martian Mono.",
+      "**Don't** let hue alone carry status, plate identity or restriction.",
+      "**Don't** add dark regions beyond the three blessed plates: the hero terrain half, the workflow diagram (and its 3D twin) and the legend plate. Everything dark is the same `.plate-surface`, never a bespoke dark colour.",
+      "**Don't** document or design around placeholder copy; text is governed by the claims register."
+    ]
+  }
+}

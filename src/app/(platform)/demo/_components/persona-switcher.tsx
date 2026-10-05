@@ -23,8 +23,8 @@ export function PersonaSwitcher({ persona }: { persona: PersonaId }) {
   };
 
   return (
-    <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="text-xs font-medium text-fg-muted">
+    <div className="flex items-center gap-2">
+      <label htmlFor={id} className="place text-fg-muted">
         Persona
       </label>
       <select
@@ -32,7 +32,7 @@ export function PersonaSwitcher({ persona }: { persona: PersonaId }) {
         value={persona}
         aria-busy={pending || undefined}
         onChange={(event) => switchTo(event.target.value as PersonaId)}
-        className="min-h-10 rounded-md border border-border-strong bg-bg-elevated px-3 text-fg"
+        className="min-h-10 rounded-md border border-fg bg-bg-elevated px-3 text-sm text-fg"
       >
         {PERSONAS.map((option) => (
           <option key={option.id} value={option.id}>

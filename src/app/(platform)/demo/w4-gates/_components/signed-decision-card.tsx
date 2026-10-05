@@ -19,7 +19,7 @@ export function SignedDecisionCard({
       id={SIGNED_DECISION_ID}
       tabIndex={-1}
       aria-label="Signed decision"
-      className="space-y-2 rounded-md border border-success p-4 text-sm"
+      className="space-y-2 rounded-md border border-success-ink p-4 text-sm"
       data-testid="signed-decision"
       data-decision-id={decision.id}
     >

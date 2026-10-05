@@ -3,6 +3,7 @@ import { WorkflowDiagram, WORKFLOW_SVG_LAYOUT } from "./workflow-diagram";
 import { WorkflowLegend } from "./workflow-legend";
 import { WorkflowText } from "./workflow-text";
 import { WorkflowViewer } from "./workflow-viewer";
+import { CONTAINER, H2, SECTION } from "./type";
 
 // Sits between the product introduction and the six components. The diagram, its caption and the text
 // version are plain server HTML; only the small viewer wrapper is client code, and it loads the
@@ -12,16 +13,18 @@ export function WorkflowSection() {
     <section
       id="workflow"
       aria-labelledby="workflow-heading"
-      className="border-t border-border py-12 md:py-16"
+      className={`${SECTION} border-t border-fg/15`}
     >
-      <div className="mx-auto max-w-6xl space-y-8 px-4 md:px-8">
-        <div className="space-y-3">
-          <h2 id="workflow-heading" className="font-display text-3xl tracking-tight text-balance">
+      <div className={`${CONTAINER} space-y-12`}>
+        <div className="grid gap-6 lg:grid-cols-12">
+          <h2 id="workflow-heading" className={`${H2} lg:col-span-7`}>
             {WORKFLOW_SECTION.heading.text}
           </h2>
-          <p className="max-w-[58ch] text-fg-muted">{WORKFLOW_SECTION.intro.text}</p>
+          <p className="max-w-[48ch] text-lg leading-relaxed text-fg-muted lg:col-span-5 lg:mt-3">
+            {WORKFLOW_SECTION.intro.text}
+          </p>
         </div>
-        <figure className="space-y-3">
+        <figure className="space-y-4">
           <WorkflowViewer
             aspect={WORKFLOW_SVG_LAYOUT.aspect}
             labels={{
@@ -36,7 +39,7 @@ export function WorkflowSection() {
             <WorkflowDiagram />
           </WorkflowViewer>
           <WorkflowLegend />
-          <figcaption className="max-w-[58ch] text-sm text-fg-muted">
+          <figcaption className="max-w-[70ch] text-sm leading-relaxed text-fg-muted">
             {WORKFLOW_SECTION.caption.text}
           </figcaption>
         </figure>

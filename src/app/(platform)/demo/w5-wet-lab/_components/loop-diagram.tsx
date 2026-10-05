@@ -56,7 +56,7 @@ export function LoopDiagram({ assayState, learningState }: Props) {
       {assayState === "hold" ? (
         <p
           data-testid="loop-hold"
-          className="rounded-md border border-warning px-3 py-2 text-sm font-semibold"
+          className="rounded-md border border-warning-ink bg-warning/15 px-3 py-2 text-sm font-semibold"
         >
           Hold: the loop is paused until the hold is resolved.
         </p>
