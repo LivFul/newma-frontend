@@ -227,6 +227,35 @@ describe("GateTracker and cards", () => {
   });
 });
 
+// Value: protects=a gate not yet started never reads as failed; unmet checks say not met yet, never failed; fails_when=pending prop dropped, so NOT_STARTED gates show failed; why_new=redesign added it; seam=none
+describe("GateTracker check wording by gate status", () => {
+  const checks = [
+    { code: "identity", passed: true, message: "Identity verified" },
+    { code: "controls", passed: false, message: "Controls qualified" },
+  ];
+  const renderGates = (...gates: Gate[]) =>
+    render(<GateTracker gates={gates} renderAction={() => null} />);
+
+  it("reports an unmet check on a NOT_STARTED gate as not met yet, not failed", () => {
+    const { container } = renderGates(gate("H0", "NOT_STARTED", { checks }));
+    const item = container.querySelector('[data-stage="H0"]')!;
+    expect(item).toHaveTextContent("Identity verified: passed");
+    expect(item).toHaveTextContent("Controls qualified: not met yet");
+    expect(item).not.toHaveTextContent("failed");
+  });
+
+  it.each(["HOLD", "FAIL", "PASS"] as const)(
+    "still reports an unmet check as failed on %s",
+    (status) => {
+      const { container } = renderGates(gate("H0", status, { checks }));
+      const item = container.querySelector('[data-stage="H0"]')!;
+      expect(item).toHaveTextContent("Controls qualified: failed");
+      expect(item).not.toHaveTextContent("not met yet");
+      expect(item.querySelector('li[data-passed="false"]')).not.toBeNull();
+    },
+  );
+});
+
 describe("W4 review fixes", () => {
   it("cannot be closed and reopened (new key) while a decision is in flight", async () => {
     let release: (r: Response) => void = () => undefined;

@@ -42,19 +42,25 @@ export default async function EcosystemPage({ params }: Params) {
   const entry = ECOSYSTEM[slug];
   const { default: Body } = await import(`@/content/ecosystem/${slug}.mdx`);
   return (
-    <article className="mx-auto max-w-3xl px-4 py-12 md:px-8 md:py-16">
+    <article className="px-5 py-10 md:px-12 md:py-14">
       <JsonLd data={techArticleJsonLd(slug)} />
-      <DetailHeader entry={entry} />
-      <section aria-labelledby="fit-heading" className="mt-12 border-t border-border pt-8">
-        <h2 id="fit-heading" className="font-display text-2xl tracking-tight">
-          {DETAIL_COPY.fitHeading.text}
-        </h2>
-        <p className="mt-4 max-w-[62ch]">{entry.fit}</p>
-      </section>
-      <Body />
-      <SourcesList entry={entry} />
-      <DemoLink entry={entry} />
-      <RelatedComponents current={slug} />
+      <div className="grid w-full gap-x-16 gap-y-12 lg:grid-cols-12">
+        <div className="min-w-0 lg:col-span-5 lg:self-start lg:[@media(min-height:56rem)]:sticky lg:[@media(min-height:56rem)]:top-[calc(var(--size-header)+2.5rem)]">
+          <DetailHeader entry={entry} />
+        </div>
+        <div className="min-w-0 lg:col-span-7 lg:border-l lg:border-fg/15 lg:pl-16">
+          <section aria-labelledby="fit-heading">
+            <h2 id="fit-heading" className="text-2xl font-medium tracking-[-0.015em]">
+              {DETAIL_COPY.fitHeading.text}
+            </h2>
+            <p className="mt-4 max-w-[52ch] text-xl leading-snug text-fg-muted">{entry.fit}</p>
+          </section>
+          <Body />
+          <SourcesList entry={entry} />
+          <DemoLink entry={entry} />
+          <RelatedComponents current={slug} />
+        </div>
+      </div>
     </article>
   );
 }

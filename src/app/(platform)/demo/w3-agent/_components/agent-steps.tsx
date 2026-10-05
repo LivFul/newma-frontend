@@ -1,4 +1,5 @@
 import { Badge, type BadgeProps, VisuallyHidden } from "@/components/ui";
+import { Mark, type MarkKind } from "@/components/ui/mark";
 import type { AgentQuery, AgentStepStatus } from "@/lib/demo/types";
 
 const TONE = {
@@ -9,12 +10,12 @@ const TONE = {
   failed: "danger",
 } as const satisfies Record<AgentStepStatus, NonNullable<BadgeProps["tone"]>>;
 
-const ICON: Readonly<Record<AgentStepStatus, string>> = {
-  pending: "○",
-  running: "◐",
-  done: "●",
-  held: "‖",
-  failed: "✕",
+const ICON: Readonly<Record<AgentStepStatus, MarkKind>> = {
+  pending: "ring",
+  running: "half",
+  done: "dot",
+  held: "pause",
+  failed: "cross",
 };
 
 /** The ten TA §2 steps, in order, with an icon and the status as text. */
@@ -28,8 +29,8 @@ export function AgentSteps({ steps }: { steps: AgentQuery["steps"] }) {
           data-status={step.status}
           className="flex flex-wrap items-baseline gap-2 text-sm"
         >
-          <span aria-hidden="true" className="w-4">
-            {ICON[step.status]}
+          <span className="w-4">
+            <Mark kind={ICON[step.status]} />
           </span>
           <span className="font-mono text-fg-muted">{index + 1}.</span>
           <span className="font-medium">{step.title}</span>

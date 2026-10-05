@@ -2,29 +2,38 @@ import type { LegalDocument } from "@/content/legal/types";
 
 export function LegalDocumentView({ doc }: { doc: LegalDocument }) {
   return (
-    <article className="mx-auto max-w-3xl px-4 py-12 md:px-8 md:py-16">
-      <h1 className="font-display text-display leading-[1.05] tracking-display text-balance">
-        {doc.title.text}
-      </h1>
-      <p className="mt-6 max-w-[62ch] border border-dashed border-warning px-4 py-3 font-display text-lg">
-        {doc.draftLabel.text}
-      </p>
-      {doc.sections.map((section) => (
-        <section
-          key={section.heading.id}
-          aria-labelledby={section.heading.id}
-          className="mt-10 border-t border-border pt-6"
-        >
-          <h2 id={section.heading.id} className="font-display text-2xl tracking-tight">
-            {section.heading.text}
-          </h2>
-          {section.paragraphs.map((paragraph) => (
-            <p key={paragraph.id} className="mt-4 max-w-[62ch] text-fg-muted">
-              {paragraph.text}
-            </p>
+    <article className="px-5 py-10 md:px-12 md:py-14">
+      <div className="grid w-full gap-x-16 gap-y-10 lg:grid-cols-12">
+        <header className="space-y-6 lg:col-span-5 lg:self-start lg:[@media(min-height:56rem)]:sticky lg:[@media(min-height:56rem)]:top-[calc(var(--size-header)+2.5rem)]">
+          <h1 className="font-display text-4xl leading-[1.0] font-medium tracking-[-0.035em] text-balance [overflow-wrap:anywhere] sm:text-5xl xl:text-6xl">
+            {doc.title.text}
+          </h1>
+          <p className="hatch-held max-w-[36ch] border border-warning-ink px-4 py-3 text-lg leading-snug">
+            <span className="bg-bg">{doc.draftLabel.text}</span>
+          </p>
+        </header>
+        <div className="lg:col-span-7 lg:border-l lg:border-fg/15 lg:pl-16">
+          {doc.sections.map((section) => (
+            <section
+              key={section.heading.id}
+              aria-labelledby={section.heading.id}
+              className="border-t border-fg pt-6 not-first:mt-12"
+            >
+              <h2 id={section.heading.id} className="text-2xl font-medium tracking-[-0.015em]">
+                {section.heading.text}
+              </h2>
+              {section.paragraphs.map((paragraph) => (
+                <p
+                  key={paragraph.id}
+                  className="mt-4 max-w-[65ch] text-lg leading-relaxed text-fg-muted"
+                >
+                  {paragraph.text}
+                </p>
+              ))}
+            </section>
           ))}
-        </section>
-      ))}
+        </div>
+      </div>
     </article>
   );
 }

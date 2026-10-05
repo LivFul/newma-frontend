@@ -77,7 +77,10 @@ export function JobProgress({ id, initial }: { id: string; initial?: Job }) {
         {percent}% · attempt {job.attempts + 1} of {job.max_attempts}
       </p>
       {job.attempts > 0 ? (
-        <p role="status" className="rounded-md border border-warning px-3 py-2 text-sm">
+        <p
+          role="status"
+          className="rounded-md border border-warning-ink bg-warning/15 px-3 py-2 text-sm"
+        >
           Retried {job.attempts} time{job.attempts === 1 ? "" : "s"} after a simulated failure.
         </p>
       ) : null}

@@ -1,6 +1,9 @@
+/* Geologica is set like map lettering; Martian Mono only for grid references, coordinates, hashes and
+   measured values. Both are self-hosted by next/font in the root layout, which sets the variables. */
 @theme {
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans:
+    var(--font-geologica), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-martian), ui-monospace, SFMono-Regular, Menlo, monospace;
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
@@ -9,6 +12,9 @@
   --text-2xl: 1.5rem;
   --text-3xl: 1.875rem;
   --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
   --leading-tight: 1.2;
   --leading-normal: 1.5;
+  /* Tracked caps for place names and sheet labels. */
+  --tracking-place: 0.14em;
 }

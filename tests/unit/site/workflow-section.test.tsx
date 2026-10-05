@@ -143,8 +143,8 @@ describe("WorkflowText", () => {
     for (const block of Object.values(WORKFLOW_EDGE_LABELS)) {
       expect(screen.getByText(block.text), block.id).toBeInTheDocument();
     }
-    // One visible arrow per transition, hidden from assistive technology.
-    const arrows = container.querySelectorAll("span[aria-hidden='true']");
+    // One drawn arrow per transition, hidden from assistive technology.
+    const arrows = container.querySelectorAll("li > svg[aria-hidden='true']");
     expect(arrows).toHaveLength(WORKFLOW_EDGES.length);
   });
 

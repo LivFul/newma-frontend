@@ -4,9 +4,14 @@
 .wf-scroll {
   /* Narrow screens scroll the diagram sideways instead of shrinking its text to nothing. */
   overflow-x: auto;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-fg);
+  background-color: var(--color-bg-elevated);
+}
+/* The region is itself a plate, so its focus colour is the light plate cut: draw the ring inside the
+   plate, where that colour has contrast, instead of outside on the paper. */
+.wf-scroll:focus-visible {
+  outline-offset: -4px;
+  box-shadow: none;
 }
 .wf-frame {
   position: relative;
@@ -33,7 +38,7 @@
   stroke: var(--color-accent);
 }
 .wf-edge[data-tone="remediate"] {
-  stroke: var(--color-warning);
+  stroke: var(--color-warning-ink);
   stroke-dasharray: 6 4;
 }
 .wf-edge[data-tone="fail"] {
@@ -42,12 +47,13 @@
 }
 .wf-edge[data-tone="learn"] {
   stroke: var(--color-eco-compute);
+  stroke-dasharray: 12 3 2 3;
 }
 .wf-arrow[data-tone="pass"] {
   fill: var(--color-accent);
 }
 .wf-arrow[data-tone="remediate"] {
-  fill: var(--color-warning);
+  fill: var(--color-warning-ink);
 }
 .wf-arrow[data-tone="fail"] {
   fill: var(--color-danger);
@@ -58,15 +64,17 @@
 
 .wf-node {
   --wf-tone: var(--color-fg-muted);
-  stroke: var(--wf-tone);
+  stroke: var(--wf-stroke, var(--wf-tone));
   stroke-width: 1.5px;
   fill: color-mix(in srgb, var(--wf-tone) 14%, var(--color-bg));
 }
 .wf-node[data-lane="governance"] {
   --wf-tone: var(--color-warning);
+  --wf-stroke: var(--color-warning-ink);
 }
 .wf-node[data-lane="execution"] {
   --wf-tone: var(--color-success);
+  --wf-stroke: var(--color-success-ink);
 }
 .wf-node[data-lane="learning"] {
   --wf-tone: var(--color-eco-compute);
@@ -76,6 +84,7 @@
 }
 .wf-node[data-kind="success"] {
   --wf-tone: var(--color-success);
+  --wf-stroke: var(--color-success-ink);
 }
 .wf-node[data-kind="failure"] {
   --wf-tone: var(--color-danger);
@@ -99,7 +108,7 @@
 }
 .wf-note {
   fill: color-mix(in srgb, var(--color-success) 12%, var(--color-bg));
-  stroke: var(--color-success);
+  stroke: var(--color-success-ink);
   stroke-width: 1.2px;
 }
 .wf-tag {
@@ -116,7 +125,7 @@
   font-family: var(--font-sans);
 }
 .wf-leader {
-  stroke: var(--color-success);
+  stroke: var(--color-success-ink);
   stroke-width: 1.2px;
   stroke-dasharray: 4 3;
 }

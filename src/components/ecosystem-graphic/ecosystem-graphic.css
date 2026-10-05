@@ -46,14 +46,14 @@
 }
 .eco-plate-top {
   fill: var(--color-bg-elevated);
-  stroke: var(--eco-tone);
+  stroke: var(--eco-stroke, var(--eco-tone));
   stroke-width: 2px;
   stroke-linejoin: round;
 }
 .eco-plate-side {
   fill: var(--eco-tone);
   fill-opacity: 0.32;
-  stroke: var(--eco-tone);
+  stroke: var(--eco-stroke, var(--eco-tone));
   stroke-width: 2px;
   stroke-linejoin: round;
 }
@@ -81,7 +81,7 @@
   stroke: none;
 }
 .eco-leader {
-  stroke: var(--eco-tone);
+  stroke: var(--eco-stroke, var(--eco-tone));
   stroke-width: 1.5px;
 }
 .eco-title {

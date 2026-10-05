@@ -5,13 +5,15 @@ import { ErrorNotice } from "../../_components/error-notice";
 export function MissingRequirements({ items }: { items: readonly string[] }) {
   if (items.length === 0) return null;
   return (
-    <div className="text-sm">
-      <p className="font-medium">Missing requirements</p>
-      <ul className="list-disc pl-5">
-        {items.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
+    <div className="hatch-held border border-warning-ink p-1.5 text-sm">
+      <div className="bg-bg-elevated px-3 py-2">
+        <p className="place text-fg">Missing requirements</p>
+        <ul className="mt-2 list-disc space-y-0.5 pl-5">
+          {items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

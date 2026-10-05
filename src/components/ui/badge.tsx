@@ -5,15 +5,16 @@ import { VisuallyHidden } from "./visually-hidden";
 
 export const badgeVariants = cva(
   // border-transparent keeps the chip outlined in forced-colors mode.
-  "inline-flex min-h-6 items-center rounded-sm border border-transparent px-2 py-0.5 text-xs font-medium",
+  // Stamped tags: a fill plus a darker ink edge from the same family, like a surveyor's mark.
+  "inline-flex min-h-6 items-center rounded-sm border px-2 py-0.5 text-xs font-medium tracking-[0.01em]",
   {
     variants: {
       tone: {
-        neutral: "bg-bg-elevated text-fg border-border",
-        accent: "bg-accent text-accent-fg",
-        warning: "bg-warning text-warning-fg",
-        danger: "bg-danger text-danger-fg",
-        success: "bg-success text-success-fg",
+        neutral: "bg-bg-elevated text-fg border-border-strong",
+        accent: "bg-accent text-accent-fg border-accent",
+        warning: "bg-warning text-warning-fg border-warning-ink",
+        danger: "bg-danger text-danger-fg border-danger",
+        success: "bg-success text-success-fg border-success-ink",
       },
     },
     defaultVariants: { tone: "neutral" },

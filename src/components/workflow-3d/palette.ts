@@ -1,29 +1,30 @@
 import type { EdgeTone, LaneId } from "@/lib/workflow/graph";
 
-// The WebGL scene cannot read CSS variables, so these hex values mirror the site tokens in
-// src/styles/tokens/color.css and ecosystem.css. tests/unit/workflow/palette.test.ts fails when they
-// drift, so a token change cannot leave the scene in the old colours.
+// The WebGL scene cannot read CSS variables, so these hex values mirror the dark plate tokens in
+// src/styles/tokens/color.css (the diagram it replaces sits on .plate-surface).
+// tests/unit/workflow/palette.test.ts fails when they drift, so a token change cannot leave the
+// scene in the old colours.
 export const SCENE_COLORS = Object.freeze({
-  /** --color-bg-elevated: the panel the static diagram sits on, so the swap is seamless. */
-  background: 0x141a2e,
-  /** --color-bg */
-  ink: 0x0b1020,
-  /** --color-fg */
-  text: 0xf3f5f9,
-  /** --color-fg-muted */
-  textMuted: 0xb7bfd1,
-  /** --color-accent */
-  accent: 0x7cc4ff,
-  /** --color-border */
-  border: 0x2a334d,
-  /** --color-warning */
-  warning: 0xffd27a,
-  /** --color-success */
-  success: 0x8fe3b4,
-  /** --color-danger */
-  danger: 0xff8f8f,
-  /** --color-eco-compute */
-  compute: 0xb69cff,
+  /** --color-plate-elevated: the plate the static diagram sits on, so the swap is seamless. */
+  background: 0x0f2329,
+  /** --color-plate */
+  ink: 0x09191f,
+  /** --color-plate-fg */
+  text: 0xe8f2ef,
+  /** --color-plate-muted */
+  textMuted: 0x8dbab3,
+  /** --color-plate-accent */
+  accent: 0x7cc9b0,
+  /** --color-plate-border */
+  border: 0x2a4a4b,
+  /** --color-plate-warning */
+  warning: 0xf2c46b,
+  /** --color-plate-success */
+  success: 0x8dbab3,
+  /** --color-plate-danger */
+  danger: 0xf08e7c,
+  /** --color-plate-compute */
+  compute: 0xe0a36c,
 });
 
 export const LANE_COLORS: Readonly<Record<LaneId, number>> = Object.freeze({

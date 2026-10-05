@@ -35,6 +35,6 @@ describe("AccessLink", () => {
     );
     const link = screen.getByRole("link", { name: "Access NEWMA" });
     expect(link.className).toMatch(/min-h-11/);
-    expect(link.className).toMatch(/border-border-strong/);
+    expect(link.className).toMatch(/border-fg/);
   });
 });

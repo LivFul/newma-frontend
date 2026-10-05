@@ -1,0 +1,290 @@
+/* Field Survey Sheet: the hero. Terrain shares the ecosystem plates' coordinate box, so the route
+   rises through the stack. Animates stroke-dashoffset and opacity only. */
+
+/* Grid ticks inside the neatline. */
+.sheet-ticks-x,
+.sheet-ticks-y {
+  position: absolute;
+  display: flex;
+  justify-content: space-around;
+  color: var(--color-fg-muted);
+  pointer-events: none;
+}
+.sheet-ticks-x {
+  inset-inline: 2.5rem;
+  top: 0.35rem;
+  z-index: 1;
+}
+/* From lg the right half of the sheet is the dark plate: its grid letters print in plate ink. */
+@media (min-width: 64rem) {
+  .sheet-ticks-x span:nth-child(n + 5) {
+    color: var(--color-plate-muted);
+  }
+}
+.sheet-ticks-y {
+  inset-block: 2.5rem;
+  left: 0.55rem;
+  flex-direction: column;
+}
+/* Below lg the plate stacks under the title block, so the column of row letters would cross it. */
+@media (max-width: 63.99rem) {
+  .sheet-ticks-y {
+    display: none;
+  }
+}
+
+/* The stage: the ecosystem figure on top, the terrain under it in the same box. */
+.survey-stage {
+  position: relative;
+  max-width: 34rem;
+  margin-inline: auto;
+}
+.survey-ground {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  aspect-ratio: 470 / 560;
+  pointer-events: none;
+}
+.survey-terrain {
+  position: absolute;
+  /* TERRAIN_BOX (-300, -100, 1100 x 800) relative to the 470 x 560 hero box. */
+  left: -63.83%;
+  top: -17.857%;
+  width: 234.04%;
+  height: 142.857%;
+  overflow: visible;
+}
+.survey-stage .eco-figure {
+  position: relative;
+}
+
+.survey-contours path {
+  fill: none;
+  stroke: var(--color-contour);
+  stroke-width: 0.9;
+  opacity: 0.6;
+}
+.survey-contours path[data-index] {
+  stroke-width: 1.7;
+  opacity: 1;
+}
+.survey-row {
+  stroke: color-mix(in srgb, var(--color-fg) 30%, transparent);
+  stroke-width: 0.8;
+}
+.survey-hatch {
+  stroke: color-mix(in srgb, var(--color-danger) 70%, transparent);
+  stroke-width: 1.4;
+}
+.survey-parcel {
+  fill: none;
+  stroke: var(--color-fg);
+  stroke-width: 1;
+}
+.survey-boundary {
+  fill: none;
+  stroke: var(--color-route-edge);
+  stroke-width: 1.4;
+  stroke-dasharray: 7 5;
+}
+.survey-place {
+  fill: var(--color-fg);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: var(--tracking-place);
+  text-transform: uppercase;
+  paint-order: stroke;
+  stroke: var(--color-bg-elevated);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+}
+.survey-tree {
+  fill: none;
+  stroke: var(--color-success-ink);
+  stroke-width: 0.9;
+}
+.survey-tree-core {
+  fill: var(--color-success-ink);
+}
+.survey-sprout {
+  fill: var(--color-success);
+  stroke: var(--color-success-ink);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+.survey-origin {
+  fill: var(--color-fg);
+}
+.survey-patient {
+  fill: var(--color-bg-elevated);
+  stroke: var(--color-fg);
+  stroke-width: 1.5;
+}
+.survey-patient-cross {
+  stroke: var(--color-accent);
+  stroke-width: 2.5;
+  stroke-linecap: square;
+}
+
+/* The farm-to-patient route: an apricot band edged in sienna. */
+.survey-route path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.survey-route-edge {
+  stroke: var(--color-route-edge);
+  stroke-width: 11;
+}
+.survey-route-band {
+  stroke: var(--color-route);
+  stroke-width: 7;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .survey-route path {
+    animation: survey-draw 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+  }
+  .survey-patient,
+  .survey-patient-cross {
+    animation: survey-arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.9s both;
+  }
+}
+@keyframes survey-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes survey-arrive {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* The six plates become translucent overprints: the route shows through where it passes. */
+.survey-stage .eco-plate-top {
+  fill: color-mix(in srgb, var(--eco-tone) 18%, var(--color-bg-elevated));
+  fill-opacity: 0.84;
+  stroke-width: 1.5px;
+}
+.survey-stage .eco-plate-side {
+  fill-opacity: 0.5;
+  stroke-width: 1.5px;
+}
+.survey-stage .eco-link:hover .eco-plate-top {
+  fill: color-mix(in srgb, var(--eco-tone) 38%, var(--color-bg-elevated));
+}
+.survey-stage .eco-title,
+.survey-stage .eco-desc {
+  font-family: var(--font-sans);
+  paint-order: stroke;
+  stroke: var(--color-bg-elevated);
+  stroke-linejoin: round;
+}
+.survey-stage .eco-title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  stroke-width: 6px;
+}
+.survey-stage .eco-desc {
+  stroke-width: 5px;
+}
+.survey-stage .eco-leader {
+  stroke-width: 1px;
+}
+
+/* Isolate one layer: pointing at or focusing a plate dims the others. Hover is gated to real pointers:
+   on touch the tapped link keeps :hover, and the second tap needs the other labels readable. */
+.survey-stage .eco-part {
+  transition: opacity var(--motion-duration-base) var(--motion-ease-standard);
+}
+.survey-stage:has(.eco-link:focus-visible) .eco-part:not(:has(.eco-link:focus-visible)) {
+  opacity: 0.24;
+}
+@media (hover: hover) {
+  .survey-stage:has(.eco-link:hover) .eco-part:not(:has(.eco-link:hover)) {
+    opacity: 0.24;
+  }
+}
+
+/* The map key in the sheet margin. */
+.sheet-key-swatch {
+  display: inline-block;
+  width: 2rem;
+  height: 0.75rem;
+  flex: none;
+}
+.sheet-key-route {
+  background: var(--color-route);
+  border-block: 2px solid var(--color-route-edge);
+}
+.sheet-key-contour {
+  background: linear-gradient(var(--color-contour), var(--color-contour)) center / 100% 1.5px
+    no-repeat;
+}
+.sheet-key-restricted {
+  border: 1px solid var(--color-fg);
+}
+.sheet-scale {
+  display: inline-grid;
+  grid-template-columns: repeat(4, 1.5rem);
+  height: 0.4rem;
+  border: 1px solid var(--color-fg);
+}
+.sheet-scale > span:nth-child(odd) {
+  background: var(--color-fg);
+}
+
+@media (forced-colors: active) {
+  .survey-route-edge,
+  .survey-route-band {
+    stroke: CanvasText;
+  }
+  .survey-contours path,
+  .survey-parcel,
+  .survey-boundary {
+    stroke: GrayText;
+  }
+  /* Match the specificity of the survey-stage plate rules, or they would keep their dark fills. */
+  .survey-stage .eco-plate-top,
+  .survey-stage .eco-plate-side {
+    fill: Canvas;
+    fill-opacity: 1;
+  }
+  .survey-place,
+  .survey-origin {
+    fill: CanvasText;
+  }
+  /* Halos are paper-coloured strokes; in a dark forced theme they would sit pale behind CanvasText. */
+  .survey-place,
+  .survey-stage .eco-title,
+  .survey-stage .eco-desc {
+    stroke: Canvas;
+  }
+  .survey-patient-cross,
+  .survey-hatch,
+  .survey-row {
+    stroke: CanvasText;
+  }
+  .survey-stage .eco-link:hover .eco-plate-top {
+    fill: Canvas;
+  }
+  .sheet-scale > span:nth-child(odd) {
+    background-color: CanvasText;
+    forced-color-adjust: none;
+  }
+  .survey-patient {
+    fill: Canvas;
+    stroke: CanvasText;
+  }
+}

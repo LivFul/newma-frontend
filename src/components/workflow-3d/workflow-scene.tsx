@@ -79,7 +79,7 @@ export function WorkflowScene({ aspect, height, onReady, onFailure }: WorkflowSc
 
   return (
     <div
-      className="relative w-full overflow-hidden rounded-lg border border-border bg-bg-elevated"
+      className="plate-surface relative w-full overflow-hidden border border-fg bg-bg-elevated"
       style={height ? { height } : { aspectRatio: aspect }}
       data-workflow-scene
     >

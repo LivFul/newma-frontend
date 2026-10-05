@@ -21,9 +21,10 @@ export const WORKFLOW_SVG_LAYOUT = buildSvgLayout({
 
 const TITLE_ID = "workflow-svg-title";
 const DESC_ID = "workflow-svg-desc";
-const NODE_RADIUS = 6;
-const NOTE_RADIUS = 6;
-const TAG_RADIUS = 4;
+// Square corners: plates on a survey sheet, not rounded app cards.
+const NODE_RADIUS = 0;
+const NOTE_RADIUS = 0;
+const TAG_RADIUS = 0;
 
 const arrowId = (tone: EdgeTone) => `workflow-arrow-${tone}`;
 
@@ -99,7 +100,7 @@ function Node({ node }: { node: SvgNodeShape }) {
 export function WorkflowDiagram() {
   const layout = WORKFLOW_SVG_LAYOUT;
   return (
-    <ScrollRegion className="wf-scroll" label={WORKFLOW_CONTROLS.region.text}>
+    <ScrollRegion className="wf-scroll sheet plate-surface" label={WORKFLOW_CONTROLS.region.text}>
       <div className="wf-frame" data-workflow-frame>
         <svg
           className="wf-svg"

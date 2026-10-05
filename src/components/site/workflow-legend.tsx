@@ -13,9 +13,11 @@ export function WorkflowLegend() {
     >
       {EDGE_TONES.map((tone) => (
         <li key={tone} className="flex items-center gap-2">
-          <svg width="36" height="8" viewBox="0 0 36 8" aria-hidden="true" focusable="false">
-            <line className="wf-edge" data-tone={tone} x1="2" y1="4" x2="34" y2="4" />
-          </svg>
+          <span aria-hidden="true" className="plate-surface sheet-key-chip">
+            <svg width="36" height="8" viewBox="0 0 36 8" focusable="false">
+              <line className="wf-edge" data-tone={tone} x1="2" y1="4" x2="34" y2="4" />
+            </svg>
+          </span>
           {WORKFLOW_TONE_NAMES[tone]?.text}
         </li>
       ))}

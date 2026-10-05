@@ -6,6 +6,8 @@ import { isDemoMode } from "@/lib/demo/mode";
 import { DemoBanner } from "./_components/demo-banner";
 import { DemoHeader } from "./_components/demo-header";
 import { TourDock } from "./_components/tour-dock";
+import { WorkflowRail } from "./_components/workflow-rail";
+import "./demo.css";
 
 export const metadata: Metadata = {
   title: "NEWMA demo",
@@ -22,9 +24,16 @@ export default async function DemoLayout({ children }: { children: ReactNode }) 
       <DemoBanner />
       <DemoHeader session={session} />
       <TourDock tenantId={session.tenant_id} persona={session.persona} />
-      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-5xl flex-1 space-y-8 p-6">
-        {children}
-      </main>
+      <div className="flex flex-1 flex-col xl:flex-row">
+        <WorkflowRail />
+        <main
+          id="main"
+          tabIndex={-1}
+          className="demo-workspace w-full min-w-0 flex-1 space-y-10 px-5 py-8 md:px-10 md:py-10"
+        >
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
