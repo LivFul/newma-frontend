@@ -71,28 +71,33 @@ test("there is no horizontal scroll at 320 px width", async ({ page }) => {
   await expect(page.getByRole("link", { name: "LivFul NEWMA home" }).first()).toBeVisible();
 });
 
-test("WCAG 2.4.11: no keyboard-focused element is hidden under the sticky header", async ({
-  page,
-}) => {
-  await page.goto("/");
+type FocusState = null | "foreign" | { inHeader: boolean; isSkip: boolean; top: number };
+
+async function focusedState(page: Page): Promise<FocusState> {
+  return page.evaluate(() => {
+    const el = document.activeElement;
+    if (!el || el === document.body || el.tagName === "NEXTJS-PORTAL") return null;
+    // Only the site's own landmarks are measured: a deployment toolbar or other injected widget
+    // (Vercel previews add one) can take focus at the end of the tab order and is not ours.
+    if (!el.closest("[data-site-header], main, footer")) return "foreign";
+    return {
+      inHeader: el.closest("[data-site-header]") !== null,
+      isSkip: el.textContent === "Skip to content",
+      top: el.getBoundingClientRect().top,
+    };
+  });
+}
+
+// Presses `key` up to `presses` times and asserts every focused page element sits fully below the
+// sticky header, whatever height the header has at this viewport (one row, or two when it wraps).
+async function expectFocusNeverUnderHeader(page: Page, key: string, presses: number) {
   const headerHeight = await page
     .locator("[data-site-header]")
     .evaluate((el) => el.getBoundingClientRect().height);
   let checked = 0;
-  for (let i = 0; i < 40; i += 1) {
-    await page.keyboard.press("Tab");
-    const state = await page.evaluate(() => {
-      const el = document.activeElement;
-      if (!el || el === document.body || el.tagName === "NEXTJS-PORTAL") return null;
-      // Only the site's own landmarks are measured: a deployment toolbar or other injected widget
-      // (Vercel previews add one) can take focus at the end of the tab order and is not ours.
-      if (!el.closest("[data-site-header], main, footer")) return "foreign";
-      return {
-        inHeader: el.closest("[data-site-header]") !== null,
-        isSkip: el.textContent === "Skip to content",
-        top: el.getBoundingClientRect().top,
-      };
-    });
+  for (let i = 0; i < presses; i += 1) {
+    await page.keyboard.press(key);
+    const state = await focusedState(page);
     if (!state) break; // Tab left the page content (browser UI, or the dev overlay in `next dev`).
     if (state === "foreign") continue;
     if (state.inHeader || state.isSkip) continue;
@@ -100,6 +105,24 @@ test("WCAG 2.4.11: no keyboard-focused element is hidden under the sticky header
     checked += 1;
   }
   expect(checked, "the loop must actually inspect page content").toBeGreaterThan(3);
+}
+
+async function tabDownThePage(page: Page) {
+  await page.goto("/");
+  await expectFocusNeverUnderHeader(page, "Tab", 40);
+}
+
+async function shiftTabUpThePage(page: Page) {
+  await page.goto("/");
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await page.getByRole("link", { name: "Terms" }).focus();
+  await expectFocusNeverUnderHeader(page, "Shift+Tab", 25);
+}
+
+test("WCAG 2.4.11: no keyboard-focused element is hidden under the sticky header", async ({
+  page,
+}) => {
+  await tabDownThePage(page);
 });
 
 test("the skip link is the first tab stop and moves focus to main", async ({ page }) => {
@@ -162,96 +185,25 @@ test("on a very short viewport (400% zoom) the header scrolls away instead of ta
 test("WCAG 2.4.11: Shift+Tab back up the page never leaves focus under the sticky header", async ({
   page,
 }) => {
-  await page.goto("/");
-  const headerHeight = await page
-    .locator("[data-site-header]")
-    .evaluate((el) => el.getBoundingClientRect().height);
-  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-  await page.getByRole("link", { name: "Terms" }).focus();
-  let checked = 0;
-  for (let i = 0; i < 25; i += 1) {
-    await page.keyboard.press("Shift+Tab");
-    const state = await page.evaluate(() => {
-      const el = document.activeElement;
-      if (!el || el === document.body || el.tagName === "NEXTJS-PORTAL") return null;
-      // Only the site's own landmarks are measured: a deployment toolbar or other injected widget
-      // (Vercel previews add one) can take focus at the end of the tab order and is not ours.
-      if (!el.closest("[data-site-header], main, footer")) return "foreign";
-      return {
-        inHeader: el.closest("[data-site-header]") !== null,
-        isSkip: el.textContent === "Skip to content",
-        top: el.getBoundingClientRect().top,
-      };
-    });
-    if (!state) break;
-    if (state === "foreign") continue;
-    if (state.inHeader || state.isSkip) continue;
-    expect(state.top).toBeGreaterThanOrEqual(headerHeight - 1);
-    checked += 1;
-  }
-  expect(checked, "the loop must actually inspect page content").toBeGreaterThan(3);
+  await shiftTabUpThePage(page);
 });
 
+// Below 375px the header wraps to two rows (101px instead of 65px), so the focus checks run there too.
+// Only the width differs from the mobile project: the height stays Pixel 7's 839px. A shorter screen
+// would test something else: the workflow diagram's sideways-scroll region is a 761px tab stop on
+// phones, and on a screen too short to show it whole below the header no header height can pass.
 test.describe("at 320px (wrapped header)", () => {
-  test.use({ viewport: { width: 320, height: 700 } });
+  test.use({ viewport: { width: 320, height: 839 } });
 
   test("WCAG 2.4.11: no keyboard-focused element is hidden under the sticky header at 320px", async ({
     page,
   }) => {
-    await page.goto("/");
-    const headerHeight = await page
-      .locator("[data-site-header]")
-      .evaluate((el) => el.getBoundingClientRect().height);
-    let checked = 0;
-    for (let i = 0; i < 40; i += 1) {
-      await page.keyboard.press("Tab");
-      const state = await page.evaluate(() => {
-        const el = document.activeElement;
-        if (!el || el === document.body || el.tagName === "NEXTJS-PORTAL") return null;
-        if (!el.closest("[data-site-header], main, footer")) return "foreign";
-        return {
-          inHeader: el.closest("[data-site-header]") !== null,
-          isSkip: el.textContent === "Skip to content",
-          top: el.getBoundingClientRect().top,
-        };
-      });
-      if (!state) break;
-      if (state === "foreign") continue;
-      if (state.inHeader || state.isSkip) continue;
-      expect(state.top).toBeGreaterThanOrEqual(headerHeight - 1);
-      checked += 1;
-    }
-    expect(checked, "the loop must actually inspect page content").toBeGreaterThan(3);
+    await tabDownThePage(page);
   });
 
   test("WCAG 2.4.11: Shift+Tab back up the page never leaves focus under the sticky header at 320px", async ({
     page,
   }) => {
-    await page.goto("/");
-    const headerHeight = await page
-      .locator("[data-site-header]")
-      .evaluate((el) => el.getBoundingClientRect().height);
-    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-    await page.getByRole("link", { name: "Terms" }).focus();
-    let checked = 0;
-    for (let i = 0; i < 25; i += 1) {
-      await page.keyboard.press("Shift+Tab");
-      const state = await page.evaluate(() => {
-        const el = document.activeElement;
-        if (!el || el === document.body || el.tagName === "NEXTJS-PORTAL") return null;
-        if (!el.closest("[data-site-header], main, footer")) return "foreign";
-        return {
-          inHeader: el.closest("[data-site-header]") !== null,
-          isSkip: el.textContent === "Skip to content",
-          top: el.getBoundingClientRect().top,
-        };
-      });
-      if (!state) break;
-      if (state === "foreign") continue;
-      if (state.inHeader || state.isSkip) continue;
-      expect(state.top).toBeGreaterThanOrEqual(headerHeight - 1);
-      checked += 1;
-    }
-    expect(checked, "the loop must actually inspect page content").toBeGreaterThan(3);
+    await shiftTabUpThePage(page);
   });
 });
