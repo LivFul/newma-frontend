@@ -6,18 +6,19 @@ import { forwardRef, type ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
 
 export const buttonVariants = cva(
-  // border-transparent keeps a visible outline in forced-colors mode; the global
+  // Filled variants carry border-transparent so forced-colors mode still draws an outline; the global
   // :focus-visible rule provides the focus ring.
-  "inline-flex items-center justify-center gap-2 rounded-md border border-transparent font-medium " +
-    "transition-colors disabled:opacity-50 disabled:pointer-events-none " +
+  "inline-flex items-center justify-center gap-2 rounded-md border font-medium " +
+    "transition-[color,background-color,border-color,transform] disabled:opacity-50 disabled:pointer-events-none " +
     "aria-disabled:opacity-50 aria-disabled:pointer-events-none",
   {
     variants: {
       variant: {
-        primary: "bg-accent text-accent-fg hover:opacity-90",
-        secondary: "bg-bg-elevated text-fg border-border-strong hover:bg-border",
-        ghost: "text-fg hover:bg-bg-elevated",
-        danger: "bg-danger text-danger-fg hover:opacity-90",
+        primary: "border-transparent bg-accent text-accent-fg hover:bg-fg active:translate-y-px",
+        secondary:
+          "bg-transparent text-fg border-fg hover:bg-fg hover:text-bg active:translate-y-px",
+        ghost: "border-transparent text-fg underline-offset-4 hover:bg-bg-deep hover:underline",
+        danger: "border-transparent bg-danger text-danger-fg hover:bg-fg active:translate-y-px",
       },
       size: {
         sm: "min-h-8 px-3 py-1 text-sm",

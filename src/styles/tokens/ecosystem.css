@@ -1,12 +1,12 @@
-/* Homepage and ecosystem-hero tokens (P4). Colours follow the TA section 1 class colours; every pair
-   is listed in contrast-pairs.json and verified by tests/unit/tokens.test.ts. Hue is never the only
-   carrier: glyph shape, label text and stroke pattern say the same thing. */
+/* Homepage and ecosystem-hero tokens. The six plates are overprints in the survey's spot inks; every
+   pair is listed in contrast-pairs.json and verified by tests/unit/tokens.test.ts. Hue is never the
+   only carrier: glyph shape, label text and stroke pattern say the same thing. */
 @theme {
-  --color-eco-compute: #b69cff; /* Agentic Compute (violet) */
-  --color-eco-optional: #ff9a85; /* Provenance & DLT (coral), always paired with a dashed stroke */
-  /* System serif in the voice of a herbarium label; zero font bytes (A-P4-05). */
-  --font-display: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  --text-display: clamp(2.25rem, 1.3rem + 4vw, 4.25rem);
-  --tracking-display: -0.025em;
+  --color-eco-compute: #9a5230; /* Agentic Compute (surveyor's sienna, deepened for text contrast) */
+  --color-eco-optional: #a8442a; /* Provenance & DLT (madder), always paired with a dashed stroke */
+  /* The display voice is Geologica with its sharpness axis raised: map lettering, not a book serif. */
+  --font-display: var(--font-geologica), ui-sans-serif, system-ui, sans-serif;
+  --text-display: clamp(2.5rem, 1.5rem + 3.2vw, 4.5rem);
+  --tracking-display: -0.035em;
   --size-header: 4rem;
 }

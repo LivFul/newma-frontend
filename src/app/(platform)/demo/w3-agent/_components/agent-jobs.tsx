@@ -39,7 +39,10 @@ export function AgentJobs({ query, retried }: { query: AgentQuery; retried: bool
         );
       })}
       {retried ? (
-        <p role="status" className="rounded-md border border-warning px-3 py-2 text-sm">
+        <p
+          role="status"
+          className="rounded-md border border-warning-ink bg-warning/15 px-3 py-2 text-sm"
+        >
           Retried after simulated failure
         </p>
       ) : null}

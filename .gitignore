@@ -55,3 +55,11 @@ coverage/
 
 # CP-2 review screenshots (pnpm screenshots)
 /docs/screenshots/
+.gstack/
+
+# Local agent/design tooling: nested worktrees, indexes, review captures and mock comps
+/.claude/
+/.serena/
+/.impeccable/review/
+/.impeccable/mocks/
+/.impeccable/questions/

@@ -52,8 +52,13 @@ describe("EcosystemSvg", () => {
     expect(svg.getAttribute("viewBox")).toBe(`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`);
   });
 
-  it("keeps rendered label text at least 12 px on a 328 px wide content column", () => {
-    const CONTENT_WIDTH_ON_360_PHONE = 328;
+  // Value: protects=hero plate labels stay >= 12 px on a 360 px phone given the real page paddings; fails_when=body, sheet or plate-column padding grows so the stage shrinks below the 12 px label floor; why_new=old test hard-coded a 328 px column that the redesign no longer gives; seam=none
+  it("keeps rendered label text at least 12 px on a 360 px phone with the real paddings", () => {
+    const PHONE = 360;
+    const BODY_PADDING = 12 * 2; // body { padding: var(--space-3) } below md
+    const SHEET_BORDER = 1 * 2; // .sheet 1px neatline
+    const PLATE_COLUMN_PADDING = 4 * 2; // hero plate column px-1 below sm
+    const CONTENT_WIDTH_ON_360_PHONE = PHONE - BODY_PADDING - SHEET_BORDER - PLATE_COLUMN_PADDING;
     const scale = CONTENT_WIDTH_ON_360_PHONE / VIEWBOX.width;
     expect(LABEL_FONT.title * scale).toBeGreaterThanOrEqual(12);
     expect(LABEL_FONT.descriptor * scale).toBeGreaterThanOrEqual(12);

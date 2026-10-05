@@ -23,7 +23,7 @@ export function VerifyPanel({ result, error, busy, onVerify }: Props) {
           <p
             data-testid="verify-result"
             data-valid={result.valid ? "true" : "false"}
-            className={`rounded-md border px-3 py-2 text-sm font-semibold ${result.valid ? "border-success" : "border-danger"}`}
+            className={`rounded-md border px-3 py-2 text-sm font-semibold ${result.valid ? "border-success-ink" : "border-danger"}`}
           >
             {result.valid
               ? "Valid"

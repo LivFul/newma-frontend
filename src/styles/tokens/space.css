@@ -7,7 +7,7 @@
   --space-8: 2rem;
   --space-12: 3rem;
   --space-16: 4rem;
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 1rem;
+  --radius-sm: 1px;
+  --radius-md: 2px;
+  --radius-lg: 4px;
 }

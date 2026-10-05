@@ -1,3 +1,4 @@
+import { Mark } from "@/components/ui/mark";
 import {
   WORKFLOW_CONTROLS,
   WORKFLOW_EDGE_LABELS,
@@ -47,7 +48,7 @@ export function WorkflowText() {
                         {outgoing.map((edge) => (
                           <li key={edge.id}>
                             <span className="sr-only">{WORKFLOW_CONTROLS.textLeadsTo.text} </span>
-                            <span aria-hidden="true">→ </span>
+                            <Mark kind="arrow" className="mr-1.5 size-3.5" />
                             {labelOf(edge.to)}
                             {WORKFLOW_EDGE_LABELS[edge.id] ? (
                               <span className="block text-sm">
@@ -61,7 +62,7 @@ export function WorkflowText() {
                     {notes.map((note) => (
                       <p
                         key={note.id}
-                        className="mt-2 border-l-2 border-success pl-3 text-sm text-fg-muted"
+                        className="mt-2 border-l border-success-ink pl-3 text-sm text-fg-muted"
                       >
                         {WORKFLOW_NOTE_TEXT[note.id]?.text}
                       </p>

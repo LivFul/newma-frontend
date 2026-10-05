@@ -12,7 +12,7 @@ export function DemoBanner() {
       <aside
         role="note"
         aria-label="Demo notice"
-        className="flex flex-wrap items-center gap-3 border-b border-warning bg-bg-elevated px-4 py-2 text-sm"
+        className="flex flex-wrap items-center gap-3 bg-plate px-5 py-2 text-sm text-plate-fg md:px-6"
       >
         <Badge tone="warning">Synthetic</Badge>
         <p className="m-0">{DEMO_BANNER_TEXT}</p>

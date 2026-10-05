@@ -13,8 +13,18 @@ describe("Badge", () => {
   it("defaults to the neutral tone with a visible border", () => {
     render(<Badge>Neutral</Badge>);
     const badge = screen.getByText("Neutral");
-    expect(badge).toHaveClass("bg-bg-elevated", "border-border");
-    expect(badge).not.toHaveClass("border-transparent");
+    expect(badge).toHaveClass("bg-bg-elevated", "border-border-strong");
+  });
+
+  // Value: protects=each tone draws a stroke ink border (warning-ink, success-ink) so the stamp holds 3:1 on paper; fails_when=a tone loses its ink border; why_new=tone borders were unasserted; seam=none
+  it.each([
+    ["warning", "border-warning-ink"],
+    ["success", "border-success-ink"],
+    ["danger", "border-danger"],
+    ["accent", "border-accent"],
+  ] as const)("draws the %s tone with %s", (tone, border) => {
+    render(<Badge tone={tone}>Tone</Badge>);
+    expect(screen.getByText("Tone")).toHaveClass(border);
   });
 });
 

@@ -227,6 +227,82 @@ describe("GateTracker and cards", () => {
   });
 });
 
+// Value: protects=a gate not yet started never reads as failed; unmet checks say not met yet, never failed; fails_when=pending prop dropped, so NOT_STARTED gates show failed; why_new=redesign added it; seam=none
+describe("GateTracker check wording by gate status", () => {
+  const checks = [
+    { code: "identity", passed: true, message: "Identity verified" },
+    { code: "controls", passed: false, message: "Controls qualified" },
+  ];
+  const renderGates = (...gates: Gate[]) =>
+    render(<GateTracker gates={gates} renderAction={() => null} />);
+
+  it("reports an unmet check on a NOT_STARTED gate as not met yet, not failed", () => {
+    const { container } = renderGates(gate("H0", "NOT_STARTED", { checks }));
+    const item = container.querySelector('[data-stage="H0"]')!;
+    expect(item).toHaveTextContent("Identity verified: passed");
+    expect(item).toHaveTextContent("Controls qualified: not met yet");
+    expect(item).not.toHaveTextContent("failed");
+  });
+
+  it.each(["HOLD", "FAIL", "PASS"] as const)(
+    "still reports an unmet check as failed on %s",
+    (status) => {
+      const { container } = renderGates(gate("H0", status, { checks }));
+      const item = container.querySelector('[data-stage="H0"]')!;
+      expect(item).toHaveTextContent("Controls qualified: failed");
+      expect(item).not.toHaveTextContent("not met yet");
+      expect(item.querySelector('li[data-passed="false"]')).not.toBeNull();
+    },
+  );
+});
+
+// Value: protects=a check mark only on PASS, a cross only on FAIL or INVALIDATED, and a missing in-scope stage says no gate record; fails_when=FAIL draws a check, or an omitted stage is called out of scope; why_new=status badge text stays correct when the benchmark mark is the wrong shape; seam=none
+describe("GateTracker benchmark marks", () => {
+  const markOf = (container: HTMLElement, stage: string): "check" | "cross" | "none" => {
+    const item = [...container.querySelectorAll("li")].find(
+      (li) => li.querySelector(".font-mono")?.textContent === stage,
+    );
+    expect(item, stage).toBeTruthy();
+    const benchmark = [...item!.querySelectorAll(":scope > span[aria-hidden='true']")].find((el) =>
+      el.classList.contains("rounded-full"),
+    );
+    const d = benchmark?.querySelector("path")?.getAttribute("d") ?? "";
+    if (d.startsWith("M3 8.5")) return "check";
+    if (d.startsWith("M4 4")) return "cross";
+    expect(benchmark?.querySelector("svg") ?? null).toBeNull();
+    return "none";
+  };
+
+  it("draws a check only after PASS and a cross only after FAIL or INVALIDATED", () => {
+    const { container } = render(
+      <GateTracker
+        gates={[
+          gate("H0", "PASS"),
+          gate("H1", "FAIL"),
+          gate("H2", "INVALIDATED"),
+          gate("H3", "PENDING"),
+          gate("L2", "PASS"),
+        ]}
+        renderAction={() => null}
+      />,
+    );
+    expect(markOf(container, "H0")).toBe("check");
+    expect(markOf(container, "H1")).toBe("cross");
+    expect(markOf(container, "H2")).toBe("cross");
+    expect(markOf(container, "H3")).toBe("none");
+    const row = (stage: string) =>
+      [...container.querySelectorAll("li")].find(
+        (li) => li.querySelector(".font-mono")?.textContent === stage,
+      )!;
+    expect(markOf(container, "L1")).toBe("none");
+    expect(row("L1")).toHaveTextContent("no gate record");
+    expect(row("L1")).not.toHaveTextContent("not in demo scope");
+    expect(markOf(container, "L2")).toBe("none");
+    expect(row("L2")).toHaveTextContent("not in demo scope");
+    expect(row("D")).toHaveTextContent("not in demo scope");
+  });
+});
+
 describe("W4 review fixes", () => {
   it("cannot be closed and reopened (new key) while a decision is in flight", async () => {
     let release: (r: Response) => void = () => undefined;

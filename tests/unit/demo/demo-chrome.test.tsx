@@ -5,12 +5,17 @@ import { DemoHeader } from "@/app/(platform)/demo/_components/demo-header";
 import { PersonaSwitcher } from "@/app/(platform)/demo/_components/persona-switcher";
 import { ResetButton } from "@/app/(platform)/demo/_components/reset-button";
 import { SignOutButton } from "@/app/(platform)/demo/_components/sign-out-button";
+import { WorkflowRail } from "@/app/(platform)/demo/_components/workflow-rail";
 import { PERSONAS } from "@/lib/personas";
 import { expectNoAxeViolations } from "../ui/axe";
 
 const refresh = vi.fn();
 const push = vi.fn();
-vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh, push }) }));
+const nav = vi.hoisted(() => ({ pathname: "/demo/w4-gates/abc" }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh, push }),
+  usePathname: () => nav.pathname,
+}));
 
 const session = {
   persona: "scientist" as const,
@@ -49,8 +54,52 @@ describe("DemoHeader", () => {
     const select = screen.getByRole("combobox", { name: /persona/i });
     expect(select).toHaveValue("scientist");
     expect(screen.getAllByRole("option")).toHaveLength(PERSONAS.length);
-    expect(screen.getByRole("link", { name: /jobs/i })).toHaveAttribute("href", "/demo/jobs");
+    expect(screen.getByRole("link", { name: /NEWMA/ })).toHaveAttribute("href", "/demo");
     await expectNoAxeViolations(container);
+  });
+});
+
+describe("WorkflowRail", () => {
+  it("links the dashboard, all ten workflows, jobs and the tour, and marks the current one", async () => {
+    const { container } = render(<WorkflowRail />);
+    expect(screen.getByRole("navigation", { name: "Demo sections" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /jobs/i })).toHaveAttribute("href", "/demo/jobs");
+    expect(screen.getByRole("link", { name: /guided tour/i })).toHaveAttribute(
+      "href",
+      "/demo/tour",
+    );
+    expect(screen.getByRole("link", { name: /^W4/ })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: /dashboard/i })).not.toHaveAttribute("aria-current");
+    expect(screen.getAllByRole("link", { name: /^W\d+/ })).toHaveLength(10);
+    await expectNoAxeViolations(container);
+  });
+});
+
+// Value: protects=rail marks exactly one current page (dashboard only on /demo, prefix on a segment boundary); fails_when=isActive matches loosely, so two links claim aria-current; why_new=redesign rewrote the rail and only /demo/w4-gates/abc was exercised; seam=none
+describe("WorkflowRail current-page matching", () => {
+  afterEach(() => {
+    nav.pathname = "/demo/w4-gates/abc";
+  });
+  const current = (pathname: string): string[] => {
+    nav.pathname = pathname;
+    const { unmount } = render(<WorkflowRail />);
+    const names = screen
+      .queryAllByRole("link")
+      .filter((link) => link.getAttribute("aria-current") === "page")
+      .map((link) => link.getAttribute("href") ?? "");
+    unmount();
+    return names;
+  };
+
+  it("marks the dashboard only on /demo itself", () => {
+    expect(current("/demo")).toEqual(["/demo"]);
+    expect(current("/demo/jobs")).toEqual(["/demo/jobs"]);
+  });
+
+  it("matches a workflow by path segment, not by shared prefix", () => {
+    expect(current("/demo/w4-gates")).toEqual(["/demo/w4-gates"]);
+    expect(current("/demo/w4-gates-extra")).toEqual([]);
+    expect(current("/demo/tour/step")).toEqual(["/demo/tour"]);
   });
 });
 

@@ -2,6 +2,9 @@ import type { Page } from "@playwright/test";
 import { expect, test } from "../support/test";
 
 const SCROLL_POSITIONS = [0, 0.25, 0.5, 0.75, 1] as const;
+// The page keeps a paper margin (0.5in = 48px from tablet up, 12px on phones) above the header, so at
+// scroll 0 the header sits inside that margin; as soon as the page scrolls it pins flush to the top.
+const PAGE_MARGIN_PX = 48;
 
 async function scrollToFraction(page: Page, fraction: number): Promise<void> {
   await page.evaluate((p) => {
@@ -56,7 +59,10 @@ test("D-03: the header stays at the top of the viewport through the whole scroll
     const top = await page
       .locator("[data-site-header]")
       .evaluate((el) => el.getBoundingClientRect().top);
-    expect(top).toBe(0);
+    if (fraction === 0) {
+      expect(top).toBeGreaterThanOrEqual(0);
+      expect(top).toBeLessThanOrEqual(PAGE_MARGIN_PX);
+    } else expect(top).toBe(0);
   }
 });
 
