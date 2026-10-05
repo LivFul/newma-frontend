@@ -42,6 +42,22 @@ describe("SiteHeader", () => {
     const access = within(header).getByRole("link", { name: "Access NEWMA" });
     expect(aveloz.compareDocumentPosition(access) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
+  it("shows short label 'Aveloz' on mobile with sr-only suffix", () => {
+    render(<SiteHeader />);
+    const header = screen.getByRole("banner");
+    const aveloz = within(header).getByRole("link", { name: "Aveloz (LivFul staff)" });
+
+    // Accessible name is exactly "Aveloz (LivFul staff)" via aria-label
+    expect(aveloz).toHaveAttribute("aria-label", "Aveloz (LivFul staff)");
+
+    // Visible text starts with "Aveloz"
+    expect(aveloz.textContent).toMatch(/^Aveloz/);
+
+    // Suffix "(LivFul staff)" is in a span with both sr-only and sm:not-sr-only
+    const suffix = within(aveloz).getByText("(LivFul staff)");
+    expect(suffix.className).toMatch(/sr-only/);
+    expect(suffix.className).toMatch(/sm:not-sr-only/);
+  });
   it("is axe clean", async () => {
     const { container } = render(<SiteHeader />);
     await expectNoAxeViolations(container);

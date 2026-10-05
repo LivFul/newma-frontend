@@ -27,11 +27,10 @@ export function SiteHeader() {
             ))}
           </nav>
           <Button asChild variant="ghost" className="min-h-11 px-2 text-sm sm:px-3 sm:text-base">
+            {/* aria-label keeps accessible name exact since flex layout collapses the suffix span's leading space */}
             <a href={AVELOZ_LINK.href} rel="noopener" aria-label={AVELOZ_LINK.block.text}>
-              {AVELOZ_LINK.block.text.split(" ")[0]}
-              <span className="sr-only sm:not-sr-only">
-                {AVELOZ_LINK.block.text.substring(AVELOZ_LINK.block.text.split(" ")[0].length)}
-              </span>
+              {AVELOZ_LINK.short.text}
+              <span className="sr-only sm:not-sr-only">{AVELOZ_LINK.suffix.text}</span>
             </a>
           </Button>
           <AccessLink variant="primary" className="min-h-11 px-3 text-sm sm:px-4 sm:text-base">
