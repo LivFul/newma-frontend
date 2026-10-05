@@ -1,18 +1,41 @@
+import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { WORDMARK } from "@/content/home/chrome";
 
-// Text wordmark (assumption A-P4-01): no brand asset exists yet. The product name is lettered like a
-// sheet title; the LivFul imprint sits before it.
-export function Wordmark() {
+type WordmarkProps = {
+  href?: string;
+  label?: string;
+  /** Size classes. The lockup is wide, so phones use a fixed width and larger screens use height. */
+  imageClassName?: string;
+  priority?: boolean;
+  children?: ReactNode;
+};
+
+// Official lockup (mark, "newma", "by LivFul Therapeutics"). The image is decorative: the link name
+// is the accessible label.
+export function Wordmark({
+  href = "/",
+  label = WORDMARK.homeLabel.text,
+  imageClassName = "h-auto w-32 sm:h-10 sm:w-auto",
+  priority = false,
+  children,
+}: WordmarkProps) {
   return (
     <Link
-      href="/"
-      aria-label={WORDMARK.homeLabel.text}
-      className="inline-flex min-h-11 items-center gap-2 text-base sm:text-lg"
+      href={href}
+      aria-label={label}
+      className="inline-flex min-h-11 shrink-0 items-center gap-2"
     >
-      <span className="font-normal">{WORDMARK.org.text}</span>
-      <span aria-hidden="true" className="h-5 w-px bg-fg/40" />
-      <span className="font-display font-semibold tracking-[0.12em]">{WORDMARK.product.text}</span>
+      <Image
+        src="/brand/logo-horizontal.png"
+        alt=""
+        width={871}
+        height={156}
+        priority={priority}
+        className={imageClassName}
+      />
+      {children}
     </Link>
   );
 }

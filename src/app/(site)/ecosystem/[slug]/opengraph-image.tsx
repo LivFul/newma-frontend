@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import { PARTS } from "@/components/ecosystem-graphic/geometry";
 import { DETAIL_COPY } from "@/content/ecosystem/detail-copy";
 import { ECOSYSTEM, ECOSYSTEM_SLUGS, isEcosystemSlug } from "@/content/ecosystem/registry";
+import { brandLogoSrc } from "@/lib/seo/brand-logo";
 import { OG_CONTENT_TYPE, OG_SIZE, OgCard } from "@/lib/seo/og";
 
 export const alt = DETAIL_COPY.ogAlt.text;
@@ -23,6 +24,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
       kicker={ECOSYSTEM[slug].descriptor}
       glyph={part.glyph}
       tone={part.tone}
+      logoSrc={brandLogoSrc()}
     />,
     { ...OG_SIZE },
   );
