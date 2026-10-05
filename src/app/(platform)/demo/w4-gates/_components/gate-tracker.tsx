@@ -36,7 +36,7 @@ function Benchmark({ marker }: { marker: Marker }) {
       className={`absolute top-0.5 left-0 grid size-7 place-items-center rounded-full border-[1.5px] ${MARKER_CLASS[marker]}`}
     >
       {marker === "passed" ? <Mark kind="check" /> : null}
-      {marker === "failed" ? <Mark kind="cross" className="text-danger-fg" /> : null}
+      {marker === "failed" ? <Mark kind="cross" className="size-3.5 text-danger-fg" /> : null}
     </span>
   );
 }
