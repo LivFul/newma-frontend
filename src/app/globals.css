@@ -18,9 +18,14 @@ body {
 
 /* Sticky header: scroll-padding keeps focused elements, anchor targets and the skip-link target out
    from under it (WCAG 2.4.11). It is the only offset: adding scroll-margin on the targets as well
-   would double it. */
+   would double it. Below 375px the header wraps to two rows (~101px), so use a larger padding. */
 html:has([data-site-header]) {
   scroll-padding-top: calc(var(--size-header) + var(--space-4));
+}
+@media (max-width: 374.98px) {
+  html:has([data-site-header]) {
+    scroll-padding-top: calc(var(--size-header-wrapped) + var(--space-4));
+  }
 }
 /* A programmatic focus target that is not interactive needs no ring (the skip link lands here). */
 main[tabindex="-1"]:focus-visible {

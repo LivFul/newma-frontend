@@ -9,4 +9,5 @@
   --text-display: clamp(2.25rem, 1.3rem + 4vw, 4.25rem);
   --tracking-display: -0.025em;
   --size-header: 4rem;
+  --size-header-wrapped: 7.5rem; /* Header height when wrapped to two rows below 375px (101px) + padding */
 }

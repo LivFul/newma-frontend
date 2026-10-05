@@ -55,8 +55,8 @@ describe("SiteHeader", () => {
 
     // Suffix "(LivFul staff)" is in a span with both sr-only and sm:not-sr-only
     const suffix = within(aveloz).getByText("(LivFul staff)");
-    expect(suffix.className).toMatch(/sr-only/);
-    expect(suffix.className).toMatch(/sm:not-sr-only/);
+    expect(suffix.classList.contains("sr-only")).toBe(true);
+    expect(suffix.classList.contains("sm:not-sr-only")).toBe(true);
   });
   it("is axe clean", async () => {
     const { container } = render(<SiteHeader />);

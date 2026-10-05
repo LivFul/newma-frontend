@@ -191,3 +191,67 @@ test("WCAG 2.4.11: Shift+Tab back up the page never leaves focus under the stick
   }
   expect(checked, "the loop must actually inspect page content").toBeGreaterThan(3);
 });
+
+test.describe("at 320px (wrapped header)", () => {
+  test.use({ viewport: { width: 320, height: 700 } });
+
+  test("WCAG 2.4.11: no keyboard-focused element is hidden under the sticky header at 320px", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const headerHeight = await page
+      .locator("[data-site-header]")
+      .evaluate((el) => el.getBoundingClientRect().height);
+    let checked = 0;
+    for (let i = 0; i < 40; i += 1) {
+      await page.keyboard.press("Tab");
+      const state = await page.evaluate(() => {
+        const el = document.activeElement;
+        if (!el || el === document.body || el.tagName === "NEXTJS-PORTAL") return null;
+        if (!el.closest("[data-site-header], main, footer")) return "foreign";
+        return {
+          inHeader: el.closest("[data-site-header]") !== null,
+          isSkip: el.textContent === "Skip to content",
+          top: el.getBoundingClientRect().top,
+        };
+      });
+      if (!state) break;
+      if (state === "foreign") continue;
+      if (state.inHeader || state.isSkip) continue;
+      expect(state.top).toBeGreaterThanOrEqual(headerHeight - 1);
+      checked += 1;
+    }
+    expect(checked, "the loop must actually inspect page content").toBeGreaterThan(3);
+  });
+
+  test("WCAG 2.4.11: Shift+Tab back up the page never leaves focus under the sticky header at 320px", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const headerHeight = await page
+      .locator("[data-site-header]")
+      .evaluate((el) => el.getBoundingClientRect().height);
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await page.getByRole("link", { name: "Terms" }).focus();
+    let checked = 0;
+    for (let i = 0; i < 25; i += 1) {
+      await page.keyboard.press("Shift+Tab");
+      const state = await page.evaluate(() => {
+        const el = document.activeElement;
+        if (!el || el === document.body || el.tagName === "NEXTJS-PORTAL") return null;
+        if (!el.closest("[data-site-header], main, footer")) return "foreign";
+        return {
+          inHeader: el.closest("[data-site-header]") !== null,
+          isSkip: el.textContent === "Skip to content",
+          top: el.getBoundingClientRect().top,
+        };
+      });
+      if (!state) break;
+      if (state === "foreign") continue;
+      if (state.inHeader || state.isSkip) continue;
+      expect(state.top).toBeGreaterThanOrEqual(headerHeight - 1);
+      checked += 1;
+    }
+    expect(checked, "the loop must actually inspect page content").toBeGreaterThan(3);
+  });
+});
