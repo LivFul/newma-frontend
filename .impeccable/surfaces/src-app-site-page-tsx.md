@@ -2,7 +2,7 @@
 version: 1
 slug: "src-app-site-page-tsx"
 primary_target: "src/app/(site)/page.tsx"
-related_targets: ["src/app/(site)/ecosystem/[slug]/page.tsx","src/app/(site)/layout.tsx"]
+related_targets: ["src/app/(site)/ecosystem/[slug]/page.tsx", "src/app/(site)/layout.tsx"]
 ---
 
 # Surface brief: NEWMA public site (homepage, ecosystem pages, legal)
@@ -18,6 +18,7 @@ OWN-WORLD: Mint survey paper printed in spot inks only: ink-teal for type and li
 STORY: The visitor sees plant origin and patient destination in one view, reads the checks between them as waypoints, believes it is done right, then enters the demo or follows a legend key to a component.
 
 FIRST VIEWPORT: A full-bleed sheet inside a neatline with grid ticks.
+
 - Left 5/12 is the title block: sheet ref, headline at display scale, lede, then field-green "See the demo" with a secondary beside it, then the disclaimer as a mono map note.
 - Right 7/12 is contour terrain, with a hatched origin parcel at the bottom left and a patient marker at the top right.
 - The six ecosystem plates stand as translucent overprints at the centre, and the apricot route rises through them.
