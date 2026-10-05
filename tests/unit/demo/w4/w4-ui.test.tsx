@@ -256,6 +256,53 @@ describe("GateTracker check wording by gate status", () => {
   );
 });
 
+// Value: protects=a check mark only on PASS, a cross only on FAIL or INVALIDATED, and a missing in-scope stage says no gate record; fails_when=FAIL draws a check, or an omitted stage is called out of scope; why_new=status badge text stays correct when the benchmark mark is the wrong shape; seam=none
+describe("GateTracker benchmark marks", () => {
+  const markOf = (container: HTMLElement, stage: string): "check" | "cross" | "none" => {
+    const item = [...container.querySelectorAll("li")].find(
+      (li) => li.querySelector(".font-mono")?.textContent === stage,
+    );
+    expect(item, stage).toBeTruthy();
+    const benchmark = [...item!.querySelectorAll(":scope > span[aria-hidden='true']")].find((el) =>
+      el.classList.contains("rounded-full"),
+    );
+    const d = benchmark?.querySelector("path")?.getAttribute("d") ?? "";
+    if (d.startsWith("M3 8.5")) return "check";
+    if (d.startsWith("M4 4")) return "cross";
+    expect(benchmark?.querySelector("svg") ?? null).toBeNull();
+    return "none";
+  };
+
+  it("draws a check only after PASS and a cross only after FAIL or INVALIDATED", () => {
+    const { container } = render(
+      <GateTracker
+        gates={[
+          gate("H0", "PASS"),
+          gate("H1", "FAIL"),
+          gate("H2", "INVALIDATED"),
+          gate("H3", "PENDING"),
+          gate("L2", "PASS"),
+        ]}
+        renderAction={() => null}
+      />,
+    );
+    expect(markOf(container, "H0")).toBe("check");
+    expect(markOf(container, "H1")).toBe("cross");
+    expect(markOf(container, "H2")).toBe("cross");
+    expect(markOf(container, "H3")).toBe("none");
+    const row = (stage: string) =>
+      [...container.querySelectorAll("li")].find(
+        (li) => li.querySelector(".font-mono")?.textContent === stage,
+      )!;
+    expect(markOf(container, "L1")).toBe("none");
+    expect(row("L1")).toHaveTextContent("no gate record");
+    expect(row("L1")).not.toHaveTextContent("not in demo scope");
+    expect(markOf(container, "L2")).toBe("none");
+    expect(row("L2")).toHaveTextContent("not in demo scope");
+    expect(row("D")).toHaveTextContent("not in demo scope");
+  });
+});
+
 describe("W4 review fixes", () => {
   it("cannot be closed and reopened (new key) while a decision is in flight", async () => {
     let release: (r: Response) => void = () => undefined;
