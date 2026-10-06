@@ -48,6 +48,9 @@ table,
 html:has([data-site-header]) {
   scroll-padding-top: calc(var(--size-header) + var(--space-4));
 }
+/* Below 27.5rem the header wraps to two rows, about 7.5rem tall. Both numbers are literals because a
+   media condition cannot read a custom property and there is no wrapped-header token; the installed-app
+   block below and workflow-diagram.css repeat them for the same reason. */
 @media (max-width: 27.5rem) {
   html:has([data-site-header]) {
     scroll-padding-top: calc(7.5rem + var(--space-4));
@@ -90,17 +93,13 @@ main[tabindex="-1"]:focus-visible {
 /* The wrapped phone header and the short-viewport static header need their own offsets here as well:
    the general standalone rule above has the same specificity and would otherwise win. */
 @media (display-mode: standalone) and (max-width: 27.5rem) {
-  @supports selector(:has(*)) {
-    html:has([data-site-header]) {
-      scroll-padding-top: calc(7.5rem + env(safe-area-inset-top) + var(--space-4));
-    }
+  html:has([data-site-header]) {
+    scroll-padding-top: calc(7.5rem + env(safe-area-inset-top) + var(--space-4));
   }
 }
 @media (display-mode: standalone) and (max-height: 32rem) {
-  @supports selector(:has(*)) {
-    html:has([data-site-header]) {
-      scroll-padding-top: var(--space-4);
-    }
+  html:has([data-site-header]) {
+    scroll-padding-top: var(--space-4);
   }
 }
 
@@ -142,6 +141,7 @@ main[tabindex="-1"]:focus-visible {
       backdrop-filter: blur(16px);
     }
   }
+  /* The size and position of one aurora layer; .aurora.botanical-lines repeats them for each layer. */
   .aurora {
     --aurora-size: 140% 140%;
     --aurora-position: 40% 50%;
@@ -276,7 +276,8 @@ main[tabindex="-1"]:focus-visible {
   }
 }
 
-/* High-contrast themes force text colours; the decorative mint wash would sit under light text. */
+/* High-contrast themes force text colours; the decorative aurora wash and botanical lines would sit
+   under light text, so they go and the system canvas shows instead. */
 @media (forced-colors: active) {
   .aurora,
   .aurora.botanical-lines {

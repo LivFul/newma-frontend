@@ -96,6 +96,9 @@ describe("hero background and installed-app contracts", () => {
     expect(
       blockAfter(globals, "@media (display-mode: standalone) and (max-width: 27.5rem)"),
     ).toContain("7.5rem");
+    expect(
+      blockAfter(globals, "@media (display-mode: standalone) and (max-height: 32rem)"),
+    ).toContain("scroll-padding-top: var(--space-4)");
   });
 
   // Value: protects=a finished reveal leaves no transform on the section, which would make it the containing block of its fixed and sticky descendants; fails_when=the reveal animation fill mode goes back to forwards or both; why_new=fill-mode both kept translateY(0) on every revealed section; seam=none

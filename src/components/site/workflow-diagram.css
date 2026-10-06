@@ -30,7 +30,7 @@
 /* The lockup, Aveloz, and Access wrap the header to two rows through 440px. At the svg's min-width
    this region is about 761px tall, which cannot sit below that header in an 839px phone viewport, so
    a focused region ends under the header. Cap it to the scroll-padding offset; the region already
-   scrolls. 7.5rem is written out for the same reason as the header offset in globals.css. */
+   scrolls. 7.5rem is the wrapped two-row header height, written out as in globals.css (see the comment there). */
 @media (max-width: 27.5rem) {
   .wf-scroll {
     max-height: calc(100dvh - 7.5rem - var(--space-4));
