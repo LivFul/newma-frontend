@@ -40,6 +40,7 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
   // (cancel, a later click with no pointerdown such as assistive technology or the keyboard) must
   // leave it empty, so a stale flag can never swallow a link activation.
   const pendingTouch = useRef<{ view: HeroView; slug: ReturnType<typeof slugFrom> } | null>(null);
+  const lastTouchSlug = useRef<ReturnType<typeof slugFrom>>(null);
   const absorbedTap = useRef(false);
   const clearPending = () => {
     pendingTouch.current = null;
@@ -63,6 +64,7 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
     }
     const inSvg = Boolean((event.target as Element).closest?.("svg.eco-svg"));
     const slug = inSvg ? slugFrom(event.target) : null;
+    if (slug) lastTouchSlug.current = slug;
     pendingTouch.current = { view: state.view, slug };
     if (!inSvg) return;
     const tap: HeroEvent = { type: "tap", slug, touch: true, view: state.view };
@@ -72,10 +74,12 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
       absorbedTap.current = true;
       if (slug) announce(heroTouchAnnouncement(slug));
       dispatch(tap);
-    } else if (effect.type === "navigate" && slug) {
+    } else if (state.view === "exploded") {
+      const go = slug ?? lastTouchSlug.current;
+      if (!go) return;
       event.preventDefault();
-      dispatch(tap);
-      follow(slug, event.target);
+      dispatch({ type: "tap", slug: go, touch: true, view: "exploded" });
+      follow(go, event.target);
       clearPending();
     }
   };
@@ -84,7 +88,7 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
     if (event.pointerType !== "touch") return;
     const pending = pendingTouch.current;
     if (!pending || pending.view !== "exploded") return;
-    const slug = slugFrom(event.target) ?? pending.slug;
+    const slug = slugFrom(event.target) ?? pending.slug ?? lastTouchSlug.current;
     if (!slug) return;
     const tap: HeroEvent = { type: "tap", slug, touch: true, view: pending.view };
     if (heroReducer(state, tap).effect.type !== "navigate") return;

@@ -54,7 +54,7 @@ export const LABEL_BOX = Object.freeze({
 export const LEADER = Object.freeze({ fromX: 0, toX: 0 });
 export const RAIL_X = 18;
 export const CENTER = Object.freeze({ x: 200, y: 230 });
-export const RING = Object.freeze({ assembled: 70, exploded: 128, inner: 70, outer: 128 });
+export const RING = Object.freeze({ assembled: 70, exploded: 112, inner: 70, outer: 112 });
 
 const TONES: Readonly<Record<EcosystemSlug, ToneToken>> = {
   interface: "--color-accent",

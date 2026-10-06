@@ -139,8 +139,7 @@ test.describe("touch", () => {
       await page.touchscreen.tap(first.x, first.y);
       await expect(heroSvg(page)).toHaveAttribute("data-view", "exploded");
       await settled(page);
-      const target = await center(heroPart(page, slug));
-      await page.touchscreen.tap(target.x, target.y);
+      await heroLink(page, slug).tap();
       await expect(page).toHaveURL(new RegExp(`/ecosystem/${slug}$`));
     });
   }
