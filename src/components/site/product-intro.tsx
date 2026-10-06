@@ -6,10 +6,10 @@ import { AccessLink } from "./access-link";
 import { PersonaGrid } from "./persona-grid";
 import { CONTAINER, H2, H3_TITLE, SECTION, STATEMENT } from "./type";
 
-// The marker is the icon at its own width (about 55px for the leaf, 49px for the pill), so the text is
-// pushed clear of it on phones, and the connecting line runs through the centre of the markers.
+// Every step marker is the pill at its own width (about 49px), so the text is pushed clear of it on
+// phones, and the connecting line runs through the centre of the markers.
 const WAYPOINT =
-  "relative grid content-start gap-3 pl-[4.5rem] lg:pl-0 lg:pt-16 " + "[counter-increment:step]";
+  "relative grid content-start gap-3 pl-16 lg:pl-0 lg:pt-16 " + "[counter-increment:step]";
 
 export function ProductIntro() {
   return (
@@ -50,7 +50,7 @@ export function ProductIntro() {
           <div className="relative">
             <span
               aria-hidden="true"
-              className="absolute top-5 bottom-0 left-[1.625rem] w-px bg-brand lg:top-[1.125rem] lg:right-8 lg:bottom-auto lg:left-8 lg:h-px lg:w-auto"
+              className="absolute top-5 bottom-0 left-6 w-px bg-brand lg:top-[1.125rem] lg:right-8 lg:bottom-auto lg:left-8 lg:h-px lg:w-auto"
             />
             <ol
               role="list"
@@ -62,17 +62,9 @@ export function ProductIntro() {
                     aria-hidden="true"
                     className="absolute top-0 left-0 grid h-9 place-items-center lg:left-1/2 lg:-translate-x-1/2"
                   >
-                    {index % 2 === 0 ? (
-                      <LeafIcon fit="shape" className="h-9 w-auto" />
-                    ) : (
-                      <PillIcon fit="shape" className="h-9 w-auto" />
-                    )}
-                    {/* Ink on the light leaf, light type on the dark pill. */}
-                    <span
-                      className={`absolute font-mono text-[0.65rem] ${
-                        index % 2 === 0 ? "text-fg" : "text-accent-fg"
-                      }`}
-                    >
+                    <PillIcon fit="shape" className="h-9 w-auto" />
+                    {/* Light type: the pill is dark. */}
+                    <span className="absolute font-mono text-[0.65rem] text-accent-fg">
                       {String(index + 1).padStart(2, "0")}
                     </span>
                   </span>
