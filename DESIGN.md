@@ -158,7 +158,7 @@ components:
 
 **Creative North Star: "The Ethnobotanical Instrument"**
 
-NEWMA is a LivFul product: scientific, future-facing and botanical. Surfaces are full-bleed mint-to-teal fields, not printed survey sheets. The leaf and the capsule from the mark are the recurring glyphs. Depth comes from soft layered light, glass panels and green-to-blue fades. Motion is restrained: a short float and settle on the orbit nodes (under five seconds, then still), hover lift and scroll reveals, all transform and opacity, all off under reduced motion. The aurora is static.
+NEWMA is a LivFul product: scientific, future-facing and botanical. Surfaces are full-bleed mint-to-teal fields, not printed survey sheets. The leaf and the capsule from the mark are the recurring glyphs. Depth comes from soft layered light, glass panels and green-to-blue fades. Motion is restrained: a short float and settle on the orbit nodes (under five seconds, then still), hover lift and scroll reveals, all transform and opacity, all off under reduced motion. The aurora wash is static. The one deliberate ambient loop is the hero's botanical lines, which drift one 720px tile a minute on their own layer, by transform only, so they never repaint the wash; because that loop runs longer than five seconds, WCAG 2.2.2 would also want a visible pause control, which is not built yet.
 
 The public site and the demo share one visual language. Layout (section order, 6/6 hero, 7/5 splits, four-step row, six-component index) is the thing that stays; the paper, neatlines, grid ticks and map key are gone.
 

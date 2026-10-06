@@ -141,36 +141,30 @@ main[tabindex="-1"]:focus-visible {
       backdrop-filter: blur(16px);
     }
   }
-  /* The size and position of one aurora layer; .aurora.botanical-lines repeats them for each layer. */
   .aurora {
-    --aurora-size: 140% 140%;
-    --aurora-position: 40% 50%;
     background-image: var(--background-image-aurora);
-    background-size: var(--aurora-size);
-    background-position: var(--aurora-position);
+    background-size: 140% 140%;
+    background-position: 40% 50%;
   }
+  /* The hero's drifting botanical lines. They are a tiled image on a ::before layer that reaches one tile
+     past the top and left edges, and the animation slides that layer by exactly one tile, so the loop has
+     no seam and no edge ever shows. Only transform moves, so it runs on the compositor and never repaints
+     the wash underneath (.aurora, the same element, stays still). */
   .botanical-lines {
-    background-image: url("/images/botanical-lines.svg");
-    background-size: 720px 720px;
+    --tile: 720px;
+    overflow: hidden;
   }
-  /* Both classes on one element make a single multi-layer background: two single-layer rules of equal
-     specificity would let the later one replace the other's image entirely. The aurora token is four
-     layers (three radials and a base gradient) and size and position need one entry per layer, since a
-     shorter list repeats and mis-sizes them; tests/unit/site/page-margin.test.ts checks the counts. */
-  .aurora.botanical-lines {
-    background-image: url("/images/botanical-lines.svg"), var(--background-image-aurora);
-    background-size:
-      720px 720px,
-      var(--aurora-size),
-      var(--aurora-size),
-      var(--aurora-size),
-      var(--aurora-size);
-    background-position:
-      0 0,
-      var(--aurora-position),
-      var(--aurora-position),
-      var(--aurora-position),
-      var(--aurora-position);
+  .botanical-lines::before {
+    content: "";
+    position: absolute;
+    inset: calc(var(--tile) * -1) 0 0 calc(var(--tile) * -1);
+    background: url("/images/botanical-lines.svg") 0 0 / var(--tile) var(--tile) repeat;
+    will-change: transform;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .botanical-lines::before {
+      animation: botanical-drift 60s linear infinite;
+    }
   }
   .hatch-held {
     background-image: repeating-linear-gradient(
@@ -245,6 +239,11 @@ main[tabindex="-1"]:focus-visible {
   }
 }
 
+@keyframes botanical-drift {
+  to {
+    transform: translate3d(var(--tile), var(--tile), 0);
+  }
+}
 @keyframes reveal-up {
   from {
     opacity: 0;
@@ -276,11 +275,13 @@ main[tabindex="-1"]:focus-visible {
   }
 }
 
-/* High-contrast themes force text colours; the decorative aurora wash and botanical lines would sit
+/* High-contrast themes force text colours; the decorative aurora wash and the botanical lines would sit
    under light text, so they go and the system canvas shows instead. */
 @media (forced-colors: active) {
-  .aurora,
-  .aurora.botanical-lines {
+  .aurora {
     background-image: none;
+  }
+  .botanical-lines::before {
+    display: none;
   }
 }
