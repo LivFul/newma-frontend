@@ -13,13 +13,13 @@ Mode: Persuade. Audience: investors, biopharma partners, communities/custodians,
 
 THESIS: NEWMA is a LivFul ethnobotanical instrument. Greens fade into capsule teals. The leaf and the pill are the recurring glyphs. The public site is scientific and botanical, not a printed survey sheet.
 
-OWN-WORLD: Mint wash, leaf lime-to-emerald, capsule teal-to-cyan, ink-teal type, apricot as a rare warm band. Geologica for display and UI; Martian Mono for hashes and measured values. Glass panels, pill buttons, orbital nodes, aurora fields. Status is never hue alone.
+OWN-WORLD: Mint wash, leaf lime-to-emerald, capsule teal-to-cyan, ink-teal type, apricot as a rare warm band. Geologica for display and UI; Martian Mono for hashes and measured values. Glass panels, pill buttons, pipeline cards, aurora fields. Status is never hue alone.
 
-STORY: The visitor sees the six-component orbit, understands the farm-to-patient loop, then enters the demo or a component page.
+STORY: The visitor sees the six-component pipeline, understands the farm-to-patient loop, then enters the demo or a component page.
 
-FIRST VIEWPORT: Full-bleed hero. Left 6/12 is the title, lede, CTAs and disclaimer. Right 6/12 is the orbital diagram in a glass panel over botanical photography.
+FIRST VIEWPORT: Full-bleed hero. Left 6/12 is the title, lede, CTAs and disclaimer. Right 6/12 is the pipeline diagram in a glass panel over botanical photography.
 
-SIGNATURE: Orbits drift slowly. Hover or focus explodes the orbit. Reduced motion shows the exploded view at rest.
+SIGNATURE: Chevrons flow Input to Validation and the core loop turns. Hover or focus explodes the pipeline. Reduced motion shows the exploded view at rest.
 
 FORM: Ethnobotanical instrument. Staytec-like photography and peach bands. LivFul greens and blues.
 

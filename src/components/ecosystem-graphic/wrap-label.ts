@@ -1,6 +1,6 @@
 const SHORT = 16;
 
-/** Split a hero title or descriptor so orbital labels stay inside the viewBox. */
+/** Split a hero title or descriptor so pipeline labels stay inside the viewBox. */
 export function wrapHeroLabel(text: string): string[] {
   const amp = text.indexOf(" & ");
   if (amp >= 0) return [`${text.slice(0, amp)} &`, text.slice(amp + 3)];

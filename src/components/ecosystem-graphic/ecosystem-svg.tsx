@@ -1,5 +1,5 @@
 import type { CSSProperties, SVGProps } from "react";
-import { HERO_SVG_DESC, HERO_SVG_TITLE } from "@/content/ecosystem/hero-text";
+import { HERO_STAGES, HERO_SVG_DESC, HERO_SVG_TITLE } from "@/content/ecosystem/hero-text";
 import {
   ecosystemHref,
   HERO_INTERFACE_FACES,
@@ -7,17 +7,20 @@ import {
   heroAriaLabel,
 } from "@/content/ecosystem/registry";
 import {
+  CARD,
   CENTER,
   EDGES,
-  ELLIPSE,
+  FLOW_GATES,
   hitRadius,
   LABEL_FONT,
   LABEL_LINE,
-  NODE_RADIUS,
+  LOOP,
   PARTS,
+  STAGES,
   TWIN_GAP,
   TWIN_RADIUS,
   VIEWBOX,
+  type Stage,
   type PartGeometry,
 } from "./geometry";
 import { Glyph } from "./glyphs";
@@ -207,17 +210,28 @@ function TwinBody({ part }: { part: PartGeometry }) {
 }
 
 function NodeBody({ part, svgId }: { part: PartGeometry; svgId: string }) {
-  const radius = NODE_RADIUS;
+  const { width, height, radius } = CARD;
   return (
     <g className="eco-bob">
-      <ellipse className="eco-node-shadow" cx={0} cy={radius + 7} rx={radius * 0.78} ry={5} />
-      <circle
-        className="eco-node"
-        r={radius}
+      <ellipse className="eco-node-shadow" cx={0} cy={height / 2 + 6} rx={width * 0.42} ry={5} />
+      <rect
+        className="eco-node eco-card"
+        x={-width / 2}
+        y={-height / 2}
+        width={width}
+        height={height}
+        rx={radius}
         data-dashed={part.dashed || undefined}
-        fill={part.center ? `url(#${svgId}-hub)` : undefined}
       />
-      <circle className="eco-node-sheen" r={radius} fill={`url(#${svgId}-sheen)`} />
+      <rect
+        className="eco-node-sheen"
+        x={-width / 2}
+        y={-height / 2}
+        width={width}
+        height={height}
+        rx={radius}
+        fill={`url(#${svgId}-sheen)`}
+      />
       <Glyph glyph={part.glyph} />
     </g>
   );
@@ -263,30 +277,51 @@ function Edges({ arrowId }: { arrowId: string }) {
   );
 }
 
-function Orbits() {
+const STAGE_COPY: Readonly<Record<Stage["id"], { text: string }>> = {
+  input: HERO_STAGES.input,
+  core: HERO_STAGES.core,
+  validation: HERO_STAGES.validation,
+};
+
+function Pipeline() {
   return (
-    <g className="eco-orbits" aria-hidden="true">
-      <ellipse
-        className="eco-disc"
-        cx={CENTER.x}
-        cy={CENTER.y + ELLIPSE.assembled.ry * 0.28}
-        rx={ELLIPSE.exploded.rx + 8}
-        ry={20}
-      />
-      <ellipse
-        className="eco-orbit eco-orbit-inner"
-        cx={CENTER.x}
-        cy={CENTER.y}
-        rx={ELLIPSE.assembled.rx}
-        ry={ELLIPSE.assembled.ry}
-      />
-      <ellipse
-        className="eco-orbit eco-orbit-outer"
-        cx={CENTER.x}
-        cy={CENTER.y}
-        rx={ELLIPSE.exploded.rx}
-        ry={ELLIPSE.exploded.ry}
-      />
+    <g className="eco-pipeline" aria-hidden="true">
+      {STAGES.map((stage) => (
+        <g key={stage.id} className="eco-stage-group" data-stage={stage.id}>
+          <rect
+            className="eco-stage"
+            data-stage={stage.id}
+            x={stage.x}
+            y={stage.y}
+            width={stage.width}
+            height={stage.height}
+            rx={16}
+          />
+          <text
+            className="eco-stage-title"
+            x={stage.x + stage.width / 2}
+            y={stage.y + 24}
+            textAnchor="middle"
+            fontSize={LABEL_FONT.title}
+          >
+            {STAGE_COPY[stage.id].text}
+          </text>
+        </g>
+      ))}
+      {FLOW_GATES.map((gate, index) => (
+        <g key={index} className="eco-flow" transform={`translate(${gate.x} ${gate.y})`}>
+          <path className="eco-chevron" d="M-8 -11 L4 0 L-8 11" />
+          <path className="eco-chevron" d="M0 -11 L12 0 L0 11" />
+        </g>
+      ))}
+      <g className="eco-loop" transform={`translate(${LOOP.x} ${LOOP.y})`}>
+        <circle className="eco-loop-disc" r={LOOP.radius} />
+        <g className="eco-loop-spin">
+          <path className="eco-loop-mark" d="M-6 0h12M0 -6v12" />
+          <path className="eco-loop-arc" d="M11 -4 A12 12 0 0 1 4 11" />
+          <path className="eco-loop-arc" d="M-11 4 A12 12 0 0 1 -4 -11" />
+        </g>
+      </g>
     </g>
   );
 }
@@ -343,7 +378,7 @@ export function EcosystemSvg({
           <path d="M0 0L8 4L0 8Z" className="eco-arrowhead" />
         </marker>
       </defs>
-      <Orbits />
+      <Pipeline />
       <Edges arrowId={arrowId} />
       {PARTS.map((part, index) => (
         <Part key={part.slug} geometry={part} index={index} view={view}>

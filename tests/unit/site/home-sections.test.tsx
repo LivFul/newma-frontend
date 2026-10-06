@@ -97,7 +97,7 @@ describe("HeroSection", () => {
   });
 
   // Value: protects=hero map key labels render and the A-H / 1-5 grid references stay out of the accessibility tree; fails_when=a label is dropped or aria-hidden is lost on the tick rows; why_new=HeroSection test only covered lede and disclaimer; seam=none
-  it("keeps the orbital diagram in a glass panel without the survey map key", () => {
+  it("keeps the pipeline diagram in a glass panel without the survey map key", () => {
     const { container } = render(<HeroSection />);
     expect(container.querySelector(".sheet-ticks-x")).toBeNull();
     expect(container.querySelector(".glass")).not.toBeNull();

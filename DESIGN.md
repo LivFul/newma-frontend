@@ -157,7 +157,7 @@ components:
 
 **Creative North Star: "The Ethnobotanical Instrument"**
 
-NEWMA is a LivFul product: scientific, future-facing and botanical. Surfaces are full-bleed mint-to-teal fields, not printed survey sheets. The leaf and the capsule from the mark are the recurring glyphs. Depth comes from soft layered light, glass panels and green-to-blue fades. Motion is restrained: orbits, aurora drift, hover lift and scroll reveals, all transform and opacity, all off under reduced motion.
+NEWMA is a LivFul product: scientific, future-facing and botanical. Surfaces are full-bleed mint-to-teal fields, not printed survey sheets. The leaf and the capsule from the mark are the recurring glyphs. Depth comes from soft layered light, glass panels and green-to-blue fades. Motion is restrained: pipeline flow, aurora drift, hover lift and scroll reveals, all transform and opacity, all off under reduced motion.
 
 The public site and the demo share one visual language. Layout (section order, 6/6 hero, 7/5 splits, four-step row, six-component index) is the thing that stays; the paper, neatlines, grid ticks and map key are gone.
 
@@ -222,7 +222,7 @@ Depth is allowed: stacked shadows, a brand glow, and glass (backdrop-filter with
 
 ## Shapes
 
-Buttons are pills. Cards use 1.25rem corners. The leaf and the capsule are the only brand silhouettes. Circles remain for orbital nodes.
+Buttons are pills. Cards use 1.25rem corners. The leaf and the capsule are the only brand silhouettes. Loop cards are rounded rectangles; Interface faces stay circular.
 
 ## Motion
 
@@ -248,7 +248,7 @@ Sticky translucent header. Mobile opens a sheet for section links. Footer is a d
 
 ### Ecosystem diagram
 
-Data & Knowledge and Provenance & DLT form a 3D records server at the centre (data on the lower rack, provenance dashed on the upper rack). Agentic Compute, Scientific Review and Wet Lab orbit that core. Interface sits outside the loop as People plus API. Keyboard, no-JS static SVG and a lazy Motion twin are required.
+The homepage diagram is a three-column pipeline: Input (Interface as People plus API), AI core (Agentic Compute and Scientific Review in a refinement loop over a records server — Data on the lower rack, Provenance dashed on the upper rack), and Validation (Wet Lab). There is no Clinical column. Keyboard, no-JS static SVG and a lazy Motion twin are required. Hover or focus explodes the columns; reduced motion shows the exploded view at rest.
 
 ## Do's and Don'ts
 
