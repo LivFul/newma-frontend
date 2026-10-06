@@ -18,6 +18,14 @@ export const NAV_LINKS = Object.freeze([
 
 export const ACCESS_LABEL = block("chrome.access", "Access NEWMA", ["C-21"]);
 
+// Staff-only tool on its own origin behind Cloudflare Access; a navigation label, so no claim.
+export const AVELOZ_LINK = Object.freeze({
+  block: block("chrome.aveloz", "Aveloz (LivFul staff)", []),
+  short: block("chrome.aveloz.short", "Aveloz", []),
+  suffix: block("chrome.aveloz.suffix", " (LivFul staff)", []),
+  href: "https://aveloz.livful.com",
+});
+
 // Assumption A-P4-02: no contact detail exists in any source.
 export const FOOTER_CONTACT = block(
   "chrome.footer.contact",

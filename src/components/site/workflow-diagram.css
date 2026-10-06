@@ -23,9 +23,17 @@
   height: auto;
   /* A floor for label size: below this width the svg, not its frame, overflows, the scroll region
      carries it and the page never scrolls sideways. It stays under the desktop column, so the region
-     only becomes a tab stop where it really scrolls, and the region stays shorter than a phone screen
-     so a focused region is never hidden under the sticky header (WCAG 2.4.11). */
+     only becomes a tab stop where it really scrolls. */
   min-width: 52rem;
+}
+/* The lockup, Aveloz, and Access wrap the header to two rows through 440px. At the svg's min-width
+   this region is about 761px tall, which cannot sit below that header in an 839px phone viewport, so
+   a focused region ends under the header. Cap it to the scroll-padding offset; the region already
+   scrolls. 7.5rem is written out for the same reason as the header offset in globals.css. */
+@media (max-width: 27.5rem) {
+  .wf-scroll {
+    max-height: calc(100dvh - 7.5rem - var(--space-4));
+  }
 }
 
 .wf-edge {

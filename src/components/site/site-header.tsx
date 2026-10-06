@@ -1,4 +1,5 @@
-import { ACCESS_LABEL, HEADER_NAV_LABEL, NAV_LINKS } from "@/content/home/chrome";
+import { Button } from "@/components/ui/button";
+import { ACCESS_LABEL, AVELOZ_LINK, HEADER_NAV_LABEL, NAV_LINKS } from "@/content/home/chrome";
 import { AccessLink } from "./access-link";
 import { Wordmark } from "./wordmark";
 
@@ -25,6 +26,13 @@ export function SiteHeader() {
               </a>
             ))}
           </nav>
+          <Button asChild variant="ghost" className="min-h-11 px-2 text-sm sm:px-3 sm:text-base">
+            {/* aria-label keeps accessible name exact since flex layout collapses the suffix span's leading space */}
+            <a href={AVELOZ_LINK.href} rel="noopener" aria-label={AVELOZ_LINK.block.text}>
+              {AVELOZ_LINK.short.text}
+              <span className="sr-only sm:not-sr-only">{AVELOZ_LINK.suffix.text}</span>
+            </a>
+          </Button>
           <AccessLink variant="primary" className="min-h-11 px-3 text-sm sm:px-4 sm:text-base">
             {ACCESS_LABEL.text}
           </AccessLink>

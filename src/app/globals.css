@@ -51,9 +51,17 @@ table,
 
 /* Sticky header: scroll-padding keeps focused elements, anchor targets and the skip-link target out
    from under it (WCAG 2.4.11). It is the only offset: adding scroll-margin on the targets as well
-   would double it. */
+   would double it. The lockup plus Aveloz and Access wrap to two rows (~101px) through a 412px
+   phone. 27.5rem (440px) covers that width and stops before the row fits on one line. The 7.5rem
+   length is written here: an unresolved custom property drops the whole calc and the browser keeps
+   the one-row offset, which leaves focus under the wrapped header. */
 html:has([data-site-header]) {
   scroll-padding-top: calc(var(--size-header) + var(--space-4));
+}
+@media (max-width: 27.5rem) {
+  html:has([data-site-header]) {
+    scroll-padding-top: calc(7.5rem + var(--space-4));
+  }
 }
 /* A programmatic focus target that is not interactive needs no ring (the skip link lands here). */
 main[tabindex="-1"]:focus-visible {

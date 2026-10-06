@@ -118,6 +118,7 @@ export const ALLOWED_TERMS = {
   ],
   words: [
     "LivFul",
+    "Aveloz",
     "NEWMA",
     "Vercel",
     "Railway",
