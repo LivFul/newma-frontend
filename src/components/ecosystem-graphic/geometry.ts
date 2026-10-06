@@ -30,7 +30,7 @@ export type PartGeometry = Readonly<{
   label: Readonly<{ x: number; y: number; anchor: LabelAnchor }>;
   center: boolean;
   shape: PartShape;
-  /** −1 back of the tilted ring, +1 front. Used for 3D lighting. */
+  /** Kept for lighting scale; the pipeline is flat so every part sits at 0. */
   depth: number;
 }>;
 export type EdgeKind = "flow" | "rail" | "optional";
@@ -42,21 +42,35 @@ export type Edge = Readonly<{
   dashed: boolean;
   d: string;
 }>;
+export type StageId = "input" | "core" | "validation";
+export type Stage = Readonly<{
+  id: StageId;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}>;
 
-export const VIEWBOX = Object.freeze({ width: 500, height: 590 });
+export const VIEWBOX = Object.freeze({ width: 500, height: 520 });
 export const NODE_RADIUS = 24;
+export const CARD = Object.freeze({ width: 56, height: 44, radius: 10 });
 export const SERVER_RADIUS = 26;
 export const TWIN_RADIUS = 18;
 export const TWIN_GAP = 20;
 export const LABEL_FONT = Object.freeze({ title: 20, descriptor: 20 });
 export const LABEL_LINE = 22;
-/** Centre of the records server and of the work loop around it. */
-export const CENTER = Object.freeze({ x: 304, y: 278 });
-/** Tilted 3D ring around the records core. Inner = assembled, outer = exploded. */
-export const ELLIPSE = Object.freeze({
-  assembled: Object.freeze({ rx: 118, ry: 90 }),
-  exploded: Object.freeze({ rx: 148, ry: 124 }),
-});
+/** Midpoint of the records server (Provenance above, Data below) inside the AI core. */
+export const CENTER = Object.freeze({ x: 250, y: 300 });
+export const STAGES: readonly Stage[] = Object.freeze([
+  Object.freeze({ id: "input" as const, x: 8, y: 52, width: 118, height: 440 }),
+  Object.freeze({ id: "core" as const, x: 140, y: 52, width: 220, height: 440 }),
+  Object.freeze({ id: "validation" as const, x: 374, y: 52, width: 118, height: 440 }),
+]);
+export const LOOP = Object.freeze({ x: 250, y: 160, radius: 14 });
+export const FLOW_GATES = Object.freeze([
+  Object.freeze({ x: 132, y: 270 }),
+  Object.freeze({ x: 366, y: 270 }),
+]);
 
 const TONES: Readonly<Record<EcosystemSlug, ToneToken>> = {
   interface: "--color-accent",
@@ -77,20 +91,6 @@ const GLYPHS: Readonly<Record<EcosystemSlug, GlyphKey>> = {
 
 const point = (x: number, y: number): Point => Object.freeze({ x, y });
 
-export const ellipsePoint = (ring: { rx: number; ry: number }, deg: number): Point => {
-  const rad = (deg * Math.PI) / 180;
-  return point(
-    Number((CENTER.x + ring.rx * Math.cos(rad)).toFixed(2)),
-    Number((CENTER.y + ring.ry * Math.sin(rad)).toFixed(2)),
-  );
-};
-
-const LOOP_ANGLES = Object.freeze({
-  "agentic-compute": -92,
-  "scientific-review": -28,
-  "wet-lab": 58,
-} as const);
-
 const LABEL_OUT = NODE_RADIUS + 28;
 
 const LAYOUT: Readonly<
@@ -108,58 +108,58 @@ const LAYOUT: Readonly<
   >
 > = Object.freeze({
   interface: Object.freeze({
-    assembled: point(78, 278),
-    exploded: point(64, 278),
-    depth: 0.2,
+    assembled: point(68, 270),
+    exploded: point(56, 270),
+    depth: 0,
     shape: "twin" as const,
     dashed: false,
     center: false,
-    label: Object.freeze({ x: 0, y: -(TWIN_GAP + TWIN_RADIUS + 28), anchor: "middle" as const }),
+    label: Object.freeze({ x: 10, y: -(TWIN_GAP + TWIN_RADIUS + 36), anchor: "start" as const }),
   }),
   "agentic-compute": Object.freeze({
-    assembled: ellipsePoint(ELLIPSE.assembled, LOOP_ANGLES["agentic-compute"]),
-    exploded: ellipsePoint(ELLIPSE.exploded, LOOP_ANGLES["agentic-compute"]),
-    depth: Number(Math.sin((LOOP_ANGLES["agentic-compute"] * Math.PI) / 180).toFixed(3)),
+    assembled: point(204, 160),
+    exploded: point(176, 124),
+    depth: 0,
     shape: "node" as const,
     dashed: false,
     center: false,
-    label: Object.freeze({ x: 0, y: -LABEL_OUT, anchor: "middle" as const }),
+    label: Object.freeze({ x: 0, y: -92, anchor: "middle" as const }),
   }),
   "scientific-review": Object.freeze({
-    assembled: ellipsePoint(ELLIPSE.assembled, LOOP_ANGLES["scientific-review"]),
-    exploded: ellipsePoint(ELLIPSE.exploded, LOOP_ANGLES["scientific-review"]),
-    depth: Number(Math.sin((LOOP_ANGLES["scientific-review"] * Math.PI) / 180).toFixed(3)),
+    assembled: point(296, 160),
+    exploded: point(324, 124),
+    depth: 0,
     shape: "node" as const,
     dashed: false,
     center: false,
-    label: Object.freeze({ x: 0, y: -LABEL_OUT, anchor: "middle" as const }),
+    label: Object.freeze({ x: 0, y: -92, anchor: "middle" as const }),
   }),
   "wet-lab": Object.freeze({
-    assembled: ellipsePoint(ELLIPSE.assembled, LOOP_ANGLES["wet-lab"]),
-    exploded: ellipsePoint(ELLIPSE.exploded, LOOP_ANGLES["wet-lab"]),
-    depth: Number(Math.sin((LOOP_ANGLES["wet-lab"] * Math.PI) / 180).toFixed(3)),
+    assembled: point(434, 270),
+    exploded: point(446, 338),
+    depth: 0,
     shape: "node" as const,
     dashed: false,
     center: false,
-    label: Object.freeze({ x: LABEL_OUT - 16, y: -8, anchor: "start" as const }),
+    label: Object.freeze({ x: 0, y: LABEL_OUT, anchor: "middle" as const }),
   }),
   "data-knowledge": Object.freeze({
-    assembled: point(CENTER.x, CENTER.y + 28),
-    exploded: point(CENTER.x, CENTER.y + 52),
-    depth: 1,
+    assembled: point(CENTER.x, 338),
+    exploded: point(CENTER.x, 400),
+    depth: 0,
     shape: "server" as const,
     dashed: false,
     center: true,
-    label: Object.freeze({ x: 0, y: SERVER_RADIUS + 20, anchor: "middle" as const }),
+    label: Object.freeze({ x: 0, y: SERVER_RADIUS + 14, anchor: "middle" as const }),
   }),
   "provenance-dlt": Object.freeze({
-    assembled: point(CENTER.x, CENTER.y - 28),
-    exploded: point(CENTER.x, CENTER.y - 56),
-    depth: 0.15,
+    assembled: point(CENTER.x, 262),
+    exploded: point(CENTER.x, 248),
+    depth: 0,
     shape: "server" as const,
     dashed: true,
     center: true,
-    label: Object.freeze({ x: -(SERVER_RADIUS + 16), y: -10, anchor: "end" as const }),
+    label: Object.freeze({ x: 0, y: SERVER_RADIUS + 14, anchor: "middle" as const }),
   }),
 });
 
@@ -194,9 +194,10 @@ const edge = (from: EcosystemSlug, to: EcosystemSlug, kind: EdgeKind, dashed = f
   const b = part(to).exploded;
   const mx = (a.x + b.x) / 2;
   const my = (a.y + b.y) / 2;
-  const cx = mx + (CENTER.x - mx) * -0.18;
-  const cy = my + (CENTER.y - my) * -0.1;
-  const d = `M${a.x} ${a.y}Q${cx.toFixed(2)} ${cy.toFixed(2)} ${b.x} ${b.y}`;
+  const d =
+    kind === "optional"
+      ? `M${a.x} ${a.y}L${b.x} ${b.y}`
+      : `M${a.x} ${a.y}Q${mx.toFixed(2)} ${my.toFixed(2)} ${b.x} ${b.y}`;
   return Object.freeze({ id: `${from}>${to}`, from, to, kind, dashed, d });
 };
 

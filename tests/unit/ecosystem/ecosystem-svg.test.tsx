@@ -53,6 +53,18 @@ describe("EcosystemSvg", () => {
     expect(svg.getAttribute("viewBox")).toBe(`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`);
   });
 
+  it("draws the pipeline frame without orbital ellipses", () => {
+    const { container } = renderSvg();
+    expect(container.querySelector(".eco-orbit")).toBeNull();
+    expect(container.querySelector(".eco-disc")).toBeNull();
+    expect(container.querySelectorAll(".eco-stage")).toHaveLength(3);
+    expect(container.querySelectorAll(".eco-flow")).toHaveLength(2);
+    expect(container.querySelector(".eco-loop")).not.toBeNull();
+    expect(container.textContent).toContain("Input");
+    expect(container.textContent).toContain("AI core");
+    expect(container.textContent).toContain("Validation");
+  });
+
   // Value: protects=hero plate labels stay >= 12 px on a 360 px phone given the real page paddings; fails_when=body, sheet or plate-column padding grows so the stage shrinks below the 12 px label floor; why_new=old test hard-coded a 328 px column that the redesign no longer gives; seam=none
   it("keeps rendered label text at least 12 px on a 360 px phone with the real paddings", () => {
     const PHONE = 360;

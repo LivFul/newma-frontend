@@ -1,15 +1,13 @@
-/* Hero graphic: tilted 3D orbital ecosystem. Static layer explodes by CSS; interactive uses Motion.
-   Animate transform and opacity only. */
+/* Hero graphic: presentation pipeline. Static layer explodes by CSS; interactive uses Motion.
+   Animate transform and opacity only (the loop spin and chevron pulse are the pipeline's own ambient loops). */
 .eco-figure {
   margin: 0;
 }
 .eco-frame {
-  aspect-ratio: 500 / 590;
+  aspect-ratio: 500 / 520;
   width: 100%;
   max-width: 36rem;
   margin-inline: auto;
-  perspective: 1200px;
-  perspective-origin: 50% 42%;
 }
 .eco-svg {
   touch-action: manipulation;
@@ -18,7 +16,6 @@
   height: auto;
   overflow: visible;
   pointer-events: none;
-  transform-style: preserve-3d;
 }
 .eco-part,
 .eco-link,
@@ -28,7 +25,7 @@
 .eco-part {
   transform-box: view-box;
   transform-origin: 0 0;
-  --eco-scale: calc(0.96 + (var(--eco-depth, 0) + 1) * 0.04);
+  --eco-scale: 1;
 }
 .eco-svg[data-layer="static"] .eco-part {
   transform: translate(var(--ax), var(--ay));
@@ -69,7 +66,6 @@
   stroke: none;
   transform-origin: 50% 50%;
   transform-box: fill-box;
-  transform: scale(calc(0.88 + (var(--eco-depth, 0) + 1) * 0.14));
 }
 .eco-node {
   stroke: var(--eco-stroke, var(--eco-tone));
@@ -132,10 +128,13 @@
   stroke: none;
 }
 .eco-title,
-.eco-desc {
+.eco-desc,
+.eco-face,
+.eco-stage-title {
   pointer-events: none;
 }
-.eco-title {
+.eco-title,
+.eco-face {
   fill: var(--color-fg);
   font-family: var(--font-display);
   font-weight: 600;
@@ -172,37 +171,78 @@
 .eco-arrowhead {
   fill: var(--color-border-strong);
 }
-.eco-disc {
-  fill: color-mix(in srgb, var(--color-capsule) 16%, transparent);
-  stroke: none;
-}
-.eco-orbit {
-  fill: none;
-  stroke: color-mix(in srgb, var(--color-capsule) 55%, transparent);
+.eco-stage {
   stroke-width: 1.25px;
-  stroke-dasharray: 5 10;
 }
-.eco-orbit-outer {
-  stroke: color-mix(in srgb, var(--color-leaf) 50%, transparent);
-  stroke-dasharray: 2 12;
+.eco-stage[data-stage="input"] {
+  fill: color-mix(in srgb, var(--color-leaf) 22%, var(--color-bg-elevated));
+  stroke: color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
-.eco-svg[data-view="assembled"] .eco-orbit-outer {
-  opacity: 0.35;
+.eco-stage[data-stage="core"] {
+  fill: color-mix(in srgb, var(--color-capsule) 18%, var(--color-bg-elevated));
+  stroke: color-mix(in srgb, var(--color-capsule) 50%, transparent);
 }
-.eco-svg[data-view="exploded"] .eco-orbit-inner {
-  opacity: 0.42;
+.eco-stage[data-stage="validation"] {
+  fill: color-mix(in srgb, var(--color-success) 32%, var(--color-bg-elevated));
+  stroke: color-mix(in srgb, var(--color-success-ink) 40%, transparent);
+}
+.eco-stage-title {
+  fill: var(--color-fg);
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  paint-order: stroke fill;
+  stroke: color-mix(in srgb, var(--color-bg-elevated) 88%, white);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.eco-chevron {
+  fill: none;
+  stroke: var(--color-capsule-deep);
+  stroke-width: 3px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.eco-loop-disc {
+  fill: color-mix(in srgb, var(--color-capsule) 16%, var(--color-bg-elevated));
+  stroke: var(--color-capsule);
+  stroke-width: 1.6px;
+}
+.eco-loop-mark,
+.eco-loop-arc {
+  fill: none;
+  stroke: var(--color-capsule-deep);
+  stroke-width: 1.8px;
+  stroke-linecap: round;
+}
+.eco-loop-spin {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
 }
 
 .eco-svg[data-view="exploded"] .eco-label,
 .eco-svg[data-view="exploded"] .eco-edges {
   opacity: 1;
 }
+.eco-svg[data-view="exploded"] .eco-stage-title {
+  opacity: 0;
+}
 .eco-svg[data-layer="interactive"] .eco-label,
-.eco-svg[data-layer="interactive"] .eco-edges {
+.eco-svg[data-layer="interactive"] .eco-edges,
+.eco-svg[data-layer="interactive"] .eco-stage-title {
   transition: opacity var(--motion-duration-base) var(--motion-ease-standard);
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .eco-loop-spin {
+    animation: loop-spin 12s linear infinite;
+  }
+  .eco-chevron {
+    animation: chevron-pulse 1.8s var(--motion-ease-standard) infinite;
+  }
+  .eco-flow .eco-chevron:nth-child(2) {
+    animation-delay: 0.28s;
+  }
   /* One short float and settle (2 x 2.2 s plus at most 0.5 s of stagger, under 5 s), so nothing moves
      on its own for long enough to need a pause control (WCAG 2.2.2). */
   .eco-glyph {
@@ -218,7 +258,8 @@
       calc(var(--i) * 60ms);
   }
   .eco-svg[data-layer="static"] .eco-label,
-  .eco-svg[data-layer="static"] .eco-edges {
+  .eco-svg[data-layer="static"] .eco-edges,
+  .eco-svg[data-layer="static"] .eco-stage-title {
     transition: opacity var(--motion-duration-base) var(--motion-ease-standard) 180ms;
   }
   .eco-svg[data-layer="static"]:focus-within .eco-part {
@@ -227,6 +268,9 @@
   .eco-svg[data-layer="static"]:focus-within .eco-label,
   .eco-svg[data-layer="static"]:focus-within .eco-edges {
     opacity: 1;
+  }
+  .eco-svg[data-layer="static"]:focus-within .eco-stage-title {
+    opacity: 0;
   }
 }
 /* The svg ignores the pointer (only its parts take it), so the frame carries the hover, as it does in
@@ -239,11 +283,14 @@
   .eco-frame:hover .eco-svg[data-layer="static"] .eco-edges {
     opacity: 1;
   }
+  .eco-frame:hover .eco-svg[data-layer="static"] .eco-stage-title {
+    opacity: 0;
+  }
 }
 
 /* Reduced motion shows the exploded, labelled diagram at once. Its transitions and animations are only
-   defined under no-preference above, and these selectors out-rank the base rules, so no priority
-   override is needed. */
+   defined under no-preference above, and these selectors out-rank the base rules, so only the stage
+   titles need a priority override. */
 @media (prefers-reduced-motion: reduce) {
   .eco-svg[data-layer="static"] .eco-part {
     transform: translate(var(--ex), var(--ey));
@@ -251,6 +298,27 @@
   .eco-svg .eco-label,
   .eco-svg .eco-edges {
     opacity: 1;
+  }
+  /* Priority needed here: the exploded-state title rule above out-ranks a plain selector. */
+  .eco-svg .eco-stage-title {
+    opacity: 0 !important;
+  }
+}
+
+@keyframes loop-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes chevron-pulse {
+  0%,
+  100% {
+    opacity: 0.28;
+    transform: translateX(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(3px);
   }
 }
 
@@ -265,19 +333,24 @@
 
 @media (forced-colors: active) {
   .eco-node,
-  .eco-orbit,
+  .eco-stage,
   .eco-edges path,
   .eco-server-front,
   .eco-server-top,
   .eco-server-side,
-  .eco-twin-join {
+  .eco-twin-join,
+  .eco-chevron,
+  .eco-loop-disc,
+  .eco-loop-mark,
+  .eco-loop-arc {
     stroke: CanvasText;
   }
   .eco-node,
-  .eco-disc,
+  .eco-stage,
   .eco-server-front,
   .eco-server-top,
-  .eco-server-side {
+  .eco-server-side,
+  .eco-loop-disc {
     fill: Canvas;
   }
   .eco-node-sheen {
@@ -288,12 +361,16 @@
   }
   .eco-glyph .eco-glyph-fill,
   .eco-title,
+  .eco-face,
   .eco-desc,
+  .eco-stage-title,
   .eco-arrowhead {
     fill: CanvasText;
   }
   .eco-title,
-  .eco-desc {
+  .eco-face,
+  .eco-desc,
+  .eco-stage-title {
     stroke: Canvas;
   }
   .eco-link:focus-visible .eco-hit {

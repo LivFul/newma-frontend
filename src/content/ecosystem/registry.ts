@@ -29,7 +29,7 @@ export const HERO_LABELS: Readonly<Record<EcosystemSlug, HeroLabel>> = Object.fr
   "provenance-dlt": { title: "Provenance & DLT", descriptor: "Optional ledger layer" },
 });
 
-/** Two faces of the Interface, drawn outside the records loop (claim C-40, C-48). */
+/** Two faces of the Interface, drawn as the input column outside the AI core (claim C-40, C-48). */
 export const HERO_INTERFACE_FACES = Object.freeze({
   people: Object.freeze({ title: "People", descriptor: "Where people sign in" }),
   apps: Object.freeze({ title: "API", descriptor: "MCP for other applications" }),

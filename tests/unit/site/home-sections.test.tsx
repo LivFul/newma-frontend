@@ -97,8 +97,8 @@ describe("HeroSection", () => {
     expect(screen.getByText(HERO.disclaimer.text)).toBeInTheDocument();
   });
 
-  // Value: protects=the hero exposes one orbital diagram with its accessible name inside the hero landmark; fails_when=the diagram leaves the hero section or loses the name that describes it to assistive technology; why_new=the previous test checked CSS class names and carried a stale card for the removed survey map key; seam=none
-  it("exposes the orbital diagram with its accessible name inside the hero", () => {
+  // Value: protects=the hero exposes one pipeline diagram with its accessible name inside the hero landmark; fails_when=the diagram leaves the hero section or loses the name that describes it to assistive technology; why_new=the previous test checked CSS class names and carried a stale card for the removed survey map key; seam=none
+  it("exposes the pipeline diagram with its accessible name inside the hero", () => {
     const { container } = render(<HeroSection />);
     const hero = container.querySelector<HTMLElement>("section#hero")!;
     expect(hero.querySelector("figure[data-hero]")).not.toBeNull();
