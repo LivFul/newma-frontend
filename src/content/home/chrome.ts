@@ -44,3 +44,21 @@ export const FOOTER_NAV_LABEL = block("chrome.footer.nav", "Legal", ["C-30"]);
 export const HEADER_NAV_LABEL = block("chrome.header.nav", "Sections", []);
 export const HEADER_MENU = block("chrome.header.menu", "Menu", []);
 export const HEADER_MOBILE_NAV = block("chrome.header.mobile", "Mobile sections", []);
+
+export const PWA_COPY = Object.freeze({
+  region: block("chrome.pwa.region", "App install", []),
+  updated: block(
+    "chrome.pwa.updated",
+    "A new version of NEWMA is available. Reload to update.",
+    [],
+  ),
+  iosHint: block(
+    "chrome.pwa.ios",
+    "Install NEWMA from the share menu, then add it to the home screen.",
+    [],
+  ),
+  install: block("chrome.pwa.install", "Install NEWMA on this device for a full-screen app.", []),
+  reload: block("chrome.pwa.reload", "Reload", []),
+  installAction: block("chrome.pwa.installAction", "Install", []),
+  dismiss: block("chrome.pwa.dismiss", "Not now", []),
+});

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { PWA_COPY } from "@/content/home/chrome";
 
 const DISMISS_KEY = "newma-install-dismissed";
 
@@ -18,20 +19,20 @@ export function PwaMount() {
   const [updated, setUpdated] = useState(false);
 
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1500));
-      const id = idle(() => {
-        navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => undefined);
-      });
-      const onController = () => setUpdated(true);
-      navigator.serviceWorker.addEventListener("controllerchange", onController);
-      return () => {
-        if (typeof window.cancelIdleCallback === "function")
-          window.cancelIdleCallback(id as number);
-        navigator.serviceWorker.removeEventListener("controllerchange", onController);
-      };
-    }
-    return undefined;
+    if (!("serviceWorker" in navigator)) return undefined;
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1500));
+    const id = idle(() => {
+      navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => undefined);
+    });
+    const onController = () => {
+      if (hadController) setUpdated(true);
+    };
+    navigator.serviceWorker.addEventListener("controllerchange", onController);
+    return () => {
+      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(id as number);
+      navigator.serviceWorker.removeEventListener("controllerchange", onController);
+    };
   }, []);
 
   useEffect(() => {
@@ -53,18 +54,17 @@ export function PwaMount() {
   if (!deferred && !iosHint && !updated) return null;
 
   return (
-    <div className="fixed right-4 bottom-4 z-50 max-w-sm rounded-xl border border-border bg-bg-elevated p-4 shadow-lg">
+    <aside
+      aria-label={PWA_COPY.region.text}
+      className="fixed right-4 bottom-4 z-50 max-w-sm rounded-xl border border-border bg-bg-elevated p-4 shadow-lg"
+    >
       <p className="text-sm text-fg">
-        {updated
-          ? "A new version of NEWMA is available. Reload to update."
-          : iosHint
-            ? "Install NEWMA: tap Share, then Add to Home Screen."
-            : "Install NEWMA on this device for a full-screen app."}
+        {updated ? PWA_COPY.updated.text : iosHint ? PWA_COPY.iosHint.text : PWA_COPY.install.text}
       </p>
       <div className="mt-3 flex gap-2">
         {updated ? (
           <Button size="sm" onClick={() => window.location.reload()}>
-            Reload
+            {PWA_COPY.reload.text}
           </Button>
         ) : null}
         {deferred ? (
@@ -75,13 +75,13 @@ export function PwaMount() {
               hide();
             }}
           >
-            Install
+            {PWA_COPY.installAction.text}
           </Button>
         ) : null}
         <Button size="sm" variant="ghost" onClick={hide}>
-          Not now
+          {PWA_COPY.dismiss.text}
         </Button>
       </div>
-    </div>
+    </aside>
   );
 }
