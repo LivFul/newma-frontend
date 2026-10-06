@@ -61,7 +61,7 @@ export const CENTER = Object.freeze({ x: 250, y: 268 });
 /** Tilted 3D ring: a circle viewed at ~44°. Inner = assembled, outer = exploded. */
 export const ELLIPSE = Object.freeze({
   assembled: Object.freeze({ rx: 108, ry: 80 }),
-  exploded: Object.freeze({ rx: 152, ry: 128 }),
+  exploded: Object.freeze({ rx: 152, ry: 136 }),
 });
 export const RING = Object.freeze({
   assembled: ELLIPSE.assembled.rx,
@@ -113,7 +113,7 @@ export const ellipsePoint = (ring: { rx: number; ry: number }, deg: number): Poi
 const LABEL_OUT = NODE_RADIUS + 28;
 
 const LABELS: Readonly<Record<EcosystemSlug, PartGeometry["label"]>> = {
-  interface: Object.freeze({ x: 0, y: HUB_RADIUS + 14, anchor: "middle" }),
+  interface: Object.freeze({ x: HUB_RADIUS + 12, y: -6, anchor: "start" }),
   "agentic-compute": Object.freeze({ x: 0, y: -LABEL_OUT, anchor: "middle" }),
   "scientific-review": Object.freeze({ x: LABEL_OUT - 16, y: -18, anchor: "start" }),
   "wet-lab": Object.freeze({ x: LABEL_OUT - 16, y: -8, anchor: "start" }),
