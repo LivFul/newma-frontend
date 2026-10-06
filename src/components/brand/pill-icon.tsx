@@ -1,18 +1,25 @@
 import { useId } from "react";
-import { MARK_VIEWBOX, PILL_PATH } from "./mark-paths";
+import { PILL_PATH, PILL_SHAPE_VIEWBOX, MARK_VIEWBOX } from "./mark-paths";
 
 type PillIconProps = {
   className?: string;
   title?: string;
   gradient?: boolean;
+  /** `mark` keeps the whole logo's box (shapes sit where they do in the logo); `shape` crops to this shape. */
+  fit?: "mark" | "shape";
 };
 
-export function PillIcon({ className = "size-5", title, gradient = true }: PillIconProps) {
+export function PillIcon({
+  className = "size-5",
+  title,
+  gradient = true,
+  fit = "mark",
+}: PillIconProps) {
   const raw = useId();
   const id = `pill-${raw.replace(/:/g, "")}`;
   return (
     <svg
-      viewBox={MARK_VIEWBOX}
+      viewBox={fit === "shape" ? PILL_SHAPE_VIEWBOX : MARK_VIEWBOX}
       className={className}
       aria-hidden={title ? undefined : true}
       focusable="false"

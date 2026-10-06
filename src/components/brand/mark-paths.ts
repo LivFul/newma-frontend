@@ -5,3 +5,10 @@ export const PILL_PATH =
   "M403.0 6.0 L627.0 6.0 L658.0 14.0 L676.0 23.0 L690.0 33.0 L712.0 57.0 L723.0 76.0 L732.0 104.0 L732.0 149.0 L727.0 167.0 L717.0 188.0 L705.0 205.0 L683.0 225.0 L660.0 238.0 L632.0 246.0 L403.0 247.0 Z";
 
 export const MARK_VIEWBOX = "0 0 735 249";
+
+// Each icon is drawn inside the whole logo's viewBox, where the leaf sits in the left half and the pill in
+// the right. These are the tight boxes of each shape on its own, for placing one icon (a step marker)
+// where its visible shape, not the empty half beside it, has to line up. tests/unit/brand/icons.test.ts
+// checks them against the paths.
+export const LEAF_SHAPE_VIEWBOX = "0 1 379 247";
+export const PILL_SHAPE_VIEWBOX = "403 6 329 241";
