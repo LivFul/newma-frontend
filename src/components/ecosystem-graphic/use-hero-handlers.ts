@@ -38,45 +38,33 @@ type Options = {
   announce: (text: string) => void;
 };
 
-// Translates DOM events into HeroEvents and carries out the one decision the DOM must make itself:
-// whether a click follows its link (touch first-tap interception).
+// Translates DOM events into HeroEvents and carries out the decisions the DOM must make itself: whether
+// a click follows its link (the first touch tap only explodes the layers) and, for the second touch tap,
+// navigating on pointerup.
 export function useHeroHandlers({ state, dispatch, announce }: Options) {
   // Set by a touch pointerdown and consumed by the pointerup or click it produces. Any other end of that
   // gesture (cancel, a later click with no pointerdown such as assistive technology or the keyboard) must
-  // leave it empty, so a stale flag can never swallow a link activation.
+  // leave it empty, so a stale gesture can never swallow a link activation.
   const pendingTouch = useRef<{ view: HeroView; slug: HeroSlug; x: number; y: number } | null>(
     null,
   );
-  const absorbedTap = useRef(false);
-  // A tap that already navigated on pointerup owns the navigation: its click must neither follow the
-  // link a second time nor record a second component_open.
-  const followedTap = useRef(false);
-  const clearPending = () => {
-    pendingTouch.current = null;
-  };
+  // One-shot: the next click belongs to a gesture already handled (a first tap that only exploded the
+  // layers, a second tap that navigated on pointerup, or a drag past the tap slop), so it must neither
+  // follow its link nor record a second component_open.
+  const swallowClick = useRef(false);
   const resetGesture = () => {
     pendingTouch.current = null;
-    absorbedTap.current = false;
-    followedTap.current = false;
+    swallowClick.current = false;
   };
 
-  const follow = (slug: NonNullable<HeroSlug>, target: EventTarget | null) => {
+  const follow = (slug: NonNullable<HeroSlug>) => {
     trackEvent({ name: "component_open", slug });
-    const link =
-      (target as Element | null)?.closest?.("[data-slug]")?.querySelector("a") ??
-      (target as Element | null)?.closest?.("a");
-    const href = link instanceof HTMLAnchorElement ? link.href : ecosystemHref(slug);
-    window.location.assign(href);
+    window.location.assign(ecosystemHref(slug));
   };
 
   const onPointerDown = (event: PointerEvent) => {
-    // Leftover flags from a click-less earlier gesture must not swallow this one.
-    absorbedTap.current = false;
-    followedTap.current = false;
-    if (event.pointerType !== "touch") {
-      pendingTouch.current = null;
-      return;
-    }
+    resetGesture();
+    if (event.pointerType !== "touch") return;
     const inSvg = Boolean((event.target as Element).closest?.("svg.eco-svg"));
     const slug = inSvg ? slugFrom(event.target) : null;
     pendingTouch.current = { view: state.view, slug, x: event.clientX, y: event.clientY };
@@ -85,37 +73,39 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
     if (heroReducer(state, tap).effect.type === "preventNavigation") {
       // The first tap only explodes the layers.
       event.preventDefault();
-      absorbedTap.current = true;
+      swallowClick.current = true;
       if (slug) announce(heroTouchAnnouncement(slug));
       dispatch(tap);
     }
   };
 
-  // The second tap navigates here, on pointerup, using the component the finger touched down on. Doing
-  // it on pointerdown would also fire for a swipe that merely starts over a node.
+  // The second tap navigates here, on pointerup, to the component the finger touched down on. Doing it
+  // on pointerdown would also fire for a swipe that merely starts over a node.
   const onPointerUp = (event: PointerEvent) => {
     if (event.pointerType !== "touch") return;
     const pending = pendingTouch.current;
+    pendingTouch.current = null;
     if (!pending || pending.view !== "exploded" || !pending.slug) return;
-    clearPending();
-    if (Math.hypot(event.clientX - pending.x, event.clientY - pending.y) > TAP_SLOP_PX) return;
+    if (Math.hypot(event.clientX - pending.x, event.clientY - pending.y) > TAP_SLOP_PX) {
+      // A drag, not a tap, but the browser may still synthesize a click for it.
+      swallowClick.current = true;
+      return;
+    }
     const tap: HeroEvent = { type: "tap", slug: pending.slug, touch: true, view: pending.view };
     if (heroReducer(state, tap).effect.type !== "navigate") return;
     dispatch(tap);
-    followedTap.current = true;
-    follow(pending.slug, event.target);
+    swallowClick.current = true;
+    follow(pending.slug);
   };
 
   const onLinkClick = (event: MouseEvent) => {
-    if (absorbedTap.current || followedTap.current) {
-      absorbedTap.current = false;
-      followedTap.current = false;
+    if (swallowClick.current) {
+      resetGesture();
       event.preventDefault();
-      clearPending();
       return;
     }
     const pending = pendingTouch.current;
-    clearPending();
+    pendingTouch.current = null;
     const slug = slugFrom(event.target);
     const tap: HeroEvent = {
       type: "tap",

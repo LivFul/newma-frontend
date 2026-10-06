@@ -289,6 +289,39 @@ describe("Interactive hero layer", () => {
     expect(assign).not.toHaveBeenCalled();
   });
 
+  // Value: protects=finger jitter inside the tap slop still opens the component, while a drag just past it neither opens it nor lets the synthesized click follow the link; fails_when=the slop becomes zero, the comparison flips, or a rejected drag does not swallow its click; why_new=only a 60 px swipe and zero-travel taps were covered; seam=none
+  it("treats jitter as a tap and a drag past the slop as neither a tap nor a click", () => {
+    const assign = vi.fn();
+    vi.stubGlobal("location", { ...window.location, assign });
+    const { links } = mount();
+    const link = links[2]!;
+    fireEvent.pointerDown(link, { pointerType: "touch" });
+    fireEvent.click(link);
+
+    fireEvent.pointerDown(link, { pointerType: "touch", clientX: 100, clientY: 100 });
+    fireEvent.pointerUp(link, { pointerType: "touch", clientX: 104, clientY: 103 });
+    expect(assign).toHaveBeenCalledTimes(1);
+    fireEvent.click(link);
+    assign.mockClear();
+
+    fireEvent.pointerDown(link, { pointerType: "touch", clientX: 100, clientY: 100 });
+    fireEvent.pointerUp(link, { pointerType: "touch", clientX: 100, clientY: 112 });
+    expect(fireEvent.click(link)).toBe(false);
+    expect(assign).not.toHaveBeenCalled();
+  });
+
+  // Value: protects=the pointerup of the tap that explodes the layers never navigates, because the view captured at pointerdown decides; fails_when=pointerup reads the re-rendered view so the first tap opens the component at once; why_new=the first tap was only exercised as pointerdown then click, never with its pointerup; seam=none
+  it("does not navigate on the pointerup of the tap that explodes the layers", () => {
+    const assign = vi.fn();
+    vi.stubGlobal("location", { ...window.location, assign });
+    const { links, svg } = mount();
+    fireEvent.pointerDown(links[1]!, { pointerType: "touch" });
+    fireEvent.pointerUp(links[1]!, { pointerType: "touch" });
+    expect(fireEvent.click(links[1]!)).toBe(false);
+    expect(svg).toHaveAttribute("data-view", "exploded");
+    expect(assign).not.toHaveBeenCalled();
+  });
+
   it("never intercepts mouse clicks", () => {
     const { links } = mount();
     fireEvent.pointerDown(links[0]!, { pointerType: "mouse" });

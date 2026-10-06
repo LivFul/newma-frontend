@@ -308,12 +308,6 @@ export function EcosystemSvg({
       aria-describedby={descId}
       data-layer={layer}
       data-view={view}
-      style={
-        {
-          "--eco-cx": `${CENTER.x}px`,
-          "--eco-cy": `${CENTER.y}px`,
-        } as CSSProperties
-      }
     >
       <title id={titleId}>{HERO_SVG_TITLE.text}</title>
       <desc id={descId}>{HERO_SVG_DESC.text}</desc>
