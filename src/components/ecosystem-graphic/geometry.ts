@@ -126,7 +126,7 @@ const LAYOUT: Readonly<
     shape: "twin" as const,
     dashed: false,
     center: false,
-    label: Object.freeze({ x: 0, y: -(TWIN_GAP + TWIN_RADIUS + 32), anchor: "middle" as const }),
+    label: Object.freeze({ x: 10, y: -(TWIN_GAP + TWIN_RADIUS + 36), anchor: "start" as const }),
   }),
   "agentic-compute": Object.freeze({
     assembled: point(204, 160),
