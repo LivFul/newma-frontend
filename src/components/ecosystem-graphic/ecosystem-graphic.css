@@ -17,6 +17,7 @@
   overflow: visible;
   pointer-events: none;
 }
+.eco-part,
 .eco-link,
 .eco-hit {
   pointer-events: auto;

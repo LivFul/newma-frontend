@@ -22,10 +22,10 @@ export type EcosystemSvgProps = Omit<SVGProps<SVGSVGElement>, "viewBox" | "role"
 };
 
 const HIT = Object.freeze({
-  x: -NODE_RADIUS - 8,
-  y: -NODE_RADIUS - 8,
-  width: NODE_RADIUS * 2 + 16,
-  height: NODE_RADIUS * 2 + 16,
+  x: -NODE_RADIUS - 16,
+  y: -NODE_RADIUS - 16,
+  width: NODE_RADIUS * 2 + 32,
+  height: NODE_RADIUS * 2 + 48,
 });
 
 const STROKE_INK: Partial<Record<PartGeometry["tone"], string>> = {

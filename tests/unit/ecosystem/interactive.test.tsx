@@ -205,6 +205,8 @@ describe("Interactive hero layer", () => {
   });
 
   it("intercepts only the first touch tap", () => {
+    const assign = vi.fn();
+    vi.stubGlobal("location", { ...window.location, assign });
     const { links, svg } = mount();
     const link = links[1]!;
     const tap = () => {
@@ -214,6 +216,8 @@ describe("Interactive hero layer", () => {
     expect(tap()).toBe(false); // default prevented: no navigation
     expect(svg).toHaveAttribute("data-view", "exploded");
     expect(tap()).toBe(true); // second tap follows the link
+    expect(assign).toHaveBeenCalled();
+    vi.unstubAllGlobals();
   });
 
   it("navigates on touch pointerup when the layers are already exploded", () => {

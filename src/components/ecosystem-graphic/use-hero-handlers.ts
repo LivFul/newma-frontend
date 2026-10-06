@@ -39,10 +39,19 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
   // Set by a touch pointerdown and consumed by the click it produces. Any other end of that gesture
   // (cancel, a later click with no pointerdown such as assistive technology or the keyboard) must
   // leave it empty, so a stale flag can never swallow a link activation.
-  const pendingTouch = useRef<{ view: HeroView } | null>(null);
+  const pendingTouch = useRef<{ view: HeroView; slug: ReturnType<typeof slugFrom> } | null>(null);
   const absorbedTap = useRef(false);
   const clearPending = () => {
     pendingTouch.current = null;
+  };
+
+  const follow = (slug: NonNullable<ReturnType<typeof slugFrom>>, target: EventTarget | null) => {
+    trackEvent({ name: "component_open", slug });
+    const link =
+      (target as Element | null)?.closest?.("[data-slug]")?.querySelector("a") ??
+      (target as Element | null)?.closest?.("a");
+    const href = link instanceof HTMLAnchorElement ? link.href : ecosystemHref(slug);
+    window.location.assign(href);
   };
 
   const onPointerDown = (event: PointerEvent) => {
@@ -52,16 +61,22 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
       pendingTouch.current = null;
       return;
     }
-    pendingTouch.current = { view: state.view };
-    const target = event.target as Element;
-    if (!target.closest?.("svg.eco-svg")) return;
-    const slug = slugFrom(event.target);
+    const inSvg = Boolean((event.target as Element).closest?.("svg.eco-svg"));
+    const slug = inSvg ? slugFrom(event.target) : null;
+    pendingTouch.current = { view: state.view, slug };
+    if (!inSvg) return;
     const tap: HeroEvent = { type: "tap", slug, touch: true, view: state.view };
-    if (heroReducer(state, tap).effect.type === "preventNavigation") {
+    const effect = heroReducer(state, tap).effect;
+    if (effect.type === "preventNavigation") {
       event.preventDefault();
       absorbedTap.current = true;
       if (slug) announce(heroTouchAnnouncement(slug));
       dispatch(tap);
+    } else if (effect.type === "navigate" && slug) {
+      event.preventDefault();
+      dispatch(tap);
+      follow(slug, event.target);
+      clearPending();
     }
   };
 
@@ -69,15 +84,12 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
     if (event.pointerType !== "touch") return;
     const pending = pendingTouch.current;
     if (!pending || pending.view !== "exploded") return;
-    const slug = slugFrom(event.target);
+    const slug = slugFrom(event.target) ?? pending.slug;
     if (!slug) return;
     const tap: HeroEvent = { type: "tap", slug, touch: true, view: pending.view };
     if (heroReducer(state, tap).effect.type !== "navigate") return;
     dispatch(tap);
-    trackEvent({ name: "component_open", slug });
-    const link = (event.target as Element).closest("a");
-    const href = link instanceof HTMLAnchorElement ? link.href : ecosystemHref(slug);
-    window.location.assign(href);
+    follow(slug, event.target);
     clearPending();
   };
 
