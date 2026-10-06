@@ -12,9 +12,11 @@ const ORIGIN = "https://newma.test";
 type FakeResponse = {
   ok: boolean;
   tag: string;
+  redirected: boolean;
   headers: { get: (name: string) => string | null };
   clone: () => FakeResponse;
 };
+type ReplyOptions = { cacheControl?: string; contentType?: string; redirected?: boolean };
 type FakeRequest = { url: string; method: string; mode: string };
 type Network = (request: FakeRequest) => Promise<FakeResponse>;
 type WorkerEvent = {
@@ -23,11 +25,16 @@ type WorkerEvent = {
   waitUntil: (result: Promise<unknown>) => void;
 };
 
-const reply = (tag: string, ok = true, cacheControl: string | null = null): FakeResponse => {
+const reply = (tag: string, ok = true, options: ReplyOptions = {}): FakeResponse => {
+  const headers: Record<string, string> = {
+    "cache-control": options.cacheControl ?? "",
+    "content-type": options.contentType ?? "application/javascript",
+  };
   const value: FakeResponse = {
     ok,
     tag,
-    headers: { get: (name) => (name.toLowerCase() === "cache-control" ? cacheControl : null) },
+    redirected: options.redirected ?? false,
+    headers: { get: (name) => headers[name.toLowerCase()] || null },
     clone: () => value,
   };
   return value;
@@ -37,6 +44,9 @@ const get = (target: string, mode = "no-cors"): FakeRequest => ({
   method: "GET",
   mode,
 });
+// The worker fetches the offline shell by plain path and everything else by request.
+const pathOf = (input: string | FakeRequest): string =>
+  typeof input === "string" ? input : new URL(input.url).pathname;
 const flush = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
 function loadWorker(network: Network) {
@@ -57,6 +67,7 @@ function loadWorker(network: Network) {
           store.set(keyOf(request), response);
           return Promise.resolve();
         },
+        match: (request: string | FakeRequest) => Promise.resolve(store.get(keyOf(request))),
         keys: () => Promise.resolve([...store.keys()].map((url) => ({ url }))),
         delete: (request: { url: string }) => Promise.resolve(store.delete(keyOf(request))),
       });
@@ -119,6 +130,8 @@ describe("service worker", () => {
       get("/access", "navigate"),
       get("/%64emo/w1-rights", "navigate"),
       get("/primitives", "navigate"),
+      get("/ecosystem", "navigate"),
+      get("/legalese", "navigate"),
       get("/sw.js"),
       get("/ecosystem/wet-lab?_rsc=1abc", "cors"),
       get("/_next/image?url=%2Fimages%2Fa.jpg&w=640&q=75"),
@@ -129,8 +142,19 @@ describe("service worker", () => {
       expect(worker.fire("fetch", request).handled, request.url).toBe(false);
     }
     expect(worker.fetch).not.toHaveBeenCalled();
-    expect(worker.fire("fetch", get("/ecosystem/wet-lab", "navigate")).handled).toBe(true);
-    expect(worker.fire("fetch", get("/images/hero-botanical.jpg")).handled).toBe(true);
+    const handled = [
+      get("/", "navigate"),
+      get("/legal/privacy", "navigate"),
+      get("/ecosystem/wet-lab", "navigate"),
+      get("/images/hero-botanical.jpg"),
+      get("/brand/icon-192.png"),
+      get("/favicon.ico"),
+      get("/_next/static/chunks/app.js"),
+      get("/_next/image?url=%2Fbrand%2Flogo-horizontal.png&w=256&q=75"),
+    ];
+    for (const request of handled) {
+      expect(worker.fire("fetch", request).handled, request.url).toBe(true);
+    }
   });
 
   // Value: protects=a visited public page reloads offline from cache (whatever its query string) and an unvisited one shows the precached offline page; fails_when=navigations stop falling back to cache or to /offline when the network fails; why_new=no test ran the fetch handler; seam=none
@@ -153,7 +177,7 @@ describe("service worker", () => {
     ).resolves.toMatchObject({ tag: "precache:/offline" });
   });
 
-  // Value: protects=an error page or a response that asked for no shared caching is never replayed offline in place of the offline page; fails_when=the ok or Cache-Control check is dropped from the navigation path; why_new=the failure branch was untested; seam=none
+  // Value: protects=an error page, a redirected or no-store response, or an HTML page answering an asset URL is never stored and replayed; fails_when=the ok, redirected, Cache-Control or HTML-type check is dropped; why_new=the failure branches were untested and a fallback page could be pinned under a hashed chunk URL forever; seam=none
   it("does not store failed or no-store navigation responses", async () => {
     let online = true;
     let next = () => reply("boom", false);
@@ -163,17 +187,34 @@ describe("service worker", () => {
     await worker.fire("install").result;
     for (const [target, response] of [
       ["/ecosystem/missing", () => reply("boom", false)],
-      ["/legal/terms", () => reply("secret", true, "private, no-store, max-age=0")],
+      [
+        "/legal/terms",
+        () => reply("secret", true, { cacheControl: "private, no-store, max-age=0" }),
+      ],
+      ["/legal/privacy", () => reply("moved", true, { redirected: true })],
     ] as const) {
       next = response;
       const call = worker.fire("fetch", get(target, "navigate"));
       await call.settled();
     }
     online = false;
-    for (const target of ["/ecosystem/missing", "/legal/terms"]) {
+    for (const target of ["/ecosystem/missing", "/legal/terms", "/legal/privacy"]) {
       await expect(worker.fire("fetch", get(target, "navigate")).result).resolves.toMatchObject({
         tag: "precache:/offline",
       });
+    }
+
+    online = true;
+    for (const [target, response] of [
+      ["/_next/static/chunks/fallback.js", () => reply("html", true, { contentType: "text/html" })],
+      ["/images/private.jpg", () => reply("secret", true, { cacheControl: "no-store" })],
+    ] as const) {
+      next = response;
+      await worker.fire("fetch", get(target)).settled();
+    }
+    online = false;
+    for (const target of ["/_next/static/chunks/fallback.js", "/images/private.jpg"]) {
+      await expect(worker.fire("fetch", get(target)).result).resolves.toBeUndefined();
     }
   });
 
@@ -209,19 +250,54 @@ describe("service worker", () => {
     await expect(worker.fire("fetch", broken).result).resolves.toBeUndefined();
   });
 
-  // Value: protects=runtime entries are capped without ever evicting the precached offline page; fails_when=the cache grows without bound or trimming removes the offline shell; why_new=the cache never evicted anything before; seam=none
-  it("caps runtime entries and keeps the precached shell", async () => {
+  // Value: protects=runtime entries are capped without ever evicting the precached offline page or the hashed chunks the cached pages need; fails_when=the cache grows without bound, trimming removes the offline shell, or a burst of images evicts a shared chunk; why_new=the cache never evicted anything before and oldest-first eviction removed the shared CSS first; seam=none
+  it("caps runtime entries and keeps the precached shell and the hashed chunks", async () => {
     const worker = loadWorker((request) => Promise.resolve(reply(`net:${request.url}`)));
     await worker.fire("install").result;
+    await worker.fire("fetch", get("/_next/static/css/shared.css")).settled();
     for (let index = 0; index < 130; index += 1) {
       await worker.fire("fetch", get(`/images/plate-${index}.jpg`)).settled();
     }
     const [name] = [...worker.stores.keys()];
     const urls = [...worker.stores.get(name!)!.keys()];
     expect(urls).toContain(new URL("/offline", ORIGIN).href);
+    expect(urls).toContain(new URL("/_next/static/css/shared.css", ORIGIN).href);
     expect(urls).not.toContain(new URL("/images/plate-0.jpg", ORIGIN).href);
     expect(urls).toContain(new URL("/images/plate-129.jpg", ORIGIN).href);
     expect(urls.length).toBeLessThan(130);
+  });
+
+  // Value: protects=the logo, which reaches the browser through the image optimizer, still shows offline, while other optimizer requests stay on the network; fails_when=the optimizer allowance for /brand/ sources is dropped or widened to every image; why_new=the v1 worker cached it by accident and the allowlist silently removed it; seam=none
+  it("keeps the optimized wordmark available offline", async () => {
+    let online = true;
+    const worker = loadWorker((request) =>
+      online ? Promise.resolve(reply(`net:${request.url}`)) : Promise.reject(new Error("offline")),
+    );
+    const logo = get("/_next/image?url=%2Fbrand%2Flogo-horizontal.png&w=256&q=75");
+    await worker.fire("fetch", logo).settled();
+    online = false;
+    await expect(worker.fire("fetch", logo).result).resolves.toMatchObject({
+      tag: `net:${logo.url}`,
+    });
+  });
+
+  // Value: protects=the offline page is refreshed whenever the home page loads, so it follows the current deploy instead of the one that installed the worker; fails_when=the refresh is dropped or runs for other pages; why_new=the precached copy was never updated between worker changes; seam=none
+  it("refreshes the offline page when the home page loads", async () => {
+    let online = true;
+    const worker = loadWorker((request) =>
+      online
+        ? Promise.resolve(reply(`net:${pathOf(request)}`))
+        : Promise.reject(new Error("offline")),
+    );
+    await worker.fire("install").result;
+    await worker.fire("fetch", get("/legal/privacy", "navigate")).settled();
+    expect(worker.fetch.mock.calls.map(([request]) => pathOf(request))).not.toContain("/offline");
+
+    await worker.fire("fetch", get("/", "navigate")).settled();
+    online = false;
+    await expect(
+      worker.fire("fetch", get("/legal/terms", "navigate")).result,
+    ).resolves.toMatchObject({ tag: "net:/offline" });
   });
 
   // Value: protects=install precaches the offline page and activates at once, and activate drops older caches; fails_when=the offline page leaves the precache or old cache versions are kept after an update; why_new=no test ran install or activate; seam=none
