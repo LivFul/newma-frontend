@@ -66,21 +66,41 @@ main[tabindex="-1"]:focus-visible {
   }
 }
 
-/* Installed app: the sticky header owns the top inset so it never pins under the status bar once
-   scrolled; pages without the site header (demo, access) pad the body instead. */
+/* Installed app. The sticky header owns the top inset, so it never pins under the status bar once
+   scrolled; pages without the site header (demo, access) pad the body. Browsers without :has() keep
+   the plain body padding and skip the header-aware rules. */
 @media (display-mode: standalone) {
   body {
+    padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
   }
-  body:not(:has([data-site-header])) {
-    padding-top: env(safe-area-inset-top);
+  @supports selector(:has(*)) {
+    body:has([data-site-header]) {
+      padding-top: 0;
+    }
+    [data-site-header] {
+      padding-top: env(safe-area-inset-top);
+      min-height: calc(var(--size-header) + env(safe-area-inset-top));
+    }
+    html:has([data-site-header]) {
+      scroll-padding-top: calc(var(--size-header) + env(safe-area-inset-top) + var(--space-4));
+    }
   }
-  [data-site-header] {
-    padding-top: env(safe-area-inset-top);
-    min-height: calc(var(--size-header) + env(safe-area-inset-top));
+}
+/* The wrapped phone header and the short-viewport static header need their own offsets here as well:
+   the general standalone rule above has the same specificity and would otherwise win. */
+@media (display-mode: standalone) and (max-width: 27.5rem) {
+  @supports selector(:has(*)) {
+    html:has([data-site-header]) {
+      scroll-padding-top: calc(7.5rem + env(safe-area-inset-top) + var(--space-4));
+    }
   }
-  html:has([data-site-header]) {
-    scroll-padding-top: calc(var(--size-header) + env(safe-area-inset-top) + var(--space-4));
+}
+@media (display-mode: standalone) and (max-height: 32rem) {
+  @supports selector(:has(*)) {
+    html:has([data-site-header]) {
+      scroll-padding-top: var(--space-4);
+    }
   }
 }
 
@@ -123,31 +143,34 @@ main[tabindex="-1"]:focus-visible {
     }
   }
   .aurora {
+    --aurora-size: 140% 140%;
+    --aurora-position: 40% 50%;
     background-image: var(--background-image-aurora);
-    background-size: 140% 140%;
-    background-position: 40% 50%;
+    background-size: var(--aurora-size);
+    background-position: var(--aurora-position);
   }
   .botanical-lines {
     background-image: url("/images/botanical-lines.svg");
     background-size: 720px 720px;
   }
   /* Both classes on one element make a single multi-layer background: two single-layer rules of equal
-     specificity would let the later one replace the other's image entirely. */
+     specificity would let the later one replace the other's image entirely. The aurora token is four
+     layers (three radials and a base gradient) and size and position need one entry per layer, since a
+     shorter list repeats and mis-sizes them; tests/unit/site/page-margin.test.ts checks the counts. */
   .aurora.botanical-lines {
     background-image: url("/images/botanical-lines.svg"), var(--background-image-aurora);
     background-size:
       720px 720px,
-      140% 140%;
+      var(--aurora-size),
+      var(--aurora-size),
+      var(--aurora-size),
+      var(--aurora-size);
     background-position:
       0 0,
-      40% 50%;
-  }
-  .hatch-restricted {
-    background-image: repeating-linear-gradient(
-      -45deg,
-      color-mix(in srgb, var(--color-danger) 28%, transparent) 0 1px,
-      transparent 1px 7px
-    );
+      var(--aurora-position),
+      var(--aurora-position),
+      var(--aurora-position),
+      var(--aurora-position);
   }
   .hatch-held {
     background-image: repeating-linear-gradient(
@@ -250,5 +273,13 @@ main[tabindex="-1"]:focus-visible {
   .glass {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+  }
+}
+
+/* High-contrast themes force text colours; the decorative mint wash would sit under light text. */
+@media (forced-colors: active) {
+  .aurora,
+  .aurora.botanical-lines {
+    background-image: none;
   }
 }

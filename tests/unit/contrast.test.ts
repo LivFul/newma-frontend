@@ -4,7 +4,13 @@ import { describe, expect, it } from "vitest";
 import { contrastRatio, parseCssVars } from "@/lib/a11y/contrast";
 
 const TOKENS = path.resolve(__dirname, "../../src/styles/tokens");
-const HOVER_BRIGHTNESS = 1.1;
+// Read from the button itself so raising `hover:brightness-*` there cannot outrun this check.
+const HOVER_BRIGHTNESS =
+  Number(
+    /hover:brightness-(\d+)/.exec(
+      readFileSync(path.resolve(__dirname, "../../src/components/ui/button.tsx"), "utf8"),
+    )?.[1],
+  ) / 100;
 const WCAG_AA_TEXT = 4.5;
 
 // What `filter: brightness(1.1)` does to a #rrggbb colour (each channel scaled and clamped).

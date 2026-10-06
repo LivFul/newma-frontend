@@ -80,6 +80,29 @@ describe("RevealRoot", () => {
     expect(observed).toEqual([below]);
   });
 
+  // Value: protects=a section fully above the viewport (after scroll restoration or an anchor jump) and one just under the observer's bottom margin still wait to be revealed; fails_when=the bottom > 0 or the 92% line check is dropped or shifted; why_new=only an on-screen and a far-below section were covered; seam=none
+  it("hides sections above the viewport and just below the reveal line", () => {
+    const { observed } = stubObserver();
+    const { container } = render(
+      <div>
+        <section data-reveal>Above</section>
+        <section data-reveal>Edge</section>
+        <section data-reveal>Inside</section>
+      </div>,
+    );
+    const [above, edge, inside] = [...container.querySelectorAll("[data-reveal]")] as [
+      Element,
+      Element,
+      Element,
+    ];
+    place(above, -600, -100);
+    place(edge, window.innerHeight * 0.93, window.innerHeight * 0.93 + 300);
+    place(inside, window.innerHeight * 0.9, window.innerHeight * 0.9 + 300);
+    render(<RevealRoot />, { container: document.body.appendChild(document.createElement("i")) });
+    expect(observed).toEqual([above, edge]);
+    expect(inside.classList.contains("reveal-pending")).toBe(false);
+  });
+
   // Value: protects=visitors who prefer reduced motion get every section revealed at once, with no observer and no hidden pending state; fails_when=the reduced-motion branch is removed so sections wait on scroll; why_new=only the intersect path was tested; seam=none
   it("reveals every section immediately when the visitor prefers reduced motion", () => {
     const Observer = vi.fn();
