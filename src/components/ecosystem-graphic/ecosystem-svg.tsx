@@ -1,15 +1,22 @@
 import type { CSSProperties, SVGProps } from "react";
 import { HERO_SVG_DESC, HERO_SVG_TITLE } from "@/content/ecosystem/hero-text";
-import { ecosystemHref, HERO_LABELS, heroAriaLabel } from "@/content/ecosystem/registry";
+import {
+  ecosystemHref,
+  HERO_INTERFACE_FACES,
+  HERO_LABELS,
+  heroAriaLabel,
+} from "@/content/ecosystem/registry";
 import {
   CENTER,
   EDGES,
   ELLIPSE,
-  HUB_RADIUS,
+  hitRadius,
   LABEL_FONT,
   LABEL_LINE,
   NODE_RADIUS,
   PARTS,
+  TWIN_GAP,
+  TWIN_RADIUS,
   VIEWBOX,
   type PartGeometry,
 } from "./geometry";
@@ -86,8 +93,48 @@ function LabelLines({
 
 function PartLabel({ part }: { part: PartGeometry }) {
   const copy = HERO_LABELS[part.slug];
+  if (part.shape === "twin") {
+    return (
+      <g className="eco-label" aria-hidden="true">
+        <LabelLines
+          className="eco-title"
+          lines={[copy.title]}
+          x={part.label.x}
+          y={part.label.y}
+          anchor={part.label.anchor}
+          size={LABEL_FONT.title}
+        />
+        <LabelLines
+          className="eco-desc"
+          lines={[copy.descriptor]}
+          x={part.label.x}
+          y={part.label.y + LABEL_LINE}
+          anchor={part.label.anchor}
+          size={LABEL_FONT.descriptor}
+        />
+        <text
+          className="eco-title"
+          x={TWIN_RADIUS + 12}
+          y={-TWIN_GAP + 4}
+          textAnchor="start"
+          fontSize={LABEL_FONT.title}
+        >
+          {HERO_INTERFACE_FACES.people.title}
+        </text>
+        <text
+          className="eco-title"
+          x={TWIN_RADIUS + 12}
+          y={TWIN_GAP + 4}
+          textAnchor="start"
+          fontSize={LABEL_FONT.title}
+        >
+          {HERO_INTERFACE_FACES.apps.title}
+        </text>
+      </g>
+    );
+  }
   const titleLines = wrapHeroLabel(copy.title);
-  const descLines = part.center ? [copy.descriptor] : wrapHeroLabel(copy.descriptor);
+  const descLines = wrapHeroLabel(copy.descriptor);
   const extra = titleLines.length + descLines.length - 1;
   const startY = part.label.y <= -24 ? part.label.y - extra * LABEL_LINE : part.label.y;
   return (
@@ -113,8 +160,71 @@ function PartLabel({ part }: { part: PartGeometry }) {
   );
 }
 
+function ServerBody({ part }: { part: PartGeometry }) {
+  const dashed = part.dashed || undefined;
+  return (
+    <g className="eco-bob">
+      <ellipse className="eco-node-shadow" cx={4} cy={22} rx={28} ry={6} />
+      <g className="eco-server-body">
+        <path className="eco-server-side" d="M16 -6 L30 -18 L30 8 L16 20Z" data-dashed={dashed} />
+        <path
+          className="eco-server-front"
+          d="M-26 -4 L16 -4 L16 20 L-26 20Z"
+          data-dashed={dashed}
+        />
+        <path
+          className="eco-server-top"
+          d="M-26 -4 L-12 -16 L30 -18 L16 -4Z"
+          data-dashed={dashed}
+        />
+        <path className="eco-server-bay" d="M-18 4 H8 M-18 10 H8 M-18 16 H8" data-dashed={dashed} />
+      </g>
+      <g transform="translate(-4 8)">
+        <Glyph glyph={part.glyph} />
+      </g>
+    </g>
+  );
+}
+
+function TwinBody({ part }: { part: PartGeometry }) {
+  return (
+    <g className="eco-bob">
+      <ellipse className="eco-node-shadow" cx={0} cy={TWIN_GAP + TWIN_RADIUS + 6} rx={16} ry={4} />
+      <line className="eco-twin-join" x1={0} y1={-2} x2={0} y2={2} />
+      <g transform={`translate(0 ${-TWIN_GAP})`}>
+        <circle className="eco-node" r={TWIN_RADIUS} />
+        <Glyph glyph={part.glyph} />
+      </g>
+      <g transform={`translate(0 ${TWIN_GAP})`}>
+        <circle className="eco-node" r={TWIN_RADIUS} data-apps="true" />
+        <g className="eco-glyph" aria-hidden="true">
+          <rect x={-10} y={-6} width={20} height={12} rx={3} />
+          <path d="M-4 -6V-10M4 -6V-10M-4 6V10M4 6V10" />
+        </g>
+      </g>
+    </g>
+  );
+}
+
+function NodeBody({ part, svgId }: { part: PartGeometry; svgId: string }) {
+  const radius = NODE_RADIUS;
+  return (
+    <g className="eco-bob">
+      <ellipse className="eco-node-shadow" cx={0} cy={radius + 7} rx={radius * 0.78} ry={5} />
+      <circle
+        className="eco-node"
+        r={radius}
+        data-dashed={part.dashed || undefined}
+        fill={part.center ? `url(#${svgId}-hub)` : undefined}
+      />
+      <circle className="eco-node-sheen" r={radius} fill={`url(#${svgId}-sheen)`} />
+      <Glyph glyph={part.glyph} />
+    </g>
+  );
+}
+
 function PartBody({ part, svgId }: { part: PartGeometry; svgId: string }) {
-  const radius = part.center ? HUB_RADIUS : NODE_RADIUS;
+  const radius = hitRadius(part);
   return (
     <>
       <a
@@ -124,18 +234,13 @@ function PartBody({ part, svgId }: { part: PartGeometry; svgId: string }) {
         style={toneStyle(part)}
       >
         <rect className="eco-hit" {...hitBox(radius)} rx={radius + 8} />
-        <g className="eco-bob">
-          <ellipse className="eco-node-shadow" cx={0} cy={radius + 7} rx={radius * 0.78} ry={5} />
-          <circle
-            className="eco-node"
-            r={radius}
-            data-dashed={part.dashed || undefined}
-            data-center={part.center || undefined}
-            fill={part.center ? `url(#${svgId}-hub)` : undefined}
-          />
-          <circle className="eco-node-sheen" r={radius} fill={`url(#${svgId}-sheen)`} />
-          <Glyph glyph={part.glyph} />
-        </g>
+        {part.shape === "server" ? (
+          <ServerBody part={part} />
+        ) : part.shape === "twin" ? (
+          <TwinBody part={part} />
+        ) : (
+          <NodeBody part={part} svgId={svgId} />
+        )}
       </a>
       <PartLabel part={part} />
     </>
@@ -164,9 +269,9 @@ function Orbits() {
       <ellipse
         className="eco-disc"
         cx={CENTER.x}
-        cy={CENTER.y + ELLIPSE.assembled.ry * 0.22}
-        rx={ELLIPSE.exploded.rx + 10}
-        ry={22}
+        cy={CENTER.y + ELLIPSE.assembled.ry * 0.28}
+        rx={ELLIPSE.exploded.rx + 8}
+        ry={20}
       />
       <ellipse
         className="eco-orbit eco-orbit-inner"

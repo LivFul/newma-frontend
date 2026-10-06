@@ -4,7 +4,7 @@
   margin: 0;
 }
 .eco-frame {
-  aspect-ratio: 500 / 560;
+  aspect-ratio: 500 / 590;
   width: 100%;
   max-width: 36rem;
   margin-inline: auto;
@@ -90,9 +90,39 @@
 .eco-link:focus-visible .eco-node:not([data-center]) {
   fill: var(--color-bg);
 }
-.eco-node[data-dashed] {
+.eco-node[data-dashed],
+.eco-server-body [data-dashed] {
   stroke-dasharray: 7 5;
-  fill-opacity: 0.9;
+  fill-opacity: 0.92;
+}
+.eco-server-front {
+  fill: color-mix(in srgb, var(--color-bg-elevated) 88%, white);
+  stroke: var(--eco-stroke, var(--eco-tone));
+  stroke-width: 1.8px;
+}
+.eco-server-top {
+  fill: color-mix(in srgb, var(--color-bg-elevated) 96%, white);
+  stroke: var(--eco-stroke, var(--eco-tone));
+  stroke-width: 1.8px;
+}
+.eco-server-side {
+  fill: color-mix(in srgb, var(--color-bg-deep) 28%, var(--color-bg-elevated));
+  stroke: var(--eco-stroke, var(--eco-tone));
+  stroke-width: 1.8px;
+}
+.eco-server-bay {
+  fill: none;
+  stroke: var(--eco-ink);
+  stroke-width: 1.4px;
+  stroke-linecap: round;
+}
+.eco-twin-join {
+  stroke: var(--eco-stroke, var(--eco-tone));
+  stroke-width: 2px;
+}
+.eco-link:hover .eco-server-front,
+.eco-link:focus-visible .eco-server-front {
+  fill: var(--color-bg);
 }
 .eco-glyph * {
   vector-effect: non-scaling-stroke;
@@ -248,11 +278,18 @@
 @media (forced-colors: active) {
   .eco-node,
   .eco-orbit,
-  .eco-edges path {
+  .eco-edges path,
+  .eco-server-front,
+  .eco-server-top,
+  .eco-server-side,
+  .eco-twin-join {
     stroke: CanvasText;
   }
   .eco-node,
-  .eco-disc {
+  .eco-disc,
+  .eco-server-front,
+  .eco-server-top,
+  .eco-server-side {
     fill: Canvas;
   }
   .eco-node-sheen {

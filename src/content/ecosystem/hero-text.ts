@@ -11,9 +11,9 @@ export const HERO_SVG_TITLE: CopyBlock = Object.freeze({
 export const HERO_SVG_DESC: CopyBlock = Object.freeze({
   id: "hero.svg.desc",
   text:
-    "Six proposed components drawn as stacked slabs, each linking to its page. Interface passes " +
-    "requests to Agentic Compute, which sends results to Scientific Review and work to Wet Lab; " +
-    "Wet Lab results return to Scientific Review. Every component relies on Data & Knowledge for " +
-    "authoritative records. Provenance & DLT is an optional extension.",
+    "Six proposed components, each linking to its page. Data & Knowledge and Provenance & DLT form " +
+    "the records core. Agentic Compute, Scientific Review and Wet Lab loop around that core. " +
+    "Interface sits outside the loop for people and for other applications through an API. " +
+    "Provenance & DLT is an optional extension.",
   claims: Object.freeze(["C-48"]),
 });

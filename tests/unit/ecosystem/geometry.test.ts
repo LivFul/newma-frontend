@@ -4,8 +4,7 @@ import {
   EDGES,
   ELLIPSE,
   GLYPH_KEYS,
-  HUB_RADIUS,
-  NODE_RADIUS,
+  hitRadius,
   PARTS,
   VIEWBOX,
 } from "@/components/ecosystem-graphic/geometry";
@@ -13,8 +12,6 @@ import { ECOSYSTEM_SLUGS } from "@/content/ecosystem/registry";
 
 const dist = (a: { x: number; y: number }, b: { x: number; y: number }) =>
   Math.hypot(a.x - b.x, a.y - b.y);
-
-const radiusOf = (part: (typeof PARTS)[number]) => (part.center ? HUB_RADIUS : NODE_RADIUS);
 
 const onEllipse = (point: { x: number; y: number }, ring: { rx: number; ry: number }) => {
   const nx = (point.x - CENTER.x) / ring.rx;
@@ -68,24 +65,37 @@ describe("ecosystem geometry", () => {
     for (const part of PARTS) expect(GLYPH_KEYS).toContain(part.glyph);
   });
 
-  it("keeps Interface at the centre and the others on two tilted ellipses", () => {
-    const hub = PARTS.find((p) => p.slug === "interface")!;
-    expect(hub.center).toBe(true);
-    expect(hub.assembled).toEqual(CENTER);
-    expect(hub.exploded).toEqual(CENTER);
-    expect(hub.depth).toBe(0);
-    for (const part of PARTS.filter((p) => !p.center)) {
+  it("stacks the records server at the core and keeps Interface outside the loop", () => {
+    const data = PARTS.find((p) => p.slug === "data-knowledge")!;
+    const provenance = PARTS.find((p) => p.slug === "provenance-dlt")!;
+    const gate = PARTS.find((p) => p.slug === "interface")!;
+    expect(data.shape).toBe("server");
+    expect(provenance.shape).toBe("server");
+    expect(gate.shape).toBe("twin");
+    expect(data.assembled.x).toBe(CENTER.x);
+    expect(provenance.assembled.x).toBe(CENTER.x);
+    expect(provenance.assembled.y).toBeLessThan(data.assembled.y);
+    expect(provenance.exploded.y).toBeLessThan(provenance.assembled.y);
+    expect(data.exploded.y).toBeGreaterThan(data.assembled.y);
+    expect(gate.assembled.x).toBeLessThan(CENTER.x - ELLIPSE.assembled.rx);
+    expect(gate.exploded.x).toBeLessThan(gate.assembled.x);
+    for (const slug of ["agentic-compute", "scientific-review", "wet-lab"] as const) {
+      const part = PARTS.find((p) => p.slug === slug)!;
       expect(onEllipse(part.assembled, ELLIPSE.assembled)).toBeCloseTo(1, 2);
       expect(onEllipse(part.exploded, ELLIPSE.exploded)).toBeCloseTo(1, 2);
       expect(dist(part.exploded, CENTER)).toBeGreaterThan(dist(part.assembled, CENTER));
     }
-    const provenance = PARTS.find((p) => p.slug === "provenance-dlt")!;
-    expect(provenance.exploded.y - provenance.assembled.y).toBeGreaterThan(20);
+    const wetLab = PARTS.find((p) => p.slug === "wet-lab")!;
+    expect(wetLab.exploded.y - wetLab.assembled.y).toBeGreaterThan(20);
   });
 
   it("never overlaps assembled or exploded nodes", () => {
     for (const state of ["assembled", "exploded"] as const) {
-      const nodes = PARTS.map((p) => ({ point: p[state], radius: radiusOf(p), slug: p.slug }));
+      const nodes = PARTS.map((p) => ({
+        point: p[state],
+        radius: hitRadius(p),
+        slug: p.slug,
+      }));
       for (let i = 0; i < nodes.length; i += 1) {
         for (let j = i + 1; j < nodes.length; j += 1) {
           expect(
@@ -99,7 +109,7 @@ describe("ecosystem geometry", () => {
 
   it("keeps every node, assembled and exploded, inside the viewBox", () => {
     for (const part of PARTS) {
-      const radius = radiusOf(part);
+      const radius = hitRadius(part);
       for (const point of [part.assembled, part.exploded]) {
         expect(point.x - radius).toBeGreaterThanOrEqual(0);
         expect(point.y - radius).toBeGreaterThanOrEqual(0);

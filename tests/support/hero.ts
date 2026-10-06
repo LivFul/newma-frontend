@@ -45,7 +45,7 @@ async function allPartYs(page: Page): Promise<number[]> {
  * part can look still while another is waiting for its delay: sample all six across several frames.
  * Returns the y of the requested part.
  */
-export async function settled(page: Page, slug: Slug = "provenance-dlt"): Promise<number> {
+export async function settled(page: Page, slug: Slug = "wet-lab"): Promise<number> {
   let previous: number[] = [];
   let stableRuns = 0;
   await expect

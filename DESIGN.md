@@ -248,7 +248,7 @@ Sticky translucent header. Mobile opens a sheet for section links. Footer is a d
 
 ### Ecosystem diagram
 
-Interface at the centre as the leaf-and-pill mark. Five components orbit on two rings. Provenance & DLT stays dashed. Keyboard, no-JS static SVG and a lazy Motion twin are required.
+Data & Knowledge and Provenance & DLT form a 3D records server at the centre (data on the lower rack, provenance dashed on the upper rack). Agentic Compute, Scientific Review and Wet Lab orbit that core. Interface sits outside the loop as People plus API. Keyboard, no-JS static SVG and a lazy Motion twin are required.
 
 ## Do's and Don'ts
 
