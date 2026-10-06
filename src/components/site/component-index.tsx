@@ -23,7 +23,10 @@ export function ComponentIndex() {
             {COMPONENTS_INDEX.intro.text}
           </p>
         </div>
-        <ul role="list" className="grid min-w-0 gap-4 [counter-reset:key] md:grid-cols-2 lg:grid-cols-3">
+        <ul
+          role="list"
+          className="grid min-w-0 gap-4 [counter-reset:key] md:grid-cols-2 lg:grid-cols-3"
+        >
           {ECOSYSTEM_SLUGS.map((slug, index) => (
             <li key={slug} className="relative [counter-increment:key]">
               <ComponentLink
