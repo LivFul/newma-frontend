@@ -211,12 +211,7 @@ function NodeBody({ part, svgId }: { part: PartGeometry; svgId: string }) {
   return (
     <g className="eco-bob">
       <ellipse className="eco-node-shadow" cx={0} cy={radius + 7} rx={radius * 0.78} ry={5} />
-      <circle
-        className="eco-node"
-        r={radius}
-        data-dashed={part.dashed || undefined}
-        fill={part.center ? `url(#${svgId}-hub)` : undefined}
-      />
+      <circle className="eco-node" r={radius} data-dashed={part.dashed || undefined} />
       <circle className="eco-node-sheen" r={radius} fill={`url(#${svgId}-sheen)`} />
       <Glyph glyph={part.glyph} />
     </g>
@@ -323,10 +318,6 @@ export function EcosystemSvg({
       <title id={titleId}>{HERO_SVG_TITLE.text}</title>
       <desc id={descId}>{HERO_SVG_DESC.text}</desc>
       <defs>
-        <radialGradient id={`${svgId}-hub`} cx="35%" cy="30%" r="70%">
-          <stop offset="0%" stopColor="var(--color-bg-elevated)" />
-          <stop offset="100%" stopColor="var(--color-bg-deep)" />
-        </radialGradient>
         <radialGradient id={`${svgId}-sheen`} cx="32%" cy="28%" r="70%">
           <stop offset="0%" stopColor="white" stopOpacity="0.55" />
           <stop offset="58%" stopColor="white" stopOpacity="0" />

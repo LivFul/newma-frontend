@@ -44,36 +44,18 @@ export type Edge = Readonly<{
 }>;
 
 export const VIEWBOX = Object.freeze({ width: 500, height: 590 });
-export const PLATE = Object.freeze({ halfWidth: 28, halfHeight: 28, thickness: 0 });
 export const NODE_RADIUS = 24;
 export const SERVER_RADIUS = 26;
 export const TWIN_RADIUS = 18;
 export const TWIN_GAP = 20;
-export const HUB_RADIUS = SERVER_RADIUS;
 export const LABEL_FONT = Object.freeze({ title: 20, descriptor: 20 });
 export const LABEL_LINE = 22;
-export const LABEL_BOX = Object.freeze({
-  offsetX: 0,
-  width: 100,
-  top: -18,
-  bottom: 34,
-  titleBaseline: 0,
-  descriptorBaseline: 20,
-});
-export const LEADER = Object.freeze({ fromX: 0, toX: 0 });
-export const RAIL_X = 18;
 /** Centre of the records server and of the work loop around it. */
 export const CENTER = Object.freeze({ x: 304, y: 278 });
 /** Tilted 3D ring around the records core. Inner = assembled, outer = exploded. */
 export const ELLIPSE = Object.freeze({
   assembled: Object.freeze({ rx: 118, ry: 90 }),
   exploded: Object.freeze({ rx: 148, ry: 124 }),
-});
-export const RING = Object.freeze({
-  assembled: ELLIPSE.assembled.rx,
-  exploded: ELLIPSE.exploded.rx,
-  inner: ELLIPSE.assembled,
-  outer: ELLIPSE.exploded,
 });
 
 const TONES: Readonly<Record<EcosystemSlug, ToneToken>> = {

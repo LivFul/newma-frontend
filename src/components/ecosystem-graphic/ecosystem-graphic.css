@@ -1,5 +1,5 @@
 /* Hero graphic: tilted 3D orbital ecosystem. Static layer explodes by CSS; interactive uses Motion.
-   Animate transform, opacity and stroke-dashoffset only. */
+   Animate transform and opacity only. */
 .eco-figure {
   margin: 0;
 }
@@ -205,14 +205,10 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .eco-orbit-inner {
-    animation: orbit-dash 28s linear infinite;
-  }
-  .eco-orbit-outer {
-    animation: orbit-dash 42s linear infinite reverse;
-  }
+  /* One short float and settle (2 x 2.2 s plus at most 0.5 s of stagger, under 5 s), so nothing moves
+     on its own for long enough to need a pause control (WCAG 2.2.2). */
   .eco-glyph {
-    animation: node-float 4.6s var(--motion-ease-standard) infinite alternate;
+    animation: node-float 2.2s var(--motion-ease-standard) 2 alternate;
     animation-delay: calc(var(--i, 0) * 80ms);
   }
   .eco-svg:hover .eco-glyph,
@@ -247,27 +243,19 @@
   }
 }
 
+/* Reduced motion shows the exploded, labelled diagram at once. Its transitions and animations are only
+   defined under no-preference above, and these selectors out-rank the base rules, so no priority
+   override is needed. */
 @media (prefers-reduced-motion: reduce) {
   .eco-svg[data-layer="static"] .eco-part {
-    transform: translate(var(--ex), var(--ey)) !important;
-    transition: none !important;
+    transform: translate(var(--ex), var(--ey));
   }
   .eco-svg .eco-label,
   .eco-svg .eco-edges {
-    opacity: 1 !important;
-    transition: none !important;
-  }
-  .eco-orbit,
-  .eco-glyph {
-    animation: none !important;
+    opacity: 1;
   }
 }
 
-@keyframes orbit-dash {
-  to {
-    stroke-dashoffset: -240;
-  }
-}
 @keyframes node-float {
   from {
     transform: scale(var(--eco-scale, 1)) translateY(0);
