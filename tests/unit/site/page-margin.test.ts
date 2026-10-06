@@ -24,9 +24,9 @@ function blockAfter(css: string, marker: string): string {
 }
 
 describe("full-bleed page shell", () => {
-  it("does not use the survey paper margin on the body", () => {
-    expect(blockAfter(globals, "\nbody {")).not.toContain("padding: var(--space-3)");
-    expect(globals).not.toContain("padding: 0.5in");
+  // Value: protects=the screen body is full-bleed (no padding of its own) and print resets padding to zero; fails_when=a page margin is put back on the body or the print reset is dropped; why_new=the old test grepped for strings of a removed design instead of the contract; seam=none
+  it("keeps the screen body full-bleed and resets padding for print", () => {
+    expect(blockAfter(globals, "\nbody {")).not.toMatch(/padding/);
     expect(blockAfter(globals, "@media print")).toMatch(/padding:\s*0;/);
   });
 

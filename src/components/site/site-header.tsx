@@ -55,31 +55,25 @@ export function SiteHeader() {
           </AccessLink>
         </div>
       </div>
-      {open ? (
-        <nav
-          id="mobile-sections"
-          aria-label={HEADER_MOBILE_NAV.text}
-          className="flex flex-col gap-1 border-t border-fg/10 px-5 py-3 md:hidden"
-        >
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="inline-flex min-h-11 items-center text-fg"
-              onClick={() => setOpen(false)}
-            >
-              {link.block.text}
-            </a>
-          ))}
-        </nav>
-      ) : (
-        <nav
-          id="mobile-sections"
-          hidden
-          className="md:hidden"
-          aria-label={HEADER_MOBILE_NAV.text}
-        />
-      )}
+      <nav
+        id="mobile-sections"
+        aria-label={HEADER_MOBILE_NAV.text}
+        hidden={!open}
+        className="flex flex-col gap-1 border-t border-fg/10 px-5 py-3 md:hidden"
+      >
+        {open
+          ? NAV_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="inline-flex min-h-11 items-center text-fg"
+                onClick={() => setOpen(false)}
+              >
+                {link.block.text}
+              </a>
+            ))
+          : null}
+      </nav>
     </header>
   );
 }

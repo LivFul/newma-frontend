@@ -24,7 +24,7 @@ export function AboutLivful() {
           {ABOUT.heading.text}
         </h2>
         <div
-          className="h-40 rounded-xl bg-cover bg-center opacity-80 shadow-sm md:h-52"
+          className="h-40 rounded-lg bg-cover bg-center opacity-80 shadow-sm md:h-52"
           style={{
             backgroundImage:
               'image-set(url("/images/field-plants.webp") type("image/webp"), url("/images/field-plants.jpg") type("image/jpeg"))',
@@ -32,11 +32,11 @@ export function AboutLivful() {
           aria-hidden="true"
         />
         <div className="grid gap-x-16 gap-y-12 md:grid-cols-2">
-          <div className="space-y-5 rounded-xl bg-bg-elevated/80 p-6 shadow-sm">
+          <div className="space-y-5 rounded-lg bg-bg-elevated/80 p-6 shadow-sm">
             <h3 className={H2_SUB}>{MISSION_HEADING.text}</h3>
             <p className="max-w-[44ch] text-xl leading-snug text-fg-muted">{MISSION.text}</p>
           </div>
-          <div className="space-y-5 rounded-xl bg-bg-elevated/80 p-6 shadow-sm">
+          <div className="space-y-5 rounded-lg bg-bg-elevated/80 p-6 shadow-sm">
             <h3 className={H2_SUB}>{VISION_HEADING.text}</h3>
             <p className="max-w-[44ch] text-xl leading-snug text-fg-muted">{VISION.text}</p>
           </div>

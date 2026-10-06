@@ -10,6 +10,7 @@ import { ComponentIndex } from "@/components/site/component-index";
 import { HeroSection } from "@/components/site/hero-section";
 import { PersonaGrid } from "@/components/site/persona-grid";
 import { ProductIntro } from "@/components/site/product-intro";
+import { HERO_SVG_TITLE } from "@/content/ecosystem/hero-text";
 import { HERO_LABELS, ECOSYSTEM_SLUGS } from "@/content/ecosystem/registry";
 import { ABOUT, HERO, PRODUCT } from "@/content/home/copy";
 import { MISSION, VISION } from "@/content/home/about";
@@ -96,12 +97,12 @@ describe("HeroSection", () => {
     expect(screen.getByText(HERO.disclaimer.text)).toBeInTheDocument();
   });
 
-  // Value: protects=hero map key labels render and the A-H / 1-5 grid references stay out of the accessibility tree; fails_when=a label is dropped or aria-hidden is lost on the tick rows; why_new=HeroSection test only covered lede and disclaimer; seam=none
-  it("keeps the orbital diagram in a glass panel without the survey map key", () => {
+  // Value: protects=the hero exposes one orbital diagram with its accessible name inside the hero landmark; fails_when=the diagram leaves the hero section or loses the name that describes it to assistive technology; why_new=the previous test checked CSS class names and carried a stale card for the removed survey map key; seam=none
+  it("exposes the orbital diagram with its accessible name inside the hero", () => {
     const { container } = render(<HeroSection />);
-    expect(container.querySelector(".sheet-ticks-x")).toBeNull();
-    expect(container.querySelector(".glass")).not.toBeNull();
-    expect(container.querySelector("figure[data-hero]")).not.toBeNull();
+    const hero = container.querySelector<HTMLElement>("section#hero")!;
+    expect(hero.querySelector("figure[data-hero]")).not.toBeNull();
+    expect(within(hero).getByRole("group", { name: HERO_SVG_TITLE.text })).toBeInTheDocument();
   });
 });
 

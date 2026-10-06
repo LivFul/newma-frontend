@@ -7,7 +7,7 @@ export function PersonaGrid() {
       {PERSONAS.map((persona) => (
         <li
           key={persona.role.id}
-          className="space-y-3 rounded-xl border border-border/70 bg-bg-elevated p-5 shadow-sm"
+          className="space-y-3 rounded-lg border border-border/70 bg-bg-elevated p-5 shadow-sm"
         >
           <LeafIcon className="h-6 w-auto" />
           <p className="text-xl font-medium tracking-[-0.01em]">{persona.role.text}</p>

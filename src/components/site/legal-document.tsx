@@ -8,7 +8,7 @@ export function LegalDocumentView({ doc }: { doc: LegalDocument }) {
           <h1 className="font-display text-4xl leading-[1.0] font-medium tracking-[-0.035em] text-balance [overflow-wrap:anywhere] sm:text-5xl xl:text-6xl">
             {doc.title.text}
           </h1>
-          <p className="max-w-[36ch] rounded-xl border border-warning-ink bg-warning/20 px-4 py-3 text-lg leading-snug">
+          <p className="max-w-[36ch] rounded-lg border border-warning-ink bg-warning/20 px-4 py-3 text-lg leading-snug">
             <span>{doc.draftLabel.text}</span>
           </p>
         </header>

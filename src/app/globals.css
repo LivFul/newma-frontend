@@ -66,10 +66,21 @@ main[tabindex="-1"]:focus-visible {
   }
 }
 
+/* Installed app: the sticky header owns the top inset so it never pins under the status bar once
+   scrolled; pages without the site header (demo, access) pad the body instead. */
 @media (display-mode: standalone) {
   body {
-    padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
+  }
+  body:not(:has([data-site-header])) {
+    padding-top: env(safe-area-inset-top);
+  }
+  [data-site-header] {
+    padding-top: env(safe-area-inset-top);
+    min-height: calc(var(--size-header) + env(safe-area-inset-top));
+  }
+  html:has([data-site-header]) {
+    scroll-padding-top: calc(var(--size-header) + env(safe-area-inset-top) + var(--space-4));
   }
 }
 
@@ -94,7 +105,7 @@ main[tabindex="-1"]:focus-visible {
     box-shadow: var(--shadow-md);
   }
   .panel {
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background-color: color-mix(in srgb, var(--color-bg-elevated) 86%, transparent);
     border: 1px solid color-mix(in srgb, var(--color-leaf) 22%, var(--color-border));
     box-shadow: var(--shadow-md);
@@ -102,7 +113,7 @@ main[tabindex="-1"]:focus-visible {
   .glass {
     background-color: color-mix(in srgb, var(--color-bg-elevated) 78%, transparent);
     border: 1px solid color-mix(in srgb, white 55%, var(--color-border));
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
   }
   @supports (backdrop-filter: blur(16px)) {
@@ -114,19 +125,22 @@ main[tabindex="-1"]:focus-visible {
   .aurora {
     background-image: var(--background-image-aurora);
     background-size: 140% 140%;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .aurora {
-      animation: aurora-drift 28s var(--motion-ease-standard) infinite alternate;
-    }
+    background-position: 40% 50%;
   }
   .botanical-lines {
     background-image: url("/images/botanical-lines.svg");
     background-size: 720px 720px;
   }
-  .molecule-lattice {
-    background-image: url("/images/molecule-lattice.svg");
-    background-size: 280px 280px;
+  /* Both classes on one element make a single multi-layer background: two single-layer rules of equal
+     specificity would let the later one replace the other's image entirely. */
+  .aurora.botanical-lines {
+    background-image: url("/images/botanical-lines.svg"), var(--background-image-aurora);
+    background-size:
+      720px 720px,
+      140% 140%;
+    background-position:
+      0 0,
+      40% 50%;
   }
   .hatch-restricted {
     background-image: repeating-linear-gradient(
@@ -165,8 +179,10 @@ main[tabindex="-1"]:focus-visible {
     opacity: 0;
     transform: translateY(16px);
   }
+  /* backwards, not both: the finished animation must not leave a transform on the section, which would
+     make it the containing block of its fixed and sticky descendants. */
   .reveal-in {
-    animation: reveal-up var(--motion-duration-slow) var(--motion-ease-emphasized) both;
+    animation: reveal-up var(--motion-duration-slow) var(--motion-ease-emphasized) backwards;
   }
   @media (prefers-reduced-motion: reduce) {
     .reveal-pending,
@@ -206,14 +222,6 @@ main[tabindex="-1"]:focus-visible {
   }
 }
 
-@keyframes aurora-drift {
-  from {
-    background-position: 0% 40%;
-  }
-  to {
-    background-position: 80% 60%;
-  }
-}
 @keyframes reveal-up {
   from {
     opacity: 0;
@@ -228,6 +236,14 @@ main[tabindex="-1"]:focus-visible {
 @media print {
   body {
     padding: 0;
+  }
+  /* Unlayered, so these beat the layered reveal rules without !important: a page printed or saved to PDF
+     before it was scrolled must not come out with blank sections. */
+  .reveal-pending,
+  .reveal-in {
+    opacity: 1;
+    transform: none;
+    animation: none;
   }
   .plate-surface,
   .surface,
