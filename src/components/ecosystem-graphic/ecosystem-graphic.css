@@ -224,8 +224,12 @@
 .eco-svg[data-view="exploded"] .eco-edges {
   opacity: 1;
 }
+.eco-svg[data-view="exploded"] .eco-stage-title {
+  opacity: 0;
+}
 .eco-svg[data-layer="interactive"] .eco-label,
-.eco-svg[data-layer="interactive"] .eco-edges {
+.eco-svg[data-layer="interactive"] .eco-edges,
+.eco-svg[data-layer="interactive"] .eco-stage-title {
   transition: opacity var(--motion-duration-base) var(--motion-ease-standard);
 }
 
@@ -252,7 +256,8 @@
       calc(var(--i) * 60ms);
   }
   .eco-svg[data-layer="static"] .eco-label,
-  .eco-svg[data-layer="static"] .eco-edges {
+  .eco-svg[data-layer="static"] .eco-edges,
+  .eco-svg[data-layer="static"] .eco-stage-title {
     transition: opacity var(--motion-duration-base) var(--motion-ease-standard) 180ms;
   }
   .eco-svg[data-layer="static"]:focus-within .eco-part {
@@ -262,6 +267,9 @@
   .eco-svg[data-layer="static"]:focus-within .eco-edges {
     opacity: 1;
   }
+  .eco-svg[data-layer="static"]:focus-within .eco-stage-title {
+    opacity: 0;
+  }
 }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .eco-svg[data-layer="static"]:hover .eco-part {
@@ -270,6 +278,9 @@
   .eco-svg[data-layer="static"]:hover .eco-label,
   .eco-svg[data-layer="static"]:hover .eco-edges {
     opacity: 1;
+  }
+  .eco-svg[data-layer="static"]:hover .eco-stage-title {
+    opacity: 0;
   }
 }
 
@@ -282,6 +293,9 @@
   .eco-svg .eco-edges {
     opacity: 1 !important;
     transition: none !important;
+  }
+  .eco-svg .eco-stage-title {
+    opacity: 0 !important;
   }
   .eco-loop-spin,
   .eco-chevron,
