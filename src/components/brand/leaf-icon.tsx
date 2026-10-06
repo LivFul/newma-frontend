@@ -1,18 +1,25 @@
 import { useId } from "react";
-import { LEAF_PATH, MARK_VIEWBOX } from "./mark-paths";
+import { LEAF_PATH, LEAF_SHAPE_VIEWBOX, MARK_VIEWBOX } from "./mark-paths";
 
 type LeafIconProps = {
   className?: string;
   title?: string;
   gradient?: boolean;
+  /** `mark` keeps the whole logo's box (shapes sit where they do in the logo); `shape` crops to this shape. */
+  fit?: "mark" | "shape";
 };
 
-export function LeafIcon({ className = "size-5", title, gradient = true }: LeafIconProps) {
+export function LeafIcon({
+  className = "size-5",
+  title,
+  gradient = true,
+  fit = "mark",
+}: LeafIconProps) {
   const raw = useId();
   const id = `leaf-${raw.replace(/:/g, "")}`;
   return (
     <svg
-      viewBox={MARK_VIEWBOX}
+      viewBox={fit === "shape" ? LEAF_SHAPE_VIEWBOX : MARK_VIEWBOX}
       className={className}
       aria-hidden={title ? undefined : true}
       focusable="false"

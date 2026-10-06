@@ -9,8 +9,10 @@ export function PersonaGrid() {
           key={persona.role.id}
           className="space-y-3 rounded-lg border border-border/70 bg-bg-elevated p-5 shadow-sm"
         >
-          <LeafIcon className="h-6 w-auto" />
-          <p className="text-xl font-medium tracking-[-0.01em]">{persona.role.text}</p>
+          <div className="flex items-center gap-3">
+            <LeafIcon fit="shape" className="h-6 w-auto shrink-0" />
+            <p className="text-xl font-medium tracking-[-0.01em]">{persona.role.text}</p>
+          </div>
           <p className="leading-relaxed text-fg-muted">{persona.need.text}</p>
         </li>
       ))}
