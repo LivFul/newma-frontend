@@ -1,5 +1,5 @@
 import { expect, test } from "../support/test";
-import { heroLink, heroPart, SLUGS } from "../support/hero";
+import { heroFrame, heroLink, heroPart, SLUGS } from "../support/hero";
 
 test.use({ javaScriptEnabled: false });
 
@@ -15,7 +15,8 @@ test("without JavaScript the six components are working links inside the svg", a
 test("without JavaScript every label is visible and each link navigates", async ({ page }) => {
   for (const slug of SLUGS) {
     await page.goto("/");
-    const title = page.locator(`svg g[data-slug="${slug}"] text.eco-title`);
+    // Interface carries three titles (one per face); the first is the part's own.
+    const title = page.locator(`svg g[data-slug="${slug}"] text.eco-title`).first();
     await expect(title).toBeVisible();
     await heroLink(page, slug).click();
     await expect(page).toHaveURL(new RegExp(`/ecosystem/${slug}$`));
@@ -28,7 +29,7 @@ test("without JavaScript hover explodes the diagram by CSS", async ({ page, isMo
   const y = () =>
     heroPart(page, "wet-lab").evaluate((g) => g.getBoundingClientRect().y + window.scrollY);
   const before = await y();
-  await page.locator("svg.eco-svg").hover();
+  await heroFrame(page).hover();
   await expect.poll(y, { timeout: 5_000 }).toBeGreaterThan(before + 20);
 });
 

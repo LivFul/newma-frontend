@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "../support/test";
-import { gotoHeroReady, heroLink, heroSvg, settled } from "../support/hero";
+import { gotoHeroReady, heroFrame, heroLink, settled } from "../support/hero";
 
 type Recorded = { name: string; [key: string]: unknown };
 
@@ -50,7 +50,7 @@ test("a hero component click emits component_open with the right slug", async ({
   test.skip(isMobile, "the touch model has its own two-tap spec");
   await recordEvents(page);
   await gotoHeroReady(page);
-  await heroSvg(page).hover();
+  await heroFrame(page).hover();
   await settled(page);
   await heroLink(page, "scientific-review").click();
   await expect(page).toHaveURL(/\/ecosystem\/scientific-review$/);

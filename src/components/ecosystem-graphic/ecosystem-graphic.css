@@ -235,12 +235,14 @@
     opacity: 1;
   }
 }
+/* The svg ignores the pointer (only its parts take it), so the frame carries the hover, as it does in
+   the interactive layer: hovering anywhere on the diagram explodes it, and the swap does not jump. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .eco-svg[data-layer="static"]:hover .eco-part {
+  .eco-frame:hover .eco-svg[data-layer="static"] .eco-part {
     transform: translate(var(--ex), var(--ey));
   }
-  .eco-svg[data-layer="static"]:hover .eco-label,
-  .eco-svg[data-layer="static"]:hover .eco-edges {
+  .eco-frame:hover .eco-svg[data-layer="static"] .eco-label,
+  .eco-frame:hover .eco-svg[data-layer="static"] .eco-edges {
     opacity: 1;
   }
 }

@@ -47,17 +47,17 @@ export const HEADER_MOBILE_NAV = block("chrome.header.mobile", "Mobile sections"
 
 export const PWA_COPY = Object.freeze({
   region: block("chrome.pwa.region", "App install", []),
-  updated: block(
-    "chrome.pwa.updated",
-    "A new version of NEWMA is available. Reload to update.",
-    [],
-  ),
+  updated: block("chrome.pwa.updated", "A new version of NEWMA is available. Reload to update.", [
+    "C-56",
+  ]),
   iosHint: block(
     "chrome.pwa.ios",
     "Install NEWMA from the share menu, then add it to the home screen.",
-    [],
+    ["C-56"],
   ),
-  install: block("chrome.pwa.install", "Install NEWMA on this device for a full-screen app.", []),
+  install: block("chrome.pwa.install", "Install NEWMA on this device for a full-screen app.", [
+    "C-56",
+  ]),
   reload: block("chrome.pwa.reload", "Reload", []),
   installAction: block("chrome.pwa.installAction", "Install", []),
   dismiss: block("chrome.pwa.dismiss", "Not now", []),

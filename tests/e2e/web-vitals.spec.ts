@@ -1,5 +1,5 @@
 import { expect, test } from "../support/test";
-import { gotoHeroReady, heroLink, heroSvg, settled } from "../support/hero";
+import { gotoHeroReady, heroFrame, heroLink, settled } from "../support/hero";
 
 // INP lab proxy (assumption A-P4-13): Lighthouse cannot measure INP, so every interaction on the hero
 // is timed with the Event Timing API. Field INP at p75 is a CP-3 follow-up.
@@ -30,7 +30,7 @@ test("hero interactions each stay within 200 ms", async ({ page, isMobile }) => 
     await toggle.click();
     await settled(page);
     if (!isMobile) {
-      await heroSvg(page).hover();
+      await heroFrame(page).hover();
       await settled(page);
       await page.mouse.move(2, 2);
       await settled(page);
