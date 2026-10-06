@@ -162,7 +162,7 @@ const LAYOUT: Readonly<
     shape: "server" as const,
     dashed: false,
     center: true,
-    label: Object.freeze({ x: SERVER_RADIUS + 16, y: -8, anchor: "start" as const }),
+    label: Object.freeze({ x: 0, y: SERVER_RADIUS + 12, anchor: "middle" as const }),
   }),
   "provenance-dlt": Object.freeze({
     assembled: point(CENTER.x, 248),
@@ -171,7 +171,7 @@ const LAYOUT: Readonly<
     shape: "server" as const,
     dashed: true,
     center: true,
-    label: Object.freeze({ x: -(SERVER_RADIUS + 16), y: -10, anchor: "end" as const }),
+    label: Object.freeze({ x: 0, y: -(SERVER_RADIUS + 28), anchor: "middle" as const }),
   }),
 });
 

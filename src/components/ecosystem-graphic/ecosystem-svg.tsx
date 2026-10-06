@@ -116,7 +116,7 @@ function PartLabel({ part }: { part: PartGeometry }) {
           size={LABEL_FONT.descriptor}
         />
         <text
-          className="eco-title"
+          className="eco-face"
           x={TWIN_RADIUS + 12}
           y={-TWIN_GAP + 4}
           textAnchor="start"
@@ -125,7 +125,7 @@ function PartLabel({ part }: { part: PartGeometry }) {
           {HERO_INTERFACE_FACES.people.title}
         </text>
         <text
-          className="eco-title"
+          className="eco-face"
           x={TWIN_RADIUS + 12}
           y={TWIN_GAP + 4}
           textAnchor="start"

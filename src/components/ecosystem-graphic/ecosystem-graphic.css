@@ -129,10 +129,12 @@
 }
 .eco-title,
 .eco-desc,
+.eco-face,
 .eco-stage-title {
   pointer-events: none;
 }
-.eco-title {
+.eco-title,
+.eco-face {
   fill: var(--color-fg);
   font-family: var(--font-display);
   font-weight: 600;
@@ -343,12 +345,14 @@
   }
   .eco-glyph .eco-glyph-fill,
   .eco-title,
+  .eco-face,
   .eco-desc,
   .eco-stage-title,
   .eco-arrowhead {
     fill: CanvasText;
   }
   .eco-title,
+  .eco-face,
   .eco-desc,
   .eco-stage-title {
     stroke: Canvas;
