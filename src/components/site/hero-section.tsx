@@ -35,7 +35,7 @@ export function HeroSection() {
               <a href="#product">{HERO.howCta.text}</a>
             </Button>
           </div>
-          <p className="gridref max-w-[52ch] leading-relaxed text-fg-muted">
+          <p className="max-w-[52ch] text-base leading-relaxed text-fg-muted">
             {HERO.disclaimer.text}
           </p>
           <div className="flex items-center gap-3 pt-2" aria-hidden="true">

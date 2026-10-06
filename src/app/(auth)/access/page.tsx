@@ -22,7 +22,7 @@ function PersonaForm({ persona }: { persona: Persona }) {
       <input type="hidden" name="persona" value={persona.id} />
       <button
         type="submit"
-        className="group grid w-full cursor-pointer grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 rounded-xl px-3 py-4 text-left transition-colors hover:bg-fg hover:text-bg focus-visible:bg-fg focus-visible:text-bg"
+        className="group grid w-full cursor-pointer grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 rounded-lg px-3 py-4 text-left transition-colors hover:bg-fg hover:text-bg focus-visible:bg-fg focus-visible:text-bg"
       >
         <span className="text-lg font-medium tracking-[-0.01em]">{persona.label}</span>
         <LeafIcon className="row-span-2 h-5 w-auto opacity-40 transition-opacity group-hover:opacity-100" />
@@ -53,7 +53,7 @@ export default async function AccessPage({ searchParams }: { searchParams: Searc
           {message ? (
             <p
               role="status"
-              className="max-w-[42ch] rounded-xl border border-warning-ink bg-warning/15 px-4 py-3"
+              className="max-w-[42ch] rounded-lg border border-warning-ink bg-warning/15 px-4 py-3"
             >
               {message}
             </p>

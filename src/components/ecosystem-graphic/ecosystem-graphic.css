@@ -1,5 +1,5 @@
 /* Hero graphic: presentation pipeline. Static layer explodes by CSS; interactive uses Motion.
-   Animate transform, opacity and stroke-dashoffset only. */
+   Animate transform and opacity only (the loop spin and chevron pulse are the pipeline's own ambient loops). */
 .eco-figure {
   margin: 0;
 }
@@ -243,8 +243,10 @@
   .eco-flow .eco-chevron:nth-child(2) {
     animation-delay: 0.28s;
   }
+  /* One short float and settle (2 x 2.2 s plus at most 0.5 s of stagger, under 5 s), so nothing moves
+     on its own for long enough to need a pause control (WCAG 2.2.2). */
   .eco-glyph {
-    animation: node-float 4.6s var(--motion-ease-standard) infinite alternate;
+    animation: node-float 2.2s var(--motion-ease-standard) 2 alternate;
     animation-delay: calc(var(--i, 0) * 80ms);
   }
   .eco-svg:hover .eco-glyph,
@@ -271,36 +273,35 @@
     opacity: 0;
   }
 }
+/* The svg ignores the pointer (only its parts take it), so the frame carries the hover, as it does in
+   the interactive layer: hovering anywhere on the diagram explodes it, and the swap does not jump. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .eco-svg[data-layer="static"]:hover .eco-part {
+  .eco-frame:hover .eco-svg[data-layer="static"] .eco-part {
     transform: translate(var(--ex), var(--ey));
   }
-  .eco-svg[data-layer="static"]:hover .eco-label,
-  .eco-svg[data-layer="static"]:hover .eco-edges {
+  .eco-frame:hover .eco-svg[data-layer="static"] .eco-label,
+  .eco-frame:hover .eco-svg[data-layer="static"] .eco-edges {
     opacity: 1;
   }
-  .eco-svg[data-layer="static"]:hover .eco-stage-title {
+  .eco-frame:hover .eco-svg[data-layer="static"] .eco-stage-title {
     opacity: 0;
   }
 }
 
+/* Reduced motion shows the exploded, labelled diagram at once. Its transitions and animations are only
+   defined under no-preference above, and these selectors out-rank the base rules, so only the stage
+   titles need a priority override. */
 @media (prefers-reduced-motion: reduce) {
   .eco-svg[data-layer="static"] .eco-part {
-    transform: translate(var(--ex), var(--ey)) !important;
-    transition: none !important;
+    transform: translate(var(--ex), var(--ey));
   }
   .eco-svg .eco-label,
   .eco-svg .eco-edges {
-    opacity: 1 !important;
-    transition: none !important;
+    opacity: 1;
   }
+  /* Priority needed here: the exploded-state title rule above out-ranks a plain selector. */
   .eco-svg .eco-stage-title {
     opacity: 0 !important;
-  }
-  .eco-loop-spin,
-  .eco-chevron,
-  .eco-glyph {
-    animation: none !important;
   }
 }
 
@@ -320,6 +321,7 @@
     transform: translateX(3px);
   }
 }
+
 @keyframes node-float {
   from {
     transform: scale(var(--eco-scale, 1)) translateY(0);

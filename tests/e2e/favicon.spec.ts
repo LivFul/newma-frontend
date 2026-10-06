@@ -1,35 +1,34 @@
 import { expect, test } from "../support/test";
 
-const ICONS = [
-  "/favicon.ico",
-  "/brand/favicon-32.png",
-  "/brand/favicon-48.png",
-  "/brand/apple-touch-icon.png",
-  "/brand/favicon.svg",
+const ICONS: ReadonlyArray<readonly [string, RegExp]> = [
+  ["/favicon.ico", /^image\/(x-icon|vnd\.microsoft\.icon)/],
+  ["/brand/favicon-32.png", /^image\/png/],
+  ["/brand/favicon-48.png", /^image\/png/],
+  ["/brand/apple-touch-icon.png", /^image\/png/],
+  ["/brand/favicon.svg", /^image\/svg\+xml/],
 ];
 
-test("favicon assets resolve with the expected types", async ({ request }) => {
-  for (const path of ICONS) {
+test("favicon assets resolve with the exact expected types", async ({ request }) => {
+  for (const [path, type] of ICONS) {
     const response = await request.get(path);
     expect(response.status(), path).toBe(200);
-    const type = response.headers()["content-type"] ?? "";
-    if (path.endsWith(".ico")) expect(type).toMatch(/icon|octet-stream|image/);
-    if (path.endsWith(".png")) expect(type).toContain("image/png");
-    if (path.endsWith(".svg")) expect(type).toMatch(/svg|xml/);
+    expect(response.headers()["content-type"] ?? "", path).toMatch(type);
   }
 });
 
 test("the document lists a PNG or ICO icon before the SVG", async ({ page }) => {
   await page.goto("/");
-  const hrefs = await page
+  const icons = await page
     .locator('link[rel="icon"], link[rel="shortcut icon"]')
     .evaluateAll((els) =>
       els.map((el) => ({
-        rel: el.getAttribute("rel"),
-        href: el.getAttribute("href"),
+        href: el.getAttribute("href") ?? "",
         type: el.getAttribute("type"),
       })),
     );
-  expect(hrefs.length).toBeGreaterThan(0);
-  expect(hrefs[0]?.href).toMatch(/favicon\.ico|favicon-32\.png|favicon-48\.png/);
+  const raster = icons.findIndex((icon) => /\.(ico|png)(\?|$)/.test(icon.href));
+  const svg = icons.findIndex((icon) => /\.svg(\?|$)/.test(icon.href));
+  expect(raster, "a PNG or ICO icon link").toBeGreaterThanOrEqual(0);
+  expect(svg, "an SVG icon link").toBeGreaterThan(raster);
+  expect(icons.find((icon) => /favicon-32\.png/.test(icon.href))?.type).toBe("image/png");
 });

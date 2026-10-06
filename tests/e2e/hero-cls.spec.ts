@@ -1,5 +1,5 @@
 import { expect, test } from "../support/test";
-import { heroSvg, holdHeroChunk } from "../support/hero";
+import { heroFrame, heroSvg, holdHeroChunk } from "../support/hero";
 
 const MAX_HERO_SHIFT = 0.02;
 const SAME_PIXEL = 0.5;
@@ -57,7 +57,7 @@ test("hover present at the swap keeps the view exploded (no collapse flash)", as
   const chunk = await holdHeroChunk(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await chunk.requested;
-  await heroSvg(page).hover();
+  await heroFrame(page).hover();
   await expect(heroSvg(page)).toHaveAttribute("data-layer", "static");
   chunk.release();
   await page.waitForSelector('[data-hero-ready="true"]', { timeout: 30_000 });

@@ -8,7 +8,6 @@ import {
 } from "@/content/ecosystem/registry";
 import {
   CARD,
-  CENTER,
   EDGES,
   FLOW_GATES,
   hitRadius,
@@ -347,20 +346,10 @@ export function EcosystemSvg({
       aria-describedby={descId}
       data-layer={layer}
       data-view={view}
-      style={
-        {
-          "--eco-cx": `${CENTER.x}px`,
-          "--eco-cy": `${CENTER.y}px`,
-        } as CSSProperties
-      }
     >
       <title id={titleId}>{HERO_SVG_TITLE.text}</title>
       <desc id={descId}>{HERO_SVG_DESC.text}</desc>
       <defs>
-        <radialGradient id={`${svgId}-hub`} cx="35%" cy="30%" r="70%">
-          <stop offset="0%" stopColor="var(--color-bg-elevated)" />
-          <stop offset="100%" stopColor="var(--color-bg-deep)" />
-        </radialGradient>
         <radialGradient id={`${svgId}-sheen`} cx="32%" cy="28%" r="70%">
           <stop offset="0%" stopColor="white" stopOpacity="0.55" />
           <stop offset="58%" stopColor="white" stopOpacity="0" />

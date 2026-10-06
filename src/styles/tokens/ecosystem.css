@@ -7,7 +7,9 @@
   --text-display: clamp(2.5rem, 1.4rem + 3.6vw, 4.75rem);
   --tracking-display: -0.04em;
   --size-header: 4rem;
-  --background-image-brand: linear-gradient(115deg, #15a676 0%, #1d5c52 46%, #1b8896 100%);
+  /* Carries the primary button label (--color-accent-fg): every stop stays at 4.5:1 or better against it,
+     also at hover brightness. tests/unit/contrast.test.ts enforces that. */
+  --background-image-brand: linear-gradient(115deg, #0c7552 0%, #1d5c52 46%, #12707d 100%);
   --background-image-leaf: linear-gradient(90deg, #b3e570 0%, #15a676 100%);
   --background-image-capsule: linear-gradient(90deg, #0b404d 0%, #1b8896 100%);
   --background-image-aurora:

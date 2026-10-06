@@ -16,4 +16,13 @@ describe("wrapHeroLabel", () => {
     expect(wrapHeroLabel(HERO_LABELS["agentic-compute"].title)).toEqual(["Agentic", "Compute"]);
     expect(wrapHeroLabel("Where people sign in")).toEqual(["Where people", "sign in"]);
   });
+
+  // Value: protects=the label wrapper's boundaries (empty, exactly 16 characters, 17 with a space, one long word, only a leading space) never throw or drop text; fails_when=the length threshold shifts by one or a no-break label is split into an empty line; why_new=only well-behaved registry titles were covered; seam=none
+  it("handles the edges without losing text", () => {
+    expect(wrapHeroLabel("")).toEqual([""]);
+    expect(wrapHeroLabel("Sixteen chars ab")).toEqual(["Sixteen chars ab"]);
+    expect(wrapHeroLabel("Seventeen chars a")).toEqual(["Seventeen", "chars a"]);
+    expect(wrapHeroLabel("Supercalifragilistic")).toEqual(["Supercalifragilistic"]);
+    expect(wrapHeroLabel(" Longlonglonglonglong")).toEqual([" Longlonglonglonglong"]);
+  });
 });

@@ -52,25 +52,13 @@ export type Stage = Readonly<{
 }>;
 
 export const VIEWBOX = Object.freeze({ width: 500, height: 520 });
-export const PLATE = Object.freeze({ halfWidth: 28, halfHeight: 28, thickness: 0 });
 export const NODE_RADIUS = 24;
 export const CARD = Object.freeze({ width: 56, height: 44, radius: 10 });
 export const SERVER_RADIUS = 26;
 export const TWIN_RADIUS = 18;
 export const TWIN_GAP = 20;
-export const HUB_RADIUS = SERVER_RADIUS;
 export const LABEL_FONT = Object.freeze({ title: 20, descriptor: 20 });
 export const LABEL_LINE = 22;
-export const LABEL_BOX = Object.freeze({
-  offsetX: 0,
-  width: 100,
-  top: -18,
-  bottom: 34,
-  titleBaseline: 0,
-  descriptorBaseline: 20,
-});
-export const LEADER = Object.freeze({ fromX: 0, toX: 0 });
-export const RAIL_X = 18;
 /** Midpoint of the records server (Provenance above, Data below) inside the AI core. */
 export const CENTER = Object.freeze({ x: 250, y: 300 });
 export const STAGES: readonly Stage[] = Object.freeze([

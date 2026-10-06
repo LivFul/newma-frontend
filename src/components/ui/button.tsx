@@ -11,7 +11,7 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "border-transparent bg-brand text-accent-fg shadow-glow hover:brightness-110 active:translate-y-px",
+          "border-transparent bg-brand text-accent-fg shadow-glow hover:brightness-110 active:translate-y-px forced-colors:border-[ButtonText] forced-colors:bg-none",
         secondary:
           "bg-transparent text-fg border-fg/40 hover:bg-fg hover:text-bg active:translate-y-px",
         ghost: "border-transparent text-fg underline-offset-4 hover:bg-bg-deep/80 hover:underline",

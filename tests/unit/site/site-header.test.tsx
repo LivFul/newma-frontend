@@ -1,4 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { SiteHeader } from "@/components/site/site-header";
 import { expectNoAxeViolations } from "../ui/axe";
@@ -57,6 +58,32 @@ describe("SiteHeader", () => {
     const suffix = within(aveloz).getByText("(LivFul staff)");
     expect(suffix.classList.contains("sr-only")).toBe(true);
     expect(suffix.classList.contains("sm:not-sr-only")).toBe(true);
+  });
+  // Value: protects=the Menu button opens a named list of the section links below md, aria-controls always has a target, and choosing a link closes it; fails_when=the toggle, the link list or the close-on-choose handler breaks; why_new=no test pressed Menu; seam=none
+  it("opens the section menu from the Menu button and closes it when a link is chosen", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<SiteHeader />);
+    const menu = screen.getByRole("button", { name: "Menu" });
+    expect(menu).toHaveAttribute("aria-expanded", "false");
+    expect(menu).toHaveAttribute("aria-controls", "mobile-sections");
+    expect(document.getElementById("mobile-sections")).not.toBeNull();
+    expect(screen.queryByRole("navigation", { name: "Mobile sections" })).toBeNull();
+
+    await user.click(menu);
+    expect(menu).toHaveAttribute("aria-expanded", "true");
+    const nav = screen.getByRole("navigation", { name: "Mobile sections" });
+    expect(nav).toHaveAttribute("id", "mobile-sections");
+    expect(
+      within(nav)
+        .getAllByRole("link")
+        .map((link) => link.getAttribute("href")),
+    ).toEqual(["/#product", "/#about"]);
+    await expectNoAxeViolations(container);
+
+    await user.click(within(nav).getByRole("link", { name: "Product" }));
+    expect(menu).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("navigation", { name: "Mobile sections" })).toBeNull();
+    expect(document.getElementById("mobile-sections")).not.toBeNull();
   });
   it("is axe clean", async () => {
     const { container } = render(<SiteHeader />);

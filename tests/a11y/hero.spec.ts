@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import type { Page } from "@playwright/test";
 import { expect, test } from "../support/test";
-import { gotoHeroReady, heroSvg, settled } from "../support/hero";
+import { gotoHeroReady, heroFrame, heroSvg, settled } from "../support/hero";
 
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"];
 
@@ -23,7 +23,7 @@ test("hero has zero axe violations exploded by hover or toggle", async ({ page, 
   if (isMobile) {
     await page.getByRole("button", { name: "Explore components" }).click();
   } else {
-    await heroSvg(page).hover();
+    await heroFrame(page).hover();
   }
   await expect(heroSvg(page)).toHaveAttribute("data-view", "exploded");
   await settled(page);

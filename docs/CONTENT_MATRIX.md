@@ -29,6 +29,7 @@ only); the sprint plan is cited for the demo labels. Status values: `draft` (age
 | Hero hint, toggle, key help | `src/content/home/hero-help.ts`                           | IP §6.4 interaction model          | C-48             | [Recommendation]     | CP-2 pending |
 | Glyph caption               | `src/content/home/hero-caption.ts`                        | A-P4-17                            | C-49             | [Recommendation]     | CP-2 pending |
 | Header, footer, wordmark    | `src/content/home/chrome.ts`                              | structural; A-P4-01                | C-21, C-29, C-30 | [Recommendation]     | CP-2 pending |
+| App install and offline     | `chrome.ts` (`PWA_COPY`), `copy.ts` (`OFFLINE`)           | structural; A-P4-01                | C-56             | [Recommendation]     | CP-2 pending |
 
 ## About LivFul: the source sentence behind each draft line (assumption A-P4-04)
 

@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import { gotoHeroReady } from "../support/hero";
 import { expect, test } from "../support/test";
 
 const SCROLL_POSITIONS = [0, 0.25, 0.5, 0.75, 1] as const;
@@ -114,7 +115,10 @@ async function expectFocusNeverUnderHeader(page: Page, key: string, presses: num
 }
 
 async function tabDownThePage(page: Page) {
-  await page.goto("/");
+  // Start from the settled page. The static hero is replaced by its interactive twin on idle; WebKit drops
+  // focus when that swap lands while a hero link is focused, which ends this walk after three or four
+  // stops and says nothing about the sticky header. That swap is a separate matter.
+  await gotoHeroReady(page);
   await expectFocusNeverUnderHeader(page, "Tab", 40);
 }
 

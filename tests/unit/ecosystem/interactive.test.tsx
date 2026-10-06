@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { EcosystemSvg } from "@/components/ecosystem-graphic/ecosystem-svg";
 import Interactive from "@/components/ecosystem-graphic/interactive";
 import { MotionPart, partVariants } from "@/components/ecosystem-graphic/motion-part";
@@ -8,7 +8,14 @@ import { PARTS } from "@/components/ecosystem-graphic/geometry";
 import { HeroStatic } from "@/components/ecosystem-graphic/hero-static";
 import { StaticPart } from "@/components/ecosystem-graphic/static-part";
 import { ECOSYSTEM_SLUGS, HERO_LABELS } from "@/content/ecosystem/registry";
+import { EVENT_NAME } from "@/lib/analytics/events";
 import { expectNoAxeViolations } from "../ui/axe";
+
+// Tests that stub window.location must not leak the stub into later tests when an assertion fails.
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
+});
 
 function mount(overrides: Partial<Parameters<typeof Interactive>[0]> = {}) {
   const onReady = vi.fn();
@@ -209,29 +216,144 @@ describe("Interactive hero layer", () => {
     vi.stubGlobal("location", { ...window.location, assign });
     const { links, svg } = mount();
     const link = links[1]!;
-    const tap = () => {
-      fireEvent.pointerDown(link, { pointerType: "touch" });
-      return fireEvent.click(link);
-    };
-    expect(tap()).toBe(false); // default prevented: no navigation
+    fireEvent.pointerDown(link, { pointerType: "touch" });
+    expect(fireEvent.click(link)).toBe(false); // first tap: default prevented, no navigation
     expect(svg).toHaveAttribute("data-view", "exploded");
-    expect(tap()).toBe(true); // second tap follows the link
-    expect(assign).toHaveBeenCalled();
-    vi.unstubAllGlobals();
+    expect(assign).not.toHaveBeenCalled();
+    fireEvent.pointerDown(link, { pointerType: "touch" });
+    fireEvent.pointerUp(link, { pointerType: "touch" });
+    expect(assign).toHaveBeenCalledTimes(1); // second tap follows the link
+    expect(fireEvent.click(link)).toBe(false); // and its click does not follow it a second time
   });
 
-  it("navigates on touch pointerup when the layers are already exploded", () => {
+  // Value: protects=a second touch tap navigates once, on pointerup, to the component the finger touched down on, and records one component_open; fails_when=navigation moves back to pointerdown, the click navigates again, or a second event is recorded; why_new=the old test named pointerup but navigated on pointerdown, so onPointerUp was never reached; seam=none
+  it("navigates once on touch pointerup when the layers are already exploded", () => {
     const assign = vi.fn();
     vi.stubGlobal("location", { ...window.location, assign });
+    const opened: unknown[] = [];
+    const record = (event: Event) => opened.push((event as CustomEvent).detail);
+    window.addEventListener(EVENT_NAME, record);
     const { links, svg } = mount();
     fireEvent.pointerDown(links[5]!, { pointerType: "touch" });
     fireEvent.click(links[5]!);
     expect(svg).toHaveAttribute("data-view", "exploded");
+    opened.length = 0;
+
     fireEvent.pointerDown(links[5]!, { pointerType: "touch" });
+    expect(assign).not.toHaveBeenCalled();
     fireEvent.pointerUp(links[5]!, { pointerType: "touch" });
-    expect(assign).toHaveBeenCalled();
+    fireEvent.click(links[5]!);
+    window.removeEventListener(EVENT_NAME, record);
+
+    expect(assign).toHaveBeenCalledTimes(1);
     expect(String(assign.mock.calls[0]?.[0])).toMatch(/\/ecosystem\/provenance-dlt$/);
-    vi.unstubAllGlobals();
+    expect(opened).toEqual([{ name: "component_open", slug: "provenance-dlt" }]);
+  });
+
+  // Value: protects=a swipe, a scroll that the browser cancels, or a tap that misses every component never navigates; fails_when=pointerup navigates regardless of travel or cancel, or falls back to the last component touched; why_new=navigating on pointerdown opened a component for any scroll that began on a node and a miss reopened a stale one; seam=none
+  it.each([
+    [
+      "a touch that travels past the tap slop",
+      (link: Element) => {
+        fireEvent.pointerDown(link, { pointerType: "touch", clientX: 100, clientY: 100 });
+        fireEvent.pointerUp(link, { pointerType: "touch", clientX: 100, clientY: 160 });
+      },
+    ],
+    [
+      "a gesture the browser cancelled",
+      (link: Element) => {
+        fireEvent.pointerDown(link, { pointerType: "touch" });
+        fireEvent.pointerCancel(link, { pointerType: "touch" });
+        fireEvent.pointerUp(link, { pointerType: "touch" });
+      },
+    ],
+  ])("does not navigate for %s", (_name, gesture) => {
+    const assign = vi.fn();
+    vi.stubGlobal("location", { ...window.location, assign });
+    const { links, svg } = mount();
+    fireEvent.pointerDown(links[2]!, { pointerType: "touch" });
+    fireEvent.click(links[2]!);
+    expect(svg).toHaveAttribute("data-view", "exploded");
+    gesture(links[2]!);
+    expect(assign).not.toHaveBeenCalled();
+  });
+
+  it("does not reopen the last component when a second tap misses every component", () => {
+    const assign = vi.fn();
+    vi.stubGlobal("location", { ...window.location, assign });
+    const { links, svg } = mount();
+    fireEvent.pointerDown(links[2]!, { pointerType: "touch" });
+    fireEvent.click(links[2]!);
+    expect(svg).toHaveAttribute("data-view", "exploded");
+    fireEvent.pointerDown(svg, { pointerType: "touch" });
+    fireEvent.pointerUp(svg, { pointerType: "touch" });
+    expect(assign).not.toHaveBeenCalled();
+  });
+
+  // Value: protects=finger jitter inside the tap slop still opens the component, while a drag just past it neither opens it nor lets the synthesized click follow the link; fails_when=the slop becomes zero, the comparison flips, or a rejected drag does not swallow its click; why_new=only a 60 px swipe and zero-travel taps were covered; seam=none
+  it("treats jitter as a tap and a drag past the slop as neither a tap nor a click", () => {
+    const assign = vi.fn();
+    vi.stubGlobal("location", { ...window.location, assign });
+    const { links } = mount();
+    const link = links[2]!;
+    fireEvent.pointerDown(link, { pointerType: "touch" });
+    fireEvent.click(link);
+
+    fireEvent.pointerDown(link, { pointerType: "touch", clientX: 100, clientY: 100 });
+    fireEvent.pointerUp(link, { pointerType: "touch", clientX: 104, clientY: 103 });
+    expect(assign).toHaveBeenCalledTimes(1);
+    fireEvent.click(link);
+    assign.mockClear();
+
+    fireEvent.pointerDown(link, { pointerType: "touch", clientX: 100, clientY: 100 });
+    fireEvent.pointerUp(link, { pointerType: "touch", clientX: 100, clientY: 112 });
+    expect(fireEvent.click(link)).toBe(false);
+    expect(assign).not.toHaveBeenCalled();
+  });
+
+  // Value: protects=the pointerup of the tap that explodes the layers never navigates, because the view captured at pointerdown decides; fails_when=pointerup reads the re-rendered view so the first tap opens the component at once; why_new=the first tap was only exercised as pointerdown then click, never with its pointerup; seam=none
+  it("does not navigate on the pointerup of the tap that explodes the layers", () => {
+    const assign = vi.fn();
+    vi.stubGlobal("location", { ...window.location, assign });
+    const { links, svg } = mount();
+    fireEvent.pointerDown(links[1]!, { pointerType: "touch" });
+    fireEvent.pointerUp(links[1]!, { pointerType: "touch" });
+    expect(fireEvent.click(links[1]!)).toBe(false);
+    expect(svg).toHaveAttribute("data-view", "exploded");
+    expect(assign).not.toHaveBeenCalled();
+  });
+
+  // Value: protects=a gesture that ended without a click cannot swallow a later keyboard or assistive-technology click; fails_when=the one-shot swallow flag stops expiring; why_new=a long press on the first tap left the flag armed until the next pointerdown, silently dropping the next link activation; seam=none
+  it("lets a later click through when the gesture ended without one", () => {
+    vi.useFakeTimers();
+    const { links } = mount();
+    fireEvent.pointerDown(links[1]!, { pointerType: "touch" });
+    fireEvent.pointerUp(links[1]!, { pointerType: "touch" });
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    expect(fireEvent.click(links[1]!)).toBe(true);
+  });
+
+  // Value: protects=a first tap that is held for longer than the swallow window still only explodes the layers: its click is prevented and records nothing; fails_when=the swallow clock starts at pointerdown instead of pointerup; why_new=the expiry timer started at pointerdown, so a slow first tap followed the link and logged component_open; seam=none
+  it("keeps swallowing the click of a slow first tap", () => {
+    vi.useFakeTimers();
+    const assign = vi.fn();
+    vi.stubGlobal("location", { ...window.location, assign });
+    const opened: unknown[] = [];
+    const record = (event: Event) => opened.push((event as CustomEvent).detail);
+    window.addEventListener(EVENT_NAME, record);
+    const { links, svg } = mount();
+    fireEvent.pointerDown(links[1]!, { pointerType: "touch" });
+    act(() => {
+      vi.advanceTimersByTime(450);
+    });
+    fireEvent.pointerUp(links[1]!, { pointerType: "touch" });
+    expect(fireEvent.click(links[1]!)).toBe(false);
+    window.removeEventListener(EVENT_NAME, record);
+    expect(svg).toHaveAttribute("data-view", "exploded");
+    expect(assign).not.toHaveBeenCalled();
+    expect(opened).toEqual([]);
   });
 
   it("never intercepts mouse clicks", () => {

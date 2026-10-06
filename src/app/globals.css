@@ -48,6 +48,9 @@ table,
 html:has([data-site-header]) {
   scroll-padding-top: calc(var(--size-header) + var(--space-4));
 }
+/* Below 27.5rem the header wraps to two rows, about 7.5rem tall. Both numbers are literals because a
+   media condition cannot read a custom property and there is no wrapped-header token; the installed-app
+   block below and workflow-diagram.css repeat them for the same reason. */
 @media (max-width: 27.5rem) {
   html:has([data-site-header]) {
     scroll-padding-top: calc(7.5rem + var(--space-4));
@@ -66,10 +69,37 @@ main[tabindex="-1"]:focus-visible {
   }
 }
 
+/* Installed app. The sticky header owns the top inset, so it never pins under the status bar once
+   scrolled; pages without the site header (demo, access) pad the body. Browsers without :has() keep
+   the plain body padding and skip the header-aware rules. */
 @media (display-mode: standalone) {
   body {
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
+  }
+  @supports selector(:has(*)) {
+    body:has([data-site-header]) {
+      padding-top: 0;
+    }
+    [data-site-header] {
+      padding-top: env(safe-area-inset-top);
+      min-height: calc(var(--size-header) + env(safe-area-inset-top));
+    }
+    html:has([data-site-header]) {
+      scroll-padding-top: calc(var(--size-header) + env(safe-area-inset-top) + var(--space-4));
+    }
+  }
+}
+/* The wrapped phone header and the short-viewport static header need their own offsets here as well:
+   the general standalone rule above has the same specificity and would otherwise win. */
+@media (display-mode: standalone) and (max-width: 27.5rem) {
+  html:has([data-site-header]) {
+    scroll-padding-top: calc(7.5rem + env(safe-area-inset-top) + var(--space-4));
+  }
+}
+@media (display-mode: standalone) and (max-height: 32rem) {
+  html:has([data-site-header]) {
+    scroll-padding-top: var(--space-4);
   }
 }
 
@@ -94,7 +124,7 @@ main[tabindex="-1"]:focus-visible {
     box-shadow: var(--shadow-md);
   }
   .panel {
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background-color: color-mix(in srgb, var(--color-bg-elevated) 86%, transparent);
     border: 1px solid color-mix(in srgb, var(--color-leaf) 22%, var(--color-border));
     box-shadow: var(--shadow-md);
@@ -102,7 +132,7 @@ main[tabindex="-1"]:focus-visible {
   .glass {
     background-color: color-mix(in srgb, var(--color-bg-elevated) 78%, transparent);
     border: 1px solid color-mix(in srgb, white 55%, var(--color-border));
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
   }
   @supports (backdrop-filter: blur(16px)) {
@@ -114,26 +144,28 @@ main[tabindex="-1"]:focus-visible {
   .aurora {
     background-image: var(--background-image-aurora);
     background-size: 140% 140%;
+    background-position: 40% 50%;
+  }
+  /* The hero's drifting botanical lines. They are a tiled image on a ::before layer that reaches one tile
+     past the top and left edges, and the animation slides that layer by exactly one tile, so the loop has
+     no seam and no edge ever shows. Only transform moves, so it runs on the compositor and never repaints
+     the wash underneath (.aurora, the same element, stays still). */
+  .botanical-lines {
+    --tile: 720px;
+    overflow: hidden;
+  }
+  .botanical-lines::before {
+    content: "";
+    position: absolute;
+    inset: calc(var(--tile) * -1) 0 0 calc(var(--tile) * -1);
+    background: url("/images/botanical-lines.svg") 0 0 / var(--tile) var(--tile) repeat;
   }
   @media (prefers-reduced-motion: no-preference) {
-    .aurora {
-      animation: aurora-drift 28s var(--motion-ease-standard) infinite alternate;
+    .botanical-lines::before {
+      animation: botanical-drift 60s linear infinite;
+      /* Promoted only while it moves: a still layer this large is wasted memory. */
+      will-change: transform;
     }
-  }
-  .botanical-lines {
-    background-image: url("/images/botanical-lines.svg");
-    background-size: 720px 720px;
-  }
-  .molecule-lattice {
-    background-image: url("/images/molecule-lattice.svg");
-    background-size: 280px 280px;
-  }
-  .hatch-restricted {
-    background-image: repeating-linear-gradient(
-      -45deg,
-      color-mix(in srgb, var(--color-danger) 28%, transparent) 0 1px,
-      transparent 1px 7px
-    );
   }
   .hatch-held {
     background-image: repeating-linear-gradient(
@@ -165,8 +197,10 @@ main[tabindex="-1"]:focus-visible {
     opacity: 0;
     transform: translateY(16px);
   }
+  /* backwards, not both: the finished animation must not leave a transform on the section, which would
+     make it the containing block of its fixed and sticky descendants. */
   .reveal-in {
-    animation: reveal-up var(--motion-duration-slow) var(--motion-ease-emphasized) both;
+    animation: reveal-up var(--motion-duration-slow) var(--motion-ease-emphasized) backwards;
   }
   @media (prefers-reduced-motion: reduce) {
     .reveal-pending,
@@ -206,12 +240,9 @@ main[tabindex="-1"]:focus-visible {
   }
 }
 
-@keyframes aurora-drift {
-  from {
-    background-position: 0% 40%;
-  }
+@keyframes botanical-drift {
   to {
-    background-position: 80% 60%;
+    transform: translate3d(var(--tile), var(--tile), 0);
   }
 }
 @keyframes reveal-up {
@@ -229,10 +260,29 @@ main[tabindex="-1"]:focus-visible {
   body {
     padding: 0;
   }
+  /* Unlayered, so these beat the layered reveal rules without !important: a page printed or saved to PDF
+     before it was scrolled must not come out with blank sections. */
+  .reveal-pending,
+  .reveal-in {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
   .plate-surface,
   .surface,
   .glass {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+  }
+}
+
+/* High-contrast themes force text colours; the decorative aurora wash and the botanical lines would sit
+   under light text, so they go and the system canvas shows instead. */
+@media (forced-colors: active) {
+  .aurora {
+    background-image: none;
+  }
+  .botanical-lines::before {
+    display: none;
   }
 }

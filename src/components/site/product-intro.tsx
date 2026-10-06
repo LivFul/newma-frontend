@@ -25,9 +25,9 @@ export function ProductIntro() {
             </h2>
             <p className={`${STATEMENT} max-w-[30ch]`}>{PRODUCT.what.text}</p>
           </div>
-          <div className="relative overflow-hidden rounded-xl border border-border/80 bg-bg-elevated p-6 shadow-sm lg:col-span-5 lg:mt-3">
+          <div className="relative overflow-hidden rounded-lg border border-border/80 bg-bg-elevated p-6 shadow-sm lg:col-span-5 lg:mt-3">
             <div
-              className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-cover bg-center opacity-30"
+              className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-cover bg-center opacity-30 [mask-image:linear-gradient(to_left,black_35%,transparent)]"
               style={{
                 backgroundImage:
                   'image-set(url("/images/lab-glassware.webp") type("image/webp"), url("/images/lab-glassware.jpg") type("image/jpeg"))',

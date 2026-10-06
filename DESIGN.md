@@ -73,6 +73,7 @@ rounded:
   sm: "0.375rem"
   md: "0.75rem"
   lg: "1.25rem"
+  full: "9999px"
 spacing:
   "1": "0.25rem"
   "2": "0.5rem"
@@ -86,7 +87,7 @@ components:
   button-primary:
     backgroundColor: "{colors.accent}"
     textColor: "{colors.accent-fg}"
-    rounded: "{rounded.md}"
+    rounded: "{rounded.full}"
     padding: "8px 16px"
     height: "40px"
   button-primary-hover:
@@ -95,13 +96,13 @@ components:
   button-primary-lg:
     backgroundColor: "{colors.accent}"
     textColor: "{colors.accent-fg}"
-    rounded: "{rounded.md}"
+    rounded: "{rounded.full}"
     padding: "12px 24px"
     height: "48px"
   button-secondary:
     backgroundColor: "transparent"
     textColor: "{colors.fg}"
-    rounded: "{rounded.md}"
+    rounded: "{rounded.full}"
     padding: "8px 16px"
     height: "40px"
   button-secondary-hover:
@@ -113,28 +114,28 @@ components:
   button-danger:
     backgroundColor: "{colors.danger}"
     textColor: "{colors.bg-elevated}"
-    rounded: "{rounded.md}"
+    rounded: "{rounded.full}"
     padding: "8px 16px"
   badge-neutral:
     backgroundColor: "{colors.bg-elevated}"
     textColor: "{colors.fg}"
-    rounded: "{rounded.sm}"
+    rounded: "{rounded.full}"
     padding: "2px 8px"
     height: "24px"
   badge-success:
     backgroundColor: "{colors.success}"
     textColor: "{colors.fg}"
-    rounded: "{rounded.sm}"
+    rounded: "{rounded.full}"
     padding: "2px 8px"
   badge-warning:
     backgroundColor: "{colors.warning}"
     textColor: "{colors.fg}"
-    rounded: "{rounded.sm}"
+    rounded: "{rounded.full}"
     padding: "2px 8px"
   badge-danger:
     backgroundColor: "{colors.danger}"
     textColor: "{colors.bg-elevated}"
-    rounded: "{rounded.sm}"
+    rounded: "{rounded.full}"
     padding: "2px 8px"
   surface:
     backgroundColor: "{colors.bg-elevated}"
@@ -157,7 +158,7 @@ components:
 
 **Creative North Star: "The Ethnobotanical Instrument"**
 
-NEWMA is a LivFul product: scientific, future-facing and botanical. Surfaces are full-bleed mint-to-teal fields, not printed survey sheets. The leaf and the capsule from the mark are the recurring glyphs. Depth comes from soft layered light, glass panels and green-to-blue fades. Motion is restrained: pipeline flow, aurora drift, hover lift and scroll reveals, all transform and opacity, all off under reduced motion.
+NEWMA is a LivFul product: scientific, future-facing and botanical. Surfaces are full-bleed mint-to-teal fields, not printed survey sheets. The leaf and the capsule from the mark are the recurring glyphs. Depth comes from soft layered light, glass panels and green-to-blue fades. Motion is restrained: the pipeline's flow (a slowly turning loop and pulsing chevrons), a short float and settle on the nodes (under five seconds, then still), hover lift and scroll reveals, all transform and opacity, all off under reduced motion. The aurora wash is static. The deliberate ambient loops are the pipeline flow and the hero's botanical lines, which drift one 720px tile a minute on their own layer, by transform only, so they never repaint the wash; because these loops run longer than five seconds, WCAG 2.2.2 would also want a visible pause control, which is not built yet.
 
 The public site and the demo share one visual language. Layout (section order, 6/6 hero, 7/5 splits, four-step row, six-component index) is the thing that stays; the paper, neatlines, grid ticks and map key are gone.
 
@@ -181,6 +182,7 @@ A mint field that blends LivFul greens into the logo's capsule blues.
 
 - **Leaf** (`#b3e570` → `#15a676`): botanical light, leaf glyphs, positive ornaments.
 - **Capsule** (`#0b404d` → `#1b8896`): pharma light, pill glyphs, focus ring, deep plates.
+- **Brand gradient** (`#0c7552` → `#1d5c52` → `#12707d`): the primary button fill. Every stop holds 4.5:1 against accent-fg, resting and at hover brightness; `tests/unit/contrast.test.ts` enforces it.
 
 ### Tertiary
 

@@ -31,7 +31,7 @@ export function ComponentIndex() {
             <li key={slug} className="relative [counter-increment:key]">
               <ComponentLink
                 slug={slug}
-                className="group grid min-h-11 min-w-0 gap-2 overflow-hidden rounded-xl border border-plate-border/50 bg-plate-elevated/50 p-6 transition-[transform,background-color] hover:-translate-y-0.5 hover:bg-plate-fg/[0.08] focus-visible:bg-plate-fg/[0.08]"
+                className="group grid min-h-11 min-w-0 gap-2 overflow-hidden rounded-lg border border-plate-border/50 bg-plate-elevated/50 p-6 transition-[transform,background-color] hover:-translate-y-0.5 hover:bg-plate-fg/[0.08] focus-visible:bg-plate-fg/[0.08]"
               >
                 <span className="flex min-w-0 flex-wrap items-center gap-3 text-2xl font-medium tracking-[-0.015em] [overflow-wrap:anywhere]">
                   {index % 2 === 0 ? (

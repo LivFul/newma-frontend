@@ -97,6 +97,6 @@ export const OFFLINE = Object.freeze({
   body: block(
     "home.offline.body",
     "NEWMA cannot reach the network right now. Reconnect to continue, or return to the last page you visited.",
-    ["C-21"],
+    ["C-56"],
   ),
 });
