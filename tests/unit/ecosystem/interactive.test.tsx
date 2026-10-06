@@ -335,6 +335,27 @@ describe("Interactive hero layer", () => {
     expect(fireEvent.click(links[1]!)).toBe(true);
   });
 
+  // Value: protects=a first tap that is held for longer than the swallow window still only explodes the layers: its click is prevented and records nothing; fails_when=the swallow clock starts at pointerdown instead of pointerup; why_new=the expiry timer started at pointerdown, so a slow first tap followed the link and logged component_open; seam=none
+  it("keeps swallowing the click of a slow first tap", () => {
+    vi.useFakeTimers();
+    const assign = vi.fn();
+    vi.stubGlobal("location", { ...window.location, assign });
+    const opened: unknown[] = [];
+    const record = (event: Event) => opened.push((event as CustomEvent).detail);
+    window.addEventListener(EVENT_NAME, record);
+    const { links, svg } = mount();
+    fireEvent.pointerDown(links[1]!, { pointerType: "touch" });
+    act(() => {
+      vi.advanceTimersByTime(450);
+    });
+    fireEvent.pointerUp(links[1]!, { pointerType: "touch" });
+    expect(fireEvent.click(links[1]!)).toBe(false);
+    window.removeEventListener(EVENT_NAME, record);
+    expect(svg).toHaveAttribute("data-view", "exploded");
+    expect(assign).not.toHaveBeenCalled();
+    expect(opened).toEqual([]);
+  });
+
   it("never intercepts mouse clicks", () => {
     const { links } = mount();
     fireEvent.pointerDown(links[0]!, { pointerType: "mouse" });

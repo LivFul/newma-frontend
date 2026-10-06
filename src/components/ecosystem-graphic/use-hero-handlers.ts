@@ -61,9 +61,16 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
     swallowClick.current = false;
     window.clearTimeout(swallowTimer.current);
   };
-  const armSwallow = () => {
+  // Swallow the click, with no expiry yet: used while the finger is still down, because a slow press
+  // must not run the clock out before its click arrives. pointerup, pointercancel and the next
+  // pointerdown settle it.
+  const holdSwallow = () => {
     clearSwallow();
     swallowClick.current = true;
+  };
+  // Swallow the click that follows now, and stop swallowing if none comes.
+  const armSwallow = () => {
+    holdSwallow();
     swallowTimer.current = window.setTimeout(() => {
       swallowClick.current = false;
     }, SWALLOW_WINDOW_MS);
@@ -89,7 +96,7 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
     if (heroReducer(state, tap).effect.type === "preventNavigation") {
       // The first tap only explodes the layers.
       event.preventDefault();
-      armSwallow();
+      holdSwallow();
       if (slug) announce(heroTouchAnnouncement(slug));
       dispatch(tap);
     }

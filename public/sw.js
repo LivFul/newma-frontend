@@ -49,7 +49,13 @@ function isPage(path) {
 function isBrandImage(url) {
   const sources = url.searchParams.getAll("url");
   if (sources.length !== 1) return false;
-  const source = new URL(sources[0], url.origin);
+  let source;
+  try {
+    source = new URL(sources[0], url.origin);
+  } catch {
+    // A malformed source is not a brand image; the request goes to the network untouched.
+    return false;
+  }
   return (
     source.origin === url.origin &&
     source.search === "" &&
@@ -113,7 +119,9 @@ const OFFLINE_REFRESH_MS = 6 * 60 * 60 * 1000;
 async function refreshOffline() {
   const current = await caches.match("/offline");
   const stored = current ? Date.parse(current.headers.get("Date") || "") : Number.NaN;
-  if (Date.now() - stored < OFFLINE_REFRESH_MS) return;
+  // A copy dated in the future (a client clock running behind the server) counts as expired, never fresh.
+  const age = Date.now() - stored;
+  if (age >= 0 && age < OFFLINE_REFRESH_MS) return;
   const response = await fetch("/offline");
   const isHtml = /text\/html/i.test(response.headers.get("Content-Type") || "");
   if (isCacheable(response) && isHtml) await store("/offline", response);

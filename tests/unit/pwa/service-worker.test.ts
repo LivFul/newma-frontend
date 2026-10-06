@@ -144,6 +144,9 @@ describe("service worker", () => {
       get("/_next/image?url=%2Fbrand%2F..%2Fdemo%2Fa.png&w=64&q=75"),
       get("/_next/image?url=%2Fbrand%2Fa.png%3Fn%3D1&w=64&q=75"),
       get("/_next/image?url=%2Fbrand%2Fa.png&url=%2Fdemo%2Fb.png&w=64&q=75"),
+      get("/_next/image?url=https%3A%2F%2Fevil.test%2Fbrand%2Fa.png&w=64&q=75"),
+      get("/_next/image?url=%2F%2Fevil.test%2Fbrand%2Fa.png&w=64&q=75"),
+      get("/_next/image?url=http%3A%2F%2F%5B&w=64&q=75"),
       { ...get("/"), method: "POST" },
       get("https://cdn.other.test/lib.js"),
     ];
@@ -351,6 +354,26 @@ describe("service worker", () => {
     await worker.fire("fetch", get("/", "navigate")).settled();
     const offlineFetches = worker.fetch.mock.calls.filter(([r]) => pathOf(r) === "/offline");
     expect(offlineFetches).toHaveLength(1);
+  });
+
+  // Value: protects=a cached offline page is refreshed again once it is older than six hours or dated in the future (a client clock behind the server), instead of being trusted forever; fails_when=the age check accepts a negative age or ignores the six-hour limit; why_new=only a fresh and a missing Date header were covered, and a client clock running behind would have kept a stale offline page indefinitely; seam=none
+  it.each([
+    ["older than six hours", () => new Date(Date.now() - 7 * 3600_000).toUTCString()],
+    ["dated in the future", () => new Date(Date.now() + 3 * 3600_000).toUTCString()],
+  ])("refreshes the offline page again when its copy is %s", async (_name, stamp) => {
+    const html = { contentType: "text/html" };
+    const worker = loadWorker((request) =>
+      Promise.resolve(
+        pathOf(request) === "/offline"
+          ? reply("copy", true, { ...html, date: stamp() })
+          : reply("home", true, html),
+      ),
+    );
+    await worker.fire("install").result;
+    await worker.fire("fetch", get("/", "navigate")).settled();
+    await worker.fire("fetch", get("/", "navigate")).settled();
+    const offlineFetches = worker.fetch.mock.calls.filter(([r]) => pathOf(r) === "/offline");
+    expect(offlineFetches).toHaveLength(2);
   });
 
   // Value: protects=hashed build chunks are capped at their own larger budget, oldest first, without touching the precached shell; fails_when=the static budget is removed or raised without bound; why_new=the static budget was only shown to survive an image burst, never to be enforced; seam=none
