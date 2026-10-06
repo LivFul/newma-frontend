@@ -1,7 +1,7 @@
 "use client";
 
 import { m } from "motion/react";
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useMemo, type CSSProperties } from "react";
 import { PARTS, type PartGeometry } from "./geometry";
 import { FALLBACK_MOTION, type HeroMotion } from "./motion-tokens";
 import type { PartProps } from "./part-props";
@@ -27,10 +27,16 @@ export function MotionPart({ geometry, index, view, children }: PartProps) {
     const ease: [number, number, number, number] = [x1, y1, x2, y2];
     return { duration: tokens.duration, ease, delay: index * tokens.stagger };
   }, [tokens, index]);
+  const style = {
+    "--i": index,
+    "--eco-depth": geometry.depth,
+  } as CSSProperties;
   return (
     <m.g
       className="eco-part"
       data-slug={geometry.slug}
+      data-depth={geometry.depth}
+      style={style}
       variants={VARIANTS.get(geometry.slug)}
       initial={false}
       animate={view}

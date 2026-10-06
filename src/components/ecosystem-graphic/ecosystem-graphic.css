@@ -1,14 +1,15 @@
-/* Hero graphic: orbital ecosystem. Static layer explodes by CSS; interactive layer uses Motion.
-   Animate transform and opacity only. */
+/* Hero graphic: tilted 3D orbital ecosystem. Static layer explodes by CSS; interactive uses Motion.
+   Animate transform, opacity and stroke-dashoffset only. */
 .eco-figure {
   margin: 0;
 }
 .eco-frame {
-  aspect-ratio: 400 / 500;
+  aspect-ratio: 500 / 560;
   width: 100%;
-  max-width: 34rem;
+  max-width: 36rem;
   margin-inline: auto;
-  padding-bottom: 1.5rem;
+  perspective: 1200px;
+  perspective-origin: 50% 42%;
 }
 .eco-svg {
   touch-action: manipulation;
@@ -17,6 +18,7 @@
   height: auto;
   overflow: visible;
   pointer-events: none;
+  transform-style: preserve-3d;
 }
 .eco-part,
 .eco-link,
@@ -24,7 +26,9 @@
   pointer-events: auto;
 }
 .eco-part {
-  transform-box: fill-box;
+  transform-box: view-box;
+  transform-origin: 0 0;
+  --eco-scale: calc(0.96 + (var(--eco-depth, 0) + 1) * 0.04);
 }
 .eco-svg[data-layer="static"] .eco-part {
   transform: translate(var(--ax), var(--ay));
@@ -44,22 +48,40 @@
 .eco-link:focus-visible .eco-hit {
   stroke: var(--color-focus);
 }
+.eco-bob {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transform: scale(var(--eco-scale, 1));
+}
+.eco-node-shadow {
+  fill: rgb(6 36 43 / 0.22);
+  stroke: none;
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+  transform: scale(calc(0.88 + (var(--eco-depth, 0) + 1) * 0.14));
+}
 .eco-node {
-  fill: color-mix(in srgb, var(--color-bg-elevated) 82%, white);
   stroke: var(--eco-stroke, var(--eco-tone));
   stroke-width: 2px;
-  filter: drop-shadow(0 8px 16px rgb(6 36 43 / 0.16));
+  filter: drop-shadow(0 10px 14px rgb(6 36 43 / 0.18));
+}
+.eco-node:not([data-center]) {
+  fill: color-mix(in srgb, var(--color-bg-elevated) 88%, white);
 }
 .eco-node[data-center] {
-  fill: var(--color-bg-elevated);
-  stroke-width: 2.5px;
+  stroke-width: 2.6px;
+  filter: drop-shadow(0 16px 22px rgb(6 36 43 / 0.28));
 }
-.eco-link:hover .eco-node {
+.eco-node-sheen {
+  pointer-events: none;
+}
+.eco-link:hover .eco-node:not([data-center]),
+.eco-link:focus-visible .eco-node:not([data-center]) {
   fill: var(--color-bg);
 }
 .eco-node[data-dashed] {
   stroke-dasharray: 7 5;
-  fill-opacity: 0.88;
+  fill-opacity: 0.9;
 }
 .eco-glyph {
   color: var(--eco-ink);
@@ -86,13 +108,19 @@
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: -0.01em;
+  paint-order: stroke fill;
+  stroke: color-mix(in srgb, var(--color-bg-elevated) 88%, white);
+  stroke-width: 5px;
+  stroke-linejoin: round;
 }
 .eco-desc {
   fill: var(--color-fg-muted);
-  opacity: 0;
+  paint-order: stroke fill;
+  stroke: color-mix(in srgb, var(--color-bg-elevated) 88%, white);
+  stroke-width: 5px;
+  stroke-linejoin: round;
 }
-.eco-svg[data-layer="static"] .eco-title:not([data-center]),
-.eco-svg[data-layer="interactive"][data-view="assembled"] .eco-title:not([data-center]) {
+.eco-label {
   opacity: 0;
 }
 .eco-edges {
@@ -101,8 +129,9 @@
 .eco-edges path {
   fill: none;
   stroke: var(--color-border-strong);
-  stroke-width: 1.75px;
+  stroke-width: 1.5px;
   stroke-linecap: round;
+  opacity: 0.7;
 }
 .eco-edges path[data-dashed] {
   stroke: var(--color-eco-optional);
@@ -111,51 +140,62 @@
 .eco-arrowhead {
   fill: var(--color-border-strong);
 }
+.eco-disc {
+  fill: color-mix(in srgb, var(--color-capsule) 16%, transparent);
+  stroke: none;
+}
 .eco-orbit {
   fill: none;
-  stroke: color-mix(in srgb, var(--color-capsule) 45%, transparent);
-  stroke-width: 1px;
-  stroke-dasharray: 3 8;
-  transform-origin: 200px 230px;
-  transform-box: fill-box;
+  stroke: color-mix(in srgb, var(--color-capsule) 55%, transparent);
+  stroke-width: 1.25px;
+  stroke-dasharray: 5 10;
+  transform-box: view-box;
+  transform-origin: var(--eco-cx) var(--eco-cy);
 }
 .eco-orbit-outer {
-  stroke: color-mix(in srgb, var(--color-leaf) 40%, transparent);
+  stroke: color-mix(in srgb, var(--color-leaf) 50%, transparent);
+  stroke-dasharray: 2 12;
+}
+.eco-svg[data-view="assembled"] .eco-orbit-outer {
+  opacity: 0.35;
+}
+.eco-svg[data-view="exploded"] .eco-orbit-inner {
+  opacity: 0.42;
 }
 
-.eco-svg[data-view="exploded"] .eco-desc,
-.eco-svg[data-view="exploded"] .eco-edges,
-.eco-svg[data-view="exploded"] .eco-title {
+.eco-svg[data-view="exploded"] .eco-label,
+.eco-svg[data-view="exploded"] .eco-edges {
   opacity: 1;
 }
-.eco-svg[data-layer="interactive"] .eco-desc,
-.eco-svg[data-layer="interactive"] .eco-edges,
-.eco-svg[data-layer="interactive"] .eco-title:not([data-center]) {
+.eco-svg[data-layer="interactive"] .eco-label,
+.eco-svg[data-layer="interactive"] .eco-edges {
   transition: opacity var(--motion-duration-base) var(--motion-ease-standard);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .eco-orbit-inner {
-    animation: orbit-spin 36s linear infinite;
+    animation: orbit-dash 28s linear infinite;
   }
   .eco-orbit-outer {
-    animation: orbit-spin 52s linear infinite reverse;
+    animation: orbit-dash 42s linear infinite reverse;
+  }
+  .eco-bob {
+    animation: node-float 4.6s var(--motion-ease-standard) infinite alternate;
+    animation-delay: calc(var(--i, 0) * 80ms);
   }
   .eco-svg[data-layer="static"] .eco-part {
     transition: transform var(--motion-duration-slow) var(--motion-ease-emphasized)
       calc(var(--i) * 60ms);
   }
-  .eco-svg[data-layer="static"] .eco-desc,
-  .eco-svg[data-layer="static"] .eco-edges,
-  .eco-svg[data-layer="static"] .eco-title:not([data-center]) {
+  .eco-svg[data-layer="static"] .eco-label,
+  .eco-svg[data-layer="static"] .eco-edges {
     transition: opacity var(--motion-duration-base) var(--motion-ease-standard) 180ms;
   }
   .eco-svg[data-layer="static"]:focus-within .eco-part {
     transform: translate(var(--ex), var(--ey));
   }
-  .eco-svg[data-layer="static"]:focus-within .eco-desc,
-  .eco-svg[data-layer="static"]:focus-within .eco-edges,
-  .eco-svg[data-layer="static"]:focus-within .eco-title {
+  .eco-svg[data-layer="static"]:focus-within .eco-label,
+  .eco-svg[data-layer="static"]:focus-within .eco-edges {
     opacity: 1;
   }
 }
@@ -163,9 +203,8 @@
   .eco-svg[data-layer="static"]:hover .eco-part {
     transform: translate(var(--ex), var(--ey));
   }
-  .eco-svg[data-layer="static"]:hover .eco-desc,
-  .eco-svg[data-layer="static"]:hover .eco-edges,
-  .eco-svg[data-layer="static"]:hover .eco-title {
+  .eco-svg[data-layer="static"]:hover .eco-label,
+  .eco-svg[data-layer="static"]:hover .eco-edges {
     opacity: 1;
   }
 }
@@ -175,20 +214,28 @@
     transform: translate(var(--ex), var(--ey)) !important;
     transition: none !important;
   }
-  .eco-svg .eco-desc,
-  .eco-svg .eco-edges,
-  .eco-svg .eco-title {
+  .eco-svg .eco-label,
+  .eco-svg .eco-edges {
     opacity: 1 !important;
     transition: none !important;
   }
-  .eco-orbit {
+  .eco-orbit,
+  .eco-bob {
     animation: none !important;
   }
 }
 
-@keyframes orbit-spin {
+@keyframes orbit-dash {
   to {
-    transform: rotate(360deg);
+    stroke-dashoffset: -240;
+  }
+}
+@keyframes node-float {
+  from {
+    transform: scale(var(--eco-scale, 1)) translateY(0);
+  }
+  to {
+    transform: scale(var(--eco-scale, 1)) translateY(-4px);
   }
 }
 
@@ -198,8 +245,12 @@
   .eco-edges path {
     stroke: CanvasText;
   }
-  .eco-node {
+  .eco-node,
+  .eco-disc {
     fill: Canvas;
+  }
+  .eco-node-sheen {
+    fill: none;
   }
   .eco-glyph {
     stroke: CanvasText;
@@ -209,6 +260,10 @@
   .eco-desc,
   .eco-arrowhead {
     fill: CanvasText;
+  }
+  .eco-title,
+  .eco-desc {
+    stroke: Canvas;
   }
   .eco-link:focus-visible .eco-hit {
     stroke: Highlight;

@@ -1,4 +1,4 @@
-import { render, within } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { EcosystemSvg } from "@/components/ecosystem-graphic/ecosystem-svg";
 import { StaticPart } from "@/components/ecosystem-graphic/static-part";
@@ -72,8 +72,8 @@ describe("EcosystemSvg", () => {
   it("shows the descriptor text for every part", () => {
     const { container } = renderSvg();
     for (const slug of ECOSYSTEM_SLUGS) {
-      const part = container.querySelector(`g[data-slug="${slug}"]`) as HTMLElement;
-      expect(within(part).getByText(HERO_LABELS[slug].descriptor)).toBeInTheDocument();
+      const part = container.querySelector(`g[data-slug="${slug}"]`);
+      expect(part?.textContent).toContain(HERO_LABELS[slug].descriptor);
     }
   });
 

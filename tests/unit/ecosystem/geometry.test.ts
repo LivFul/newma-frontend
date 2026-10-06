@@ -2,16 +2,25 @@ import { describe, expect, it } from "vitest";
 import {
   CENTER,
   EDGES,
+  ELLIPSE,
   GLYPH_KEYS,
+  HUB_RADIUS,
   NODE_RADIUS,
   PARTS,
-  RING,
   VIEWBOX,
 } from "@/components/ecosystem-graphic/geometry";
 import { ECOSYSTEM_SLUGS } from "@/content/ecosystem/registry";
 
 const dist = (a: { x: number; y: number }, b: { x: number; y: number }) =>
   Math.hypot(a.x - b.x, a.y - b.y);
+
+const radiusOf = (part: (typeof PARTS)[number]) => (part.center ? HUB_RADIUS : NODE_RADIUS);
+
+const onEllipse = (point: { x: number; y: number }, ring: { rx: number; ry: number }) => {
+  const nx = (point.x - CENTER.x) / ring.rx;
+  const ny = (point.y - CENTER.y) / ring.ry;
+  return nx * nx + ny * ny;
+};
 
 describe("ecosystem geometry", () => {
   it("has six parts with the exact slugs in order", () => {
@@ -59,34 +68,43 @@ describe("ecosystem geometry", () => {
     for (const part of PARTS) expect(GLYPH_KEYS).toContain(part.glyph);
   });
 
-  it("keeps Interface at the centre and the others on two rings", () => {
+  it("keeps Interface at the centre and the others on two tilted ellipses", () => {
     const hub = PARTS.find((p) => p.slug === "interface")!;
     expect(hub.center).toBe(true);
     expect(hub.assembled).toEqual(CENTER);
     expect(hub.exploded).toEqual(CENTER);
+    expect(hub.depth).toBe(0);
     for (const part of PARTS.filter((p) => !p.center)) {
-      expect(dist(part.assembled, CENTER)).toBeCloseTo(RING.assembled, 0);
-      expect(dist(part.exploded, CENTER)).toBeCloseTo(RING.exploded, 0);
+      expect(onEllipse(part.assembled, ELLIPSE.assembled)).toBeCloseTo(1, 2);
+      expect(onEllipse(part.exploded, ELLIPSE.exploded)).toBeCloseTo(1, 2);
       expect(dist(part.exploded, CENTER)).toBeGreaterThan(dist(part.assembled, CENTER));
     }
+    const provenance = PARTS.find((p) => p.slug === "provenance-dlt")!;
+    expect(provenance.exploded.y - provenance.assembled.y).toBeGreaterThan(20);
   });
 
-  it("never overlaps exploded nodes", () => {
-    const nodes = PARTS.map((p) => p.exploded);
-    for (let i = 0; i < nodes.length; i += 1) {
-      for (let j = i + 1; j < nodes.length; j += 1) {
-        expect(dist(nodes[i]!, nodes[j]!)).toBeGreaterThan(NODE_RADIUS * 2);
+  it("never overlaps assembled or exploded nodes", () => {
+    for (const state of ["assembled", "exploded"] as const) {
+      const nodes = PARTS.map((p) => ({ point: p[state], radius: radiusOf(p), slug: p.slug }));
+      for (let i = 0; i < nodes.length; i += 1) {
+        for (let j = i + 1; j < nodes.length; j += 1) {
+          expect(
+            dist(nodes[i]!.point, nodes[j]!.point),
+            `${nodes[i]!.slug} vs ${nodes[j]!.slug} ${state}`,
+          ).toBeGreaterThan(nodes[i]!.radius + nodes[j]!.radius);
+        }
       }
     }
   });
 
   it("keeps every node, assembled and exploded, inside the viewBox", () => {
     for (const part of PARTS) {
+      const radius = radiusOf(part);
       for (const point of [part.assembled, part.exploded]) {
-        expect(point.x - NODE_RADIUS).toBeGreaterThanOrEqual(0);
-        expect(point.y - NODE_RADIUS).toBeGreaterThanOrEqual(0);
-        expect(point.x + NODE_RADIUS).toBeLessThanOrEqual(VIEWBOX.width);
-        expect(point.y + NODE_RADIUS).toBeLessThanOrEqual(VIEWBOX.height);
+        expect(point.x - radius).toBeGreaterThanOrEqual(0);
+        expect(point.y - radius).toBeGreaterThanOrEqual(0);
+        expect(point.x + radius).toBeLessThanOrEqual(VIEWBOX.width);
+        expect(point.y + radius).toBeLessThanOrEqual(VIEWBOX.height);
       }
     }
   });

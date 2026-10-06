@@ -28,6 +28,8 @@ export type PartGeometry = Readonly<{
   dashed: boolean;
   label: Readonly<{ x: number; y: number; anchor: LabelAnchor }>;
   center: boolean;
+  /** −1 back of the tilted ring, +1 front. Used for 3D lighting. */
+  depth: number;
 }>;
 export type EdgeKind = "flow" | "rail" | "optional";
 export type Edge = Readonly<{
@@ -39,22 +41,34 @@ export type Edge = Readonly<{
   d: string;
 }>;
 
-export const VIEWBOX = Object.freeze({ width: 400, height: 500 });
+export const VIEWBOX = Object.freeze({ width: 500, height: 560 });
 export const PLATE = Object.freeze({ halfWidth: 28, halfHeight: 28, thickness: 0 });
-export const NODE_RADIUS = 28;
-export const LABEL_FONT = Object.freeze({ title: 18, descriptor: 16 });
+export const NODE_RADIUS = 24;
+export const HUB_RADIUS = NODE_RADIUS + 8;
+export const LABEL_FONT = Object.freeze({ title: 20, descriptor: 20 });
+export const LABEL_LINE = 22;
 export const LABEL_BOX = Object.freeze({
   offsetX: 0,
   width: 100,
   top: -18,
   bottom: 34,
   titleBaseline: 0,
-  descriptorBaseline: 16,
+  descriptorBaseline: 20,
 });
 export const LEADER = Object.freeze({ fromX: 0, toX: 0 });
 export const RAIL_X = 18;
-export const CENTER = Object.freeze({ x: 200, y: 230 });
-export const RING = Object.freeze({ assembled: 70, exploded: 112, inner: 70, outer: 112 });
+export const CENTER = Object.freeze({ x: 250, y: 268 });
+/** Tilted 3D ring: a circle viewed at ~44°. Inner = assembled, outer = exploded. */
+export const ELLIPSE = Object.freeze({
+  assembled: Object.freeze({ rx: 108, ry: 80 }),
+  exploded: Object.freeze({ rx: 152, ry: 128 }),
+});
+export const RING = Object.freeze({
+  assembled: ELLIPSE.assembled.rx,
+  exploded: ELLIPSE.exploded.rx,
+  inner: ELLIPSE.assembled,
+  outer: ELLIPSE.exploded,
+});
 
 const TONES: Readonly<Record<EcosystemSlug, ToneToken>> = {
   interface: "--color-accent",
@@ -78,36 +92,44 @@ const point = (x: number, y: number): Point => Object.freeze({ x, y });
 const ORBITERS = ECOSYSTEM_SLUGS.filter(
   (slug): slug is Exclude<EcosystemSlug, "interface"> => slug !== "interface",
 );
-const polar = (radius: number, deg: number): Point => {
+
+/** Provenance stays on the near (south) rim so explode moves it down the page. */
+const ORBIT_ANGLES: Readonly<Record<Exclude<EcosystemSlug, "interface">, number>> = Object.freeze({
+  "agentic-compute": -90,
+  "scientific-review": -40,
+  "wet-lab": 42,
+  "data-knowledge": 175,
+  "provenance-dlt": 90,
+});
+
+export const ellipsePoint = (ring: { rx: number; ry: number }, deg: number): Point => {
   const rad = (deg * Math.PI) / 180;
   return point(
-    Number((CENTER.x + radius * Math.cos(rad)).toFixed(2)),
-    Number((CENTER.y + radius * Math.sin(rad)).toFixed(2)),
+    Number((CENTER.x + ring.rx * Math.cos(rad)).toFixed(2)),
+    Number((CENTER.y + ring.ry * Math.sin(rad)).toFixed(2)),
   );
 };
 
-const LABELS: Readonly<Record<EcosystemSlug, PartGeometry["label"]>> = {
-  interface: Object.freeze({ x: 0, y: -46, anchor: "middle" }),
-  "agentic-compute": Object.freeze({ x: 0, y: 42, anchor: "middle" }),
-  "scientific-review": Object.freeze({ x: 0, y: 42, anchor: "middle" }),
-  "wet-lab": Object.freeze({ x: 0, y: 42, anchor: "middle" }),
-  "data-knowledge": Object.freeze({ x: 0, y: 42, anchor: "middle" }),
-  "provenance-dlt": Object.freeze({ x: 0, y: 42, anchor: "middle" }),
-};
+const LABEL_OUT = NODE_RADIUS + 28;
 
-const ORBIT_ANGLES = Object.freeze([-90, -30, 30, 150, 90]);
+const LABELS: Readonly<Record<EcosystemSlug, PartGeometry["label"]>> = {
+  interface: Object.freeze({ x: 0, y: HUB_RADIUS + 14, anchor: "middle" }),
+  "agentic-compute": Object.freeze({ x: 0, y: -LABEL_OUT, anchor: "middle" }),
+  "scientific-review": Object.freeze({ x: LABEL_OUT - 16, y: -18, anchor: "start" }),
+  "wet-lab": Object.freeze({ x: LABEL_OUT - 16, y: -8, anchor: "start" }),
+  "data-knowledge": Object.freeze({ x: 0, y: LABEL_OUT, anchor: "middle" }),
+  "provenance-dlt": Object.freeze({ x: 0, y: LABEL_OUT, anchor: "middle" }),
+};
 
 export const PARTS: readonly PartGeometry[] = Object.freeze(
   ECOSYSTEM_SLUGS.map((slug) => {
     const orbitIndex = slug === "interface" ? -1 : ORBITERS.indexOf(slug);
+    const deg = orbitIndex === -1 ? 0 : ORBIT_ANGLES[ORBITERS[orbitIndex]!];
     const assembled =
-      orbitIndex === -1
-        ? point(CENTER.x, CENTER.y)
-        : polar(RING.assembled, ORBIT_ANGLES[orbitIndex]!);
+      orbitIndex === -1 ? point(CENTER.x, CENTER.y) : ellipsePoint(ELLIPSE.assembled, deg);
     const exploded =
-      orbitIndex === -1
-        ? point(CENTER.x, CENTER.y)
-        : polar(RING.exploded, ORBIT_ANGLES[orbitIndex]!);
+      orbitIndex === -1 ? point(CENTER.x, CENTER.y) : ellipsePoint(ELLIPSE.exploded, deg);
+    const depth = orbitIndex === -1 ? 0 : Number(Math.sin((deg * Math.PI) / 180).toFixed(3));
     return Object.freeze({
       slug,
       assembled,
@@ -117,6 +139,7 @@ export const PARTS: readonly PartGeometry[] = Object.freeze(
       dashed: slug === "provenance-dlt",
       label: LABELS[slug],
       center: slug === "interface",
+      depth,
     });
   }),
 );
@@ -128,8 +151,8 @@ const edge = (from: EcosystemSlug, to: EcosystemSlug, kind: EdgeKind, dashed = f
   const b = part(to).exploded;
   const mx = (a.x + b.x) / 2;
   const my = (a.y + b.y) / 2;
-  const cx = mx + (CENTER.x - mx) * -0.18;
-  const cy = my + (CENTER.y - my) * -0.18;
+  const cx = mx + (CENTER.x - mx) * -0.22;
+  const cy = my + (CENTER.y - my) * -0.12;
   const d = `M${a.x} ${a.y}Q${cx.toFixed(2)} ${cy.toFixed(2)} ${b.x} ${b.y}`;
   return Object.freeze({ id: `${from}>${to}`, from, to, kind, dashed, d });
 };
