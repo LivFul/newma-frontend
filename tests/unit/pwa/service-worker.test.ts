@@ -16,7 +16,12 @@ type FakeResponse = {
   headers: { get: (name: string) => string | null };
   clone: () => FakeResponse;
 };
-type ReplyOptions = { cacheControl?: string; contentType?: string; redirected?: boolean };
+type ReplyOptions = {
+  cacheControl?: string;
+  contentType?: string;
+  redirected?: boolean;
+  date?: string;
+};
 type FakeRequest = { url: string; method: string; mode: string };
 type Network = (request: FakeRequest) => Promise<FakeResponse>;
 type WorkerEvent = {
@@ -29,6 +34,7 @@ const reply = (tag: string, ok = true, options: ReplyOptions = {}): FakeResponse
   const headers: Record<string, string> = {
     "cache-control": options.cacheControl ?? "",
     "content-type": options.contentType ?? "application/javascript",
+    date: options.date ?? "",
   };
   const value: FakeResponse = {
     ok,
@@ -135,6 +141,9 @@ describe("service worker", () => {
       get("/sw.js"),
       get("/ecosystem/wet-lab?_rsc=1abc", "cors"),
       get("/_next/image?url=%2Fimages%2Fa.jpg&w=640&q=75"),
+      get("/_next/image?url=%2Fbrand%2F..%2Fdemo%2Fa.png&w=64&q=75"),
+      get("/_next/image?url=%2Fbrand%2Fa.png%3Fn%3D1&w=64&q=75"),
+      get("/_next/image?url=%2Fbrand%2Fa.png&url=%2Fdemo%2Fb.png&w=64&q=75"),
       { ...get("/"), method: "POST" },
       get("https://cdn.other.test/lib.js"),
     ];
@@ -286,7 +295,11 @@ describe("service worker", () => {
     let online = true;
     const worker = loadWorker((request) =>
       online
-        ? Promise.resolve(reply(`net:${pathOf(request)}`))
+        ? Promise.resolve(
+            reply(`net:${pathOf(request)}`, true, {
+              contentType: pathOf(request) === "/offline" ? "text/html" : undefined,
+            }),
+          )
         : Promise.reject(new Error("offline")),
     );
     await worker.fire("install").result;
@@ -298,6 +311,62 @@ describe("service worker", () => {
     await expect(
       worker.fire("fetch", get("/legal/terms", "navigate")).result,
     ).resolves.toMatchObject({ tag: "net:/offline" });
+  });
+
+  // Value: protects=a failed, non-HTML, no-store or rejected refresh never replaces the precached offline page, and a copy refreshed within six hours is not fetched again; fails_when=the HTML or cacheability check or the .catch is dropped, or the throttle is removed; why_new=only the happy refresh was tested, and an interstitial answering 200 could have replaced the only offline fallback; seam=none
+  it("keeps the precached offline page when a refresh fails and throttles recent ones", async () => {
+    const html = { contentType: "text/html" };
+    const attempts: Array<() => Promise<FakeResponse>> = [
+      () => Promise.resolve(reply("bad", false, html)),
+      () => Promise.resolve(reply("portal", true, { contentType: "application/json" })),
+      () => Promise.resolve(reply("secret", true, { ...html, cacheControl: "no-store" })),
+      () => Promise.reject(new Error("refresh failed")),
+    ];
+    for (const attempt of attempts) {
+      let online = true;
+      const worker = loadWorker((request) =>
+        online
+          ? pathOf(request) === "/offline"
+            ? attempt()
+            : Promise.resolve(reply("home", true, html))
+          : Promise.reject(new Error("offline")),
+      );
+      await worker.fire("install").result;
+      await worker.fire("fetch", get("/", "navigate")).settled();
+      online = false;
+      await expect(
+        worker.fire("fetch", get("/legal/terms", "navigate")).result,
+      ).resolves.toMatchObject({ tag: "precache:/offline" });
+    }
+
+    const worker = loadWorker((request) =>
+      Promise.resolve(
+        pathOf(request) === "/offline"
+          ? reply("fresh", true, { ...html, date: new Date().toUTCString() })
+          : reply("home", true, html),
+      ),
+    );
+    await worker.fire("install").result;
+    await worker.fire("fetch", get("/", "navigate")).settled();
+    await worker.fire("fetch", get("/", "navigate")).settled();
+    const offlineFetches = worker.fetch.mock.calls.filter(([r]) => pathOf(r) === "/offline");
+    expect(offlineFetches).toHaveLength(1);
+  });
+
+  // Value: protects=hashed build chunks are capped at their own larger budget, oldest first, without touching the precached shell; fails_when=the static budget is removed or raised without bound; why_new=the static budget was only shown to survive an image burst, never to be enforced; seam=none
+  it("caps hashed chunks at their own budget", async () => {
+    const worker = loadWorker((request) => Promise.resolve(reply(`net:${request.url}`)));
+    await worker.fire("install").result;
+    for (let index = 0; index < 405; index += 1) {
+      await worker.fire("fetch", get(`/_next/static/chunks/c-${index}.js`)).settled();
+    }
+    const [name] = [...worker.stores.keys()];
+    const urls = [...worker.stores.get(name!)!.keys()];
+    const chunks = urls.filter((url) => url.includes("/_next/static/"));
+    expect(chunks.length).toBeLessThanOrEqual(400);
+    expect(urls).not.toContain(new URL("/_next/static/chunks/c-0.js", ORIGIN).href);
+    expect(urls).toContain(new URL("/_next/static/chunks/c-404.js", ORIGIN).href);
+    expect(urls).toContain(new URL("/offline", ORIGIN).href);
   });
 
   // Value: protects=install precaches the offline page and activates at once, and activate drops older caches; fails_when=the offline page leaves the precache or old cache versions are kept after an update; why_new=no test ran install or activate; seam=none

@@ -13,7 +13,8 @@ const MAX_STATIC_ENTRIES = 400;
 const PAGE_PATHS = new Set(["/", "/offline"]);
 const PAGE_PREFIXES = ["/ecosystem/", "/legal/"];
 const STATIC_PREFIX = "/_next/static/";
-const ASSET_PREFIXES = [STATIC_PREFIX, "/brand/", "/images/", "/favicon.ico"];
+// Matched with startsWith: three directories plus the favicon, whose exact path has no longer variant.
+const ASSET_PATH_STARTS = [STATIC_PREFIX, "/brand/", "/images/", "/favicon.ico"];
 // The wordmark goes through next/image, so the browser asks the optimizer for it.
 const IMAGE_ENDPOINT = "/_next/image";
 const IMAGE_SOURCE_PREFIX = "/brand/";
@@ -42,11 +43,23 @@ function isPage(path) {
   return PAGE_PATHS.has(path) || PAGE_PREFIXES.some((prefix) => path.startsWith(prefix));
 }
 
+// Only a plain /brand/ file: the source is resolved first, so /brand/../demo/x.png collapses to /demo/x.png
+// and is refused, and a source carrying its own query (one cache key per value) or a repeated `url`
+// parameter is refused too.
+function isBrandImage(url) {
+  const sources = url.searchParams.getAll("url");
+  if (sources.length !== 1) return false;
+  const source = new URL(sources[0], url.origin);
+  return (
+    source.origin === url.origin &&
+    source.search === "" &&
+    source.pathname.startsWith(IMAGE_SOURCE_PREFIX)
+  );
+}
+
 function isAsset(url) {
-  if (url.pathname === IMAGE_ENDPOINT) {
-    return (url.searchParams.get("url") || "").startsWith(IMAGE_SOURCE_PREFIX);
-  }
-  return ASSET_PREFIXES.some((prefix) => url.pathname.startsWith(prefix));
+  if (url.pathname === IMAGE_ENDPOINT) return isBrandImage(url);
+  return ASSET_PATH_STARTS.some((prefix) => url.pathname.startsWith(prefix));
 }
 
 // A response is stored only when it succeeded, was not redirected, and did not ask to stay out of
@@ -91,11 +104,19 @@ async function store(key, response) {
 }
 
 // The precached offline page references the chunk hashes of the deploy that installed this worker, and
-// the worker's bytes do not change between ordinary deploys. Refreshing it whenever the home page
-// loads keeps it in step with the current deploy; if that fails the previous copy simply stays.
+// the worker's bytes do not change between ordinary deploys. Refreshing it when the home page loads
+// keeps it in step with the current deploy, at most every OFFLINE_REFRESH_MS, and only with an HTML
+// answer (a captive portal or proxy interstitial must not replace it). On any failure the previous copy
+// simply stays.
+const OFFLINE_REFRESH_MS = 6 * 60 * 60 * 1000;
+
 async function refreshOffline() {
+  const current = await caches.match("/offline");
+  const stored = current ? Date.parse(current.headers.get("Date") || "") : Number.NaN;
+  if (Date.now() - stored < OFFLINE_REFRESH_MS) return;
   const response = await fetch("/offline");
-  if (isCacheable(response)) await store("/offline", response);
+  const isHtml = /text\/html/i.test(response.headers.get("Content-Type") || "");
+  if (isCacheable(response) && isHtml) await store("/offline", response);
 }
 
 // Pages are keyed by path, so query strings never multiply entries.
