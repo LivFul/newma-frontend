@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geologica, Martian_Mono } from "next/font/google";
 import "./globals.css";
-import { PwaGate } from "@/components/pwa/pwa-gate";
 import { HOME_META } from "@/content/home/copy";
 import { BACKGROUND_HEX, BRAND_HEX } from "@/lib/brand";
 import { siteUrl } from "@/lib/site";
@@ -64,7 +63,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         {children}
-        <PwaGate />
       </body>
     </html>
   );

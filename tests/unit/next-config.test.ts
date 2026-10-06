@@ -40,6 +40,16 @@ describe("next.config security headers", () => {
       expect(rule!.headers).toEqual([{ key: "X-Robots-Tag", value: "noindex, nofollow" }]);
     }
   });
+  // Value: protects=/sw.js is revalidated on every load and may control the whole origin, so an updated worker is picked up; fails_when=the no-cache or Service-Worker-Allowed header is dropped or loosened; why_new=no test covered the worker's headers; seam=none
+  it("serves /sw.js uncached and allowed to control the whole origin", async () => {
+    const rules = await (nextConfig as NextConfig).headers!();
+    const rule = rules.find((r) => r.source === "/sw.js");
+    expect(rule, "/sw.js").toBeDefined();
+    expect(rule!.headers).toEqual([
+      { key: "Cache-Control", value: "no-cache" },
+      { key: "Service-Worker-Allowed", value: "/" },
+    ]);
+  });
   it("leaves the homepage and component pages indexable (no X-Robots-Tag rule)", async () => {
     const rules = await (nextConfig as NextConfig).headers!();
     const robotsSources = rules

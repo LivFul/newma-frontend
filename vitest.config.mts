@@ -25,6 +25,8 @@ export default defineConfig({
         "src/components/ui/**",
         "src/components/ecosystem-graphic/**",
         "src/components/site/**",
+        "src/components/pwa/**",
+        "src/components/brand/**",
         // The 3D scene runs in jsdom with only WebGLRenderer and the 2D canvas faked in its tests.
         "src/components/workflow-3d/**",
         "src/lib/**",
