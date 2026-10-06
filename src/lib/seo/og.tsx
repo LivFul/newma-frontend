@@ -19,10 +19,12 @@ export type OgCardProps = Readonly<{
   kicker?: string;
   glyph?: GlyphKey;
   tone?: ToneToken;
+  /** Data URI of the horizontal lockup. Omitted in unit tests, which keep the text stand-in. */
+  logoSrc?: string;
 }>;
 
 // Static card for next/og (satori): flex layout and inline styles only, no external fetch, no webfont.
-export function OgCard({ title, kicker, glyph, tone = "--color-accent" }: OgCardProps) {
+export function OgCard({ title, kicker, glyph, tone = "--color-accent", logoSrc }: OgCardProps) {
   const ink = TONE_HEX[tone];
   return (
     <div
@@ -37,11 +39,17 @@ export function OgCard({ title, kicker, glyph, tone = "--color-accent" }: OgCard
         padding: 72,
       }}
     >
-      <div style={{ display: "flex", fontSize: 40, gap: 14 }}>
-        <span>LivFul</span>
-        <span style={{ color: BRAND_HEX.muted }}>/</span>
-        <span style={{ fontWeight: 700 }}>NEWMA</span>
-      </div>
+      {logoSrc ? (
+        // satori renders a raw img; next/image is not available inside ImageResponse.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={logoSrc} width={460} height={82} alt="" />
+      ) : (
+        <div style={{ display: "flex", fontSize: 40, gap: 14 }}>
+          <span>LivFul</span>
+          <span style={{ color: BRAND_HEX.muted }}>/</span>
+          <span style={{ fontWeight: 700 }}>NEWMA</span>
+        </div>
+      )}
       <div
         style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 48 }}
       >

@@ -23,6 +23,16 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: "NEWMA",
   description: HOME_META.defaultDescription.text,
+  applicationName: "NEWMA",
+  icons: {
+    icon: [
+      { url: "/brand/favicon.svg", type: "image/svg+xml" },
+      { url: "/brand/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/brand/favicon-16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [{ url: "/brand/apple-touch-icon.png", sizes: "180x180" }],
+    other: [{ rel: "mask-icon", url: "/brand/safari-pinned-tab.svg", color: "#082b33" }],
+  },
 };
 
 export const viewport: Viewport = { colorScheme: "light", themeColor: BACKGROUND_HEX };
