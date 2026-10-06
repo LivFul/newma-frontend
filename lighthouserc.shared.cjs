@@ -63,6 +63,8 @@ function buildConfig({ preset, env = process.env }) {
           ...seo,
           "largest-contentful-paint": ["error", { maxNumericValue: 2500 }],
           "cumulative-layout-shift": ["error", { maxNumericValue: 0.1 }],
+          "installable-manifest": "warn",
+          "service-worker": "warn",
           // Lighthouse cannot measure INP; total blocking time is the lab proxy (A-P4-13).
           "total-blocking-time": ["warn", { maxNumericValue: 200 }],
           "total-byte-weight": ["warn", { maxNumericValue: 1_000_000 }],

@@ -4,7 +4,7 @@ import { expect, test } from "../support/test";
 const SCROLL_POSITIONS = [0, 0.25, 0.5, 0.75, 1] as const;
 // The page keeps a paper margin (0.5in = 48px from tablet up, 12px on phones) above the header, so at
 // scroll 0 the header sits inside that margin; as soon as the page scrolls it pins flush to the top.
-const PAGE_MARGIN_PX = 48;
+const PAGE_MARGIN_PX = 1;
 
 async function scrollToFraction(page: Page, fraction: number): Promise<void> {
   await page.evaluate((p) => {

@@ -7,7 +7,7 @@ import type { EcosystemEntry } from "@/content/ecosystem/registry";
 export function DemoLink({ entry }: { entry: EcosystemEntry }) {
   const labels = demoLabelsSentence(entry);
   return (
-    <section aria-labelledby="demo-heading" className="sheet mt-14 px-6 py-8 md:px-10">
+    <section aria-labelledby="demo-heading" className="surface mt-14 px-6 py-8 md:px-10">
       <h2 id="demo-heading" className="text-2xl font-medium tracking-[-0.015em]">
         {DETAIL_COPY.demoHeading.text}
       </h2>

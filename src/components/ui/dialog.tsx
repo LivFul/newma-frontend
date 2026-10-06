@@ -41,8 +41,9 @@ export function DialogContent({
         {...describedBy}
         className={cn(
           "fixed left-1/2 top-1/2 z-50 w-[min(92vw,32rem)] max-h-[calc(100dvh-2rem)] overflow-y-auto",
-          "-translate-x-1/2 -translate-y-1/2 rounded-lg border border-border bg-bg-elevated p-6",
-          "text-fg shadow-xl focus:outline-none",
+          "-translate-x-1/2 -translate-y-1/2 rounded-xl border border-border bg-bg-elevated p-6 glass",
+          "text-fg shadow-lg max-sm:left-0 max-sm:right-0 max-sm:top-auto max-sm:bottom-0 max-sm:w-full max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:rounded-t-2xl max-sm:rounded-b-none",
+          "focus:outline-none",
           className,
         )}
         {...props}

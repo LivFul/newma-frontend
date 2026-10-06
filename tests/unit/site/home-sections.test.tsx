@@ -13,7 +13,6 @@ import { ProductIntro } from "@/components/site/product-intro";
 import { HERO_LABELS, ECOSYSTEM_SLUGS } from "@/content/ecosystem/registry";
 import { ABOUT, HERO, PRODUCT } from "@/content/home/copy";
 import { MISSION, VISION } from "@/content/home/about";
-import { SURVEY_LABELS } from "@/content/home/survey";
 import { expectNoAxeViolations } from "../ui/axe";
 import HomePage from "@/app/(site)/page";
 
@@ -98,20 +97,11 @@ describe("HeroSection", () => {
   });
 
   // Value: protects=hero map key labels render and the A-H / 1-5 grid references stay out of the accessibility tree; fails_when=a label is dropped or aria-hidden is lost on the tick rows; why_new=HeroSection test only covered lede and disclaimer; seam=none
-  it("prints the map key and keeps the grid references hidden from assistive technology", () => {
+  it("keeps the orbital diagram in a glass panel without the survey map key", () => {
     const { container } = render(<HeroSection />);
-    for (const key of [
-      "sheetRef",
-      "legendHeading",
-      "route",
-      "contours",
-      "restricted",
-      "scale",
-    ] as const) {
-      expect(screen.getByText(SURVEY_LABELS[key].text), key).toBeInTheDocument();
-    }
-    expect(container.querySelector(".sheet-ticks-x")).toHaveAttribute("aria-hidden", "true");
-    expect(container.querySelector(".sheet-ticks-y")).toHaveAttribute("aria-hidden", "true");
+    expect(container.querySelector(".sheet-ticks-x")).toBeNull();
+    expect(container.querySelector(".glass")).not.toBeNull();
+    expect(container.querySelector("figure[data-hero]")).not.toBeNull();
   });
 });
 

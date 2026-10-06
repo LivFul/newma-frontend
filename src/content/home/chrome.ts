@@ -42,3 +42,5 @@ export const FOOTER_LEGAL_LINKS = Object.freeze([
 ]);
 export const FOOTER_NAV_LABEL = block("chrome.footer.nav", "Legal", ["C-30"]);
 export const HEADER_NAV_LABEL = block("chrome.header.nav", "Sections", []);
+export const HEADER_MENU = block("chrome.header.menu", "Menu", []);
+export const HEADER_MOBILE_NAV = block("chrome.header.mobile", "Mobile sections", []);

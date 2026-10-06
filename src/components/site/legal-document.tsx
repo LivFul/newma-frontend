@@ -8,16 +8,16 @@ export function LegalDocumentView({ doc }: { doc: LegalDocument }) {
           <h1 className="font-display text-4xl leading-[1.0] font-medium tracking-[-0.035em] text-balance [overflow-wrap:anywhere] sm:text-5xl xl:text-6xl">
             {doc.title.text}
           </h1>
-          <p className="hatch-held max-w-[36ch] border border-warning-ink px-4 py-3 text-lg leading-snug">
-            <span className="bg-bg">{doc.draftLabel.text}</span>
+          <p className="max-w-[36ch] rounded-xl border border-warning-ink bg-warning/20 px-4 py-3 text-lg leading-snug">
+            <span>{doc.draftLabel.text}</span>
           </p>
         </header>
-        <div className="lg:col-span-7 lg:border-l lg:border-fg/15 lg:pl-16">
+        <div className="lg:col-span-7 lg:border-l lg:border-border lg:pl-16">
           {doc.sections.map((section) => (
             <section
               key={section.heading.id}
               aria-labelledby={section.heading.id}
-              className="border-t border-fg pt-6 not-first:mt-12"
+              className="border-t border-border pt-6 not-first:mt-12"
             >
               <h2 id={section.heading.id} className="text-2xl font-medium tracking-[-0.015em]">
                 {section.heading.text}

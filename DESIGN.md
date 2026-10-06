@@ -1,10 +1,10 @@
 ---
 name: NEWMA
-description: A surveyed field sheet for nature-to-medicine, printed in spot inks on mint survey paper.
+description: A modern ethnobotanical instrument — LivFul greens fading into capsule teals.
 colors:
   bg: "#e8f2ef"
   bg-elevated: "#f6faf8"
-  bg-deep: "#dce9e4"
+  bg-deep: "#d7ebe6"
   fg: "#09191f"
   fg-muted: "#4a6467"
   accent: "#1d5c52"
@@ -16,11 +16,11 @@ colors:
   warning-ink: "#8a5a00"
   success: "#8dbab3"
   success-ink: "#3f7a70"
-  focus: "#b8643a"
+  focus: "#1b8896"
   route: "#fbd699"
   route-edge: "#b8643a"
   contour: "#8dbab3"
-  plate: "#09191f"
+  plate: "#06242b"
   plate-fg: "#e8f2ef"
   plate-muted: "#8dbab3"
   eco-compute: "#9a5230"
@@ -28,25 +28,22 @@ colors:
 typography:
   display:
     fontFamily: "Geologica, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "clamp(2.5rem, 1.5rem + 3.2vw, 4.5rem)"
+    fontSize: "clamp(2.5rem, 1.4rem + 3.6vw, 4.75rem)"
     fontWeight: 500
     lineHeight: 0.98
-    letterSpacing: "-0.035em"
-    fontVariation: '"SHRP" 60'
+    letterSpacing: "-0.04em"
   headline:
     fontFamily: "Geologica, ui-sans-serif, system-ui, sans-serif"
     fontSize: "2.25rem"
     fontWeight: 500
     lineHeight: 1.02
     letterSpacing: "-0.03em"
-    fontVariation: '"SHRP" 60'
   statement:
     fontFamily: "Geologica, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.5rem"
     fontWeight: 400
     lineHeight: 1.375
     letterSpacing: "-0.02em"
-    fontVariation: '"SHRP" 60'
   title:
     fontFamily: "Geologica, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.5rem"
@@ -64,7 +61,7 @@ typography:
     fontSize: "0.75rem"
     fontWeight: 500
     lineHeight: 1.5
-    letterSpacing: "0.14em"
+    letterSpacing: "0.08em"
   gridref:
     fontFamily: "Martian Mono, ui-monospace, SFMono-Regular, Menlo, monospace"
     fontSize: "0.6875rem"
@@ -73,9 +70,9 @@ typography:
     letterSpacing: "0.02em"
     fontFeature: '"tnum"'
 rounded:
-  sm: "1px"
-  md: "2px"
-  lg: "4px"
+  sm: "0.375rem"
+  md: "0.75rem"
+  lg: "1.25rem"
 spacing:
   "1": "0.25rem"
   "2": "0.5rem"
@@ -139,10 +136,10 @@ components:
     textColor: "{colors.bg-elevated}"
     rounded: "{rounded.sm}"
     padding: "2px 8px"
-  sheet:
+  surface:
     backgroundColor: "{colors.bg-elevated}"
     textColor: "{colors.fg}"
-    rounded: "0"
+    rounded: "{rounded.lg}"
   legend-plate:
     backgroundColor: "{colors.plate}"
     textColor: "{colors.plate-fg}"
@@ -158,182 +155,115 @@ components:
 
 ## Overview
 
-**Creative North Star: "The Field Survey Sheet"**
+**Creative North Star: "The Ethnobotanical Instrument"**
 
-Every NEWMA surface is a printed survey sheet: mint survey paper carrying a small set of spot inks, framed by an ink neatline with corner ticks, lettered like a map. Farm to patient is drawn as a real route, an apricot band edged in sienna, and each check along it is a surveyed benchmark. The public site uses the sheet to persuade; the demo workspace uses the same sheet in its working register, with legend keys, ruled tables and title-block fields. There is no second visual language for the product.
+NEWMA is a LivFul product: scientific, future-facing and botanical. Surfaces are full-bleed mint-to-teal fields, not printed survey sheets. The leaf and the capsule from the mark are the recurring glyphs. Depth comes from soft layered light, glass panels and green-to-blue fades. Motion is restrained: orbits, aurora drift, hover lift and scroll reveals, all transform and opacity, all off under reduced motion.
 
-The density is printed, not decorated. Structure comes from ink rules (1px hairlines, 1.5–2px heavier rules for heads and section tops), hatching for parcels whose data is restricted or held, and numbered legend keys. Hue never carries meaning by itself: a glyph shape, a stroke pattern (dashed for optional or out of scope, hatched for restricted or held) or a text label always says the same thing.
-
-The world refuses the dark biotech hero with a glowing diagram and the leafy wellness landing. Surfaces are flat paper; the only breaks in the paper rhythm are the three deep ink-teal plates: the hero terrain half, the workflow diagram (and its 3D twin) and the legend plate.
+The public site and the demo share one visual language. Layout (section order, 6/6 hero, 7/5 splits, four-step row, six-component index) is the thing that stays; the paper, neatlines, grid ticks and map key are gone.
 
 **Key Characteristics:**
 
-- Mint paper, ink-teal linework, spot inks only; every text and stroke pair is contrast-tested.
-- Geologica with its sharpness axis raised for display lettering; Martian Mono only for grid references, coordinates, hashes and measured values.
-- Neatlines, corner ticks, grid references, hatched parcels, numbered legend keys and benchmark markers as the recurring vocabulary.
-- Square corners (1–2px) everywhere a surface or control has an edge; circles only for benchmarks and waypoints.
-- Flat: depth comes from paper tones and the deep plate, never from soft shadows.
+- LivFul mint wash, leaf lime-to-emerald, capsule teal-to-cyan, ink-teal type.
+- Soft colour-fade gradients and aurora meshes; apricot only as a rare warm band.
+- Geologica for display and UI; Martian Mono only for hashes, codes and measured values.
+- Pill buttons, rounded cards, glass panels, a glow on primary actions.
+- Leaf bullets and pill step markers; hue never carries meaning alone.
 
 ## Colors
 
-A cool mint survey paper printed in ink-teal, with field green for action, apricot and sienna for the route, and madder and ochre for refusals and holds.
+A mint field that blends LivFul greens into the logo's capsule blues.
 
 ### Primary
 
-- **Field Green** (accent): the only action colour. Filled primary buttons, links, the patient cross on the terrain. Text on it is the fresh-sheet tone (accent-fg).
+- **Field Green** (accent): action, links, primary fills. Text on it is accent-fg.
 
 ### Secondary
 
-- **Apricot Route** (route): the farm-to-patient band, the route profile behind waypoints, the walked segments of the gate tracker, and text selection. Ink-teal text only.
-- **Surveyor's Sienna** (route-edge / focus): the route's edge and the focus ring pencil. One value, two roles on paper (it clears 3:1 on paper and the elevated sheet); inside a plate it is re-cut lighter (route-edge #c97a4d, focus #f2b27e). Also the underline ink for header nav hover.
+- **Leaf** (`#b3e570` → `#15a676`): botanical light, leaf glyphs, positive ornaments.
+- **Capsule** (`#0b404d` → `#1b8896`): pharma light, pill glyphs, focus ring, deep plates.
 
-### Tertiary (status and plate inks)
+### Tertiary
 
-- **Madder** (danger): refusals, failed checks, restricted hatching (mixed to 28% in the hatch).
-- **Ochre** (warning) with **Ochre Ink** (warning-ink): fill for holds and pending checks; the ink is the stroke wherever a line must carry meaning on paper (WCAG 1.4.11).
-- **Sage** (success) with **Sage Ink** (success-ink): fill for passed checks; the ink strokes trees, sprouts and badge edges. Contour lines and plate-muted text reuse the sage value.
-- **Deepened Sienna** (eco-compute): the Agentic Compute plate tone, deepened from the route edge so it holds 4.5:1 as text.
-- **Provenance Madder** (eco-optional): the Provenance & DLT plate, always paired with a dashed stroke because it is optional.
+- **Madder** (danger), **Ochre** (warning) with **Ochre Ink**, **Sage** (success) with **Sage Ink**.
+- **Apricot** (route): rare warm accent, staytec-like peach bands.
+- **Deepened Sienna** (eco-compute) and **Provenance Madder** (eco-optional), always paired with a glyph or dash.
 
 ### Neutral
 
-- **Survey Paper** (bg): the page.
-- **Fresh Sheet** (bg-elevated): a sheet laid on the paper; inputs, sheet interiors, fill-on-colour text.
-- **Paper Band** (bg-deep): section rhythm bands (with the survey grid), ghost-button and rail-item hover.
-- **Ink-Teal** (fg): type and all linework, neatlines, table head rules, current rail item fill.
-- **Faded Ink** (fg-muted): secondary text, ledes, grid ticks. Passes 4.5:1 on all three paper tones.
-- **Grid Line** (border): table row dividers, light rules.
-- **Pencil Outline** (border-strong): interactive outlines (neutral badge edge, toggles), the Data & Knowledge plate, scrollbar thumb.
-- **Plates** (plate / plate-fg / plate-muted, plus the plate-* re-cuts): the deep ink-teal surface of the hero terrain half, the workflow diagram and its 3D twin, the legend section. (The demo banner is a flat plate-coloured strip, not a fourth plate.) Inside a plate the semantic tokens are remapped (`.plate-surface`): text is paper-tone, secondary text sage, accent a lighter field green, danger/warning/success/compute/optional lighter re-cuts, contour a dim sage, route edge and focus lighter sienna (#c97a4d, #f2b27e). Every re-cut pair is in contrast-pairs.json.
+- **Mint wash** (bg), **Elevated glass** (bg-elevated), **Mint band** (bg-deep).
+- **Ink-teal** (fg), **Faded ink** (fg-muted).
+- **Plates** (plate / plate-fg / plate-muted): the dark teal-blue field for the workflow, legend and 3D scene. `.plate-surface` remaps semantic tokens.
 
 ### Named Rules
 
-**The Spot Ink Rule.** Every colour is a named ink with a job. A new colour enters only with a pair in `contrast-pairs.json` that the token test verifies; no ad-hoc hex in components.
+**The Spot Ink Rule.** A new colour enters only with a pair in `contrast-pairs.json`.
 
-**The Fill-and-Ink Rule.** Light fills (ochre, sage, apricot) never carry meaning as a stroke on paper. Where a line must be seen, use the matching ink (warning-ink, success-ink, route-edge).
+**The Fill-and-Ink Rule.** Light fills never carry meaning as a stroke; use warning-ink, success-ink, route-edge.
 
-**The Never-Hue-Alone Rule.** Status, plate identity and restriction are always doubled by a glyph, a dash or hatch pattern, or text. Status badges read "Status: PASS" to screen readers.
+**The Never-Hue-Alone Rule.** Status, plate identity and restriction are doubled by a glyph, dash, hatch or text.
+
+**The Blend Rule.** Brand surfaces may fade leaf into capsule. Text sits on a solid token, never on the middle of a gradient, unless that pairing is contrast-tested.
 
 ## Typography
 
-**Display Font:** Geologica (variable, SHRP axis), with ui-sans-serif, system-ui fallback
-**Body Font:** Geologica
-**Label/Mono Font:** Martian Mono, with ui-monospace fallback
+**Display Font:** Geologica  
+**Body Font:** Geologica  
+**Mono Font:** Martian Mono
 
-**Character:** Geologica is set like map lettering: tight, slightly cut display titles and tracked-caps place names. Martian Mono is the surveyor's instrument voice and appears only where something is measured or referenced.
-
-### Hierarchy
-
-- **Display** (500, clamp 2.5rem to 4.5rem, 0.98, -0.035em, SHRP 60): the hero headline in the title block only. Detail page and legal h1s use 2.25rem on phones, 3rem from sm and 3.75rem from xl, at the same weight and tracking.
-- **Headline** (500, 2.25rem to 3rem, 1.02, -0.03em, SHRP 60): section h2s, balanced wrap.
-- **Statement** (400, 1.5rem to 1.875rem, snug, -0.02em, SHRP 60): a single declarative line under a headline, capped near 30–34ch.
-- **Title** (500, 1.5rem, -0.015em): sentence-case sub-headings inside a section; 1.25rem/-0.01em for waypoint and card titles. Demo h2/h3 sit at 500 with -0.015em.
-- **Body** (400, 1rem; ledes 1.125rem, relaxed 1.625): prose capped at 38–52ch on the site, 72ch in demo intros.
-- **Label** (500, 0.75rem, 0.14em, uppercase): place names, legend headings, nav group labels and form labels. Demo table heads and definition terms use 0.6875rem at 0.12em, heads at 600.
-- **Grid reference** (Martian Mono 400, 0.6875rem, 0.02em, tabular figures): sheet refs, grid ticks, scale text, the hero disclaimer as a map note, legend key numbers and W-codes.
-
-### Named Rules
-
-**The Instrument Mono Rule.** Martian Mono is for grid references, coordinates, hashes, codes and measured values. Never for headings, buttons or body copy.
-
-**The Sharp Display Rule.** Display, headline and statement lettering carry `font-variation-settings: "SHRP" 60`; UI and body text stay at the default axis.
-
-**The Tabular Rule.** Tables and anything tagged tabular use tabular numerals.
+Display lettering is tight and large. Labels are tracked, not shouted map caps. Mono is the instrument voice.
 
 ## Layout
 
-Every page sits inside a paper margin: 12px on phones, 0.5in from md (48rem), so the neatline reads as a sheet laid on paper; content spans the full width inside it (no max-width container, only line-length caps in ch on running text). Sections pad 20px horizontally and 80px vertically on phones, 48px and 112px from md. Composition is a 12-column grid: the hero splits 6/6 with an ink rule between title block and terrain; content sections pair a 7-column headline with a 5-column ruled aside. Spacing follows a 4px base (0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4rem).
-
-Section rhythm alternates paper (bg), paper band with the 64px survey grid (bg-deep), and once, the deep legend plate. In the demo, each top-level section starts on a 15%-ink hairline with 2.5rem above its content, like a new block on the sheet. The workflow rail is a sticky 16rem left margin from xl (80rem); below that it becomes a horizontally scrolling strip of keys under the header. The sticky header is 4rem; scroll-padding clears it, and it unsticks on viewports shorter than 32rem. Vertical grid ticks drop below 48rem.
+Pages are full-bleed. Horizontal padding is 20px on phones, 48px from md. Sections pad 80px / 112px vertically. Composition is a 12-column grid: hero 6/6, content 7/5. Safe-area insets apply in standalone PWA mode. The sticky header is 4rem; scroll-padding clears it. The header unsticks below 32rem viewport height.
 
 ## Elevation & Depth
 
-The system is flat. Depth is tonal: Survey Paper underneath, Fresh Sheet laid on top inside a neatline, Paper Band for recessed rhythm, and the plates as the only dark fields. The hero's six ecosystem plates sit as translucent overprints (tone mixed 18% into the sheet at 0.84 opacity) so the route shows through them; isolating a plate dims the others to 0.24 rather than lifting the chosen one.
-
-### Shadow Vocabulary
-
-- **Focus halo** (`box-shadow: 0 0 0 2px var(--color-bg)`): the inner half of the two-tone focus ring, paired with a 2px sienna outline offset 3px. The only sanctioned shadow.
-
-### Named Rules
-
-**The Printed Sheet Rule.** Nothing floats. No drop shadows, glass or blur on any surface; separation is an ink rule, a paper tone or the plate.
+Depth is allowed: stacked shadows, a brand glow, and glass (backdrop-filter with an opaque fallback). Nothing uses a harsh drop under type.
 
 ## Shapes
 
-Edges are square: 1px for badges (stamped tags), 2px for buttons and native inputs, 4px as the ceiling. Containers take an ink neatline, not a rounded shell: the sheet is a 1px ink border with 10px corner ticks inset 5px. Circles appear only for surveyed points: gate benchmarks (28px, 1.5px stroke), numbered route waypoints (36px) and terrain markers. Dashed strokes mean optional, unsurveyed or out of scope; diagonal hatching means restricted (madder, -45deg, 7px pitch) or held (ochre, 45deg, 8px pitch). Hard-stop CSS gradients are the world's drawing tool for ticks, hatching and the survey grid; they never fade between colours.
+Buttons are pills. Cards use 1.25rem corners. The leaf and the capsule are the only brand silhouettes. Circles remain for orbital nodes.
 
-Drawn marks replace text glyphs: a 16-unit box, one 1.6px stroke weight, currentColor, always decorative beside text that carries the meaning.
+## Motion
+
+Tokens: fast 150ms, base 280ms, slow 600ms. Animate transform and opacity only. `prefers-reduced-motion: reduce` zeros every duration.
 
 ## Components
 
 ### Buttons
 
-Inked, square and decisive.
+Pill-shaped, 44px minimum on touch. Primary uses the brand gradient and a glow on hover. Secondary is an ink outline. Ghost is quiet. Danger is madder.
 
-- **Shape:** square-cornered (2px), 1px border on every variant so forced-colors mode draws an outline.
-- **Primary:** field green fill, fresh-sheet text, 500 weight; sizes 32/40/48px min-height with 12/16/24px side padding.
-- **Hover / Focus:** primary and danger hover to ink-teal fill; secondary inverts to ink fill with paper text; ghost gains a paper-band fill and underline. Active nudges down 1px. Focus is the global two-tone sienna ring. Transitions run 150ms on the standard ease.
-- **Secondary:** transparent with an ink-teal 1px border, paired beside primary in the title block.
-- **Ghost / Danger:** ghost for low-emphasis actions; danger is a madder fill.
+### Chips
 
-### Chips (Status Badges)
-
-- **Style:** stamped tags: 24px min-height, 1px corners, 12px 500 text, a fill plus a darker ink edge from the same family (sage fill with sage ink, ochre with ochre ink, neutral fresh sheet with pencil outline).
-- **State:** the vocabulary is exactly the gate status enum: PASS (sage), HOLD and PENDING (ochre), FAIL and INVALIDATED (madder), NOT_STARTED (neutral).
+Rounded tags. Status vocabulary is the gate enum: PASS, HOLD, PENDING, FAIL, INVALIDATED, NOT_STARTED. Screen readers hear "Status: PASS".
 
 ### Cards / Containers
 
-- **Corner Style:** square; the sheet has no radius.
-- **Background:** Fresh Sheet on Survey Paper.
-- **Shadow Strategy:** none (see Elevation & Depth).
-- **Border:** 1px ink neatline with corner ticks; sections inside are divided by ink rules (1px, or 2px for heavier section tops).
-- **Internal Padding:** 20px on phones, 40px from md.
-
-### Inputs / Fields
-
-- **Style:** native controls with 2px corners on a Fresh Sheet fill; the border darkens to ink-teal on hover.
-- **Focus:** the global two-tone sienna ring.
+Rounded glass or elevated mint. No neatline ticks.
 
 ### Navigation
 
-- **Site header:** sticky 4rem paper bar on a 15%-ink hairline; muted links that turn ink with a 2px sienna underline on hover; a compact primary button for access.
-- **Workflow rail (demo):** numbered legend keys (W-codes in mono) with 40px rows; hover takes the paper band, the current page is a solid ink-teal fill with paper text. Group labels use the tracked-caps label style.
+Sticky translucent header. Mobile opens a sheet for section links. Footer is a deep teal-blue band.
 
-### Legend Plate
+### Ecosystem diagram
 
-The deep ink-teal section printed as the map legend: numbered keys (mono counters in plate-muted), each a ruled row with a plate swatch, title and descriptor; hover lifts the row by a 6% paper-tone wash.
-
-### Map Key
-
-The strip along the bottom of a sheet: sheet ref in mono, a tracked-caps legend heading, swatches for route (apricot with sienna edges), contour (sage hairline) and restricted (hatched box), and an alternating ink scale bar.
-
-### Benchmark Tracker
-
-Gates as surveyed benchmarks down a vertical route: sage fill with a drawn check for passed, ochre hatching for held, madder fill for failed, open ink ring for not started, dashed muted ring for out of scope. Walked segments are the apricot band with sienna edges; unwalked segments are a dashed muted line.
-
-### Workflow Key
-
-Each demo h1 opens with its W-code in a square ink-bordered mono key that matches the rail.
+Interface at the centre as the leaf-and-pill mark. Five components orbit on two rings. Provenance & DLT stays dashed. Keyboard, no-JS static SVG and a lazy Motion twin are required.
 
 ## Do's and Don'ts
 
 ### Do:
 
-- **Do** frame primary surfaces as sheets: a 1px ink neatline, corner ticks, and a map key or grid references where the surface warrants them.
-- **Do** use field green (accent) for action and nothing else; hover filled actions to ink-teal.
-- **Do** pair every light fill with its ink (warning-ink, success-ink, route-edge) whenever a stroke carries meaning.
-- **Do** double hue with a glyph, dash, hatch or label; dashed means optional or out of scope, hatched means restricted or held.
-- **Do** set place names and table heads in tracked caps (0.12–0.14em) and reserve Martian Mono for references, codes and measurements.
-- **Do** add a contrast pair to `contrast-pairs.json` for any new colour pairing before it ships.
-- **Do** use drawn SVG marks (16-unit box, 1.6px stroke, currentColor) instead of text glyphs for status.
-- **Do** honour reduced motion: the route is shown complete and token durations drop to 0ms.
+- **Do** keep the existing layout, copy and claim register.
+- **Do** use leaf glyphs for bullets and pass accents; pill glyphs for steps and optional marks.
+- **Do** pair every light fill with its ink when a stroke carries meaning.
+- **Do** add a contrast pair before shipping a new colour pairing.
+- **Do** honour reduced motion.
 
 ### Don't:
 
-- **Don't** use soft drop shadows, glass or backdrop blur; the focus halo is the only shadow.
-- **Don't** use colour-fade gradients; hard-stop gradients for ticks, hatching and grids are the only gradients.
-- **Don't** wrap content in rounded card shells or exceed 4px corners; circles are for benchmarks and waypoints only.
+- **Don't** bring back the survey sheet, neatlines, grid ticks or map key.
+- **Don't** let hue alone carry status.
 - **Don't** set headings, buttons or body copy in Martian Mono.
-- **Don't** let hue alone carry status, plate identity or restriction.
-- **Don't** add dark regions beyond the three blessed plates: the hero terrain half, the workflow diagram (and its 3D twin) and the legend plate. Everything dark is the same `.plate-surface`, never a bespoke dark colour.
-- **Don't** document or design around placeholder copy; text is governed by the claims register.
+- **Don't** document placeholder claims; text is governed by the claims register.
+- **Don't** take photography from Pinterest or any source that is not free for commercial use.

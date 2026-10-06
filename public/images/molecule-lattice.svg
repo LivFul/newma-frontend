@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 280" fill="none">
+  <g stroke="#1b8896" stroke-width="1" opacity="0.2">
+    <circle cx="40" cy="40" r="6"/>
+    <circle cx="120" cy="70" r="6"/>
+    <circle cx="200" cy="40" r="6"/>
+    <circle cx="70" cy="150" r="6"/>
+    <circle cx="160" cy="160" r="6"/>
+    <circle cx="240" cy="130" r="6"/>
+    <circle cx="50" cy="230" r="6"/>
+    <circle cx="140" cy="240" r="6"/>
+    <circle cx="230" cy="220" r="6"/>
+    <path d="M40 40L120 70L200 40M120 70L70 150L160 160L240 130M70 150L50 230M160 160L140 240M240 130L230 220M50 230L140 240L230 220"/>
+  </g>
+</svg>

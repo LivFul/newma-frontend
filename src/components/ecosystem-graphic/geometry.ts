@@ -1,6 +1,4 @@
-// Single geometry source for the hero: the static SVG, its interactive Motion twin, the tests and
-// the CSS baseline all read these numbers, so the swap between layers cannot move anything.
-// Units are SVG user units. Pure and deeply frozen.
+// Single geometry source for the hero: static SVG, Motion twin, tests and CSS. SVG user units. Frozen.
 import { ECOSYSTEM_SLUGS, type EcosystemSlug } from "@/content/ecosystem/registry";
 
 export type Point = Readonly<{ x: number; y: number }>;
@@ -20,6 +18,7 @@ export const GLYPH_KEYS = [
   "linked-rings",
 ] as const;
 export type GlyphKey = (typeof GLYPH_KEYS)[number];
+export type LabelAnchor = "start" | "middle" | "end";
 export type PartGeometry = Readonly<{
   slug: EcosystemSlug;
   assembled: Point;
@@ -27,6 +26,8 @@ export type PartGeometry = Readonly<{
   tone: ToneToken;
   glyph: GlyphKey;
   dashed: boolean;
+  label: Readonly<{ x: number; y: number; anchor: LabelAnchor }>;
+  center: boolean;
 }>;
 export type EdgeKind = "flow" | "rail" | "optional";
 export type Edge = Readonly<{
@@ -38,29 +39,22 @@ export type Edge = Readonly<{
   d: string;
 }>;
 
-// About 480 x 560 portrait: label text stays at least 12 px rendered on a 360 px phone.
-export const VIEWBOX = Object.freeze({ width: 470, height: 560 });
-export const PLATE = Object.freeze({ halfWidth: 76, halfHeight: 20, thickness: 8 });
-export const LABEL_FONT = Object.freeze({ title: 20, descriptor: 18 });
-// Label box relative to the part origin (the plate centre); width is a conservative text estimate.
+export const VIEWBOX = Object.freeze({ width: 400, height: 420 });
+export const PLATE = Object.freeze({ halfWidth: 28, halfHeight: 28, thickness: 0 });
+export const NODE_RADIUS = 28;
+export const LABEL_FONT = Object.freeze({ title: 18, descriptor: 16 });
 export const LABEL_BOX = Object.freeze({
-  offsetX: 128,
-  width: 198,
-  top: -24,
-  bottom: 26,
-  titleBaseline: -2,
-  descriptorBaseline: 20,
+  offsetX: 0,
+  width: 100,
+  top: -18,
+  bottom: 34,
+  titleBaseline: 0,
+  descriptorBaseline: 16,
 });
-// The slab-to-label leader tick, relative to the part origin.
-export const LEADER = Object.freeze({ fromX: PLATE.halfWidth + 6, toX: LABEL_BOX.offsetX - 8 });
-export const RAIL_X = 16;
-const ASSEMBLED_X = 116;
-const ASSEMBLED_PITCH = 44;
-const ASSEMBLED_CENTRE_Y = 276;
-const EXPLODED_TOP = 64;
-const EXPLODED_PITCH = 88;
-const EXPLODED_DRIFT = 10;
-const EDGE_GAP = 4;
+export const LEADER = Object.freeze({ fromX: 0, toX: 0 });
+export const RAIL_X = 18;
+export const CENTER = Object.freeze({ x: 200, y: 210 });
+export const RING = Object.freeze({ assembled: 48, exploded: 100, inner: 48, outer: 100 });
 
 const TONES: Readonly<Record<EcosystemSlug, ToneToken>> = {
   interface: "--color-accent",
@@ -81,83 +75,73 @@ const GLYPHS: Readonly<Record<EcosystemSlug, GlyphKey>> = {
 
 const point = (x: number, y: number): Point => Object.freeze({ x, y });
 
+const ORBITERS = ECOSYSTEM_SLUGS.filter(
+  (slug): slug is Exclude<EcosystemSlug, "interface"> => slug !== "interface",
+);
+const polar = (radius: number, deg: number): Point => {
+  const rad = (deg * Math.PI) / 180;
+  return point(
+    Number((CENTER.x + radius * Math.cos(rad)).toFixed(2)),
+    Number((CENTER.y + radius * Math.sin(rad)).toFixed(2)),
+  );
+};
+
+const LABELS: Readonly<Record<EcosystemSlug, PartGeometry["label"]>> = {
+  interface: Object.freeze({ x: 0, y: -48, anchor: "middle" }),
+  "agentic-compute": Object.freeze({ x: 0, y: -46, anchor: "middle" }),
+  "scientific-review": Object.freeze({ x: 8, y: 4, anchor: "start" }),
+  "wet-lab": Object.freeze({ x: 12, y: 40, anchor: "start" }),
+  "data-knowledge": Object.freeze({ x: -12, y: 40, anchor: "end" }),
+  "provenance-dlt": Object.freeze({ x: 0, y: 46, anchor: "middle" }),
+};
+
+const ORBIT_ANGLES = Object.freeze([-90, -30, 30, 150, 90]);
+
 export const PARTS: readonly PartGeometry[] = Object.freeze(
-  ECOSYSTEM_SLUGS.map((slug, index) =>
-    Object.freeze({
+  ECOSYSTEM_SLUGS.map((slug) => {
+    const orbitIndex = slug === "interface" ? -1 : ORBITERS.indexOf(slug);
+    const assembled =
+      orbitIndex === -1
+        ? point(CENTER.x, CENTER.y)
+        : polar(RING.assembled, ORBIT_ANGLES[orbitIndex]!);
+    const exploded =
+      orbitIndex === -1
+        ? point(CENTER.x, CENTER.y)
+        : polar(RING.exploded, ORBIT_ANGLES[orbitIndex]!);
+    return Object.freeze({
       slug,
-      assembled: point(
-        ASSEMBLED_X,
-        ASSEMBLED_CENTRE_Y + (index - (ECOSYSTEM_SLUGS.length - 1) / 2) * ASSEMBLED_PITCH,
-      ),
-      // Alternate sides drift outward a little when the stack explodes.
-      exploded: point(
-        ASSEMBLED_X + (index % 2 === 0 ? -EXPLODED_DRIFT : EXPLODED_DRIFT),
-        EXPLODED_TOP + index * EXPLODED_PITCH,
-      ),
+      assembled,
+      exploded,
       tone: TONES[slug],
       glyph: GLYPHS[slug],
       dashed: slug === "provenance-dlt",
-    }),
-  ),
+      label: LABELS[slug],
+      center: slug === "interface",
+    });
+  }),
 );
 
 const part = (slug: EcosystemSlug): PartGeometry => PARTS[ECOSYSTEM_SLUGS.indexOf(slug)]!;
-const top = (slug: EcosystemSlug): Point => {
-  const p = part(slug).exploded;
-  return point(p.x, p.y - PLATE.halfHeight - EDGE_GAP);
-};
-const bottom = (slug: EcosystemSlug): Point => {
-  const p = part(slug).exploded;
-  return point(p.x, p.y + PLATE.halfHeight + PLATE.thickness + EDGE_GAP);
-};
-const left = (slug: EcosystemSlug): Point => {
-  const p = part(slug).exploded;
-  return point(p.x - PLATE.halfWidth - EDGE_GAP, p.y);
-};
-const right = (slug: EcosystemSlug): Point => {
-  const p = part(slug).exploded;
-  return point(p.x + PLATE.halfWidth + EDGE_GAP, p.y);
-};
-const edge = (
-  from: EcosystemSlug,
-  to: EcosystemSlug,
-  kind: EdgeKind,
-  d: string,
-  dashed = false,
-): Edge => Object.freeze({ id: `${from}>${to}`, from, to, kind, dashed, d });
 
-const line = (a: Point, b: Point): string => `M${a.x} ${a.y}L${b.x} ${b.y}`;
-// Agentic Compute reaches Wet Lab through the adapter, so the arc bows round the plate between them.
-const BOW = 24;
-const bow = (a: Point, b: Point): string =>
-  `M${a.x} ${a.y}C${a.x + BOW} ${a.y} ${b.x + BOW} ${b.y} ${b.x} ${b.y}`;
-const railPath = (slug: EcosystemSlug): string => {
-  const from = left(slug);
-  const to = left("data-knowledge");
-  return `M${from.x} ${from.y}H${RAIL_X}V${to.y}H${to.x}`;
+const edge = (from: EcosystemSlug, to: EcosystemSlug, kind: EdgeKind, dashed = false): Edge => {
+  const a = part(from).exploded;
+  const b = part(to).exploded;
+  const mx = (a.x + b.x) / 2;
+  const my = (a.y + b.y) / 2;
+  const cx = mx + (CENTER.x - mx) * -0.18;
+  const cy = my + (CENTER.y - my) * -0.18;
+  const d = `M${a.x} ${a.y}Q${cx.toFixed(2)} ${cy.toFixed(2)} ${b.x} ${b.y}`;
+  return Object.freeze({ id: `${from}>${to}`, from, to, kind, dashed, d });
 };
 
 export const EDGES: readonly Edge[] = Object.freeze([
-  edge("interface", "agentic-compute", "flow", line(bottom("interface"), top("agentic-compute"))),
-  edge(
-    "agentic-compute",
-    "scientific-review",
-    "flow",
-    line(bottom("agentic-compute"), top("scientific-review")),
-  ),
-  edge("agentic-compute", "wet-lab", "flow", bow(right("agentic-compute"), right("wet-lab"))),
-  edge("wet-lab", "scientific-review", "flow", line(top("wet-lab"), bottom("scientific-review"))),
-  // Authoritative records: every plate reads and writes through Data & Knowledge (left-hand rail).
-  edge("interface", "data-knowledge", "rail", railPath("interface")),
-  edge("agentic-compute", "data-knowledge", "rail", railPath("agentic-compute")),
-  edge("scientific-review", "data-knowledge", "rail", railPath("scientific-review")),
-  edge("wet-lab", "data-knowledge", "rail", railPath("wet-lab")),
-  // Signed-log baseline first; ledger and anchoring are optional extensions.
-  edge(
-    "data-knowledge",
-    "provenance-dlt",
-    "optional",
-    line(bottom("data-knowledge"), top("provenance-dlt")),
-    true,
-  ),
+  edge("interface", "agentic-compute", "flow"),
+  edge("agentic-compute", "scientific-review", "flow"),
+  edge("agentic-compute", "wet-lab", "flow"),
+  edge("wet-lab", "scientific-review", "flow"),
+  edge("interface", "data-knowledge", "rail"),
+  edge("agentic-compute", "data-knowledge", "rail"),
+  edge("scientific-review", "data-knowledge", "rail"),
+  edge("wet-lab", "data-knowledge", "rail"),
+  edge("data-knowledge", "provenance-dlt", "optional", true),
 ]);

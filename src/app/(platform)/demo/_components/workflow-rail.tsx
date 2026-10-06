@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Mark } from "@/components/ui/mark";
+import { LeafIcon } from "@/components/brand/leaf-icon";
+import { PillIcon } from "@/components/brand/pill-icon";
 import { WORKFLOWS } from "@/lib/demo/workflows";
 import { cn } from "@/lib/cn";
 
@@ -13,22 +14,13 @@ const UTILITY_LINKS = Object.freeze([
 
 // Drawn in the survey's linework: one stroke weight, square caps.
 function SheetIcon() {
-  return (
-    <svg viewBox="0 0 16 16" className="size-4" aria-hidden="true" focusable="false">
-      <path
-        d="M2.5 2.5h11v11h-11zM2.5 7h11M7 7v6.5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-      />
-    </svg>
-  );
+  return <LeafIcon className="size-4" gradient={false} />;
 }
 const isActive = (pathname: string, href: string): boolean =>
   href === "/demo" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
 
 const ITEM =
-  "flex min-h-10 items-center gap-3 px-3 py-1.5 text-sm text-fg-muted transition-colors " +
+  "flex min-h-11 items-center gap-3 rounded-full px-3 py-1.5 text-sm text-fg-muted transition-colors " +
   "hover:bg-bg-deep hover:text-fg aria-[current=page]:bg-fg aria-[current=page]:text-bg forced-colors:aria-[current=page]:outline-2 forced-colors:aria-[current=page]:-outline-offset-2";
 
 // The workflow legend, always in reach: W1–W10 as numbered keys down the sheet's left margin on wide
@@ -39,7 +31,7 @@ export function WorkflowRail() {
   return (
     <nav
       aria-label="Demo sections"
-      className="border-b border-fg/15 bg-bg xl:sticky xl:top-0 xl:h-dvh xl:w-64 xl:shrink-0 xl:overflow-y-auto xl:border-r xl:border-b-0"
+      className="border-b border-border bg-bg xl:sticky xl:top-0 xl:h-dvh xl:w-64 xl:shrink-0 xl:overflow-y-auto xl:border-r xl:border-b-0"
     >
       <ul
         role="list"
@@ -85,7 +77,7 @@ export function WorkflowRail() {
               className={cn(ITEM, "whitespace-nowrap")}
             >
               <span className="w-8 max-xl:hidden">
-                <Mark kind="arrow" className="size-4" />
+                <PillIcon className="size-4" gradient={false} />
               </span>
               {link.label}
             </Link>

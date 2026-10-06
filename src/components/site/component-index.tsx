@@ -1,17 +1,18 @@
 import { ECOSYSTEM_SLUGS, HERO_LABELS } from "@/content/ecosystem/registry";
 import { COMPONENTS_INDEX } from "@/content/home/copy";
+import { LeafIcon } from "@/components/brand/leaf-icon";
+import { PillIcon } from "@/components/brand/pill-icon";
 import { ComponentLink } from "./component-link";
 import { PlateSwatch } from "./plate-swatch";
 import { CONTAINER, H2, SECTION } from "./type";
 
-// The map legend, printed on the deep plate: the text twin of the hero graphic, the same six links
-// readable without any diagram. Keys are numbered by CSS, so link text stays title plus descriptor.
 export function ComponentIndex() {
   return (
     <section
       id="components"
       aria-labelledby="components-heading"
       className={`${SECTION} plate-surface`}
+      data-reveal
     >
       <div className={`${CONTAINER} space-y-14`}>
         <div className="grid gap-6 lg:grid-cols-12">
@@ -22,17 +23,19 @@ export function ComponentIndex() {
             {COMPONENTS_INDEX.intro.text}
           </p>
         </div>
-        <ul role="list" className="grid [counter-reset:key] md:grid-cols-2 lg:grid-cols-3">
-          {ECOSYSTEM_SLUGS.map((slug) => (
-            <li
-              key={slug}
-              className="relative border-t border-plate-muted/40 [counter-increment:key] before:pointer-events-none before:absolute before:top-7 before:left-0 before:font-mono before:text-xs before:text-plate-muted before:content-[counter(key)]"
-            >
+        <ul role="list" className="grid gap-4 [counter-reset:key] md:grid-cols-2 lg:grid-cols-3">
+          {ECOSYSTEM_SLUGS.map((slug, index) => (
+            <li key={slug} className="relative [counter-increment:key]">
               <ComponentLink
                 slug={slug}
-                className="group grid min-h-11 gap-2 py-6 pr-6 pl-8 transition-colors hover:bg-plate-fg/[0.06] focus-visible:bg-plate-fg/[0.06]"
+                className="group grid min-h-11 gap-2 rounded-xl border border-plate-border/50 bg-plate-elevated/50 p-6 transition-[transform,background-color] hover:-translate-y-0.5 hover:bg-plate-fg/[0.08] focus-visible:bg-plate-fg/[0.08]"
               >
                 <span className="flex items-center gap-3 text-2xl font-medium tracking-[-0.015em]">
+                  {index % 2 === 0 ? (
+                    <LeafIcon className="h-7 w-auto" />
+                  ) : (
+                    <PillIcon className="h-7 w-auto" />
+                  )}
                   <PlateSwatch slug={slug} outline="var(--color-plate-fg)" />
                   {HERO_LABELS[slug].title}
                 </span>

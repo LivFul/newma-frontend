@@ -1,6 +1,3 @@
-/* Demo workspace: the survey world in its working register. Rules sit in the components layer, so an
-   explicit utility on an element still wins; these set the shared grammar for tables, section rhythm
-   and headings across W1–W10 without touching each workflow's markup. */
 @layer components {
   .demo-workspace h2 {
     font-weight: 500;
@@ -10,26 +7,27 @@
     font-weight: 500;
   }
 
-  /* Section rhythm: each top-level section starts on a hairline, like a new block on the sheet. */
   .demo-workspace > section + section,
   .demo-workspace > div > section + section {
-    border-top: 1px solid color-mix(in srgb, var(--color-fg) 15%, transparent);
+    border-top: 1px solid color-mix(in srgb, var(--color-fg) 12%, transparent);
     padding-top: 2.5rem;
   }
 
-  /* Tables: tracked-caps heads on an ink rule, hairline rows, tabular figures. */
   .demo-workspace table {
     border-collapse: collapse;
     font-variant-numeric: tabular-nums;
+    display: block;
+    overflow-x: auto;
+    width: 100%;
   }
   .demo-workspace thead th {
     font-size: 0.6875rem;
     font-weight: 600;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-fg);
     vertical-align: bottom;
-    border-bottom: 1.5px solid var(--color-fg);
+    border-bottom: 1.5px solid var(--color-border-strong);
   }
   .demo-workspace tbody tr {
     border-top: 1px solid var(--color-border);
@@ -45,15 +43,13 @@
     vertical-align: top;
   }
 
-  /* Definition lists read like a sheet's title-block fields. */
   .demo-workspace dt {
     font-size: 0.6875rem;
     font-weight: 500;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
-  /* Native controls take the sheet's square, inked edge. */
   .demo-workspace :is(input:not([type="checkbox"], [type="radio"]), select, textarea) {
     border-radius: var(--radius-md);
     background-color: var(--color-bg-elevated);

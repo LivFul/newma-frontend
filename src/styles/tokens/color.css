@@ -1,38 +1,36 @@
-/* Field Survey Sheet palette: mint survey paper printed in a handful of spot inks (LivFul brand
-   family). Every pair in contrast-pairs.json is verified by tests/unit/tokens.test.ts.
-   Declared inside @theme so Tailwind emits the variables and the colour utilities. */
+/* Ethnobotanical instrument palette: LivFul mint, leaf greens and capsule teals, blended as
+   fades rather than hard-stop survey inks. Every pair in contrast-pairs.json is verified by
+   tests/unit/tokens.test.ts. */
 @theme {
-  --color-bg: #e8f2ef; /* survey paper (LivFul mint wash) */
-  --color-bg-elevated: #f6faf8; /* a fresh sheet laid on the paper */
-  --color-bg-deep: #dce9e4; /* paper band for section rhythm */
-  --color-fg: #09191f; /* ink-teal: type and linework (LivFul ink) */
+  --color-bg: #e8f2ef; /* mint wash */
+  --color-bg-elevated: #f6faf8; /* glass-card fill */
+  --color-bg-deep: #d7ebe6; /* mint-to-teal band */
+  --color-fg: #09191f; /* ink-teal */
   --color-fg-muted: #4a6467;
   --color-accent: #1d5c52; /* field green: action and links */
   --color-accent-fg: #f6faf8;
-  --color-border: #c3d5d0; /* dividers, grid lines */
-  --color-border-strong: #6e8986; /* interactive outlines, e.g. secondary Button */
-  --color-danger: #a3352b; /* madder: refusals, failed checks */
+  --color-border: #c3d5d0;
+  --color-border-strong: #6e8986;
+  --color-danger: #a3352b;
   --color-danger-fg: #f6faf8;
-  --color-warning: #f2c46b; /* ochre fill: holds, pending */
+  --color-warning: #f2c46b;
   --color-warning-fg: #09191f;
-  --color-success: #8dbab3; /* sage fill: passed checks */
+  --color-success: #8dbab3;
   --color-success-fg: #09191f;
-  --color-focus: #b8643a; /* surveyor's sienna pencil */
-  /* Stroke inks for the light fills, where a line carries meaning (WCAG 1.4.11). */
+  --color-focus: #1b8896; /* capsule cyan-teal */
+  /* Stroke inks for light fills (WCAG 1.4.11). */
   --color-warning-ink: #8a5a00;
   --color-success-ink: #3f7a70;
 
-  /* Survey spot inks. Decorative linework only unless a contrast pair says otherwise. */
-  --color-route: #fbd699; /* apricot: the farm-to-patient route fill (LivFul apricot) */
-  --color-route-edge: #b8643a; /* sienna edge of the route, 3:1 on paper */
-  --color-contour: #8dbab3; /* sage contour lines (LivFul sage) */
-  --color-plate: #09191f; /* the deep legend plate */
+  --color-route: #fbd699; /* apricot, rare warm accent */
+  --color-route-edge: #b8643a;
+  --color-contour: #8dbab3;
+  --color-plate: #06242b; /* deep capsule teal */
   --color-plate-fg: #e8f2ef;
   --color-plate-muted: #8dbab3;
-  /* The same inks re-cut for the dark plate (.plate-surface remaps the semantic tokens to these). */
-  --color-plate-elevated: #0f2329;
-  --color-plate-deep: #0c1f25;
-  --color-plate-border: #2a4a4b;
+  --color-plate-elevated: #0b404d;
+  --color-plate-deep: #09191f;
+  --color-plate-border: #1b8896;
   --color-plate-border-strong: #6f9a94;
   --color-plate-accent: #7cc9b0;
   --color-plate-danger: #f08e7c;
@@ -42,5 +40,10 @@
   --color-plate-optional: #ef8f86;
   --color-plate-contour: #3a6660;
   --color-plate-route-edge: #c97a4d;
-  --color-plate-focus: #f2b27e;
+  --color-plate-focus: #7ec8d4;
+
+  --color-leaf: #15a676;
+  --color-leaf-bright: #b3e570;
+  --color-capsule: #1b8896;
+  --color-capsule-deep: #0b404d;
 }

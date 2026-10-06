@@ -2,12 +2,12 @@ import type { CSSProperties, SVGProps } from "react";
 import { HERO_SVG_DESC, HERO_SVG_TITLE } from "@/content/ecosystem/hero-text";
 import { ecosystemHref, HERO_LABELS, heroAriaLabel } from "@/content/ecosystem/registry";
 import {
+  CENTER,
   EDGES,
-  LABEL_BOX,
   LABEL_FONT,
-  LEADER,
+  NODE_RADIUS,
   PARTS,
-  PLATE,
+  RING,
   VIEWBOX,
   type PartGeometry,
 } from "./geometry";
@@ -22,19 +22,12 @@ export type EcosystemSvgProps = Omit<SVGProps<SVGSVGElement>, "viewBox" | "role"
 };
 
 const HIT = Object.freeze({
-  x: -PLATE.halfWidth - 6,
-  y: -PLATE.halfHeight - 6,
-  width: LABEL_BOX.offsetX + LABEL_BOX.width + PLATE.halfWidth + 6,
-  height: PLATE.halfHeight * 2 + PLATE.thickness + 12,
+  x: -NODE_RADIUS - 8,
+  y: -NODE_RADIUS - 8,
+  width: NODE_RADIUS * 2 + 16,
+  height: NODE_RADIUS * 2 + 16,
 });
-export const PLATE_TOP = `M0 ${-PLATE.halfHeight}L${PLATE.halfWidth} 0L0 ${PLATE.halfHeight}L${-PLATE.halfWidth} 0Z`;
-export const PLATE_SIDE =
-  `M${-PLATE.halfWidth} 0L0 ${PLATE.halfHeight}L${PLATE.halfWidth} 0` +
-  `V${PLATE.thickness}L0 ${PLATE.halfHeight + PLATE.thickness}L${-PLATE.halfWidth} ${PLATE.thickness}Z`;
 
-// Light fills keep their hue for the plate but stroke and print in a darker ink of the same family,
-// so every outline and glyph holds 3:1 on the survey paper (WCAG 1.4.11). Data & Knowledge is the one
-// exception: it strokes in --color-border-strong (already 3:1) and prints in --color-fg-muted.
 const STROKE_INK: Partial<Record<PartGeometry["tone"], string>> = {
   "--color-warning": "--color-warning-ink",
   "--color-success": "--color-success-ink",
@@ -58,23 +51,29 @@ function PartBody({ part }: { part: PartGeometry }) {
       aria-label={heroAriaLabel(part.slug)}
       style={toneStyle(part)}
     >
-      <rect className="eco-hit" {...HIT} rx={10} />
-      <path className="eco-plate-side" d={PLATE_SIDE} data-dashed={part.dashed || undefined} />
-      <path className="eco-plate-top" d={PLATE_TOP} data-dashed={part.dashed || undefined} />
+      <rect className="eco-hit" {...HIT} rx={NODE_RADIUS + 8} />
+      <circle
+        className="eco-node"
+        r={part.center ? NODE_RADIUS + 6 : NODE_RADIUS}
+        data-dashed={part.dashed || undefined}
+        data-center={part.center || undefined}
+      />
       <Glyph glyph={part.glyph} />
-      <path className="eco-leader" d={`M${LEADER.fromX} 0H${LEADER.toX}`} />
       <text
         className="eco-title"
-        x={LABEL_BOX.offsetX}
-        y={LABEL_BOX.titleBaseline}
+        data-center={part.center || undefined}
+        x={part.label.x}
+        y={part.label.y}
+        textAnchor={part.label.anchor}
         fontSize={LABEL_FONT.title}
       >
         {label.title}
       </text>
       <text
         className="eco-desc"
-        x={LABEL_BOX.offsetX}
-        y={LABEL_BOX.descriptorBaseline}
+        x={part.label.x}
+        y={part.label.y + LABEL_FONT.descriptor}
+        textAnchor={part.label.anchor}
         fontSize={LABEL_FONT.descriptor}
       >
         {label.descriptor}
@@ -99,8 +98,15 @@ function Edges({ arrowId }: { arrowId: string }) {
   );
 }
 
-// Presentational and hook-free, so the server (static layer) and the client (Motion layer) render the
-// same markup; only the Part wrapper differs.
+function Orbits() {
+  return (
+    <g className="eco-orbits" aria-hidden="true">
+      <circle className="eco-orbit eco-orbit-inner" cx={CENTER.x} cy={CENTER.y} r={RING.inner} />
+      <circle className="eco-orbit eco-orbit-outer" cx={CENTER.x} cy={CENTER.y} r={RING.outer} />
+    </g>
+  );
+}
+
 export function EcosystemSvg({
   Part,
   svgId,
@@ -139,6 +145,7 @@ export function EcosystemSvg({
           <path d="M0 0L8 4L0 8Z" className="eco-arrowhead" />
         </marker>
       </defs>
+      <Orbits />
       <Edges arrowId={arrowId} />
       {PARTS.map((part, index) => (
         <Part key={part.slug} geometry={part} index={index} view={view}>

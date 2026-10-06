@@ -5,7 +5,7 @@ import type { MDXComponents } from "mdx/types";
 const components: MDXComponents = {
   h2: (props) => (
     <h2
-      className="mt-14 border-t border-fg pt-6 text-2xl font-medium tracking-[-0.015em] text-balance"
+      className="mt-14 border-t border-border pt-6 text-2xl font-medium tracking-[-0.015em] text-balance"
       {...props}
     />
   ),
@@ -14,11 +14,7 @@ const components: MDXComponents = {
     <p className="mt-4 max-w-[65ch] text-lg leading-relaxed text-fg-muted" {...props} />
   ),
   ul: (props) => (
-    <ul
-      role="list"
-      className="mt-4 max-w-[65ch] list-disc space-y-2 pl-6 text-fg-muted"
-      {...props}
-    />
+    <ul role="list" className="mt-4 max-w-[65ch] leaf-list space-y-2 text-fg-muted" {...props} />
   ),
   ol: (props) => (
     <ol

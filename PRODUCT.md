@@ -43,8 +43,9 @@ The demo platform (`/demo`, W1–W10 + guided tour) is used by those same visito
 
 ## Brand commitments
 
-- **Align with LivFul.** NEWMA is a LivFul product and should read as part of the LivFul family. Observed on livful.com (2026-10-04): display face "Fabio XM" (weight 500), deep ink-teal `#09191F` text, sage `#8DBAB3`, apricot `#FBD699`, slate-teal `#5D777A`, parchment `#EBE5DE`, mint wash `#E8F2EF`; light, calm, mission-driven tone; sage-to-apricot gradient surfaces. Fabio XM licensing for NEWMA is an **open decision**.
-- **Keep the concepts** of the interactive ecosystem graphic (six stacked components) and the 3D workflow scene; restyling is allowed.
+- **Align with LivFul.** NEWMA is a LivFul product and should read as part of the LivFul family. Observed on livful.com (2026-10-04): display face "Fabio XM" (weight 500), deep ink-teal `#09191F` text, sage `#8DBAB3`, apricot `#FBD699`, slate-teal `#5D777A`, parchment `#EBE5DE`, mint wash `#E8F2EF`; light, calm, mission-driven tone; sage-to-apricot gradient surfaces. Fabio XM licensing for NEWMA is an **open decision**. Staytec (staytec.net) is the sibling product reference for full-bleed photography, peach bands and a scientific-but-human tone.
+- **Keep the concepts** of the interactive ecosystem graphic (six components; orbital layout) and the 3D workflow scene; restyling is allowed.
+- **Mark language.** The official lockup's leaf and capsule are the site's recurring icons. The public site is ethnobotanical and pharma-inspired, not a printed survey sheet.
 
 ## Open decisions
 

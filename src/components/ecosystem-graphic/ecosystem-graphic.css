@@ -1,14 +1,10 @@
-/* Hero graphic baselines. Parts sit at the assembled translate; the static layer explodes by CSS on
-   hover or focus, and prefers-reduced-motion forces the exploded layout with no transition. The
-   interactive layer (Motion) owns part transforms and drives opacity through [data-view]. Everything
-   animates transform and opacity only. */
+/* Hero graphic: orbital ecosystem. Static layer explodes by CSS; interactive layer uses Motion.
+   Animate transform and opacity only. */
 .eco-figure {
   margin: 0;
 }
 .eco-frame {
-  /* Reserved box: the static SVG and its interactive twin share this aspect ratio, so the swap
-     cannot shift layout. */
-  aspect-ratio: 470 / 560;
+  aspect-ratio: 400 / 420;
   width: 100%;
   max-width: 34rem;
   margin-inline: auto;
@@ -41,28 +37,22 @@
 .eco-link:focus-visible .eco-hit {
   stroke: var(--color-focus);
 }
-.eco-link:hover .eco-plate-top {
-  fill: var(--color-border);
+.eco-node {
+  fill: color-mix(in srgb, var(--color-bg-elevated) 82%, white);
+  stroke: var(--eco-stroke, var(--eco-tone));
+  stroke-width: 2px;
+  filter: drop-shadow(0 8px 16px rgb(6 36 43 / 0.16));
 }
-.eco-plate-top {
+.eco-node[data-center] {
   fill: var(--color-bg-elevated);
-  stroke: var(--eco-stroke, var(--eco-tone));
-  stroke-width: 2px;
-  stroke-linejoin: round;
+  stroke-width: 2.5px;
 }
-.eco-plate-side {
-  fill: var(--eco-tone);
-  fill-opacity: 0.32;
-  stroke: var(--eco-stroke, var(--eco-tone));
-  stroke-width: 2px;
-  stroke-linejoin: round;
+.eco-link:hover .eco-node {
+  fill: var(--color-bg);
 }
-.eco-plate-top[data-dashed],
-.eco-plate-side[data-dashed] {
+.eco-node[data-dashed] {
   stroke-dasharray: 7 5;
-}
-.eco-plate-side[data-dashed] {
-  fill-opacity: 0.12;
+  fill-opacity: 0.88;
 }
 .eco-glyph {
   color: var(--eco-ink);
@@ -80,10 +70,6 @@
   fill: var(--eco-ink);
   stroke: none;
 }
-.eco-leader {
-  stroke: var(--eco-stroke, var(--eco-tone));
-  stroke-width: 1.5px;
-}
 .eco-title {
   fill: var(--color-fg);
   font-family: var(--font-display);
@@ -94,10 +80,13 @@
   fill: var(--color-fg-muted);
   opacity: 0;
 }
+.eco-svg[data-layer="static"] .eco-title:not([data-center]),
+.eco-svg[data-layer="interactive"][data-view="assembled"] .eco-title:not([data-center]) {
+  opacity: 0;
+}
 .eco-edges {
   opacity: 0;
 }
-/* Edges, rail included, are 3:1 against the background (WCAG 1.4.11). */
 .eco-edges path {
   fill: none;
   stroke: var(--color-border-strong);
@@ -111,32 +100,51 @@
 .eco-arrowhead {
   fill: var(--color-border-strong);
 }
+.eco-orbit {
+  fill: none;
+  stroke: color-mix(in srgb, var(--color-capsule) 45%, transparent);
+  stroke-width: 1px;
+  stroke-dasharray: 3 8;
+  transform-origin: 200px 210px;
+  transform-box: fill-box;
+}
+.eco-orbit-outer {
+  stroke: color-mix(in srgb, var(--color-leaf) 40%, transparent);
+}
 
-/* Interactive layer: opacity follows the view state. */
 .eco-svg[data-view="exploded"] .eco-desc,
-.eco-svg[data-view="exploded"] .eco-edges {
+.eco-svg[data-view="exploded"] .eco-edges,
+.eco-svg[data-view="exploded"] .eco-title {
   opacity: 1;
 }
 .eco-svg[data-layer="interactive"] .eco-desc,
-.eco-svg[data-layer="interactive"] .eco-edges {
+.eco-svg[data-layer="interactive"] .eco-edges,
+.eco-svg[data-layer="interactive"] .eco-title:not([data-center]) {
   transition: opacity var(--motion-duration-base) var(--motion-ease-standard);
 }
 
-/* Static layer without JavaScript: focus explodes anywhere, hover only on hover-capable devices. */
 @media (prefers-reduced-motion: no-preference) {
+  .eco-orbit-inner {
+    animation: orbit-spin 36s linear infinite;
+  }
+  .eco-orbit-outer {
+    animation: orbit-spin 52s linear infinite reverse;
+  }
   .eco-svg[data-layer="static"] .eco-part {
     transition: transform var(--motion-duration-slow) var(--motion-ease-emphasized)
       calc(var(--i) * 60ms);
   }
   .eco-svg[data-layer="static"] .eco-desc,
-  .eco-svg[data-layer="static"] .eco-edges {
+  .eco-svg[data-layer="static"] .eco-edges,
+  .eco-svg[data-layer="static"] .eco-title:not([data-center]) {
     transition: opacity var(--motion-duration-base) var(--motion-ease-standard) 180ms;
   }
   .eco-svg[data-layer="static"]:focus-within .eco-part {
     transform: translate(var(--ex), var(--ey));
   }
   .eco-svg[data-layer="static"]:focus-within .eco-desc,
-  .eco-svg[data-layer="static"]:focus-within .eco-edges {
+  .eco-svg[data-layer="static"]:focus-within .eco-edges,
+  .eco-svg[data-layer="static"]:focus-within .eco-title {
     opacity: 1;
   }
 }
@@ -145,39 +153,42 @@
     transform: translate(var(--ex), var(--ey));
   }
   .eco-svg[data-layer="static"]:hover .eco-desc,
-  .eco-svg[data-layer="static"]:hover .eco-edges {
+  .eco-svg[data-layer="static"]:hover .eco-edges,
+  .eco-svg[data-layer="static"]:hover .eco-title {
     opacity: 1;
   }
 }
 
-/* Reduced motion: the exploded, labelled diagram is final. No transition, no animation. */
 @media (prefers-reduced-motion: reduce) {
-  /* Static layer only: the interactive layer is never mounted under reduce, and its parts carry no
-     --ex/--ey variables. */
   .eco-svg[data-layer="static"] .eco-part {
     transform: translate(var(--ex), var(--ey)) !important;
     transition: none !important;
   }
   .eco-svg .eco-desc,
-  .eco-svg .eco-edges {
+  .eco-svg .eco-edges,
+  .eco-svg .eco-title {
     opacity: 1 !important;
     transition: none !important;
+  }
+  .eco-orbit {
+    animation: none !important;
+  }
+}
+
+@keyframes orbit-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
 @media (forced-colors: active) {
-  .eco-plate-top,
-  .eco-plate-side,
-  .eco-leader,
+  .eco-node,
+  .eco-orbit,
   .eco-edges path {
     stroke: CanvasText;
   }
-  .eco-plate-top {
+  .eco-node {
     fill: Canvas;
-  }
-  .eco-plate-side {
-    fill: Canvas;
-    fill-opacity: 1;
   }
   .eco-glyph {
     stroke: CanvasText;
@@ -191,5 +202,15 @@
   .eco-link:focus-visible .eco-hit {
     stroke: Highlight;
     stroke-width: 4px;
+  }
+}
+
+.eco-fallback {
+  display: none;
+}
+@media (max-width: 22.5rem) {
+  .eco-fallback {
+    display: grid;
+    gap: 0.5rem;
   }
 }

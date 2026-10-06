@@ -28,7 +28,7 @@ describe("Button", () => {
   });
   it("exposes buttonVariants for non-button elements", () => {
     expect(buttonVariants({ variant: "danger" })).toContain("bg-danger");
-    expect(buttonVariants()).toContain("bg-accent");
+    expect(buttonVariants()).toContain("bg-brand");
   });
   // Value: protects=filled variants keep border-transparent (forced-colors still draws an outline) while secondary draws an ink border; fails_when=a variant loses its border colour so no outline shows in forced colours; why_new=old negative assertion became vacuous when the base class dropped border-transparent; seam=none
   it("gives filled variants a transparent border and secondary an ink border", () => {

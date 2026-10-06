@@ -4,7 +4,8 @@
 .wf-scroll {
   /* Narrow screens scroll the diagram sideways instead of shrinking its text to nothing. */
   overflow-x: auto;
-  border: 1px solid var(--color-fg);
+  border: 1px solid color-mix(in srgb, var(--color-plate-border) 70%, transparent);
+  border-radius: var(--radius-lg);
   background-color: var(--color-bg-elevated);
 }
 /* The region is itself a plate, so its focus colour is the light plate cut: draw the ring inside the

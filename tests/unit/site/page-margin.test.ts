@@ -1,16 +1,11 @@
-// Value: protects=page margin is 12px below 48rem, 0.5in from there, and 0 in print, and a wrapped header still clears focused content; fails_when=the tablet rule, the print padding reset, or the narrow-screen focus offset is dropped; why_new=sticky-header allows a header top anywhere in 0 to 48px at rest; seam=none
 import { readFileSync } from "node:fs";
-import path from "node:path";
+import path from "path";
 import { describe, expect, it } from "vitest";
-import { parseCssVars } from "@/lib/a11y/contrast";
 
 const globals = readFileSync(path.resolve(__dirname, "../../../src/app/globals.css"), "utf8");
 const workflow = readFileSync(
   path.resolve(__dirname, "../../../src/components/site/workflow-diagram.css"),
   "utf8",
-);
-const space = parseCssVars(
-  readFileSync(path.resolve(__dirname, "../../../src/styles/tokens/space.css"), "utf8"),
 );
 
 function blockAfter(css: string, marker: string): string {
@@ -28,13 +23,10 @@ function blockAfter(css: string, marker: string): string {
   throw new Error(`unclosed ${marker}`);
 }
 
-describe("survey page margin", () => {
-  it("is 12px on phones, a half inch from tablet width, and zero in print", () => {
-    expect(space["--space-3"]).toBe("0.75rem");
-    expect(blockAfter(globals, "\nbody {")).toContain("padding: var(--space-3)");
-    const tablet = blockAfter(globals, "@media (min-width: 48rem)");
-    expect(tablet).toContain("padding: 0.5in");
-    expect(tablet).not.toContain("var(--space-3)");
+describe("full-bleed page shell", () => {
+  it("does not use the survey paper margin on the body", () => {
+    expect(blockAfter(globals, "\nbody {")).not.toContain("padding: var(--space-3)");
+    expect(globals).not.toContain("padding: 0.5in");
     expect(blockAfter(globals, "@media print")).toMatch(/padding:\s*0;/);
   });
 

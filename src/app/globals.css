@@ -4,34 +4,30 @@
 :root {
   color-scheme: light;
 }
+html {
+  caret-color: var(--color-focus);
+  scrollbar-color: var(--color-border-strong) var(--color-bg);
+}
+@view-transition {
+  navigation: auto;
+}
 body {
   background: var(--color-bg);
   color: var(--color-fg);
   font-family: var(--font-sans);
   text-rendering: optimizeLegibility;
-  /* A paper margin round every page, as round a printed sheet: 12px on phones, where a half inch
-     would leave 224px of a 320px screen (WCAG 1.4.10 reflow), and 0.5in from tablet up. Padding
-     rather than margin, so the paper colour fills it and the sticky header still pins to the top. */
-  padding: var(--space-3);
+  overflow-x: clip;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 100dvh;
+  overscroll-behavior: none;
 }
-@media (min-width: 48rem) {
-  body {
-    padding: 0.5in;
-  }
-}
-/* Display lettering: Geologica's sharpness axis gives the cut edge of survey map titles. */
 .font-display {
-  font-variation-settings: "SHRP" 60;
+  font-variation-settings: "SHRP" 40;
 }
 
-/* Browser surfaces carry the survey inks too. */
 ::selection {
   background: var(--color-route);
   color: var(--color-fg);
-}
-html {
-  caret-color: var(--color-focus);
-  scrollbar-color: var(--color-border-strong) var(--color-bg);
 }
 a {
   text-underline-offset: 0.22em;
@@ -45,16 +41,9 @@ table,
 :focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 3px;
-  /* Two-tone ring: the inner halo keeps the ring visible on filled and plate surfaces. */
   box-shadow: 0 0 0 2px var(--color-bg);
 }
 
-/* Sticky header: scroll-padding keeps focused elements, anchor targets and the skip-link target out
-   from under it (WCAG 2.4.11). It is the only offset: adding scroll-margin on the targets as well
-   would double it. The lockup plus Aveloz and Access wrap to two rows (~101px) through a 412px
-   phone. 27.5rem (440px) covers that width and stops before the row fits on one line. The 7.5rem
-   length is written here: an unresolved custom property drops the whole calc and the browser keeps
-   the one-row offset, which leaves focus under the wrapped header. */
 html:has([data-site-header]) {
   scroll-padding-top: calc(var(--size-header) + var(--space-4));
 }
@@ -63,13 +52,10 @@ html:has([data-site-header]) {
     scroll-padding-top: calc(7.5rem + var(--space-4));
   }
 }
-/* A programmatic focus target that is not interactive needs no ring (the skip link lands here). */
 main[tabindex="-1"]:focus-visible {
   outline: none;
   box-shadow: none;
 }
-/* Very short viewports (400% zoom, landscape phones): a sticky header would take a quarter of the
-   screen, so it scrolls away and the offset shrinks with it. */
 @media (max-height: 32rem) {
   [data-site-header] {
     position: static;
@@ -79,56 +65,68 @@ main[tabindex="-1"]:focus-visible {
   }
 }
 
-/* Sheet primitives live in the components layer, so a utility on an element (border-x-0, a
-   padding) still overrides them. */
-@layer components {
-  /* ---- Survey sheet primitives (shared by the site and the demo) ---- */
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
 
-  /* Tracked-caps place-name lettering for sheet labels, legends and table heads. */
+@layer components {
   .place {
     font-size: var(--text-xs);
     font-weight: 500;
     letter-spacing: var(--tracking-place);
     text-transform: uppercase;
   }
-  /* Grid reference: mono, small, measured. */
   .gridref {
     font-family: var(--font-mono);
     font-size: 0.6875rem;
     letter-spacing: 0.02em;
     font-variant-numeric: tabular-nums;
   }
-  /* A sheet with a neatline: hairline frame plus corner ticks drawn by background gradients. */
-  .sheet {
-    --tick: 10px;
-    --tick-ink: linear-gradient(var(--color-fg), var(--color-fg));
+  .surface {
     position: relative;
     background-color: var(--color-bg-elevated);
-    border: 1px solid var(--color-fg);
-    background-image:
-      var(--tick-ink), var(--tick-ink), var(--tick-ink), var(--tick-ink), var(--tick-ink),
-      var(--tick-ink), var(--tick-ink), var(--tick-ink);
-    background-size:
-      var(--tick) 1.5px,
-      1.5px var(--tick),
-      var(--tick) 1.5px,
-      1.5px var(--tick),
-      var(--tick) 1.5px,
-      1.5px var(--tick),
-      var(--tick) 1.5px,
-      1.5px var(--tick);
-    background-position:
-      top 5px left 5px,
-      top 5px left 5px,
-      top 5px right 5px,
-      top 5px right 5px,
-      bottom 5px left 5px,
-      bottom 5px left 5px,
-      bottom 5px right 5px,
-      bottom 5px right 5px;
-    background-repeat: no-repeat;
+    border: 1px solid color-mix(in srgb, var(--color-border-strong) 35%, transparent);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
   }
-  /* Restricted parcel: diagonal madder hatching for withheld or confidential data. */
+  .panel {
+    border-radius: var(--radius-xl);
+    background-color: color-mix(in srgb, var(--color-bg-elevated) 86%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-leaf) 22%, var(--color-border));
+    box-shadow: var(--shadow-md);
+  }
+  .glass {
+    background-color: color-mix(in srgb, var(--color-bg-elevated) 78%, transparent);
+    border: 1px solid color-mix(in srgb, white 55%, var(--color-border));
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+  }
+  @supports (backdrop-filter: blur(16px)) {
+    .glass {
+      background-color: color-mix(in srgb, var(--color-bg-elevated) 62%, transparent);
+      backdrop-filter: blur(16px);
+    }
+  }
+  .aurora {
+    background-image: var(--background-image-aurora);
+    background-size: 140% 140%;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .aurora {
+      animation: aurora-drift 28s var(--motion-ease-standard) infinite alternate;
+    }
+  }
+  .botanical-lines {
+    background-image: url("/images/botanical-lines.svg");
+    background-size: 720px 720px;
+  }
+  .molecule-lattice {
+    background-image: url("/images/molecule-lattice.svg");
+    background-size: 280px 280px;
+  }
   .hatch-restricted {
     background-image: repeating-linear-gradient(
       -45deg,
@@ -136,7 +134,6 @@ main[tabindex="-1"]:focus-visible {
       transparent 1px 7px
     );
   }
-  /* Held parcel: ochre hatching for holds and pending checks. */
   .hatch-held {
     background-image: repeating-linear-gradient(
       45deg,
@@ -144,24 +141,41 @@ main[tabindex="-1"]:focus-visible {
       transparent 2px 8px
     );
   }
-  /* Faint survey grid for paper bands. */
-  .survey-grid {
-    background-image:
-      linear-gradient(
-        color-mix(in srgb, var(--color-contour) 32%, transparent) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        90deg,
-        color-mix(in srgb, var(--color-contour) 32%, transparent) 1px,
-        transparent 1px
-      );
-    background-size: 64px 64px;
-    background-position: -1px -1px;
+  .leaf-list {
+    list-style: none;
+    padding-left: 0;
+  }
+  .leaf-list > li {
+    position: relative;
+    padding-left: 1.6rem;
+  }
+  .leaf-list > li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.45em;
+    width: 0.85rem;
+    height: 0.85rem;
+    background-image: var(--background-image-leaf);
+    mask: url("/brand/leaf-bullet.svg") center / contain no-repeat;
+    -webkit-mask: url("/brand/leaf-bullet.svg") center / contain no-repeat;
+  }
+  .reveal-pending {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  .reveal-in {
+    animation: reveal-up var(--motion-duration-slow) var(--motion-ease-emphasized) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal-pending,
+    .reveal-in {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
   }
 
-  /* Dark plate surface: the semantic tokens remapped to the plate inks, so everything inside (lines,
-     labels, halos, plates, controls) re-colours with the right contrast and no component changes. */
   .plate-surface {
     --color-bg: var(--color-plate);
     --color-bg-elevated: var(--color-plate-elevated);
@@ -183,28 +197,40 @@ main[tabindex="-1"]:focus-visible {
     --color-focus: var(--color-plate-focus);
     color: var(--color-fg);
     background-color: var(--color-bg);
+    background-image: var(--background-image-deep);
     color-scheme: dark;
   }
   .plate-surface ::selection {
     color: var(--color-plate);
   }
-  /* A legend swatch printed on a chip of the plate, so the key shows the colour the dark map uses. */
-  .sheet-key-chip {
-    display: inline-grid;
-    place-items: center;
-    padding: 0.3rem 0.4rem;
-    border: 1px solid var(--color-plate);
+}
+
+@keyframes aurora-drift {
+  from {
+    background-position: 0% 40%;
+  }
+  to {
+    background-position: 80% 60%;
+  }
+}
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Print keeps the plates dark: their light ink would otherwise land on white paper, and the sheet's
-   own page margin would stack on the printer's. */
 @media print {
   body {
     padding: 0;
   }
   .plate-surface,
-  .sheet {
+  .surface,
+  .glass {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }

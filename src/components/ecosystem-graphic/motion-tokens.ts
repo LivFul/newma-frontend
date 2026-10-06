@@ -7,8 +7,8 @@ export type HeroMotion = Readonly<{
 }>;
 
 export const FALLBACK_MOTION: HeroMotion = Object.freeze({
-  duration: 0.45,
-  ease: Object.freeze([0.3, 0, 0, 1] as const),
+  duration: 0.6,
+  ease: Object.freeze([0.22, 1, 0.36, 1] as const),
   // Between plates, inside the 0.05 to 0.10 s rule.
   stagger: 0.06,
 });
