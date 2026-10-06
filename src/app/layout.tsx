@@ -1,15 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import nextDynamic from "next/dynamic";
 import { Geologica, Martian_Mono } from "next/font/google";
 import "./globals.css";
+import { PwaGate } from "@/components/pwa/pwa-gate";
 import { HOME_META } from "@/content/home/copy";
 import { BACKGROUND_HEX, BRAND_HEX } from "@/lib/brand";
 import { siteUrl } from "@/lib/site";
-
-const PwaMount = nextDynamic(
-  () => import("@/components/pwa/pwa-mount").then((mod) => mod.PwaMount),
-  { ssr: false },
-);
 
 const geologica = Geologica({
   subsets: ["latin"],
@@ -69,7 +64,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         {children}
-        <PwaMount />
+        <PwaGate />
       </body>
     </html>
   );
