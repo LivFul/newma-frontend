@@ -24,12 +24,15 @@ export type EcosystemSvgProps = Omit<SVGProps<SVGSVGElement>, "viewBox" | "role"
   layer?: "static" | "interactive";
 };
 
-const HIT = Object.freeze({
-  x: -NODE_RADIUS - 12,
-  y: -NODE_RADIUS - 12,
-  width: NODE_RADIUS * 2 + 24,
-  height: NODE_RADIUS * 2 + 24,
-});
+function hitBox(radius: number) {
+  const pad = 16;
+  return {
+    x: -radius - pad,
+    y: -radius - pad,
+    width: (radius + pad) * 2,
+    height: (radius + pad) * 2,
+  };
+}
 
 const STROKE_INK: Partial<Record<PartGeometry["tone"], string>> = {
   "--color-warning": "--color-warning-ink",
@@ -84,7 +87,7 @@ function LabelLines({
 function PartLabel({ part }: { part: PartGeometry }) {
   const copy = HERO_LABELS[part.slug];
   const titleLines = wrapHeroLabel(copy.title);
-  const descLines = wrapHeroLabel(copy.descriptor);
+  const descLines = part.center ? [copy.descriptor] : wrapHeroLabel(copy.descriptor);
   const extra = titleLines.length + descLines.length - 1;
   const startY = part.label.y <= -24 ? part.label.y - extra * LABEL_LINE : part.label.y;
   return (
@@ -120,7 +123,7 @@ function PartBody({ part, svgId }: { part: PartGeometry; svgId: string }) {
         aria-label={heroAriaLabel(part.slug)}
         style={toneStyle(part)}
       >
-        <rect className="eco-hit" {...HIT} rx={radius + 8} />
+        <rect className="eco-hit" {...hitBox(radius)} rx={radius + 8} />
         <g className="eco-bob">
           <ellipse className="eco-node-shadow" cx={0} cy={radius + 7} rx={radius * 0.78} ry={5} />
           <circle

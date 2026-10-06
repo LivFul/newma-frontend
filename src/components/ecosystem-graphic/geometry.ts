@@ -113,7 +113,7 @@ export const ellipsePoint = (ring: { rx: number; ry: number }, deg: number): Poi
 const LABEL_OUT = NODE_RADIUS + 28;
 
 const LABELS: Readonly<Record<EcosystemSlug, PartGeometry["label"]>> = {
-  interface: Object.freeze({ x: HUB_RADIUS + 12, y: -6, anchor: "start" }),
+  interface: Object.freeze({ x: HUB_RADIUS + 14, y: -10, anchor: "start" }),
   "agentic-compute": Object.freeze({ x: 0, y: -LABEL_OUT, anchor: "middle" }),
   "scientific-review": Object.freeze({ x: LABEL_OUT - 16, y: -18, anchor: "start" }),
   "wet-lab": Object.freeze({ x: LABEL_OUT - 16, y: -8, anchor: "start" }),

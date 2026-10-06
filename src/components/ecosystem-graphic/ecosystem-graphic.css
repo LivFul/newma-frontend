@@ -53,6 +53,17 @@
   transform-origin: 50% 50%;
   transform: scale(var(--eco-scale, 1));
 }
+.eco-glyph {
+  color: var(--eco-ink);
+  fill: none;
+  stroke: var(--eco-ink);
+  stroke-width: 1.8px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
 .eco-node-shadow {
   fill: rgb(6 36 43 / 0.22);
   stroke: none;
@@ -82,15 +93,6 @@
 .eco-node[data-dashed] {
   stroke-dasharray: 7 5;
   fill-opacity: 0.9;
-}
-.eco-glyph {
-  color: var(--eco-ink);
-  fill: none;
-  stroke: var(--eco-ink);
-  stroke-width: 1.8px;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  pointer-events: none;
 }
 .eco-glyph * {
   vector-effect: non-scaling-stroke;
@@ -179,9 +181,13 @@
   .eco-orbit-outer {
     animation: orbit-dash 42s linear infinite reverse;
   }
-  .eco-bob {
+  .eco-glyph {
     animation: node-float 4.6s var(--motion-ease-standard) infinite alternate;
     animation-delay: calc(var(--i, 0) * 80ms);
+  }
+  .eco-svg:hover .eco-glyph,
+  .eco-svg:focus-within .eco-glyph {
+    animation-play-state: paused;
   }
   .eco-svg[data-layer="static"] .eco-part {
     transition: transform var(--motion-duration-slow) var(--motion-ease-emphasized)
@@ -220,7 +226,7 @@
     transition: none !important;
   }
   .eco-orbit,
-  .eco-bob {
+  .eco-glyph {
     animation: none !important;
   }
 }
