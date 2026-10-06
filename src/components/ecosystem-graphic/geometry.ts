@@ -51,7 +51,7 @@ export type Stage = Readonly<{
   height: number;
 }>;
 
-export const VIEWBOX = Object.freeze({ width: 500, height: 480 });
+export const VIEWBOX = Object.freeze({ width: 500, height: 520 });
 export const PLATE = Object.freeze({ halfWidth: 28, halfHeight: 28, thickness: 0 });
 export const NODE_RADIUS = 24;
 export const CARD = Object.freeze({ width: 56, height: 44, radius: 10 });
@@ -72,16 +72,16 @@ export const LABEL_BOX = Object.freeze({
 export const LEADER = Object.freeze({ fromX: 0, toX: 0 });
 export const RAIL_X = 18;
 /** Midpoint of the records server (Provenance above, Data below) inside the AI core. */
-export const CENTER = Object.freeze({ x: 250, y: 283 });
+export const CENTER = Object.freeze({ x: 250, y: 300 });
 export const STAGES: readonly Stage[] = Object.freeze([
-  Object.freeze({ id: "input" as const, x: 8, y: 52, width: 118, height: 400 }),
-  Object.freeze({ id: "core" as const, x: 140, y: 52, width: 220, height: 400 }),
-  Object.freeze({ id: "validation" as const, x: 374, y: 52, width: 118, height: 400 }),
+  Object.freeze({ id: "input" as const, x: 8, y: 52, width: 118, height: 440 }),
+  Object.freeze({ id: "core" as const, x: 140, y: 52, width: 220, height: 440 }),
+  Object.freeze({ id: "validation" as const, x: 374, y: 52, width: 118, height: 440 }),
 ]);
-export const LOOP = Object.freeze({ x: 250, y: 150, radius: 14 });
+export const LOOP = Object.freeze({ x: 250, y: 160, radius: 14 });
 export const FLOW_GATES = Object.freeze([
-  Object.freeze({ x: 132, y: 260 }),
-  Object.freeze({ x: 366, y: 260 }),
+  Object.freeze({ x: 132, y: 270 }),
+  Object.freeze({ x: 366, y: 270 }),
 ]);
 
 const TONES: Readonly<Record<EcosystemSlug, ToneToken>> = {
@@ -120,8 +120,8 @@ const LAYOUT: Readonly<
   >
 > = Object.freeze({
   interface: Object.freeze({
-    assembled: point(68, 260),
-    exploded: point(56, 260),
+    assembled: point(68, 270),
+    exploded: point(56, 270),
     depth: 0,
     shape: "twin" as const,
     dashed: false,
@@ -129,26 +129,26 @@ const LAYOUT: Readonly<
     label: Object.freeze({ x: 0, y: -(TWIN_GAP + TWIN_RADIUS + 32), anchor: "middle" as const }),
   }),
   "agentic-compute": Object.freeze({
-    assembled: point(204, 150),
-    exploded: point(176, 124),
+    assembled: point(204, 160),
+    exploded: point(188, 124),
     depth: 0,
     shape: "node" as const,
     dashed: false,
     center: false,
-    label: Object.freeze({ x: -(NODE_RADIUS + 10), y: -8, anchor: "end" as const }),
+    label: Object.freeze({ x: 0, y: CARD.height / 2 + 16, anchor: "middle" as const }),
   }),
   "scientific-review": Object.freeze({
-    assembled: point(296, 150),
-    exploded: point(324, 124),
+    assembled: point(296, 160),
+    exploded: point(312, 124),
     depth: 0,
     shape: "node" as const,
     dashed: false,
     center: false,
-    label: Object.freeze({ x: NODE_RADIUS + 10, y: -8, anchor: "start" as const }),
+    label: Object.freeze({ x: 0, y: CARD.height / 2 + 16, anchor: "middle" as const }),
   }),
   "wet-lab": Object.freeze({
-    assembled: point(434, 260),
-    exploded: point(446, 322),
+    assembled: point(434, 270),
+    exploded: point(446, 338),
     depth: 0,
     shape: "node" as const,
     dashed: false,
@@ -156,22 +156,22 @@ const LAYOUT: Readonly<
     label: Object.freeze({ x: 0, y: LABEL_OUT, anchor: "middle" as const }),
   }),
   "data-knowledge": Object.freeze({
-    assembled: point(CENTER.x, 318),
-    exploded: point(CENTER.x, 358),
+    assembled: point(CENTER.x, 338),
+    exploded: point(CENTER.x, 400),
     depth: 0,
     shape: "server" as const,
     dashed: false,
     center: true,
-    label: Object.freeze({ x: 0, y: SERVER_RADIUS + 12, anchor: "middle" as const }),
+    label: Object.freeze({ x: 0, y: SERVER_RADIUS + 14, anchor: "middle" as const }),
   }),
   "provenance-dlt": Object.freeze({
-    assembled: point(CENTER.x, 248),
-    exploded: point(CENTER.x, 214),
+    assembled: point(CENTER.x, 262),
+    exploded: point(CENTER.x, 248),
     depth: 0,
     shape: "server" as const,
     dashed: true,
     center: true,
-    label: Object.freeze({ x: 0, y: -(SERVER_RADIUS + 28), anchor: "middle" as const }),
+    label: Object.freeze({ x: 0, y: SERVER_RADIUS + 14, anchor: "middle" as const }),
   }),
 });
 

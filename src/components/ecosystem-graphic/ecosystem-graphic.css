@@ -4,7 +4,7 @@
   margin: 0;
 }
 .eco-frame {
-  aspect-ratio: 500 / 480;
+  aspect-ratio: 500 / 520;
   width: 100%;
   max-width: 36rem;
   margin-inline: auto;
@@ -198,8 +198,8 @@
 }
 .eco-chevron {
   fill: none;
-  stroke: var(--color-capsule);
-  stroke-width: 2.4px;
+  stroke: var(--color-capsule-deep);
+  stroke-width: 3px;
   stroke-linecap: round;
   stroke-linejoin: round;
 }

@@ -138,8 +138,7 @@ function PartLabel({ part }: { part: PartGeometry }) {
   }
   const titleLines = wrapHeroLabel(copy.title);
   const descLines = wrapHeroLabel(copy.descriptor);
-  const extra = titleLines.length + descLines.length - 1;
-  const startY = part.label.y <= -24 ? part.label.y - extra * LABEL_LINE : part.label.y;
+  const startY = part.label.y;
   return (
     <g className="eco-label" aria-hidden="true">
       <LabelLines
