@@ -15,7 +15,7 @@ export type FocusStop = Readonly<{
 const MARK = "data-kb-idx";
 // Vercel injects its toolbar and comments into preview deployments as this custom element; focus
 // inside its shadow root reports the host as document.activeElement.
-const FOREIGN_HOSTS = "vercel-live-feedback";
+const FOREIGN_HOSTS = "vercel-live-feedback, nextjs-portal";
 
 /**
  * Marks every element a keyboard user should be able to reach and returns how many there are.
