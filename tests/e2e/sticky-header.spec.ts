@@ -194,10 +194,10 @@ test("WCAG 2.4.11: Shift+Tab back up the page never leaves focus under the stick
   await shiftTabUpThePage(page);
 });
 
-// Below 375px the header wraps to two rows (101px instead of 65px), so the focus checks run there too.
-// Only the width differs from the mobile project: the height stays Pixel 7's 839px. A shorter screen
-// would test something else: the workflow diagram's sideways-scroll region is a 761px tab stop on
-// phones, and on a screen too short to show it whole below the header no header height can pass.
+// Below 440px the header wraps to two rows (101px instead of 65px), so the focus checks run there too.
+// Only the width differs from the mobile project: the height stays Pixel 7's 839px. The workflow
+// diagram is a sideways-scroll tab stop on phones, and its height is capped so it can sit below the
+// wrapped header. A shorter screen hits the short-viewport rule instead.
 test.describe("at 320px (wrapped header)", () => {
   test.use({ viewport: { width: 320, height: 839 } });
 

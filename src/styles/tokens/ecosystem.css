@@ -9,7 +9,4 @@
   --text-display: clamp(2.5rem, 1.5rem + 3.2vw, 4.5rem);
   --tracking-display: -0.035em;
   --size-header: 4rem;
-  /* Below 375px the header wraps to two rows (measured 101px); the headroom keeps a focused tab stop
-     taller than the space below the header, which Chrome centres, clear of it on a Pixel 7 height. */
-  --size-header-wrapped: 7.5rem;
 }
