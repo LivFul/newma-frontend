@@ -1,33 +1,50 @@
+"use client";
+
+import { useState } from "react";
+import {
+  ACCESS_LABEL,
+  AVELOZ_LINK,
+  HEADER_MENU,
+  HEADER_MOBILE_NAV,
+  HEADER_NAV_LABEL,
+  NAV_LINKS,
+} from "@/content/home/chrome";
 import { Button } from "@/components/ui/button";
-import { ACCESS_LABEL, AVELOZ_LINK, HEADER_NAV_LABEL, NAV_LINKS } from "@/content/home/chrome";
 import { AccessLink } from "./access-link";
 import { Wordmark } from "./wordmark";
 
-// Section links are plain anchors on purpose: a hash jump is a browser scroll that honours
-// scroll-padding, whereas a client-side Link navigation clicked in the first moments after load
-// scrolled to the wrong place in the production build.
 export function SiteHeader() {
+  const [open, setOpen] = useState(false);
   return (
     <header
       data-site-header
-      className="sticky top-0 z-40 min-h-[var(--size-header)] border-b border-fg/15 bg-bg"
+      className="sticky top-0 z-40 min-h-[var(--size-header)] border-b border-fg/10 bg-bg/80 backdrop-blur-md"
     >
       <div className="flex min-h-[var(--size-header)] w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 px-5 py-1 md:px-12">
         <Wordmark priority />
-        <div className="flex items-center gap-4 sm:gap-8">
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 sm:gap-4">
           <nav aria-label={HEADER_NAV_LABEL.text} className="hidden items-center gap-8 md:flex">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="inline-flex min-h-11 items-center text-fg-muted decoration-route-edge decoration-2 hover:text-fg hover:underline"
+                className="inline-flex min-h-11 items-center text-fg-muted decoration-capsule decoration-2 hover:text-fg hover:underline"
               >
                 {link.block.text}
               </a>
             ))}
           </nav>
+          <Button
+            type="button"
+            variant="ghost"
+            className="min-h-11 min-w-11 px-2 md:hidden"
+            aria-expanded={open}
+            aria-controls="mobile-sections"
+            onClick={() => setOpen((value) => !value)}
+          >
+            {HEADER_MENU.text}
+          </Button>
           <Button asChild variant="ghost" className="min-h-11 px-2 text-sm sm:px-3 sm:text-base">
-            {/* aria-label keeps accessible name exact since flex layout collapses the suffix span's leading space */}
             <a href={AVELOZ_LINK.href} rel="noopener" aria-label={AVELOZ_LINK.block.text}>
               {AVELOZ_LINK.short.text}
               <span className="sr-only sm:not-sr-only">{AVELOZ_LINK.suffix.text}</span>
@@ -38,6 +55,25 @@ export function SiteHeader() {
           </AccessLink>
         </div>
       </div>
+      <nav
+        id="mobile-sections"
+        aria-label={HEADER_MOBILE_NAV.text}
+        hidden={!open}
+        className="flex flex-col gap-1 border-t border-fg/10 px-5 py-3 md:hidden"
+      >
+        {open
+          ? NAV_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="inline-flex min-h-11 items-center text-fg"
+                onClick={() => setOpen(false)}
+              >
+                {link.block.text}
+              </a>
+            ))
+          : null}
+      </nav>
     </header>
   );
 }

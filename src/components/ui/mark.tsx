@@ -1,6 +1,5 @@
-// Drawn status marks in the survey's linework: one stroke weight, 16-unit box, currentColor. They
-// replace text glyphs, which render in whatever font the platform falls back to. Always decorative:
-// the adjacent text carries the meaning.
+// Drawn status marks. Functional kinds (check, cross, alert, pause) carry meaning in the demo;
+// decorative dots and squares are retained only as last-resort fallbacks.
 export type MarkKind =
   | "check"
   | "cross"

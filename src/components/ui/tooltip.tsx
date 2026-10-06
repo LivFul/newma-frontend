@@ -26,7 +26,7 @@ export function Tooltip({ content, children }: TooltipProps) {
       <RadixTooltip.Portal>
         <RadixTooltip.Content
           sideOffset={TOOLTIP_SIDE_OFFSET}
-          className="z-50 max-w-xs rounded-sm bg-fg px-2 py-1 text-xs text-bg"
+          className="z-50 max-w-xs rounded-md bg-fg px-2 py-1 text-xs text-bg shadow-md"
         >
           {content}
           <RadixTooltip.Arrow className="fill-fg" />

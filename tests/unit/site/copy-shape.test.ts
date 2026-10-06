@@ -35,10 +35,16 @@ const modules = { about, chrome, copy, caption, help, how, personas, survey, her
 // A block may be re-exported from two modules (the footer reuses the hero disclaimer): count it once.
 const blocks = [...new Set(Object.values(modules).flatMap((m) => collect(m)))];
 // Hero labels live in the registry as plain title/descriptor pairs; wrap them for the same checks.
-const heroLabelBlocks: CopyBlock[] = Object.entries(registry.HERO_LABELS).flatMap(([slug, l]) => [
-  { id: `hero.${slug}.title`, text: l.title, claims: registry.HERO_CLAIMS },
-  { id: `hero.${slug}.descriptor`, text: l.descriptor, claims: registry.HERO_CLAIMS },
-]);
+const heroLabelBlocks: CopyBlock[] = [
+  ...Object.entries(registry.HERO_LABELS).flatMap(([slug, l]) => [
+    { id: `hero.${slug}.title`, text: l.title, claims: registry.HERO_CLAIMS },
+    { id: `hero.${slug}.descriptor`, text: l.descriptor, claims: registry.HERO_CLAIMS },
+  ]),
+  ...Object.entries(registry.HERO_INTERFACE_FACES).flatMap(([face, l]) => [
+    { id: `hero.interface.${face}.title`, text: l.title, claims: registry.HERO_CLAIMS },
+    { id: `hero.interface.${face}.descriptor`, text: l.descriptor, claims: registry.HERO_CLAIMS },
+  ]),
+];
 const all = [...blocks, ...heroLabelBlocks];
 
 describe("home copy modules", () => {

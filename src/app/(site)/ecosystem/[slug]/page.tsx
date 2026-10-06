@@ -48,7 +48,7 @@ export default async function EcosystemPage({ params }: Params) {
         <div className="min-w-0 lg:col-span-5 lg:self-start lg:[@media(min-height:56rem)]:sticky lg:[@media(min-height:56rem)]:top-[calc(var(--size-header)+2.5rem)]">
           <DetailHeader entry={entry} />
         </div>
-        <div className="min-w-0 lg:col-span-7 lg:border-l lg:border-fg/15 lg:pl-16">
+        <div className="min-w-0 lg:col-span-7 lg:border-l lg:border-border lg:pl-16">
           <section aria-labelledby="fit-heading">
             <h2 id="fit-heading" className="text-2xl font-medium tracking-[-0.015em]">
               {DETAIL_COPY.fitHeading.text}

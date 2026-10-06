@@ -8,7 +8,7 @@ import {
   VISION,
   VISION_HEADING,
 } from "@/content/home/about";
-import { BenchmarkMark } from "./benchmark-mark";
+import { LeafIcon } from "@/components/brand/leaf-icon";
 import { CONTAINER, H2, H2_SUB, H3_TITLE, SECTION } from "./type";
 
 export function AboutLivful() {
@@ -16,18 +16,27 @@ export function AboutLivful() {
     <section
       id="about"
       aria-labelledby="about-heading"
-      className={`${SECTION} survey-grid bg-bg-deep`}
+      className={`${SECTION} bg-peach`}
+      data-reveal
     >
       <div className={`${CONTAINER} space-y-16`}>
         <h2 id="about-heading" className={H2}>
           {ABOUT.heading.text}
         </h2>
+        <div
+          className="h-40 rounded-lg bg-cover bg-center opacity-80 shadow-sm md:h-52"
+          style={{
+            backgroundImage:
+              'image-set(url("/images/field-plants.webp") type("image/webp"), url("/images/field-plants.jpg") type("image/jpeg"))',
+          }}
+          aria-hidden="true"
+        />
         <div className="grid gap-x-16 gap-y-12 md:grid-cols-2">
-          <div className="space-y-5 border-t-2 border-fg pt-6">
+          <div className="space-y-5 rounded-lg bg-bg-elevated/80 p-6 shadow-sm">
             <h3 className={H2_SUB}>{MISSION_HEADING.text}</h3>
             <p className="max-w-[44ch] text-xl leading-snug text-fg-muted">{MISSION.text}</p>
           </div>
-          <div className="space-y-5 border-t-2 border-fg pt-6">
+          <div className="space-y-5 rounded-lg bg-bg-elevated/80 p-6 shadow-sm">
             <h3 className={H2_SUB}>{VISION_HEADING.text}</h3>
             <p className="max-w-[44ch] text-xl leading-snug text-fg-muted">{VISION.text}</p>
           </div>
@@ -36,11 +45,8 @@ export function AboutLivful() {
           <h3 className={H3_TITLE}>{APPROACH_HEADING.text}</h3>
           <ul role="list" className="grid gap-x-10 gap-y-8 md:grid-cols-3">
             {APPROACH.map((item) => (
-              <li
-                key={item.id}
-                className="flex gap-4 border-t border-fg pt-5 leading-relaxed text-fg-muted"
-              >
-                <BenchmarkMark className="size-6 shrink-0 text-fg" />
+              <li key={item.id} className="flex gap-4 leading-relaxed text-fg-muted">
+                <LeafIcon className="h-6 w-auto shrink-0" />
                 <span>{item.text}</span>
               </li>
             ))}

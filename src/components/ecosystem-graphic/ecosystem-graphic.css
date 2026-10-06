@@ -1,17 +1,15 @@
-/* Hero graphic baselines. Parts sit at the assembled translate; the static layer explodes by CSS on
-   hover or focus, and prefers-reduced-motion forces the exploded layout with no transition. The
-   interactive layer (Motion) owns part transforms and drives opacity through [data-view]. Everything
-   animates transform and opacity only. */
+/* Hero graphic: tilted 3D orbital ecosystem. Static layer explodes by CSS; interactive uses Motion.
+   Animate transform and opacity only. */
 .eco-figure {
   margin: 0;
 }
 .eco-frame {
-  /* Reserved box: the static SVG and its interactive twin share this aspect ratio, so the swap
-     cannot shift layout. */
-  aspect-ratio: 470 / 560;
+  aspect-ratio: 500 / 590;
   width: 100%;
-  max-width: 34rem;
+  max-width: 36rem;
   margin-inline: auto;
+  perspective: 1200px;
+  perspective-origin: 50% 42%;
 }
 .eco-svg {
   touch-action: manipulation;
@@ -19,9 +17,18 @@
   width: 100%;
   height: auto;
   overflow: visible;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+.eco-part,
+.eco-link,
+.eco-hit {
+  pointer-events: auto;
 }
 .eco-part {
-  transform-box: fill-box;
+  transform-box: view-box;
+  transform-origin: 0 0;
+  --eco-scale: calc(0.96 + (var(--eco-depth, 0) + 1) * 0.04);
 }
 .eco-svg[data-layer="static"] .eco-part {
   transform: translate(var(--ax), var(--ay));
@@ -41,28 +48,10 @@
 .eco-link:focus-visible .eco-hit {
   stroke: var(--color-focus);
 }
-.eco-link:hover .eco-plate-top {
-  fill: var(--color-border);
-}
-.eco-plate-top {
-  fill: var(--color-bg-elevated);
-  stroke: var(--eco-stroke, var(--eco-tone));
-  stroke-width: 2px;
-  stroke-linejoin: round;
-}
-.eco-plate-side {
-  fill: var(--eco-tone);
-  fill-opacity: 0.32;
-  stroke: var(--eco-stroke, var(--eco-tone));
-  stroke-width: 2px;
-  stroke-linejoin: round;
-}
-.eco-plate-top[data-dashed],
-.eco-plate-side[data-dashed] {
-  stroke-dasharray: 7 5;
-}
-.eco-plate-side[data-dashed] {
-  fill-opacity: 0.12;
+.eco-bob {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transform: scale(var(--eco-scale, 1));
 }
 .eco-glyph {
   color: var(--eco-ink);
@@ -72,6 +61,68 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+.eco-node-shadow {
+  fill: rgb(6 36 43 / 0.22);
+  stroke: none;
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+  transform: scale(calc(0.88 + (var(--eco-depth, 0) + 1) * 0.14));
+}
+.eco-node {
+  stroke: var(--eco-stroke, var(--eco-tone));
+  stroke-width: 2px;
+  filter: drop-shadow(0 10px 14px rgb(6 36 43 / 0.18));
+}
+.eco-node:not([data-center]) {
+  fill: color-mix(in srgb, var(--color-bg-elevated) 88%, white);
+}
+.eco-node[data-center] {
+  stroke-width: 2.6px;
+  filter: drop-shadow(0 16px 22px rgb(6 36 43 / 0.28));
+}
+.eco-node-sheen {
+  pointer-events: none;
+}
+.eco-link:hover .eco-node:not([data-center]),
+.eco-link:focus-visible .eco-node:not([data-center]) {
+  fill: var(--color-bg);
+}
+.eco-node[data-dashed],
+.eco-server-body [data-dashed] {
+  stroke-dasharray: 7 5;
+  fill-opacity: 0.92;
+}
+.eco-server-front {
+  fill: color-mix(in srgb, var(--color-bg-elevated) 88%, white);
+  stroke: var(--eco-stroke, var(--eco-tone));
+  stroke-width: 1.8px;
+}
+.eco-server-top {
+  fill: color-mix(in srgb, var(--color-bg-elevated) 96%, white);
+  stroke: var(--eco-stroke, var(--eco-tone));
+  stroke-width: 1.8px;
+}
+.eco-server-side {
+  fill: color-mix(in srgb, var(--color-bg-deep) 28%, var(--color-bg-elevated));
+  stroke: var(--eco-stroke, var(--eco-tone));
+  stroke-width: 1.8px;
+}
+.eco-server-bay {
+  fill: none;
+  stroke: var(--eco-ink);
+  stroke-width: 1.4px;
+  stroke-linecap: round;
+}
+.eco-twin-join {
+  stroke: var(--eco-stroke, var(--eco-tone));
+  stroke-width: 2px;
+}
+.eco-link:hover .eco-server-front,
+.eco-link:focus-visible .eco-server-front {
+  fill: var(--color-bg);
 }
 .eco-glyph * {
   vector-effect: non-scaling-stroke;
@@ -80,29 +131,39 @@
   fill: var(--eco-ink);
   stroke: none;
 }
-.eco-leader {
-  stroke: var(--eco-stroke, var(--eco-tone));
-  stroke-width: 1.5px;
+.eco-title,
+.eco-desc {
+  pointer-events: none;
 }
 .eco-title {
   fill: var(--color-fg);
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: -0.01em;
+  paint-order: stroke fill;
+  stroke: color-mix(in srgb, var(--color-bg-elevated) 88%, white);
+  stroke-width: 5px;
+  stroke-linejoin: round;
 }
 .eco-desc {
   fill: var(--color-fg-muted);
+  paint-order: stroke fill;
+  stroke: color-mix(in srgb, var(--color-bg-elevated) 88%, white);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+}
+.eco-label {
   opacity: 0;
 }
 .eco-edges {
   opacity: 0;
 }
-/* Edges, rail included, are 3:1 against the background (WCAG 1.4.11). */
 .eco-edges path {
   fill: none;
   stroke: var(--color-border-strong);
-  stroke-width: 1.75px;
+  stroke-width: 1.5px;
   stroke-linecap: round;
+  opacity: 0.7;
 }
 .eco-edges path[data-dashed] {
   stroke: var(--color-eco-optional);
@@ -111,73 +172,116 @@
 .eco-arrowhead {
   fill: var(--color-border-strong);
 }
+.eco-disc {
+  fill: color-mix(in srgb, var(--color-capsule) 16%, transparent);
+  stroke: none;
+}
+.eco-orbit {
+  fill: none;
+  stroke: color-mix(in srgb, var(--color-capsule) 55%, transparent);
+  stroke-width: 1.25px;
+  stroke-dasharray: 5 10;
+}
+.eco-orbit-outer {
+  stroke: color-mix(in srgb, var(--color-leaf) 50%, transparent);
+  stroke-dasharray: 2 12;
+}
+.eco-svg[data-view="assembled"] .eco-orbit-outer {
+  opacity: 0.35;
+}
+.eco-svg[data-view="exploded"] .eco-orbit-inner {
+  opacity: 0.42;
+}
 
-/* Interactive layer: opacity follows the view state. */
-.eco-svg[data-view="exploded"] .eco-desc,
+.eco-svg[data-view="exploded"] .eco-label,
 .eco-svg[data-view="exploded"] .eco-edges {
   opacity: 1;
 }
-.eco-svg[data-layer="interactive"] .eco-desc,
+.eco-svg[data-layer="interactive"] .eco-label,
 .eco-svg[data-layer="interactive"] .eco-edges {
   transition: opacity var(--motion-duration-base) var(--motion-ease-standard);
 }
 
-/* Static layer without JavaScript: focus explodes anywhere, hover only on hover-capable devices. */
 @media (prefers-reduced-motion: no-preference) {
+  /* One short float and settle (2 x 2.2 s plus at most 0.5 s of stagger, under 5 s), so nothing moves
+     on its own for long enough to need a pause control (WCAG 2.2.2). */
+  .eco-glyph {
+    animation: node-float 2.2s var(--motion-ease-standard) 2 alternate;
+    animation-delay: calc(var(--i, 0) * 80ms);
+  }
+  .eco-svg:hover .eco-glyph,
+  .eco-svg:focus-within .eco-glyph {
+    animation-play-state: paused;
+  }
   .eco-svg[data-layer="static"] .eco-part {
     transition: transform var(--motion-duration-slow) var(--motion-ease-emphasized)
       calc(var(--i) * 60ms);
   }
-  .eco-svg[data-layer="static"] .eco-desc,
+  .eco-svg[data-layer="static"] .eco-label,
   .eco-svg[data-layer="static"] .eco-edges {
     transition: opacity var(--motion-duration-base) var(--motion-ease-standard) 180ms;
   }
   .eco-svg[data-layer="static"]:focus-within .eco-part {
     transform: translate(var(--ex), var(--ey));
   }
-  .eco-svg[data-layer="static"]:focus-within .eco-desc,
+  .eco-svg[data-layer="static"]:focus-within .eco-label,
   .eco-svg[data-layer="static"]:focus-within .eco-edges {
     opacity: 1;
   }
 }
+/* The svg ignores the pointer (only its parts take it), so the frame carries the hover, as it does in
+   the interactive layer: hovering anywhere on the diagram explodes it, and the swap does not jump. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .eco-svg[data-layer="static"]:hover .eco-part {
+  .eco-frame:hover .eco-svg[data-layer="static"] .eco-part {
     transform: translate(var(--ex), var(--ey));
   }
-  .eco-svg[data-layer="static"]:hover .eco-desc,
-  .eco-svg[data-layer="static"]:hover .eco-edges {
+  .eco-frame:hover .eco-svg[data-layer="static"] .eco-label,
+  .eco-frame:hover .eco-svg[data-layer="static"] .eco-edges {
     opacity: 1;
   }
 }
 
-/* Reduced motion: the exploded, labelled diagram is final. No transition, no animation. */
+/* Reduced motion shows the exploded, labelled diagram at once. Its transitions and animations are only
+   defined under no-preference above, and these selectors out-rank the base rules, so no priority
+   override is needed. */
 @media (prefers-reduced-motion: reduce) {
-  /* Static layer only: the interactive layer is never mounted under reduce, and its parts carry no
-     --ex/--ey variables. */
   .eco-svg[data-layer="static"] .eco-part {
-    transform: translate(var(--ex), var(--ey)) !important;
-    transition: none !important;
+    transform: translate(var(--ex), var(--ey));
   }
-  .eco-svg .eco-desc,
+  .eco-svg .eco-label,
   .eco-svg .eco-edges {
-    opacity: 1 !important;
-    transition: none !important;
+    opacity: 1;
+  }
+}
+
+@keyframes node-float {
+  from {
+    transform: scale(var(--eco-scale, 1)) translateY(0);
+  }
+  to {
+    transform: scale(var(--eco-scale, 1)) translateY(-4px);
   }
 }
 
 @media (forced-colors: active) {
-  .eco-plate-top,
-  .eco-plate-side,
-  .eco-leader,
-  .eco-edges path {
+  .eco-node,
+  .eco-orbit,
+  .eco-edges path,
+  .eco-server-front,
+  .eco-server-top,
+  .eco-server-side,
+  .eco-twin-join {
     stroke: CanvasText;
   }
-  .eco-plate-top {
+  .eco-node,
+  .eco-disc,
+  .eco-server-front,
+  .eco-server-top,
+  .eco-server-side {
     fill: Canvas;
   }
-  .eco-plate-side {
-    fill: Canvas;
-    fill-opacity: 1;
+  .eco-node-sheen {
+    fill: none;
   }
   .eco-glyph {
     stroke: CanvasText;
@@ -188,8 +292,28 @@
   .eco-arrowhead {
     fill: CanvasText;
   }
+  .eco-title,
+  .eco-desc {
+    stroke: Canvas;
+  }
   .eco-link:focus-visible .eco-hit {
     stroke: Highlight;
     stroke-width: 4px;
+  }
+}
+
+.eco-fallback {
+  display: none;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.eco-fallback a,
+.eco-fallback li {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 22.5rem) {
+  .eco-fallback {
+    display: grid;
+    gap: 0.5rem;
   }
 }

@@ -18,7 +18,7 @@ export function DetailHeader({ entry }: { entry: EcosystemEntry }) {
       {entry.callout ? (
         <p
           role="note"
-          className="max-w-[44ch] border border-dashed border-eco-optional bg-bg-elevated px-4 py-3 text-lg leading-snug"
+          className="max-w-[44ch] rounded-lg border border-dashed border-eco-optional bg-bg-elevated px-4 py-3 text-lg leading-snug"
         >
           {entry.callout.text}
         </p>

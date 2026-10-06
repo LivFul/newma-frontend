@@ -1,4 +1,4 @@
-import { render, within } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { EcosystemSvg } from "@/components/ecosystem-graphic/ecosystem-svg";
 import { StaticPart } from "@/components/ecosystem-graphic/static-part";
@@ -25,12 +25,13 @@ describe("EcosystemSvg", () => {
   it("starts every accessible name with the visible label (WCAG 2.5.3)", () => {
     const { container } = renderSvg();
     for (const slug of ECOSYSTEM_SLUGS) {
-      const link = container.querySelector(`g[data-slug="${slug}"] > a`)!;
+      const group = container.querySelector(`g[data-slug="${slug}"]`)!;
+      const link = group.querySelector("a")!;
       const label = link.getAttribute("aria-label")!;
       const { title, descriptor } = HERO_LABELS[slug];
       expect(label.startsWith(title)).toBe(true);
       expect(label).toBe(`${title}. ${descriptor}. Opens the ${title} page.`);
-      expect(link.textContent).toContain(title);
+      expect(group.textContent).toContain(title);
     }
   });
 
@@ -55,10 +56,8 @@ describe("EcosystemSvg", () => {
   // Value: protects=hero plate labels stay >= 12 px on a 360 px phone given the real page paddings; fails_when=body, sheet or plate-column padding grows so the stage shrinks below the 12 px label floor; why_new=old test hard-coded a 328 px column that the redesign no longer gives; seam=none
   it("keeps rendered label text at least 12 px on a 360 px phone with the real paddings", () => {
     const PHONE = 360;
-    const BODY_PADDING = 12 * 2; // body { padding: var(--space-3) } below md
-    const SHEET_BORDER = 1 * 2; // .sheet 1px neatline
-    const PLATE_COLUMN_PADDING = 4 * 2; // hero plate column px-1 below sm
-    const CONTENT_WIDTH_ON_360_PHONE = PHONE - BODY_PADDING - SHEET_BORDER - PLATE_COLUMN_PADDING;
+    const COLUMN_PADDING = 16 * 2 + 12 * 2; // hero column px-4 plus glass px-3
+    const CONTENT_WIDTH_ON_360_PHONE = PHONE - COLUMN_PADDING;
     const scale = CONTENT_WIDTH_ON_360_PHONE / VIEWBOX.width;
     expect(LABEL_FONT.title * scale).toBeGreaterThanOrEqual(12);
     expect(LABEL_FONT.descriptor * scale).toBeGreaterThanOrEqual(12);
@@ -73,8 +72,8 @@ describe("EcosystemSvg", () => {
   it("shows the descriptor text for every part", () => {
     const { container } = renderSvg();
     for (const slug of ECOSYSTEM_SLUGS) {
-      const part = container.querySelector(`g[data-slug="${slug}"]`) as HTMLElement;
-      expect(within(part).getByText(HERO_LABELS[slug].descriptor)).toBeInTheDocument();
+      const part = container.querySelector(`g[data-slug="${slug}"]`);
+      expect(part?.textContent).toContain(HERO_LABELS[slug].descriptor);
     }
   });
 

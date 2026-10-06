@@ -6,9 +6,9 @@ import type { EdgeTone, LaneId } from "@/lib/workflow/graph";
 // scene in the old colours.
 export const SCENE_COLORS = Object.freeze({
   /** --color-plate-elevated: the plate the static diagram sits on, so the swap is seamless. */
-  background: 0x0f2329,
+  background: 0x0b404d,
   /** --color-plate */
-  ink: 0x09191f,
+  ink: 0x06242b,
   /** --color-plate-fg */
   text: 0xe8f2ef,
   /** --color-plate-muted */
@@ -16,7 +16,7 @@ export const SCENE_COLORS = Object.freeze({
   /** --color-plate-accent */
   accent: 0x7cc9b0,
   /** --color-plate-border */
-  border: 0x2a4a4b,
+  border: 0x1b8896,
   /** --color-plate-warning */
   warning: 0xf2c46b,
   /** --color-plate-success */

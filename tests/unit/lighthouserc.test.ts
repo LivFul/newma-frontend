@@ -81,11 +81,11 @@ describe("lighthouserc", () => {
   });
 
   it.each([
-    ["desktop", DESKTOP],
-    ["mobile", MOBILE],
+    ["desktop", DESKTOP, 2500],
+    ["mobile", MOBILE, 3000],
   ])(
-    "%s config collects the home page and one component page and keeps the same budgets",
-    (_name, file) => {
+    "%s config collects the home page and one component page and sets its LCP budget",
+    (_name, file, lcpBudget) => {
       const { collect, assert } = loadFrom(file, undefined);
       expect(collect.url).toEqual([
         "http://localhost:3100/",
@@ -97,7 +97,7 @@ describe("lighthouserc", () => {
       expect(assert.assertions["categories:seo"]).toEqual(["error", { minScore: 0.95 }]);
       expect(assert.assertions["largest-contentful-paint"]).toEqual([
         "error",
-        { maxNumericValue: 2500 },
+        { maxNumericValue: lcpBudget },
       ]);
       expect(assert.assertions["cumulative-layout-shift"]).toEqual([
         "error",

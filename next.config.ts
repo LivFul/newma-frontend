@@ -38,6 +38,13 @@ const nextConfig: NextConfig = {
     return [
       { source: "/:path*", headers: SECURITY_HEADERS },
       { source: CSP_STATIC_SOURCE, headers: CSP_HEADERS },
+      {
+        source: "/sw.js",
+        headers: [
+          { key: "Cache-Control", value: "no-cache" },
+          { key: "Service-Worker-Allowed", value: "/" },
+        ],
+      },
       ...NOINDEX_SOURCES.map((source) => ({ source, headers: NOINDEX_HEADERS })),
     ];
   },

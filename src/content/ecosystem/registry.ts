@@ -21,12 +21,18 @@ export type HeroLabel = { readonly title: string; readonly descriptor: string };
 // Titles and one-line descriptors (claim C-48). Descriptors stay short so they fit the label column
 // of the graphic at a legible size, and none implies a deployed ledger.
 export const HERO_LABELS: Readonly<Record<EcosystemSlug, HeroLabel>> = Object.freeze({
-  interface: { title: "Interface", descriptor: "Where people sign in" },
+  interface: { title: "Interface", descriptor: "People and API" },
   "agentic-compute": { title: "Agentic Compute", descriptor: "Plans screening runs" },
   "scientific-review": { title: "Scientific Review", descriptor: "Scientists decide" },
   "wet-lab": { title: "Wet Lab", descriptor: "Assays and results" },
   "data-knowledge": { title: "Data & Knowledge", descriptor: "Authoritative records" },
   "provenance-dlt": { title: "Provenance & DLT", descriptor: "Optional ledger layer" },
+});
+
+/** Two faces of the Interface, drawn outside the records loop (claim C-40, C-48). */
+export const HERO_INTERFACE_FACES = Object.freeze({
+  people: Object.freeze({ title: "People", descriptor: "Where people sign in" }),
+  apps: Object.freeze({ title: "API", descriptor: "MCP for other applications" }),
 });
 
 export type SourceDoc = "TA" | "ARCH" | "PRD";

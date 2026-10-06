@@ -1,9 +1,9 @@
 @theme {
   --motion-duration-fast: 150ms;
-  --motion-duration-base: 250ms;
-  --motion-duration-slow: 450ms;
+  --motion-duration-base: 280ms;
+  --motion-duration-slow: 600ms;
   --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --motion-ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+  --motion-ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
   /* Tailwind transition-* utilities consume the tokens. */
   --default-transition-duration: var(--motion-duration-fast);
   --default-transition-timing-function: var(--motion-ease-standard);

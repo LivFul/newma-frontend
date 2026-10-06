@@ -6,7 +6,7 @@ import { VisuallyHidden } from "./visually-hidden";
 export const badgeVariants = cva(
   // border-transparent keeps the chip outlined in forced-colors mode.
   // Stamped tags: a fill plus a darker ink edge from the same family, like a surveyor's mark.
-  "inline-flex min-h-6 items-center rounded-sm border px-2 py-0.5 text-xs font-medium tracking-[0.01em]",
+  "inline-flex min-h-6 items-center rounded-full border px-2.5 py-0.5 text-xs font-medium tracking-[0.01em]",
   {
     variants: {
       tone: {

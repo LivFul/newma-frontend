@@ -17,6 +17,9 @@ export const heroLink = (page: Page, slug: Slug): Locator =>
 export const heroPart = (page: Page, slug: Slug): Locator =>
   page.locator(`svg.eco-svg g[data-slug="${slug}"]`);
 export const heroSvg = (page: Page): Locator => page.locator("svg.eco-svg");
+// The svg is pointer-events: none (only its parts take the pointer), and the frame owns hover, so
+// hover the frame: Playwright refuses to hover an element that another element receives the pointer for.
+export const heroFrame = (page: Page): Locator => page.locator(".eco-frame");
 
 /** Open the home page and wait for the interactive twin (stable hook set by Interactive). */
 export async function gotoHeroReady(page: Page): Promise<void> {
@@ -45,7 +48,7 @@ async function allPartYs(page: Page): Promise<number[]> {
  * part can look still while another is waiting for its delay: sample all six across several frames.
  * Returns the y of the requested part.
  */
-export async function settled(page: Page, slug: Slug = "provenance-dlt"): Promise<number> {
+export async function settled(page: Page, slug: Slug = "wet-lab"): Promise<number> {
   let previous: number[] = [];
   let stableRuns = 0;
   await expect

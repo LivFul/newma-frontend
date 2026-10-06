@@ -3,6 +3,7 @@ import {
   center,
   focusedHref,
   gotoHeroReady,
+  heroFrame,
   heroLink,
   heroPart,
   heroSvg,
@@ -18,7 +19,7 @@ test.describe("mouse", () => {
   test("hover explodes the diagram and leaving puts it back", async ({ page }) => {
     await gotoHeroReady(page);
     const assembled = await settled(page);
-    await heroSvg(page).hover();
+    await heroFrame(page).hover();
     await expect(heroSvg(page)).toHaveAttribute("data-view", "exploded");
     expect(await settled(page)).toBeGreaterThan(assembled + 20);
     await page.mouse.move(2, 2);
@@ -29,7 +30,7 @@ test.describe("mouse", () => {
   for (const slug of SLUGS) {
     test(`clicking ${slug} opens /ecosystem/${slug}`, async ({ page }) => {
       await gotoHeroReady(page);
-      await heroSvg(page).hover();
+      await heroFrame(page).hover();
       await settled(page);
       await heroLink(page, slug).click();
       await expect(page).toHaveURL(new RegExp(`/ecosystem/${slug}$`));
@@ -139,8 +140,7 @@ test.describe("touch", () => {
       await page.touchscreen.tap(first.x, first.y);
       await expect(heroSvg(page)).toHaveAttribute("data-view", "exploded");
       await settled(page);
-      const target = await center(heroLink(page, slug));
-      await page.touchscreen.tap(target.x, target.y);
+      await heroLink(page, slug).tap();
       await expect(page).toHaveURL(new RegExp(`/ecosystem/${slug}$`));
     });
   }

@@ -13,7 +13,8 @@ export function WorkflowSection() {
     <section
       id="workflow"
       aria-labelledby="workflow-heading"
-      className={`${SECTION} border-t border-fg/15`}
+      className={`${SECTION} plate-surface`}
+      data-reveal
     >
       <div className={`${CONTAINER} space-y-12`}>
         <div className="grid gap-6 lg:grid-cols-12">

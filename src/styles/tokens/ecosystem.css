@@ -1,12 +1,22 @@
-/* Homepage and ecosystem-hero tokens. The six plates are overprints in the survey's spot inks; every
-   pair is listed in contrast-pairs.json and verified by tests/unit/tokens.test.ts. Hue is never the
-   only carrier: glyph shape, label text and stroke pattern say the same thing. */
+/* Homepage and ecosystem-hero tokens. Hue is never the only carrier: glyph shape, label text and
+   stroke pattern say the same thing. */
 @theme {
-  --color-eco-compute: #9a5230; /* Agentic Compute (surveyor's sienna, deepened for text contrast) */
-  --color-eco-optional: #a8442a; /* Provenance & DLT (madder), always paired with a dashed stroke */
-  /* The display voice is Geologica with its sharpness axis raised: map lettering, not a book serif. */
+  --color-eco-compute: #9a5230; /* Agentic Compute, deepened for text contrast */
+  --color-eco-optional: #a8442a; /* Provenance & DLT, always paired with a dashed stroke */
   --font-display: var(--font-geologica), ui-sans-serif, system-ui, sans-serif;
-  --text-display: clamp(2.5rem, 1.5rem + 3.2vw, 4.5rem);
-  --tracking-display: -0.035em;
+  --text-display: clamp(2.5rem, 1.4rem + 3.6vw, 4.75rem);
+  --tracking-display: -0.04em;
   --size-header: 4rem;
+  /* Carries the primary button label (--color-accent-fg): every stop stays at 4.5:1 or better against it,
+     also at hover brightness. tests/unit/contrast.test.ts enforces that. */
+  --background-image-brand: linear-gradient(115deg, #0c7552 0%, #1d5c52 46%, #12707d 100%);
+  --background-image-leaf: linear-gradient(90deg, #b3e570 0%, #15a676 100%);
+  --background-image-capsule: linear-gradient(90deg, #0b404d 0%, #1b8896 100%);
+  --background-image-aurora:
+    radial-gradient(120% 80% at 12% 18%, rgb(179 229 112 / 0.45), transparent 55%),
+    radial-gradient(90% 70% at 88% 8%, rgb(27 136 150 / 0.38), transparent 50%),
+    radial-gradient(70% 60% at 70% 90%, rgb(232 242 239 / 0.8), transparent 60%),
+    linear-gradient(165deg, #e8f2ef 0%, #d7ebe6 42%, #c5e4de 100%);
+  --background-image-deep: linear-gradient(165deg, #06242b 0%, #0b404d 48%, #09191f 100%);
+  --background-image-peach: linear-gradient(180deg, #f7efe4 0%, #e8f2ef 100%);
 }

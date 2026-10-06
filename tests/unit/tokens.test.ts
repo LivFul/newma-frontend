@@ -40,6 +40,19 @@ describe("design tokens", () => {
     }
   });
 
+  it("declares brand gradient surfaces", () => {
+    const eco = read("ecosystem.css");
+    for (const name of [
+      "--background-image-brand",
+      "--background-image-leaf",
+      "--background-image-capsule",
+      "--background-image-aurora",
+      "--background-image-deep",
+    ]) {
+      expect(eco).toContain(name);
+    }
+  });
+
   it("declares the ecosystem hues and the display, header tokens", () => {
     const eco = parseCssVars(read("ecosystem.css"));
     for (const name of [

@@ -53,7 +53,7 @@ export default async function DemoDashboard() {
             </Link>
           </div>
         </div>
-        <dl className="sheet grid gap-6 px-6 py-5 text-sm sm:grid-cols-3">
+        <dl className="surface grid gap-6 px-6 py-5 text-sm sm:grid-cols-3">
           <div className="space-y-1">
             <dt className="text-fg-muted">Persona</dt>
             <dd className="text-lg font-medium">{personaLabel(session.persona)}</dd>

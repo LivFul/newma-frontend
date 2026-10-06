@@ -100,7 +100,7 @@ function Node({ node }: { node: SvgNodeShape }) {
 export function WorkflowDiagram() {
   const layout = WORKFLOW_SVG_LAYOUT;
   return (
-    <ScrollRegion className="wf-scroll sheet plate-surface" label={WORKFLOW_CONTROLS.region.text}>
+    <ScrollRegion className="wf-scroll surface plate-surface" label={WORKFLOW_CONTROLS.region.text}>
       <div className="wf-frame" data-workflow-frame>
         <svg
           className="wf-svg"

@@ -4,20 +4,21 @@ import type { EcosystemSlug } from "@/content/ecosystem/registry";
 const TONE = new Map<EcosystemSlug, string>(PARTS.map((p) => [p.slug, p.tone]));
 const DASHED = new Set<EcosystemSlug>(PARTS.filter((p) => p.dashed).map((p) => p.slug));
 
-// A component's plate in miniature, so legend keys match their layer in the hero. Decorative.
 export function PlateSwatch({
   slug,
   outline = "var(--color-fg)",
-  className = "h-5 w-10 shrink-0",
+  className = "h-6 w-6 shrink-0",
 }: {
   slug: EcosystemSlug;
   outline?: string;
   className?: string;
 }) {
   return (
-    <svg viewBox="0 0 44 22" className={className} aria-hidden="true" focusable="false">
-      <path
-        d="M22 2L42 11L22 20L2 11Z"
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true" focusable="false">
+      <circle
+        cx="12"
+        cy="12"
+        r="9"
         fill={`var(${TONE.get(slug)})`}
         stroke={outline}
         strokeWidth="1.25"

@@ -1,43 +1,23 @@
 import { describe, expect, it } from "vitest";
 import {
+  CENTER,
   EDGES,
+  ELLIPSE,
   GLYPH_KEYS,
-  LABEL_BOX,
+  hitRadius,
   PARTS,
-  PLATE,
   VIEWBOX,
-  type Point,
 } from "@/components/ecosystem-graphic/geometry";
 import { ECOSYSTEM_SLUGS } from "@/content/ecosystem/registry";
 
-type Box = { left: number; top: number; right: number; bottom: number };
+const dist = (a: { x: number; y: number }, b: { x: number; y: number }) =>
+  Math.hypot(a.x - b.x, a.y - b.y);
 
-const plateBox = (p: Point): Box => ({
-  left: p.x - PLATE.halfWidth,
-  right: p.x + PLATE.halfWidth,
-  top: p.y - PLATE.halfHeight,
-  bottom: p.y + PLATE.halfHeight + PLATE.thickness,
-});
-const labelBox = (p: Point): Box => ({
-  left: p.x + LABEL_BOX.offsetX,
-  right: p.x + LABEL_BOX.offsetX + LABEL_BOX.width,
-  top: p.y + LABEL_BOX.top,
-  bottom: p.y + LABEL_BOX.bottom,
-});
-const union = (a: Box, b: Box): Box => ({
-  left: Math.min(a.left, b.left),
-  right: Math.max(a.right, b.right),
-  top: Math.min(a.top, b.top),
-  bottom: Math.max(a.bottom, b.bottom),
-});
-const GAP = 8;
-const overlaps = (a: Box, b: Box) =>
-  a.left < b.right + GAP &&
-  b.left < a.right + GAP &&
-  a.top < b.bottom + GAP &&
-  b.top < a.bottom + GAP;
-const inside = (b: Box) =>
-  b.left >= 0 && b.top >= 0 && b.right <= VIEWBOX.width && b.bottom <= VIEWBOX.height;
+const onEllipse = (point: { x: number; y: number }, ring: { rx: number; ry: number }) => {
+  const nx = (point.x - CENTER.x) / ring.rx;
+  const ny = (point.y - CENTER.y) / ring.ry;
+  return nx * nx + ny * ny;
+};
 
 describe("ecosystem geometry", () => {
   it("has six parts with the exact slugs in order", () => {
@@ -85,21 +65,56 @@ describe("ecosystem geometry", () => {
     for (const part of PARTS) expect(GLYPH_KEYS).toContain(part.glyph);
   });
 
-  it("never overlaps exploded parts (plate plus label box, 8-unit gap)", () => {
-    const boxes = PARTS.map((p) => union(plateBox(p.exploded), labelBox(p.exploded)));
-    for (let i = 0; i < boxes.length; i += 1) {
-      for (let j = i + 1; j < boxes.length; j += 1) {
-        expect(overlaps(boxes[i]!, boxes[j]!), `${PARTS[i]!.slug} vs ${PARTS[j]!.slug}`).toBe(
-          false,
-        );
+  it("stacks the records server at the core and keeps Interface outside the loop", () => {
+    const data = PARTS.find((p) => p.slug === "data-knowledge")!;
+    const provenance = PARTS.find((p) => p.slug === "provenance-dlt")!;
+    const gate = PARTS.find((p) => p.slug === "interface")!;
+    expect(data.shape).toBe("server");
+    expect(provenance.shape).toBe("server");
+    expect(gate.shape).toBe("twin");
+    expect(data.assembled.x).toBe(CENTER.x);
+    expect(provenance.assembled.x).toBe(CENTER.x);
+    expect(provenance.assembled.y).toBeLessThan(data.assembled.y);
+    expect(provenance.exploded.y).toBeLessThan(provenance.assembled.y);
+    expect(data.exploded.y).toBeGreaterThan(data.assembled.y);
+    expect(gate.assembled.x).toBeLessThan(CENTER.x - ELLIPSE.assembled.rx);
+    expect(gate.exploded.x).toBeLessThan(gate.assembled.x);
+    for (const slug of ["agentic-compute", "scientific-review", "wet-lab"] as const) {
+      const part = PARTS.find((p) => p.slug === slug)!;
+      expect(onEllipse(part.assembled, ELLIPSE.assembled)).toBeCloseTo(1, 2);
+      expect(onEllipse(part.exploded, ELLIPSE.exploded)).toBeCloseTo(1, 2);
+      expect(dist(part.exploded, CENTER)).toBeGreaterThan(dist(part.assembled, CENTER));
+    }
+    const wetLab = PARTS.find((p) => p.slug === "wet-lab")!;
+    expect(wetLab.exploded.y - wetLab.assembled.y).toBeGreaterThan(20);
+  });
+
+  it("never overlaps assembled or exploded nodes", () => {
+    for (const state of ["assembled", "exploded"] as const) {
+      const nodes = PARTS.map((p) => ({
+        point: p[state],
+        radius: hitRadius(p),
+        slug: p.slug,
+      }));
+      for (let i = 0; i < nodes.length; i += 1) {
+        for (let j = i + 1; j < nodes.length; j += 1) {
+          expect(
+            dist(nodes[i]!.point, nodes[j]!.point),
+            `${nodes[i]!.slug} vs ${nodes[j]!.slug} ${state}`,
+          ).toBeGreaterThan(nodes[i]!.radius + nodes[j]!.radius);
+        }
       }
     }
   });
 
-  it("keeps every position, assembled and exploded, inside the viewBox", () => {
+  it("keeps every node, assembled and exploded, inside the viewBox", () => {
     for (const part of PARTS) {
+      const radius = hitRadius(part);
       for (const point of [part.assembled, part.exploded]) {
-        expect(inside(union(plateBox(point), labelBox(point))), part.slug).toBe(true);
+        expect(point.x - radius).toBeGreaterThanOrEqual(0);
+        expect(point.y - radius).toBeGreaterThanOrEqual(0);
+        expect(point.x + radius).toBeLessThanOrEqual(VIEWBOX.width);
+        expect(point.y + radius).toBeLessThanOrEqual(VIEWBOX.height);
       }
     }
   });
@@ -114,15 +129,5 @@ describe("ecosystem geometry", () => {
       expect(Object.isFrozen(part.exploded)).toBe(true);
     }
     for (const edge of EDGES) expect(Object.isFrozen(edge)).toBe(true);
-  });
-
-  it("separates parts vertically when exploded and keeps assembled parts stacked", () => {
-    const assembledSpan = PARTS.at(-1)!.assembled.y - PARTS[0]!.assembled.y;
-    const explodedSpan = PARTS.at(-1)!.exploded.y - PARTS[0]!.exploded.y;
-    expect(explodedSpan).toBeGreaterThan(assembledSpan * 1.5);
-    for (let i = 1; i < PARTS.length; i += 1) {
-      expect(PARTS[i]!.exploded.y).toBeGreaterThan(PARTS[i - 1]!.exploded.y);
-      expect(PARTS[i]!.assembled.y).toBeGreaterThan(PARTS[i - 1]!.assembled.y);
-    }
   });
 });

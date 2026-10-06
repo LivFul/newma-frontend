@@ -91,3 +91,12 @@ export const HOME_META = Object.freeze({
     ["C-50"],
   ),
 });
+
+export const OFFLINE = Object.freeze({
+  title: block("home.offline.title", "You are offline"),
+  body: block(
+    "home.offline.body",
+    "NEWMA cannot reach the network right now. Reconnect to continue, or return to the last page you visited.",
+    ["C-56"],
+  ),
+});

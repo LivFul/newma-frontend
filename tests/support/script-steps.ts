@@ -6,7 +6,7 @@ import type { Page } from "@playwright/test";
 import { EVIDENCE_LABEL_TEXT } from "../../src/lib/evidence";
 import { SERVER_DEFAULT_CHOICE } from "../../src/lib/demo/parse-config";
 import { PERSONA_LABELS, TOUR_ROUTE, banner, DEMO_BANNER_TEXT, switchPersona } from "./demo";
-import { focusedHref, gotoHeroReady, heroSvg, tabToFirstComponent } from "./hero";
+import { focusedHref, gotoHeroReady, heroFrame, heroSvg, tabToFirstComponent } from "./hero";
 import { expect } from "./test";
 import { SLOW_MS, type TourContext } from "./tour-context";
 import { STEP_RUNS } from "./tour-driver";
@@ -29,7 +29,7 @@ export async function homepage(page: Page): Promise<void> {
   await page.mouse.wheel(0, 1500);
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
   await page.evaluate(() => window.scrollTo(0, 0));
-  await heroSvg(page).hover();
+  await heroFrame(page).hover();
   await expect(heroSvg(page)).toHaveAttribute("data-view", "exploded");
   await page.mouse.move(2, 2);
   await expect(heroSvg(page)).toHaveAttribute("data-view", "assembled");

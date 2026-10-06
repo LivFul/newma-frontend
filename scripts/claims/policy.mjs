@@ -120,6 +120,8 @@ export const ALLOWED_TERMS = {
     "LivFul",
     "Aveloz",
     "NEWMA",
+    "People",
+    "MCP",
     "Vercel",
     "Railway",
     "RDKit",

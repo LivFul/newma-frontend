@@ -17,7 +17,7 @@ type WordmarkProps = {
 export function Wordmark({
   href = "/",
   label = WORDMARK.homeLabel.text,
-  imageClassName = "h-auto w-32 sm:h-10 sm:w-auto",
+  imageClassName = "h-auto w-28 max-w-[min(100%,9rem)] sm:h-10 sm:w-auto sm:max-w-none",
   priority = false,
   children,
 }: WordmarkProps) {
@@ -25,7 +25,7 @@ export function Wordmark({
     <Link
       href={href}
       aria-label={label}
-      className="inline-flex min-h-11 shrink-0 items-center gap-2"
+      className="inline-flex min-h-11 min-w-0 items-center gap-2"
     >
       <Image
         src="/brand/logo-horizontal.png"

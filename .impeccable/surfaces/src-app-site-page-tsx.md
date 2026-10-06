@@ -7,25 +7,20 @@ related_targets: ["src/app/(site)/ecosystem/[slug]/page.tsx", "src/app/(site)/la
 
 # Surface brief: NEWMA public site (homepage, ecosystem pages, legal)
 
-Mode: Persuade. Audience: investors, biopharma partners, communities/custodians, scientists (equal weight). Visitor should leave believing "nature to medicine, done right" — LivFul's farm-to-patient approach with rights, authentication, scientist gates and provenance attached. Action: enter the demo (/access) or open a component page. Copy is placeholder pending a separate copy pass; never add claims. Avoid: cold pharma corporate, generic SaaS/AI. Keep the ecosystem graphic (six stacked plates) and the 3D workflow scene as concepts.
+Mode: Persuade. Audience: investors, biopharma partners, communities/custodians, scientists (equal weight). Visitor should leave believing "nature to medicine, done right" — LivFul's farm-to-patient approach with rights, authentication, scientist gates and provenance attached. Action: enter the demo (/access) or open a component page. Copy is governed by the claim register; never add claims.
 
 ## Direction contract
 
-THESIS: The site is one surveyed field sheet. Farm to patient is drawn as a real route across terrain and every check on the way is a surveyed waypoint. It refuses the dark biotech hero with a glowing diagram, and the leafy wellness landing.
+THESIS: NEWMA is a LivFul ethnobotanical instrument. Greens fade into capsule teals. The leaf and the pill are the recurring glyphs. The public site is scientific and botanical, not a printed survey sheet.
 
-OWN-WORLD: Mint survey paper printed in spot inks only: ink-teal for type and linework, sage contours, apricot route fill edged in surveyor's sienna, field green for action, madder hatching for restricted or held. Geologica is set like map lettering (title block, tracked-caps place names); Martian Mono is for grid references and measurements only. Neatlines, corner and edge grid ticks, hatched parcels, numbered legend keys, square plates. No gradients, no glass, no rounded card shells. One deep ink-teal legend plate section breaks the paper rhythm.
+OWN-WORLD: Mint wash, leaf lime-to-emerald, capsule teal-to-cyan, ink-teal type, apricot as a rare warm band. Geologica for display and UI; Martian Mono for hashes and measured values. Glass panels, pill buttons, orbital nodes, aurora fields. Status is never hue alone.
 
-STORY: The visitor sees plant origin and patient destination in one view, reads the checks between them as waypoints, believes it is done right, then enters the demo or follows a legend key to a component.
+STORY: The visitor sees the six-component orbit, understands the farm-to-patient loop, then enters the demo or a component page.
 
-FIRST VIEWPORT: A full-bleed sheet inside a neatline with grid ticks.
+FIRST VIEWPORT: Full-bleed hero. Left 6/12 is the title, lede, CTAs and disclaimer. Right 6/12 is the orbital diagram in a glass panel over botanical photography.
 
-- Left 5/12 is the title block: sheet ref, headline at display scale, lede, then field-green "See the demo" with a secondary beside it, then the disclaimer as a mono map note.
-- Right 7/12 is contour terrain, with a hatched origin parcel at the bottom left and a patient marker at the top right.
-- The six ecosystem plates stand as translucent overprints at the centre, and the apricot route rises through them.
-- A scale bar and legend strip run along the bottom edge.
+SIGNATURE: Orbits drift slowly. Hover or focus explodes the orbit. Reduced motion shows the exploded view at rest.
 
-SIGNATURE: On load the route draws once, from field to patient. Focusing a plate or legend key isolates that layer, dims the rest and lights its route segment. Under reduced motion the route is shown complete.
-
-FORM: Field Survey Sheet, 5th of 7 on the ordered list, seed key 6be6aaa1.
+FORM: Ethnobotanical instrument. Staytec-like photography and peach bands. LivFul greens and blues.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
