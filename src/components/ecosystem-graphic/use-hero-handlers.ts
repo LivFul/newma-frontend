@@ -29,6 +29,10 @@ const canHover = (event: PointerEvent) => event.pointerType !== "touch";
 
 // A touch that travels further than this between pointerdown and pointerup is a swipe or scroll, not a tap.
 const TAP_SLOP_PX = 10;
+// A click belongs to a gesture only if it follows its last pointer event this closely. Past it the
+// one-shot flag below is stale (the gesture produced no click), so a later keyboard or assistive
+// technology click is never swallowed.
+const SWALLOW_WINDOW_MS = 400;
 
 type HeroSlug = ReturnType<typeof slugFrom>;
 
@@ -52,9 +56,21 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
   // layers, a second tap that navigated on pointerup, or a drag past the tap slop), so it must neither
   // follow its link nor record a second component_open.
   const swallowClick = useRef(false);
+  const swallowTimer = useRef<number | undefined>(undefined);
+  const clearSwallow = () => {
+    swallowClick.current = false;
+    window.clearTimeout(swallowTimer.current);
+  };
+  const armSwallow = () => {
+    clearSwallow();
+    swallowClick.current = true;
+    swallowTimer.current = window.setTimeout(() => {
+      swallowClick.current = false;
+    }, SWALLOW_WINDOW_MS);
+  };
   const resetGesture = () => {
     pendingTouch.current = null;
-    swallowClick.current = false;
+    clearSwallow();
   };
 
   const follow = (slug: NonNullable<HeroSlug>) => {
@@ -73,7 +89,7 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
     if (heroReducer(state, tap).effect.type === "preventNavigation") {
       // The first tap only explodes the layers.
       event.preventDefault();
-      swallowClick.current = true;
+      armSwallow();
       if (slug) announce(heroTouchAnnouncement(slug));
       dispatch(tap);
     }
@@ -83,18 +99,20 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
   // on pointerdown would also fire for a swipe that merely starts over a node.
   const onPointerUp = (event: PointerEvent) => {
     if (event.pointerType !== "touch") return;
+    // The click of a gesture that is already being swallowed follows this pointerup, not the pointerdown.
+    if (swallowClick.current) armSwallow();
     const pending = pendingTouch.current;
     pendingTouch.current = null;
     if (!pending || pending.view !== "exploded" || !pending.slug) return;
     if (Math.hypot(event.clientX - pending.x, event.clientY - pending.y) > TAP_SLOP_PX) {
       // A drag, not a tap, but the browser may still synthesize a click for it.
-      swallowClick.current = true;
+      armSwallow();
       return;
     }
     const tap: HeroEvent = { type: "tap", slug: pending.slug, touch: true, view: pending.view };
     if (heroReducer(state, tap).effect.type !== "navigate") return;
     dispatch(tap);
-    swallowClick.current = true;
+    armSwallow();
     follow(pending.slug);
   };
 

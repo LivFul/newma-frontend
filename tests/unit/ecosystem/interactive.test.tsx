@@ -14,6 +14,7 @@ import { expectNoAxeViolations } from "../ui/axe";
 // Tests that stub window.location must not leak the stub into later tests when an assertion fails.
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
 
 function mount(overrides: Partial<Parameters<typeof Interactive>[0]> = {}) {
@@ -320,6 +321,18 @@ describe("Interactive hero layer", () => {
     expect(fireEvent.click(links[1]!)).toBe(false);
     expect(svg).toHaveAttribute("data-view", "exploded");
     expect(assign).not.toHaveBeenCalled();
+  });
+
+  // Value: protects=a gesture that ended without a click cannot swallow a later keyboard or assistive-technology click; fails_when=the one-shot swallow flag stops expiring; why_new=a long press on the first tap left the flag armed until the next pointerdown, silently dropping the next link activation; seam=none
+  it("lets a later click through when the gesture ended without one", () => {
+    vi.useFakeTimers();
+    const { links } = mount();
+    fireEvent.pointerDown(links[1]!, { pointerType: "touch" });
+    fireEvent.pointerUp(links[1]!, { pointerType: "touch" });
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    expect(fireEvent.click(links[1]!)).toBe(true);
   });
 
   it("never intercepts mouse clicks", () => {
