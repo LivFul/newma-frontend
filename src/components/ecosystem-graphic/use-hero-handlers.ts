@@ -8,8 +8,9 @@ import {
   type MouseEvent,
   type PointerEvent,
 } from "react";
-import { trackEvent } from "@/lib/analytics/events";
+import { ecosystemHref } from "@/content/ecosystem/registry";
 import { heroTouchAnnouncement } from "@/content/home/hero-help";
+import { trackEvent } from "@/lib/analytics/events";
 import type { HeroView } from "./part-props";
 import { slugFrom } from "./slug-from";
 import { heroReducer, type HeroEvent, type HeroState } from "./state";
@@ -39,15 +40,54 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
   // (cancel, a later click with no pointerdown such as assistive technology or the keyboard) must
   // leave it empty, so a stale flag can never swallow a link activation.
   const pendingTouch = useRef<{ view: HeroView } | null>(null);
+  const absorbedTap = useRef(false);
   const clearPending = () => {
     pendingTouch.current = null;
   };
 
   const onPointerDown = (event: PointerEvent) => {
-    pendingTouch.current = event.pointerType === "touch" ? { view: state.view } : null;
+    // A leftover absorb flag from a click-less first tap must not swallow the next gesture.
+    absorbedTap.current = false;
+    if (event.pointerType !== "touch") {
+      pendingTouch.current = null;
+      return;
+    }
+    pendingTouch.current = { view: state.view };
+    const target = event.target as Element;
+    if (!target.closest?.("svg.eco-svg")) return;
+    const slug = slugFrom(event.target);
+    const tap: HeroEvent = { type: "tap", slug, touch: true, view: state.view };
+    if (heroReducer(state, tap).effect.type === "preventNavigation") {
+      event.preventDefault();
+      absorbedTap.current = true;
+      if (slug) announce(heroTouchAnnouncement(slug));
+      dispatch(tap);
+    }
+  };
+
+  const onPointerUp = (event: PointerEvent) => {
+    if (event.pointerType !== "touch") return;
+    const pending = pendingTouch.current;
+    if (!pending || pending.view !== "exploded") return;
+    const slug = slugFrom(event.target);
+    if (!slug) return;
+    const tap: HeroEvent = { type: "tap", slug, touch: true, view: pending.view };
+    if (heroReducer(state, tap).effect.type !== "navigate") return;
+    dispatch(tap);
+    trackEvent({ name: "component_open", slug });
+    const link = (event.target as Element).closest("a");
+    const href = link instanceof HTMLAnchorElement ? link.href : ecosystemHref(slug);
+    window.location.assign(href);
+    clearPending();
   };
 
   const onLinkClick = (event: MouseEvent) => {
+    if (absorbedTap.current) {
+      absorbedTap.current = false;
+      event.preventDefault();
+      clearPending();
+      return;
+    }
     const pending = pendingTouch.current;
     clearPending();
     const slug = slugFrom(event.target);
@@ -92,7 +132,11 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
 
   return {
     onPointerDown,
-    onPointerCancel: clearPending,
+    onPointerUp,
+    onPointerCancel: () => {
+      absorbedTap.current = false;
+      pendingTouch.current = null;
+    },
     onFrameClick: clearPending,
     onLinkClick,
     onKeyDown,

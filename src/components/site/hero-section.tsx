@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { LeafIcon } from "@/components/brand/leaf-icon";
 import { PillIcon } from "@/components/brand/pill-icon";
 import { Button } from "@/components/ui/button";
@@ -12,17 +11,13 @@ export function HeroSection() {
       <div className="aurora botanical-lines absolute inset-0 -z-10" aria-hidden="true" />
       {/* Decorative photography sits under the aurora so type stays the LCP node. */}
       <div
-        className="pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-[48%] overflow-hidden lg:block"
+        className="pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-[48%] bg-cover bg-center opacity-40 lg:block"
+        style={{
+          backgroundImage:
+            'image-set(url("/images/hero-botanical.webp") type("image/webp"), url("/images/hero-botanical.jpg") type("image/jpeg"))',
+        }}
         aria-hidden="true"
-      >
-        <Image
-          src="/images/hero-botanical.jpg"
-          alt=""
-          fill
-          sizes="48vw"
-          className="object-cover opacity-40"
-        />
-      </div>
+      />
       <div className="grid lg:grid-cols-12">
         <div className="flex flex-col justify-center gap-7 px-5 pt-12 pb-8 md:px-12 md:py-20 lg:col-span-6">
           <h1

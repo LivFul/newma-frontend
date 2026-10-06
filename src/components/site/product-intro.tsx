@@ -25,11 +25,21 @@ export function ProductIntro() {
             </h2>
             <p className={`${STATEMENT} max-w-[30ch]`}>{PRODUCT.what.text}</p>
           </div>
-          <div className="space-y-4 rounded-xl border border-border/80 bg-bg-elevated p-6 shadow-sm lg:col-span-5 lg:mt-3">
-            <h3 className={H3_TITLE}>{PRODUCT.problemHeading.text}</h3>
-            <p className="max-w-[48ch] text-lg leading-relaxed text-fg-muted">
-              {PRODUCT.problem.text}
-            </p>
+          <div className="relative overflow-hidden rounded-xl border border-border/80 bg-bg-elevated p-6 shadow-sm lg:col-span-5 lg:mt-3">
+            <div
+              className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-cover bg-center opacity-30"
+              style={{
+                backgroundImage:
+                  'image-set(url("/images/lab-glassware.webp") type("image/webp"), url("/images/lab-glassware.jpg") type("image/jpeg"))',
+              }}
+              aria-hidden="true"
+            />
+            <div className="relative space-y-4">
+              <h3 className={H3_TITLE}>{PRODUCT.problemHeading.text}</h3>
+              <p className="max-w-[48ch] text-lg leading-relaxed text-fg-muted">
+                {PRODUCT.problem.text}
+              </p>
+            </div>
           </div>
         </div>
 

@@ -58,6 +58,7 @@ export default function Interactive({
           data-hero-chunk={HERO_CHUNK_MARKER}
           onKeyDown={handlers.onKeyDown}
           onPointerDown={handlers.onPointerDown}
+          onPointerUp={handlers.onPointerUp}
           onPointerCancel={handlers.onPointerCancel}
           onClick={handlers.onFrameClick}
         >
@@ -81,7 +82,7 @@ export default function Interactive({
               type="button"
               variant="secondary"
               size="sm"
-              className={TOGGLE_CLASS}
+              className={`${TOGGLE_CLASS} relative z-10`}
               aria-pressed={state.pinned || state.touchOpen}
               aria-controls={HERO_SVG_ID}
               onClick={() => dispatch({ type: "toggle" })}

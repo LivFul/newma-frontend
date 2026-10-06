@@ -216,6 +216,20 @@ describe("Interactive hero layer", () => {
     expect(tap()).toBe(true); // second tap follows the link
   });
 
+  it("navigates on touch pointerup when the layers are already exploded", () => {
+    const assign = vi.fn();
+    vi.stubGlobal("location", { ...window.location, assign });
+    const { links, svg } = mount();
+    fireEvent.pointerDown(links[5]!, { pointerType: "touch" });
+    fireEvent.click(links[5]!);
+    expect(svg).toHaveAttribute("data-view", "exploded");
+    fireEvent.pointerDown(links[5]!, { pointerType: "touch" });
+    fireEvent.pointerUp(links[5]!, { pointerType: "touch" });
+    expect(assign).toHaveBeenCalled();
+    expect(String(assign.mock.calls[0]?.[0])).toMatch(/\/ecosystem\/provenance-dlt$/);
+    vi.unstubAllGlobals();
+  });
+
   it("never intercepts mouse clicks", () => {
     const { links } = mount();
     fireEvent.pointerDown(links[0]!, { pointerType: "mouse" });

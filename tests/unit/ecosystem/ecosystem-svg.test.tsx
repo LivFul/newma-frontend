@@ -25,12 +25,13 @@ describe("EcosystemSvg", () => {
   it("starts every accessible name with the visible label (WCAG 2.5.3)", () => {
     const { container } = renderSvg();
     for (const slug of ECOSYSTEM_SLUGS) {
-      const link = container.querySelector(`g[data-slug="${slug}"] > a`)!;
+      const group = container.querySelector(`g[data-slug="${slug}"]`)!;
+      const link = group.querySelector("a")!;
       const label = link.getAttribute("aria-label")!;
       const { title, descriptor } = HERO_LABELS[slug];
       expect(label.startsWith(title)).toBe(true);
       expect(label).toBe(`${title}. ${descriptor}. Opens the ${title} page.`);
-      expect(link.textContent).toContain(title);
+      expect(group.textContent).toContain(title);
     }
   });
 

@@ -39,7 +39,7 @@ export type Edge = Readonly<{
   d: string;
 }>;
 
-export const VIEWBOX = Object.freeze({ width: 400, height: 420 });
+export const VIEWBOX = Object.freeze({ width: 400, height: 500 });
 export const PLATE = Object.freeze({ halfWidth: 28, halfHeight: 28, thickness: 0 });
 export const NODE_RADIUS = 28;
 export const LABEL_FONT = Object.freeze({ title: 18, descriptor: 16 });
@@ -53,8 +53,8 @@ export const LABEL_BOX = Object.freeze({
 });
 export const LEADER = Object.freeze({ fromX: 0, toX: 0 });
 export const RAIL_X = 18;
-export const CENTER = Object.freeze({ x: 200, y: 210 });
-export const RING = Object.freeze({ assembled: 48, exploded: 100, inner: 48, outer: 100 });
+export const CENTER = Object.freeze({ x: 200, y: 230 });
+export const RING = Object.freeze({ assembled: 70, exploded: 128, inner: 70, outer: 128 });
 
 const TONES: Readonly<Record<EcosystemSlug, ToneToken>> = {
   interface: "--color-accent",
@@ -87,12 +87,12 @@ const polar = (radius: number, deg: number): Point => {
 };
 
 const LABELS: Readonly<Record<EcosystemSlug, PartGeometry["label"]>> = {
-  interface: Object.freeze({ x: 0, y: -48, anchor: "middle" }),
-  "agentic-compute": Object.freeze({ x: 0, y: -46, anchor: "middle" }),
-  "scientific-review": Object.freeze({ x: 8, y: 4, anchor: "start" }),
-  "wet-lab": Object.freeze({ x: 12, y: 40, anchor: "start" }),
-  "data-knowledge": Object.freeze({ x: -12, y: 40, anchor: "end" }),
-  "provenance-dlt": Object.freeze({ x: 0, y: 46, anchor: "middle" }),
+  interface: Object.freeze({ x: 0, y: -46, anchor: "middle" }),
+  "agentic-compute": Object.freeze({ x: 0, y: 42, anchor: "middle" }),
+  "scientific-review": Object.freeze({ x: 0, y: 42, anchor: "middle" }),
+  "wet-lab": Object.freeze({ x: 0, y: 42, anchor: "middle" }),
+  "data-knowledge": Object.freeze({ x: 0, y: 42, anchor: "middle" }),
+  "provenance-dlt": Object.freeze({ x: 0, y: 42, anchor: "middle" }),
 };
 
 const ORBIT_ANGLES = Object.freeze([-90, -30, 30, 150, 90]);

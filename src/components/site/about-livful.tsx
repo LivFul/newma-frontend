@@ -23,6 +23,14 @@ export function AboutLivful() {
         <h2 id="about-heading" className={H2}>
           {ABOUT.heading.text}
         </h2>
+        <div
+          className="h-40 rounded-xl bg-cover bg-center opacity-80 shadow-sm md:h-52"
+          style={{
+            backgroundImage:
+              'image-set(url("/images/field-plants.webp") type("image/webp"), url("/images/field-plants.jpg") type("image/jpeg"))',
+          }}
+          aria-hidden="true"
+        />
         <div className="grid gap-x-16 gap-y-12 md:grid-cols-2">
           <div className="space-y-5 rounded-xl bg-bg-elevated/80 p-6 shadow-sm">
             <h3 className={H2_SUB}>{MISSION_HEADING.text}</h3>

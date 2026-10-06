@@ -45,40 +45,44 @@ export function toneStyle(part: PartGeometry): CSSProperties {
 function PartBody({ part }: { part: PartGeometry }) {
   const label = HERO_LABELS[part.slug];
   return (
-    <a
-      className="eco-link"
-      href={ecosystemHref(part.slug)}
-      aria-label={heroAriaLabel(part.slug)}
-      style={toneStyle(part)}
-    >
-      <rect className="eco-hit" {...HIT} rx={NODE_RADIUS + 8} />
-      <circle
-        className="eco-node"
-        r={part.center ? NODE_RADIUS + 6 : NODE_RADIUS}
-        data-dashed={part.dashed || undefined}
-        data-center={part.center || undefined}
-      />
-      <Glyph glyph={part.glyph} />
-      <text
-        className="eco-title"
-        data-center={part.center || undefined}
-        x={part.label.x}
-        y={part.label.y}
-        textAnchor={part.label.anchor}
-        fontSize={LABEL_FONT.title}
+    <>
+      <a
+        className="eco-link"
+        href={ecosystemHref(part.slug)}
+        aria-label={heroAriaLabel(part.slug)}
+        style={toneStyle(part)}
       >
-        {label.title}
-      </text>
-      <text
-        className="eco-desc"
-        x={part.label.x}
-        y={part.label.y + LABEL_FONT.descriptor}
-        textAnchor={part.label.anchor}
-        fontSize={LABEL_FONT.descriptor}
-      >
-        {label.descriptor}
-      </text>
-    </a>
+        <rect className="eco-hit" {...HIT} rx={NODE_RADIUS + 8} />
+        <circle
+          className="eco-node"
+          r={part.center ? NODE_RADIUS + 6 : NODE_RADIUS}
+          data-dashed={part.dashed || undefined}
+          data-center={part.center || undefined}
+        />
+        <Glyph glyph={part.glyph} />
+      </a>
+      <g aria-hidden="true">
+        <text
+          className="eco-title"
+          data-center={part.center || undefined}
+          x={part.label.x}
+          y={part.label.y}
+          textAnchor={part.label.anchor}
+          fontSize={LABEL_FONT.title}
+        >
+          {label.title}
+        </text>
+        <text
+          className="eco-desc"
+          x={part.label.x}
+          y={part.label.y + LABEL_FONT.descriptor}
+          textAnchor={part.label.anchor}
+          fontSize={LABEL_FONT.descriptor}
+        >
+          {label.descriptor}
+        </text>
+      </g>
+    </>
   );
 }
 

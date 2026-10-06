@@ -4,7 +4,7 @@
   margin: 0;
 }
 .eco-frame {
-  aspect-ratio: 400 / 420;
+  aspect-ratio: 400 / 500;
   width: 100%;
   max-width: 34rem;
   margin-inline: auto;
@@ -15,6 +15,11 @@
   width: 100%;
   height: auto;
   overflow: visible;
+  pointer-events: none;
+}
+.eco-link,
+.eco-hit {
+  pointer-events: auto;
 }
 .eco-part {
   transform-box: fill-box;
@@ -70,6 +75,10 @@
   fill: var(--eco-ink);
   stroke: none;
 }
+.eco-title,
+.eco-desc {
+  pointer-events: none;
+}
 .eco-title {
   fill: var(--color-fg);
   font-family: var(--font-display);
@@ -105,7 +114,7 @@
   stroke: color-mix(in srgb, var(--color-capsule) 45%, transparent);
   stroke-width: 1px;
   stroke-dasharray: 3 8;
-  transform-origin: 200px 210px;
+  transform-origin: 200px 230px;
   transform-box: fill-box;
 }
 .eco-orbit-outer {
@@ -207,6 +216,12 @@
 
 .eco-fallback {
   display: none;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.eco-fallback a,
+.eco-fallback li {
+  overflow-wrap: anywhere;
 }
 @media (max-width: 22.5rem) {
   .eco-fallback {

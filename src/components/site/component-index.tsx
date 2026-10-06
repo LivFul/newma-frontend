@@ -23,14 +23,14 @@ export function ComponentIndex() {
             {COMPONENTS_INDEX.intro.text}
           </p>
         </div>
-        <ul role="list" className="grid gap-4 [counter-reset:key] md:grid-cols-2 lg:grid-cols-3">
+        <ul role="list" className="grid min-w-0 gap-4 [counter-reset:key] md:grid-cols-2 lg:grid-cols-3">
           {ECOSYSTEM_SLUGS.map((slug, index) => (
             <li key={slug} className="relative [counter-increment:key]">
               <ComponentLink
                 slug={slug}
-                className="group grid min-h-11 gap-2 rounded-xl border border-plate-border/50 bg-plate-elevated/50 p-6 transition-[transform,background-color] hover:-translate-y-0.5 hover:bg-plate-fg/[0.08] focus-visible:bg-plate-fg/[0.08]"
+                className="group grid min-h-11 min-w-0 gap-2 overflow-hidden rounded-xl border border-plate-border/50 bg-plate-elevated/50 p-6 transition-[transform,background-color] hover:-translate-y-0.5 hover:bg-plate-fg/[0.08] focus-visible:bg-plate-fg/[0.08]"
               >
-                <span className="flex items-center gap-3 text-2xl font-medium tracking-[-0.015em]">
+                <span className="flex min-w-0 flex-wrap items-center gap-3 text-2xl font-medium tracking-[-0.015em] [overflow-wrap:anywhere]">
                   {index % 2 === 0 ? (
                     <LeafIcon className="h-7 w-auto" />
                   ) : (

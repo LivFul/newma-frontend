@@ -22,7 +22,7 @@ export function SiteHeader() {
     >
       <div className="flex min-h-[var(--size-header)] w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 px-5 py-1 md:px-12">
         <Wordmark priority />
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 sm:gap-4">
           <nav aria-label={HEADER_NAV_LABEL.text} className="hidden items-center gap-8 md:flex">
             {NAV_LINKS.map((link) => (
               <a
