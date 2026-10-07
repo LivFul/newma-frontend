@@ -32,7 +32,7 @@ describe("toneStyle", () => {
     },
   );
 
-  it("maps the light warning and success fills to their darker ink variants", () => {
+  it("maps the light warning, success and compute fills to their darker ink variants", () => {
     const byTone = (tone: string) => PARTS.find((part) => part.tone === tone)!;
     expect(
       tokenOf((toneStyle(byTone("--color-warning")) as Record<string, unknown>)["--eco-stroke"]),
@@ -40,5 +40,10 @@ describe("toneStyle", () => {
     expect(
       tokenOf((toneStyle(byTone("--color-success")) as Record<string, unknown>)["--eco-stroke"]),
     ).toBe("--color-success-ink");
+    expect(
+      tokenOf(
+        (toneStyle(byTone("--color-eco-compute")) as Record<string, unknown>)["--eco-stroke"],
+      ),
+    ).toBe("--color-eco-compute-ink");
   });
 });

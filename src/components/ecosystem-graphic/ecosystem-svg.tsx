@@ -33,6 +33,7 @@ const PLATE_SIDE =
   `V${PLATE.thickness}L0 ${PLATE.halfHeight + PLATE.thickness}L${-PLATE.halfWidth} ${PLATE.thickness}Z`;
 
 const STROKE_INK: Partial<Record<PartGeometry["tone"], string>> = {
+  "--color-eco-compute": "--color-eco-compute-ink",
   "--color-warning": "--color-warning-ink",
   "--color-success": "--color-success-ink",
   "--color-border-strong": "--color-fg-muted",

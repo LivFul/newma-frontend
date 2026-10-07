@@ -23,16 +23,14 @@ export const SCENE_COLORS = Object.freeze({
   success: 0x8dbab3,
   /** --color-plate-danger */
   danger: 0xf08e7c,
-  /** --color-plate-compute */
-  compute: 0xe0a36c,
-  /** --color-plate-learn */
-  learn: 0xb69cff,
+  /** --color-plate-compute (Agentic Compute and workflow learning loop) */
+  compute: 0xb69cff,
 });
 
 export const LANE_COLORS: Readonly<Record<LaneId, number>> = Object.freeze({
   governance: SCENE_COLORS.warning,
   execution: SCENE_COLORS.success,
-  learning: SCENE_COLORS.learn,
+  learning: SCENE_COLORS.compute,
   confirmation: SCENE_COLORS.accent,
   outcome: SCENE_COLORS.textMuted,
 });
@@ -41,7 +39,7 @@ export const TONE_COLORS: Readonly<Record<EdgeTone, number>> = Object.freeze({
   pass: SCENE_COLORS.accent,
   remediate: SCENE_COLORS.warning,
   fail: SCENE_COLORS.danger,
-  learn: SCENE_COLORS.learn,
+  learn: SCENE_COLORS.compute,
 });
 
 export const cssHex = (hex: number): string => `#${hex.toString(16).padStart(6, "0")}`;

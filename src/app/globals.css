@@ -226,6 +226,7 @@ main[tabindex="-1"]:focus-visible {
     --color-warning-ink: var(--color-plate-warning);
     --color-success-ink: var(--color-plate-success);
     --color-eco-compute: var(--color-plate-compute);
+    --color-eco-compute-ink: var(--color-plate-compute);
     --color-eco-optional: var(--color-plate-optional);
     --color-contour: var(--color-plate-contour);
     --color-route-edge: var(--color-plate-route-edge);

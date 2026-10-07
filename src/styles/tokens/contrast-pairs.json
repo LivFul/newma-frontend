@@ -70,12 +70,12 @@
     "min": 3
   },
   {
-    "fg": "--color-eco-compute",
+    "fg": "--color-eco-compute-ink",
     "bg": "--color-bg",
     "min": 4.5
   },
   {
-    "fg": "--color-eco-compute",
+    "fg": "--color-eco-compute-ink",
     "bg": "--color-bg-elevated",
     "min": 4.5
   },
@@ -215,11 +215,6 @@
     "min": 4.5
   },
   {
-    "fg": "--color-plate-learn",
-    "bg": "--color-plate-elevated",
-    "min": 4.5
-  },
-  {
     "fg": "--color-plate-optional",
     "bg": "--color-plate-elevated",
     "min": 4.5
@@ -271,11 +266,6 @@
   },
   {
     "fg": "--color-plate-compute",
-    "bg": "--color-plate",
-    "min": 4.5
-  },
-  {
-    "fg": "--color-plate-learn",
     "bg": "--color-plate",
     "min": 4.5
   },

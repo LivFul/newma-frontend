@@ -1,7 +1,8 @@
 /* Homepage and ecosystem-hero tokens. Hue is never the only carrier: glyph shape, label text and
    stroke pattern say the same thing. */
 @theme {
-  --color-eco-compute: #9a5230; /* Agentic Compute, deepened for text contrast */
+  --color-eco-compute: #b69cff; /* Agentic Compute (violet, aligned with the workflow learning loop) */
+  --color-eco-compute-ink: #553d99; /* Agentic Compute strokes on survey paper */
   --color-eco-optional: #a8442a; /* Provenance & DLT, always paired with a dashed stroke */
   --font-display: var(--font-geologica), ui-sans-serif, system-ui, sans-serif;
   --text-display: clamp(2.5rem, 1.4rem + 3.6vw, 4.75rem);

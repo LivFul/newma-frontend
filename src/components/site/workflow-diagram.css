@@ -55,7 +55,7 @@
   stroke-dasharray: 2 4;
 }
 .wf-edge[data-tone="learn"] {
-  stroke: var(--color-plate-learn);
+  stroke: var(--color-plate-compute);
   stroke-dasharray: 12 3 2 3;
 }
 .wf-arrow[data-tone="pass"] {
@@ -68,7 +68,7 @@
   fill: var(--color-danger);
 }
 .wf-arrow[data-tone="learn"] {
-  fill: var(--color-plate-learn);
+  fill: var(--color-plate-compute);
 }
 
 .wf-node {
@@ -86,7 +86,7 @@
   --wf-stroke: var(--color-success-ink);
 }
 .wf-node[data-lane="learning"] {
-  --wf-tone: var(--color-plate-learn);
+  --wf-tone: var(--color-plate-compute);
 }
 .wf-node[data-lane="confirmation"] {
   --wf-tone: var(--color-accent);

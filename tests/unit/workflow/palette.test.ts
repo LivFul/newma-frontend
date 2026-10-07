@@ -28,7 +28,6 @@ describe("scene palette", () => {
     expect(SCENE_COLORS.success).toBe(token("plate-success"));
     expect(SCENE_COLORS.danger).toBe(token("plate-danger"));
     expect(SCENE_COLORS.compute).toBe(token("plate-compute"));
-    expect(SCENE_COLORS.learn).toBe(token("plate-learn"));
   });
 
   it("colours every lane and every transition kind in use", () => {
