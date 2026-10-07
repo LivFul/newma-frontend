@@ -9,7 +9,10 @@ const PAGE_MARGIN_PX = 1;
 
 async function scrollToFraction(page: Page, fraction: number): Promise<void> {
   await page.evaluate((p) => {
-    window.scrollTo(0, (document.documentElement.scrollHeight - window.innerHeight) * p);
+    window.scrollTo({
+      top: (document.documentElement.scrollHeight - window.innerHeight) * p,
+      behavior: "instant",
+    });
   }, fraction);
   // Let the scroll position settle before measuring.
   await page.waitForFunction(

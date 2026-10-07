@@ -87,14 +87,10 @@ describe("home page composition", () => {
     );
   });
 
-  it(
-    "is axe clean",
-    async () => {
-      const { container } = renderHome();
-      await expectNoAxeViolations(container);
-    },
-    60_000,
-  );
+  it("is axe clean", async () => {
+    const { container } = renderHome();
+    await expectNoAxeViolations(container);
+  }, 60_000);
 });
 
 describe("HeroSection", () => {
@@ -133,6 +129,18 @@ describe("ComponentIndex", () => {
       expect(links[i]).toHaveTextContent(ECOSYSTEM[slug].title);
     });
   });
+
+  // Value: protects=ecosystem cards stagger in and do not translate on hover; fails_when=ComponentIndex drops hover-lift or reveal-child; why_new=motion-utilities checks the utility definition, not the cards; seam=none
+  it("staggers the six ecosystem cards and lifts them without a hover translate", () => {
+    render(<ComponentIndex />);
+    const list = screen.getByRole("list", { name: COMPONENTS_INDEX.listLabel.text });
+    const cards = within(list).getAllByRole("listitem");
+    expect(cards).toHaveLength(6);
+    for (const card of cards) {
+      expect(card.className).toMatch(/\breveal-child\b/);
+      expect(within(card).getByRole("link").className).toMatch(/\bhover-lift\b/);
+    }
+  });
 });
 
 describe("ComponentLink", () => {
@@ -157,6 +165,14 @@ describe("PersonaGrid", () => {
     expect(
       screen.getByText("Knowledge holders and authorized community representatives"),
     ).toBeInTheDocument();
+  });
+
+  // Value: protects=persona cards join the section reveal stagger; fails_when=PersonaGrid drops reveal-child; why_new=the product test only counts steps inside the ol; seam=none
+  it("gives each of the five persona cards the reveal stagger", () => {
+    render(<PersonaGrid />);
+    const items = screen.getAllByRole("listitem");
+    expect(items).toHaveLength(5);
+    for (const item of items) expect(item.className).toMatch(/\breveal-child\b/);
   });
 });
 
