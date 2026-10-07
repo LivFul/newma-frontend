@@ -305,13 +305,14 @@ main[tabindex="-1"]:focus-visible {
     scale: 0.96;
   }
 
-  /* Hero stage. The photo fades out toward its left and bottom edges so it reads as light behind the
-     diagram, not a second panel. The stage is a scrim between photo and diagram: no edge, no card, no
-     blur, so nothing is re-rendered while the page moves. It is densest under the caption and hint,
-     which are the only small text on it, and lightest at the top where only the photo shows through.
-     --hero-scrim-text is that dense end; tests/unit/site/hero-stage.test.ts proves AA from it over a
-     black photo pixel, so the check does not depend on the viewport width. Both layers are decorative. */
-  .hero-photo {
+  /* Hero stage. Two decorative layers, no card, no blur, so nothing is re-rendered while the page moves.
+     The wash takes the photo's exact box and mask, so it is flush with the hero's top, right and bottom
+     and can never drift from the photo; it only lifts the forest toward the page colour. The caption
+     scrim is anchored to the figure's own bottom, where the only small text is, and is the dense one:
+     --hero-scrim-text is its alpha, and tests/unit/site/hero-stage.test.ts proves AA for the muted
+     caption text from it over a black photo pixel, so the check does not depend on viewport width. */
+  .hero-photo,
+  .hero-stage {
     -webkit-mask-image:
       linear-gradient(to right, transparent 0%, var(--color-fg) 38%),
       linear-gradient(to bottom, var(--color-fg) 72%, transparent 100%);
@@ -322,43 +323,43 @@ main[tabindex="-1"]:focus-visible {
     mask-composite: intersect;
   }
   .hero-stage {
+    background-color: color-mix(in srgb, var(--color-bg-elevated) 44%, transparent);
+  }
+  .hero-caption-scrim {
     --hero-scrim-text: 86%;
-    --hero-scrim-mid: 60%;
-    --hero-scrim-top: 38%;
-    background-image: linear-gradient(
-      to top,
-      color-mix(in srgb, var(--color-bg-elevated) var(--hero-scrim-text), transparent) 18rem,
-      color-mix(in srgb, var(--color-bg-elevated) var(--hero-scrim-mid), transparent) 31rem,
-      color-mix(in srgb, var(--color-bg-elevated) var(--hero-scrim-top), transparent) 100%
+    background-color: color-mix(
+      in srgb,
+      var(--color-bg-elevated) var(--hero-scrim-text),
+      transparent
     );
     -webkit-mask-image:
       linear-gradient(
         to right,
         transparent 0,
-        var(--color-fg) 4.5rem,
-        var(--color-fg) calc(100% - 4.5rem),
+        var(--color-fg) 5rem,
+        var(--color-fg) calc(100% - 5rem),
         transparent 100%
       ),
       linear-gradient(
         to bottom,
         transparent 0,
-        var(--color-fg) 5rem,
-        var(--color-fg) calc(100% - 5rem),
+        var(--color-fg) 6rem,
+        var(--color-fg) calc(100% - 4.5rem),
         transparent 100%
       );
     mask-image:
       linear-gradient(
         to right,
         transparent 0,
-        var(--color-fg) 4.5rem,
-        var(--color-fg) calc(100% - 4.5rem),
+        var(--color-fg) 5rem,
+        var(--color-fg) calc(100% - 5rem),
         transparent 100%
       ),
       linear-gradient(
         to bottom,
         transparent 0,
-        var(--color-fg) 5rem,
-        var(--color-fg) calc(100% - 5rem),
+        var(--color-fg) 6rem,
+        var(--color-fg) calc(100% - 4.5rem),
         transparent 100%
       );
     -webkit-mask-composite: source-in;

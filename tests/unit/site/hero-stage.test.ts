@@ -51,11 +51,39 @@ describe("hero stage scrim", () => {
     );
   });
 
-  // Value: protects=the stage stays a feathered scrim with no card chrome and no per-frame blur; fails_when=backdrop-filter, a border, or a shadow returns to .hero-stage; why_new=the first version boxed the diagram and re-blurred a large area while the photo animated; seam=none
-  it("is a borderless scrim with no backdrop filter", () => {
-    const stage = blockAfter(globals, ".hero-stage {");
-    expect(stage).not.toMatch(/backdrop-filter|border\s*:|box-shadow/);
-    expect(globals).not.toMatch(/\.hero-stage[^{]*\{[^}]*backdrop-filter/);
+  // Value: protects=the stage layers stay borderless scrims with no card chrome and no per-frame blur; fails_when=backdrop-filter, a border, or a shadow returns to either layer; why_new=the first version boxed the diagram and re-blurred a large area while the photo animated; seam=none
+  it("keeps both layers borderless with no backdrop filter", () => {
+    for (const marker of [".hero-stage {", ".hero-caption-scrim {"]) {
+      expect(blockAfter(globals, marker), marker).not.toMatch(
+        /backdrop-filter|border\s*:|box-shadow/,
+      );
+    }
+    expect(globals).not.toMatch(/\.hero-(stage|caption-scrim)[^{]*\{[^}]*backdrop-filter/);
+  });
+
+  // Value: protects=the caption text starts inside the scrim's dense core, not in its side feather, so the proved alpha is the alpha the text actually sits on; fails_when=the scrim is inset less than its horizontal feather is wide; why_new=at 1024px the caption starts 48px inside the figure while the feather was 80px wide, so part of the text sat on a partly faded scrim and contrast fell from 5.3:1 to 4.8:1; seam=none
+  it("insets the caption scrim at least as far as its horizontal feather", () => {
+    const inset = Number(/hero-caption-scrim[^"]*-inset-x-(\d+)/.exec(heroSource)?.[1]) * 4;
+    const mask = blockAfter(globals, ".hero-caption-scrim {");
+    const feather =
+      Number(/to right,\s*transparent 0,\s*var\(--color-fg\) ([\d.]+)rem/.exec(mask)?.[1]) * 16;
+    expect(inset).toBeGreaterThan(0);
+    expect(feather).toBeGreaterThan(0);
+    expect(inset).toBeGreaterThanOrEqual(feather);
+  });
+
+  // Value: protects=the wash covers exactly the photo's box, so it is flush with the hero's top, right and bottom and never leaves a gap under the header; fails_when=the stage is sized or offset on its own again; why_new=an offset box bled 56px above the hero and 24px past the viewport, and floated away from the photo whenever the hero was taller than its content; seam=none
+  it("shares the photo's box and mask instead of being positioned on its own", () => {
+    const photo = /className="([^"]*hero-photo[^"]*)"/.exec(heroSource)?.[1] ?? "";
+    const stage = /className="([^"]*hero-stage[^"]*)"/.exec(heroSource)?.[1] ?? "";
+    const box = (classes: string) =>
+      classes
+        .split(/\s+/)
+        .filter((c) => /^(absolute|inset-y-0|right-0|w-\[48%\]|hidden|lg:block|-z-10)$/.test(c))
+        .sort();
+    expect(box(stage)).toEqual(box(photo));
+    expect(stage).not.toMatch(/-inset|inset-x|inset-0/);
+    expect(globals).toMatch(/\.hero-photo,\s*\.hero-stage\s*\{[^}]*mask-image/);
   });
 
   it("does not animate the photo behind the stage", () => {

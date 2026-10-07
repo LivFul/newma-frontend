@@ -16,6 +16,10 @@ export function HeroSection() {
         }}
         aria-hidden="true"
       />
+      <div
+        className="hero-stage pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-[48%] lg:block"
+        aria-hidden="true"
+      />
       <div className="grid min-h-[calc(100dvh-var(--size-header))] items-center lg:grid-cols-12">
         <div className="flex flex-col justify-center gap-10 px-5 py-16 md:px-12 md:py-20 lg:col-span-6">
           <h1
@@ -49,12 +53,14 @@ export function HeroSection() {
           </div>
         </div>
         <div className="relative px-5 py-8 md:px-12 lg:col-span-6">
-          <div
-            className="hero-stage absolute -inset-x-6 -inset-y-14 hidden lg:block"
-            aria-hidden="true"
-          />
           <div className="relative">
-            <EcosystemGraphic />
+            <div
+              className="hero-caption-scrim absolute -inset-x-20 -bottom-24 hidden h-96 lg:block"
+              aria-hidden="true"
+            />
+            <div className="relative">
+              <EcosystemGraphic />
+            </div>
           </div>
         </div>
       </div>
