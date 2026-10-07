@@ -40,7 +40,7 @@ describe("home metadata", () => {
   it("has a title of at most 60 characters and a 120 to 160 character description", async () => {
     const { metadata } = await import("@/app/(site)/page");
     const title = String(metadata.title);
-    expect(title).toBe("NEWMA — evidence-led discovery from authorized knowledge");
+    expect(title).toBe("NEWMA | Ethnobotanical Drug Discovery by LivFul");
     expect(title.length).toBeLessThanOrEqual(MAX_TITLE);
     const description = String(metadata.description);
     expect(description.length).toBeGreaterThanOrEqual(MIN);

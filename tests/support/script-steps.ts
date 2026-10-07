@@ -22,7 +22,7 @@ const TAKEN_BACK = "This agreement has been taken back.";
 /** Demo speed for the automated walk (the presenter keeps the server default of 4x). */
 export const SCRIPT_SPEED = "8";
 
-/** Step 1: scroll, hover the hero, Tab and Enter into Wet Lab, follow "See it in the demo". */
+/** Step 1: scroll, hover the hero, Tab and Enter into Wet Lab, follow "Explore the demo". */
 export async function homepage(page: Page): Promise<void> {
   await gotoHeroReady(page);
   await page.mouse.move(400, 300);
@@ -39,7 +39,7 @@ export async function homepage(page: Page): Promise<void> {
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/ecosystem\/wet-lab$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Wet Lab");
-  await page.getByRole("link", { name: "See it in the demo" }).click();
+  await page.getByRole("link", { name: "Explore the demo" }).first().click();
   await expect(page).toHaveURL(/\/access$/);
   await page.getByRole("button", { name: PERSONA_LABELS.community_liaison }).click();
   await page.waitForURL("**/demo");

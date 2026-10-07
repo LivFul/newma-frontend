@@ -27,7 +27,7 @@ for (const slug of SLUGS) {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(TITLES[slug]);
     await expect(page.getByRole("heading", { level: 2, name: "Sources" })).toBeVisible();
     expect(await page.locator("#sources-heading + ol > li").count()).toBeGreaterThanOrEqual(1);
-    const demo = page.getByRole("link", { name: "See it in the demo" });
+    const demo = page.getByRole("link", { name: "Explore the demo" });
     await expect(demo).toHaveAttribute("href", "/access");
     await expect(page.locator("#demo-heading").locator("..")).toContainText(DEMO_ROUTES[slug]);
   });

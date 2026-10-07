@@ -70,7 +70,7 @@ describe("ecosystem registry", () => {
     expect(text).toContain("optional");
     expect(text).toContain("off-chain");
     expect(entry.callout?.text).toBe(
-      "This component is optional. Records stay off-chain. In the demo it is labelled Optional, simulated.",
+      "Digital verification supports record review; it does not independently establish consent, material identity or scientific validity.",
     );
   });
 

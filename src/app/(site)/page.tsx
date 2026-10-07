@@ -1,4 +1,5 @@
-import { AboutLivful } from "@/components/site/about-livful";
+import { AboutNewma } from "@/components/site/about-newma";
+import { ClosingSection } from "@/components/site/closing-section";
 import { ComponentIndex } from "@/components/site/component-index";
 import { HeroSection } from "@/components/site/hero-section";
 import { JsonLd } from "@/components/site/json-ld";
@@ -23,7 +24,8 @@ export default function Home() {
       <ProductIntro />
       <WorkflowSection />
       <ComponentIndex />
-      <AboutLivful />
+      <AboutNewma />
+      <ClosingSection />
     </>
   );
 }

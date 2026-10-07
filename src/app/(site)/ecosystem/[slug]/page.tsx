@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ComponentBody } from "@/components/site/component-body";
 import { DemoLink } from "@/components/site/demo-link";
 import { DetailHeader } from "@/components/site/detail-header";
 import { JsonLd } from "@/components/site/json-ld";
@@ -17,8 +19,6 @@ import { pageMetadata } from "@/lib/seo/metadata";
 
 type Params = { params: Promise<{ slug: string }> };
 
-// Compiled at build and rendered as a server component: zero client JS for the prose, a 404 for any
-// unknown slug (assumption A-P4-08).
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -40,7 +40,6 @@ export default async function EcosystemPage({ params }: Params) {
   const { slug } = await params;
   if (!isEcosystemSlug(slug)) notFound();
   const entry = ECOSYSTEM[slug];
-  const { default: Body } = await import(`@/content/ecosystem/${slug}.mdx`);
   return (
     <article className="px-5 py-10 md:px-12 md:py-14">
       <JsonLd data={techArticleJsonLd(slug)} />
@@ -49,16 +48,24 @@ export default async function EcosystemPage({ params }: Params) {
           <DetailHeader entry={entry} />
         </div>
         <div className="min-w-0 lg:col-span-7 lg:border-l lg:border-border lg:pl-16">
-          <section aria-labelledby="fit-heading">
+          <ComponentBody entry={entry} />
+          <section aria-labelledby="fit-heading" className="mt-10 border-t border-border pt-10">
             <h2 id="fit-heading" className="text-2xl font-medium tracking-[-0.015em]">
               {DETAIL_COPY.fitHeading.text}
             </h2>
             <p className="mt-4 max-w-[52ch] text-xl leading-snug text-fg-muted">{entry.fit}</p>
           </section>
-          <Body />
           <SourcesList entry={entry} />
           <DemoLink entry={entry} />
           <RelatedComponents current={slug} />
+          <p className="mt-10">
+            <Link
+              href="/#components"
+              className="inline-flex min-h-11 items-center text-fg-muted underline hover:text-fg"
+            >
+              {DETAIL_COPY.backToEcosystem.text}
+            </Link>
+          </p>
         </div>
       </div>
     </article>

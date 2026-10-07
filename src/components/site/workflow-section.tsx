@@ -1,13 +1,11 @@
 import { WORKFLOW_CONTROLS, WORKFLOW_SECTION } from "@/content/home/workflow";
 import { WorkflowDiagram, WORKFLOW_SVG_LAYOUT } from "./workflow-diagram";
 import { WorkflowLegend } from "./workflow-legend";
-import { WorkflowText } from "./workflow-text";
+import { WorkflowScientificAlt } from "./workflow-scientific-alt";
+import { WorkflowSoftwareFlow } from "./workflow-software-flow";
 import { WorkflowViewer } from "./workflow-viewer";
 import { CONTAINER, H2, SECTION } from "./type";
 
-// Sits between the product introduction and the six components. The diagram, its caption and the text
-// version are plain server HTML; only the small viewer wrapper is client code, and it loads the
-// three-dimensional scene on request.
 export function WorkflowSection() {
   return (
     <section
@@ -18,11 +16,16 @@ export function WorkflowSection() {
     >
       <div className={`${CONTAINER} space-y-12`}>
         <div className="grid gap-6 lg:grid-cols-12">
-          <h2 id="workflow-heading" className={`${H2} lg:col-span-7`}>
-            {WORKFLOW_SECTION.heading.text}
-          </h2>
+          <div className="space-y-4 lg:col-span-7">
+            <h2 id="workflow-heading" className={H2}>
+              {WORKFLOW_SECTION.heading.text}
+            </h2>
+            <p className="max-w-[48ch] text-lg leading-relaxed text-fg-muted">
+              {WORKFLOW_SECTION.intro.text}
+            </p>
+          </div>
           <p className="max-w-[48ch] text-lg leading-relaxed text-fg-muted lg:col-span-5 lg:mt-3">
-            {WORKFLOW_SECTION.intro.text}
+            {WORKFLOW_SECTION.supporting.text}
           </p>
         </div>
         <figure className="space-y-4">
@@ -44,7 +47,8 @@ export function WorkflowSection() {
             {WORKFLOW_SECTION.caption.text}
           </figcaption>
         </figure>
-        <WorkflowText />
+        <WorkflowScientificAlt />
+        <WorkflowSoftwareFlow />
       </div>
     </section>
   );

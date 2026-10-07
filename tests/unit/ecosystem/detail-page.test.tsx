@@ -32,16 +32,24 @@ describe("ecosystem detail route", () => {
 
   for (const slug of ECOSYSTEM_SLUGS) {
     describe(slug, () => {
-      it("renders the title, summary, fit sentence and the MDX body", async () => {
+      it("renders the title, headline, summary, designed functions and handoff", async () => {
         const entry = ECOSYSTEM[slug];
         await renderSlug(slug);
         expect(screen.getByRole("heading", { level: 1, name: entry.title })).toBeInTheDocument();
+        expect(screen.getByText(entry.headline)).toBeInTheDocument();
         expect(screen.getByText(entry.summary)).toBeInTheDocument();
+        expect(
+          screen.getByRole("heading", { level: 2, name: "Designed functions" }),
+        ).toBeInTheDocument();
+        for (const fn of entry.designedFunctions) {
+          expect(screen.getByText(fn.text)).toBeInTheDocument();
+        }
+        expect(screen.getByRole("heading", { level: 2, name: "Handoff" })).toBeInTheDocument();
+        expect(screen.getByText(entry.handoff.text)).toBeInTheDocument();
         expect(
           screen.getByRole("heading", { level: 2, name: "How it fits the platform" }),
         ).toBeInTheDocument();
         expect(screen.getByText(entry.fit)).toBeInTheDocument();
-        expect(screen.getAllByRole("heading", { level: 2 }).length).toBeGreaterThanOrEqual(4);
         expect(screen.getByText(/proposed architecture/i)).toBeInTheDocument();
       });
 
@@ -57,15 +65,14 @@ describe("ecosystem detail route", () => {
       it("ends with a demo block whose link is exactly /access and names the workflow and route", async () => {
         const entry = ECOSYSTEM[slug];
         const { container } = await renderSlug(slug);
-        const heading = screen.getByRole("heading", { level: 2, name: "See it in the demo" });
+        const heading = screen.getByRole("heading", { level: 2, name: "Explore the demo" });
         const block = heading.parentElement!;
-        const link = within(block).getByRole("link", { name: "See it in the demo" });
+        const link = within(block).getByRole("link", { name: "Explore the demo" });
         expect(link).toHaveAttribute("href", "/access");
         expect(block.textContent).toContain(entry.demo.href);
         expect(block.textContent).toContain("Opens Demo sign-in.");
         if (entry.demo.href !== "/demo") expect(block.textContent).toContain(entry.demo.workflow);
         for (const label of entry.demo.labels) expect(block.textContent).toContain(label);
-        // The only /access link carries no query string (open-redirect rule).
         for (const a of container.querySelectorAll('a[href^="/access"]')) {
           expect(a.getAttribute("href")).toBe("/access");
         }
@@ -78,21 +85,18 @@ describe("ecosystem detail route", () => {
     });
   }
 
-  it("shows the optional and off-chain callout above the fold on the provenance page only", async () => {
+  it("shows the verification callout above the fold on the provenance page only", async () => {
     const { container } = await renderSlug("provenance-dlt");
     const callout = screen.getByRole("note");
     expect(callout).toHaveTextContent(
-      "This component is optional. Records stay off-chain. In the demo it is labelled Optional, simulated.",
+      "Digital verification supports record review; it does not independently establish consent, material identity or scientific validity.",
     );
     const h1 = container.querySelector("h1")!;
-    // Above the fold: the callout follows the title block before any other section.
     expect(h1.compareDocumentPosition(callout) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(
-      callout.compareDocumentPosition(
-        screen.getByRole("heading", { name: "How it fits the platform" }),
-      ) & Node.DOCUMENT_POSITION_FOLLOWING,
+      callout.compareDocumentPosition(screen.getByRole("heading", { name: "Designed functions" })) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
-    expect(container.textContent).toContain("Optional, simulated");
     expect(container.textContent?.toLowerCase()).toContain("off-chain");
   });
 
@@ -106,7 +110,7 @@ describe("ecosystem detail route", () => {
       expect(hrefs).toEqual(
         ECOSYSTEM_SLUGS.filter((s) => s !== slug).map((s) => `/ecosystem/${s}`),
       );
-      expect(container.querySelectorAll("nav").length).toBe(1);
+      expect(container.querySelectorAll("nav").length).toBeGreaterThanOrEqual(1);
       unmount();
     }
   });
@@ -114,5 +118,13 @@ describe("ecosystem detail route", () => {
   it("shows no callout on the other pages", async () => {
     await renderSlug("interface");
     expect(screen.queryByRole("note")).toBeNull();
+  });
+
+  it("links back to the homepage ecosystem section", async () => {
+    await renderSlug("interface");
+    expect(screen.getByRole("link", { name: "Back to ecosystem" })).toHaveAttribute(
+      "href",
+      "/#components",
+    );
   });
 });

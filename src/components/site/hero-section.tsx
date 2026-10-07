@@ -9,7 +9,6 @@ export function HeroSection() {
   return (
     <section id="hero" aria-labelledby="hero-heading" className="relative overflow-hidden">
       <div className="aurora botanical-lines absolute inset-0 -z-10" aria-hidden="true" />
-      {/* Decorative photography sits under the aurora so type stays the LCP node. */}
       <div
         className="pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-[48%] bg-cover bg-center opacity-40 lg:block"
         style={{
@@ -26,13 +25,16 @@ export function HeroSection() {
           >
             {HERO.title.text}
           </h1>
+          <p className="max-w-[46ch] text-xl font-medium leading-snug tracking-[-0.01em]">
+            {HERO.tagline.text}
+          </p>
           <p className="max-w-[46ch] text-lg leading-relaxed text-fg-muted">{HERO.lede.text}</p>
           <div className="flex flex-wrap items-center gap-3">
             <AccessLink variant="primary" size="lg" className="min-h-12">
               {HERO.demoCta.text}
             </AccessLink>
             <Button asChild variant="secondary" size="lg" className="min-h-12">
-              <a href="#product">{HERO.howCta.text}</a>
+              <a href="#workflow">{HERO.howCta.text}</a>
             </Button>
           </div>
           <p className="max-w-[52ch] text-base leading-relaxed text-fg-muted">

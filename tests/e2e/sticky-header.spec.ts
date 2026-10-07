@@ -158,8 +158,10 @@ test("in-page anchors land below the sticky header", async ({ page, isMobile }) 
     .locator("[data-site-header]")
     .evaluate((el) => el.getBoundingClientRect().height);
   for (const [name, id] of [
-    ["Product", "product"],
-    ["About LivFul", "about"],
+    ["Overview", "product"],
+    ["How it works", "workflow"],
+    ["Ecosystem", "components"],
+    ["About Newma", "about"],
   ] as const) {
     await page.locator("[data-site-header]").getByRole("link", { name }).click();
     await expect(page).toHaveURL(new RegExp(`#${id}$`));

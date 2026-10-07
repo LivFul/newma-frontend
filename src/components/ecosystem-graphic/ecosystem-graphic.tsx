@@ -1,11 +1,9 @@
-import { HERO_CAPTION } from "@/content/home/hero-caption";
+import { HERO_CAPTION, HERO_MAP_LEGEND } from "@/content/home/hero-caption";
 import { HeroLoader } from "./hero-loader";
 import { HeroStatic } from "./hero-static";
 import { KeyboardHelp } from "./keyboard-help";
 import "./ecosystem-graphic.css";
 
-// Server component: the static layer is a complete, working diagram with zero client JavaScript; the
-// loader swaps in the interactive twin after idle or on first intent.
 export function EcosystemGraphic() {
   return (
     <figure className="eco-figure" data-hero>
@@ -13,8 +11,9 @@ export function EcosystemGraphic() {
         <HeroStatic />
       </HeroLoader>
       <KeyboardHelp />
-      <figcaption className="mx-auto max-w-[34rem] pb-2 text-sm text-fg-muted">
-        {HERO_CAPTION.text}
+      <figcaption className="mx-auto max-w-[34rem] space-y-2 pb-2 text-sm text-fg-muted">
+        <p>{HERO_CAPTION.text}</p>
+        <p className="text-xs">{HERO_MAP_LEGEND.text}</p>
       </figcaption>
     </figure>
   );

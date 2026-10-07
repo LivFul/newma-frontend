@@ -6,7 +6,7 @@ describe("wrapHeroLabel", () => {
   it("keeps short labels on one line", () => {
     expect(wrapHeroLabel("Interface")).toEqual(["Interface"]);
     expect(wrapHeroLabel("Wet Lab")).toEqual(["Wet Lab"]);
-    expect(wrapHeroLabel(HERO_LABELS.interface.descriptor)).toEqual(["People and API"]);
+    expect(wrapHeroLabel(HERO_LABELS.interface.descriptor)).toEqual(["Research", "workspace"]);
   });
 
   it("splits on an ampersand and at the nearest space to the middle", () => {

@@ -5,17 +5,27 @@ import { SiteHeader } from "@/components/site/site-header";
 import { expectNoAxeViolations } from "../ui/axe";
 
 describe("SiteHeader", () => {
-  it("renders a banner with the wordmark home link, two in-page anchors and Access NEWMA", () => {
+  it("renders a banner with the wordmark home link, four in-page anchors and Access NEWMA", () => {
     const { container } = render(<SiteHeader />);
     const header = screen.getByRole("banner");
     expect(header).toHaveAttribute("data-site-header");
-    const home = within(header).getByRole("link", { name: "LivFul NEWMA home" });
+    const home = within(header).getByRole("link", {
+      name: "NEWMA by LivFul Therapeutics",
+    });
     expect(home).toHaveAttribute("href", "/");
-    expect(within(header).getByRole("link", { name: "Product" })).toHaveAttribute(
+    expect(within(header).getByRole("link", { name: "Overview" })).toHaveAttribute(
       "href",
       "/#product",
     );
-    expect(within(header).getByRole("link", { name: "About LivFul" })).toHaveAttribute(
+    expect(within(header).getByRole("link", { name: "How it works" })).toHaveAttribute(
+      "href",
+      "/#workflow",
+    );
+    expect(within(header).getByRole("link", { name: "Ecosystem" })).toHaveAttribute(
+      "href",
+      "/#components",
+    );
+    expect(within(header).getByRole("link", { name: "About Newma" })).toHaveAttribute(
       "href",
       "/#about",
     );
@@ -26,9 +36,9 @@ describe("SiteHeader", () => {
   });
   it("keeps Access NEWMA visible below md and hides the section anchors there", () => {
     render(<SiteHeader />);
-    const product = screen.getByRole("link", { name: "Product" });
-    expect(product.closest("nav")?.className).toMatch(/hidden/);
-    expect(product.closest("nav")?.className).toMatch(/md:flex/);
+    const overview = screen.getByRole("link", { name: "Overview" });
+    expect(overview.closest("nav")?.className).toMatch(/hidden/);
+    expect(overview.closest("nav")?.className).toMatch(/md:flex/);
     expect(screen.getByRole("link", { name: "Access NEWMA" }).closest("nav")).toBeNull();
   });
   it("links staff to Aveloz just before Access NEWMA, at every breakpoint", () => {
@@ -47,19 +57,12 @@ describe("SiteHeader", () => {
     render(<SiteHeader />);
     const header = screen.getByRole("banner");
     const aveloz = within(header).getByRole("link", { name: "Aveloz (LivFul staff)" });
-
-    // Accessible name is exactly "Aveloz (LivFul staff)" via aria-label
     expect(aveloz).toHaveAttribute("aria-label", "Aveloz (LivFul staff)");
-
-    // Visible text starts with "Aveloz"
     expect(aveloz.textContent).toMatch(/^Aveloz/);
-
-    // Suffix "(LivFul staff)" is in a span with both sr-only and sm:not-sr-only
     const suffix = within(aveloz).getByText("(LivFul staff)");
     expect(suffix.classList.contains("sr-only")).toBe(true);
     expect(suffix.classList.contains("sm:not-sr-only")).toBe(true);
   });
-  // Value: protects=the Menu button opens a named list of the section links below md, aria-controls always has a target, and choosing a link closes it; fails_when=the toggle, the link list or the close-on-choose handler breaks; why_new=no test pressed Menu; seam=none
   it("opens the section menu from the Menu button and closes it when a link is chosen", async () => {
     const user = userEvent.setup();
     const { container } = render(<SiteHeader />);
@@ -77,10 +80,10 @@ describe("SiteHeader", () => {
       within(nav)
         .getAllByRole("link")
         .map((link) => link.getAttribute("href")),
-    ).toEqual(["/#product", "/#about"]);
+    ).toEqual(["/#product", "/#workflow", "/#components", "/#about"]);
     await expectNoAxeViolations(container);
 
-    await user.click(within(nav).getByRole("link", { name: "Product" }));
+    await user.click(within(nav).getByRole("link", { name: "Overview" }));
     expect(menu).toHaveAttribute("aria-expanded", "false");
     expect(screen.queryByRole("navigation", { name: "Mobile sections" })).toBeNull();
     expect(document.getElementById("mobile-sections")).not.toBeNull();
