@@ -215,6 +215,11 @@
     "min": 4.5
   },
   {
+    "fg": "--color-plate-learn",
+    "bg": "--color-plate-elevated",
+    "min": 4.5
+  },
+  {
     "fg": "--color-plate-optional",
     "bg": "--color-plate-elevated",
     "min": 4.5
@@ -266,6 +271,11 @@
   },
   {
     "fg": "--color-plate-compute",
+    "bg": "--color-plate",
+    "min": 4.5
+  },
+  {
+    "fg": "--color-plate-learn",
     "bg": "--color-plate",
     "min": 4.5
   },
