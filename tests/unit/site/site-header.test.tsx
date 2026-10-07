@@ -1,6 +1,6 @@
-import { render, screen, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { SiteHeader } from "@/components/site/site-header";
 import { expectNoAxeViolations } from "../ui/axe";
 
@@ -85,8 +85,24 @@ describe("SiteHeader", () => {
 
     await user.click(within(nav).getByRole("link", { name: "Overview" }));
     expect(menu).toHaveAttribute("aria-expanded", "false");
-    expect(screen.queryByRole("navigation", { name: "Mobile sections" })).toBeNull();
+    await waitFor(() => {
+      expect(screen.queryByRole("navigation", { name: "Mobile sections" })).toBeNull();
+    });
     expect(document.getElementById("mobile-sections")).not.toBeNull();
+  });
+
+  it("marks the header once the page has scrolled", async () => {
+    render(<SiteHeader />);
+    const header = screen.getByRole("banner");
+    expect(header).not.toHaveAttribute("data-scrolled");
+    vi.spyOn(window, "scrollY", "get").mockReturnValue(24);
+    await act(async () => {
+      window.dispatchEvent(new Event("scroll"));
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
+    expect(header).toHaveAttribute("data-scrolled");
   });
   it("is axe clean", async () => {
     const { container } = render(<SiteHeader />);

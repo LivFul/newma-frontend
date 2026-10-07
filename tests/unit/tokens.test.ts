@@ -73,10 +73,33 @@ describe("design tokens", () => {
     expect(block).toBeDefined();
     const base = parseCssVars(css.split("@media")[0]);
     const durations = Object.keys(base).filter((k) => k.startsWith("--motion-duration-"));
-    expect(durations.length).toBeGreaterThanOrEqual(3);
+    expect(durations.length).toBeGreaterThanOrEqual(4);
     for (const d of durations) {
       expect(block).toMatch(new RegExp(`${d}\\s*:\\s*0ms`));
     }
+  });
+
+  it("declares reveal stagger and distance tokens and zeros them under reduced motion", () => {
+    const css = read("motion.css");
+    const base = parseCssVars(css.split("@media")[0]);
+    expect(base["--motion-duration-reveal"]).toBe("400ms");
+    expect(base["--motion-stagger-tight"]).toBe("60ms");
+    expect(base["--motion-stagger-base"]).toBe("80ms");
+    expect(base["--motion-distance-sm"]).toBe("8px");
+    expect(base["--motion-distance-md"]).toBe("16px");
+    const block = css.split("@media (prefers-reduced-motion: reduce)")[1]!;
+    expect(block).toMatch(/--motion-stagger-tight\s*:\s*0ms/);
+    expect(block).toMatch(/--motion-stagger-base\s*:\s*0ms/);
+    expect(block).toMatch(/--motion-distance-sm\s*:\s*0px/);
+    expect(block).toMatch(/--motion-distance-md\s*:\s*0px/);
+  });
+
+  it("declares the extra spacing steps used by the marketing layout", () => {
+    const space = parseCssVars(read("space.css"));
+    expect(space["--space-5"]).toBe("1.25rem");
+    expect(space["--space-10"]).toBe("2.5rem");
+    expect(space["--space-20"]).toBe("5rem");
+    expect(space["--space-28"]).toBe("7rem");
   });
 
   it("no CSS custom property under src/ references itself", () => {

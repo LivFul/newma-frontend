@@ -96,6 +96,7 @@ describe("WorkflowViewer", () => {
     expect(await screen.findByRole("button", { name: LABELS.explore })).toBeInTheDocument();
     expect(sceneLoaded).not.toHaveBeenCalled();
     expect(screen.queryByTestId("scene")).toBeNull();
+    expect(document.querySelector(".workflow-swap")).not.toBeNull();
   });
 
   it("has a status region that is empty until something happens", async () => {

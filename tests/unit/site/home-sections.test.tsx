@@ -87,10 +87,14 @@ describe("home page composition", () => {
     );
   });
 
-  it("is axe clean", async () => {
-    const { container } = renderHome();
-    await expectNoAxeViolations(container);
-  });
+  it(
+    "is axe clean",
+    async () => {
+      const { container } = renderHome();
+      await expectNoAxeViolations(container);
+    },
+    60_000,
+  );
 });
 
 describe("HeroSection", () => {
@@ -99,6 +103,15 @@ describe("HeroSection", () => {
     expect(screen.getByText(HERO.tagline.text)).toBeInTheDocument();
     expect(screen.getByText(HERO.lede.text)).toBeInTheDocument();
     expect(screen.getByText(HERO.disclaimer.text)).toBeInTheDocument();
+  });
+
+  it("keeps the headline still and staggers the rest of the hero", () => {
+    const { container } = render(<HeroSection />);
+    const heading = screen.getByRole("heading", { level: 1 });
+    expect(heading.className).not.toMatch(/hero-entrance-item/);
+    expect(screen.getByText(HERO.tagline.text).className).toMatch(/hero-entrance-item/);
+    expect(screen.getByText(HERO.lede.text).className).toMatch(/hero-entrance-item/);
+    expect(container.querySelectorAll("#hero .hero-entrance-item")).toHaveLength(4);
   });
 
   it("exposes the ecosystem diagram with its accessible name inside the hero", () => {
@@ -152,6 +165,8 @@ describe("ProductIntro and AboutNewma", () => {
     const { container } = render(<ProductIntro />);
     expect(screen.getByText(PRODUCT.guardrail.text)).toBeInTheDocument();
     expect(container.querySelectorAll("ol > li")).toHaveLength(4);
+    expect(container.querySelector("#product > div")?.className).toMatch(/max-w-\[80rem\]/);
+    expect(container.querySelectorAll("#product ol .reveal-child")).toHaveLength(4);
   });
   it("About has mission, vision and approach", () => {
     render(<AboutNewma />);

@@ -77,6 +77,7 @@ describe("Dialog", () => {
   it("layers above page content and scrolls long content", async () => {
     renderDialog();
     const dialog = await open();
-    expect(dialog).toHaveClass("z-50", "overflow-y-auto", "focus:outline-none");
+    expect(dialog).toHaveClass("dialog-panel", "z-50", "overflow-y-auto", "focus:outline-none");
+    expect(document.querySelector(".dialog-overlay")).not.toBeNull();
   });
 });

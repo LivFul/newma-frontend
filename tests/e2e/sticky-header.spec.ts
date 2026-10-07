@@ -99,6 +99,30 @@ async function focusedState(page: Page): Promise<FocusState> {
 
 // Presses `key` up to `presses` times and asserts every focused page element sits fully below the
 // sticky header, whatever height the header has at this viewport (one row, or two when it wraps).
+async function waitForScrollSettled(page: Page) {
+  // Smooth scrolling can start a frame late. Treat the position as settled only after it has
+  // stopped moving, and not before it has had a chance to begin.
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        const start = performance.now();
+        let last = window.scrollY;
+        let lastChange = start;
+        const tick = () => {
+          const now = performance.now();
+          const y = window.scrollY;
+          if (y !== last) {
+            last = y;
+            lastChange = now;
+          }
+          if (now - start > 80 && now - lastChange > 140) resolve();
+          else requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }),
+  );
+}
+
 async function expectFocusNeverUnderHeader(page: Page, key: string, presses: number) {
   const headerHeight = await page
     .locator("[data-site-header]")
@@ -106,6 +130,7 @@ async function expectFocusNeverUnderHeader(page: Page, key: string, presses: num
   let checked = 0;
   for (let i = 0; i < presses; i += 1) {
     await page.keyboard.press(key);
+    await waitForScrollSettled(page);
     const state = await focusedState(page);
     if (!state) break; // Tab left the page content (browser UI, or the dev overlay in `next dev`).
     if (state === "foreign") continue;
@@ -167,10 +192,11 @@ test("in-page anchors land below the sticky header", async ({ page, isMobile }) 
   ] as const) {
     await page.locator("[data-site-header]").getByRole("link", { name }).click();
     await expect(page).toHaveURL(new RegExp(`#${id}$`));
-    // The anchor scroll is instant; poll rather than sleep until the section has settled below the header.
-    await expect
-      .poll(() => page.locator(`#${id}`).evaluate((el) => el.getBoundingClientRect().top))
-      .toBeGreaterThanOrEqual(headerHeight - 1);
+    // Smooth scrolling takes a moment; measure only after the position has stopped moving.
+    await waitForScrollSettled(page);
+    const top = await page.locator(`#${id}`).evaluate((el) => el.getBoundingClientRect().top);
+    // Smooth scrolling can stop a fraction of a pixel short of the scroll-padding target.
+    expect(Math.ceil(top)).toBeGreaterThanOrEqual(headerHeight - 1);
     // ...and not pushed far below it: scroll-padding is the only offset (a second one would double it).
     // The last section cannot reach the top of a short page, so only the product anchor is bounded.
     if (id === "product") {

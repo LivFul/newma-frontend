@@ -9,6 +9,11 @@ html {
   scrollbar-color: var(--color-border-strong) var(--color-bg);
   overflow-x: clip;
 }
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
 @view-transition {
   navigation: auto;
 }
@@ -159,6 +164,8 @@ main[tabindex="-1"]:focus-visible {
     position: absolute;
     inset: calc(var(--tile) * -1) 0 0 calc(var(--tile) * -1);
     background: url("/images/botanical-lines.svg") 0 0 / var(--tile) var(--tile) repeat;
+    /* Quieter than the headline so the wash does not compete with type. */
+    opacity: 0.6;
   }
   @media (prefers-reduced-motion: no-preference) {
     .botanical-lines::before {
@@ -195,20 +202,82 @@ main[tabindex="-1"]:focus-visible {
   }
   .reveal-pending {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(var(--motion-distance-md));
   }
   /* backwards, not both: the finished animation must not leave a transform on the section, which would
      make it the containing block of its fixed and sticky descendants. */
   .reveal-in {
-    animation: reveal-up var(--motion-duration-slow) var(--motion-ease-emphasized) backwards;
+    animation: reveal-up var(--motion-duration-reveal) var(--motion-ease-emphasized) backwards;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-entrance-item {
+      animation: hero-fade-up var(--motion-duration-reveal) var(--motion-ease-emphasized) backwards;
+      animation-delay: calc(var(--hero-i, 0) * var(--motion-stagger-tight));
+    }
+    .reveal-in .reveal-child {
+      animation: hero-fade-up var(--motion-duration-reveal) var(--motion-ease-emphasized) backwards;
+      animation-delay: calc(var(--reveal-i, 0) * var(--motion-stagger-base));
+    }
+    .mobile-sections:not([hidden]) {
+      display: grid;
+      grid-template-rows: 1fr;
+      opacity: 1;
+      transition:
+        grid-template-rows var(--motion-duration-base) var(--motion-ease-standard),
+        opacity var(--motion-duration-base) var(--motion-ease-standard);
+    }
+    .mobile-sections:not([hidden])[data-open="false"] {
+      grid-template-rows: 0fr;
+      opacity: 0;
+      transition-duration: calc(var(--motion-duration-base) * 0.8);
+    }
+    .mobile-sections:not([hidden]) > .mobile-sections-clip {
+      min-height: 0;
+      overflow: hidden;
+    }
+    @starting-style {
+      .mobile-sections:not([hidden])[data-open="true"] {
+        grid-template-rows: 0fr;
+        opacity: 0;
+      }
+    }
+    .dialog-overlay[data-state="open"] {
+      animation: dialog-fade-in var(--motion-duration-fast) var(--motion-ease-standard) backwards;
+    }
+    .dialog-overlay[data-state="closed"] {
+      animation: dialog-fade-out calc(var(--motion-duration-fast) * 0.8) var(--motion-ease-standard)
+        forwards;
+    }
+    .dialog-panel[data-state="open"] {
+      animation: dialog-panel-in var(--motion-duration-base) var(--motion-ease-emphasized) backwards;
+    }
+    .dialog-panel[data-state="closed"] {
+      animation: dialog-panel-out calc(var(--motion-duration-base) * 0.8)
+        var(--motion-ease-standard) forwards;
+    }
+    .workflow-swap {
+      animation: dialog-fade-in var(--motion-duration-base) var(--motion-ease-standard) backwards;
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     .reveal-pending,
-    .reveal-in {
+    .reveal-in,
+    .hero-entrance-item,
+    .reveal-child {
       opacity: 1;
       transform: none;
       animation: none;
     }
+  }
+  .hover-lift {
+    transition:
+      background-color var(--motion-duration-fast) var(--motion-ease-standard),
+      border-color var(--motion-duration-fast) var(--motion-ease-standard),
+      box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
+  }
+  .hover-lift:hover,
+  .hover-lift:focus-visible {
+    box-shadow: var(--shadow-md);
   }
 
   .plate-surface {
@@ -249,11 +318,57 @@ main[tabindex="-1"]:focus-visible {
 @keyframes reveal-up {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(var(--motion-distance-md));
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-distance-sm));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes dialog-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes dialog-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes dialog-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-distance-sm));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes dialog-panel-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(var(--motion-distance-sm));
   }
 }
 
@@ -264,7 +379,9 @@ main[tabindex="-1"]:focus-visible {
   /* Unlayered, so these beat the layered reveal rules without !important: a page printed or saved to PDF
      before it was scrolled must not come out with blank sections. */
   .reveal-pending,
-  .reveal-in {
+  .reveal-in,
+  .hero-entrance-item,
+  .reveal-child {
     opacity: 1;
     transform: none;
     animation: none;
@@ -285,5 +402,24 @@ main[tabindex="-1"]:focus-visible {
   }
   .botanical-lines::before {
     display: none;
+  }
+}
+
+/* Unlayered so these beat the header's Tailwind background utility. */
+[data-site-header] {
+  transition:
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    border-color var(--motion-duration-fast) var(--motion-ease-standard);
+}
+[data-site-header][data-scrolled] {
+  background-color: color-mix(in srgb, var(--color-bg) 95%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--color-fg) 18%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
   }
 }

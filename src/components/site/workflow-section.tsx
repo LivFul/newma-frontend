@@ -14,7 +14,7 @@ export function WorkflowSection() {
       className={`${SECTION} plate-surface`}
       data-reveal
     >
-      <div className={`${CONTAINER} space-y-12`}>
+      <div className={`${CONTAINER} space-y-(--space-12)`}>
         <div className="grid gap-6 lg:grid-cols-12">
           <div className="space-y-4 lg:col-span-7">
             <h2 id="workflow-heading" className={H2}>

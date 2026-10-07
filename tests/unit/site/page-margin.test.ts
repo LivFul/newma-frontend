@@ -82,6 +82,33 @@ describe("hero background and installed-app contracts", () => {
 
   // Value: protects=a finished reveal leaves no transform on the section, which would make it the containing block of its fixed and sticky descendants; fails_when=the reveal animation fill mode goes back to forwards or both; why_new=fill-mode both kept translateY(0) on every revealed section; seam=none
   it("does not keep the reveal animation's end state", () => {
-    expect(declaration(blockAfter(globals, ".reveal-in {"), "animation")).toMatch(/\bbackwards\b/);
+    const animation = declaration(blockAfter(globals, ".reveal-in {"), "animation");
+    expect(animation).toMatch(/\bbackwards\b/);
+    expect(animation).toContain("var(--motion-duration-reveal)");
+    expect(animation).not.toMatch(/\b(forwards|both)\b/);
+  });
+
+  it("fades the hero entrance with compositor properties only, and only when motion is allowed", () => {
+    const frames = blockAfter(globals, "@keyframes hero-fade-up");
+    expect(frames).toContain("opacity");
+    expect(frames).toContain("transform");
+    expect(frames).not.toMatch(/background|width|height|top|left/);
+    const use = globals.indexOf("animation: hero-fade-up");
+    expect(use).toBeGreaterThan(0);
+    expect(globals.slice(globals.lastIndexOf("@media", use))).toMatch(
+      /^@media \(prefers-reduced-motion: no-preference\)/,
+    );
+  });
+
+  it("smooth-scrolls anchors only when motion is allowed", () => {
+    const use = globals.indexOf("scroll-behavior: smooth");
+    expect(use).toBeGreaterThan(0);
+    expect(globals.slice(globals.lastIndexOf("@media", use))).toMatch(
+      /^@media \(prefers-reduced-motion: no-preference\)/,
+    );
+  });
+
+  it("keeps the botanical lines quieter than the headline", () => {
+    expect(declaration(blockAfter(globals, ".botanical-lines::before {"), "opacity")).toBe("0.6");
   });
 });

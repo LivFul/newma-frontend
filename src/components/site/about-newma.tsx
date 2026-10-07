@@ -20,7 +20,7 @@ export function AboutNewma() {
       className={`${SECTION} bg-peach`}
       data-reveal
     >
-      <div className={`${CONTAINER} space-y-16`}>
+      <div className={`${CONTAINER} space-y-(--space-16)`}>
         <div className="space-y-4">
           <h2 id="about-heading" className={H2}>
             {ABOUT.heading.text}

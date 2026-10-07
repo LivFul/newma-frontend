@@ -4,7 +4,7 @@ import { LeafIcon } from "@/components/brand/leaf-icon";
 import { PillIcon } from "@/components/brand/pill-icon";
 import { ComponentLink } from "./component-link";
 import { PlateSwatch } from "./plate-swatch";
-import { CONTAINER, H2, H3_TITLE, SECTION } from "./type";
+import { CONTAINER, H2, H3_TITLE, revealChild, SECTION } from "./type";
 export function ComponentIndex() {
   return (
     <section
@@ -13,7 +13,7 @@ export function ComponentIndex() {
       className={`${SECTION} plate-surface`}
       data-reveal
     >
-      <div className={`${CONTAINER} space-y-14`}>
+      <div className={`${CONTAINER} space-y-(--space-16)`}>
         <div className="grid gap-6 lg:grid-cols-12">
           <h2 id="components-heading" className={`${H2} lg:col-span-7`}>
             {COMPONENTS_INDEX.heading.text}
@@ -28,10 +28,10 @@ export function ComponentIndex() {
           className="grid min-w-0 gap-4 [counter-reset:key] md:grid-cols-2 lg:grid-cols-3"
         >
           {ECOSYSTEM_SLUGS.map((slug, index) => (
-            <li key={slug} className="relative [counter-increment:key]">
+            <li key={slug} className={`relative [counter-increment:key] ${revealChild(index)}`}>
               <ComponentLink
                 slug={slug}
-                className="group grid min-h-11 min-w-0 gap-2 overflow-hidden rounded-lg border border-plate-border/50 bg-plate-elevated/50 p-6 transition-[transform,background-color] hover:-translate-y-0.5 hover:bg-plate-fg/[0.08] focus-visible:bg-plate-fg/[0.08]"
+                className="hover-lift group grid min-h-11 min-w-0 gap-2 overflow-hidden rounded-lg border border-plate-border/50 bg-plate-elevated/50 p-6 hover:border-plate-fg/40 hover:bg-plate-fg/[0.08] focus-visible:bg-plate-fg/[0.08]"
               >
                 <span className="flex min-w-0 flex-wrap items-center gap-3 text-2xl font-medium tracking-[-0.015em] [overflow-wrap:anywhere]">
                   {index % 2 === 0 ? (

@@ -4,7 +4,7 @@ import { LeafIcon } from "@/components/brand/leaf-icon";
 import { PillIcon } from "@/components/brand/pill-icon";
 import { AccessLink } from "./access-link";
 import { PersonaGrid } from "./persona-grid";
-import { CONTAINER, H2, H3_TITLE, SECTION, STATEMENT } from "./type";
+import { CONTAINER, H2, H3_TITLE, revealChild, SECTION, STATEMENT } from "./type";
 
 const WAYPOINT =
   "relative grid content-start gap-3 pl-16 lg:pl-0 lg:pt-16 " + "[counter-increment:step]";
@@ -17,7 +17,7 @@ export function ProductIntro() {
       className={`${SECTION} bg-bg-deep/40`}
       data-reveal
     >
-      <div className={`${CONTAINER} space-y-24`}>
+      <div className={`${CONTAINER} space-y-(--space-20)`}>
         <div className="grid gap-x-16 gap-y-10 lg:grid-cols-12">
           <div className="space-y-8 lg:col-span-7">
             <h2 id="product-heading" className={H2}>
@@ -52,7 +52,7 @@ export function ProductIntro() {
           </div>
         </div>
 
-        <div className="space-y-10">
+        <div className="space-y-(--space-10)">
           <h3 className={H3_TITLE}>{PRODUCT.howHeading.text}</h3>
           <div className="relative">
             <span
@@ -61,10 +61,10 @@ export function ProductIntro() {
             />
             <ol
               role="list"
-              className="relative grid gap-12 [counter-reset:step] lg:grid-cols-4 lg:gap-10"
+              className="relative grid gap-(--space-12) [counter-reset:step] lg:grid-cols-4 lg:gap-(--space-10)"
             >
               {HOW_IT_WORKS.map((step, index) => (
-                <li key={step.title.id} className={WAYPOINT}>
+                <li key={step.title.id} className={`${WAYPOINT} ${revealChild(index)}`}>
                   <span
                     aria-hidden="true"
                     className="absolute top-0 left-0 grid h-9 place-items-center lg:left-1/2 lg:-translate-x-1/2"

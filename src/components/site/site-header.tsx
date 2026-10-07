@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ACCESS_LABEL,
   AVELOZ_LINK,
@@ -13,15 +13,62 @@ import { Button } from "@/components/ui/button";
 import { AccessLink } from "./access-link";
 import { Wordmark } from "./wordmark";
 
+function navCloseDelay(): number {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return 0;
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue("--motion-duration-base")
+    .trim();
+  const amount = raw.endsWith("ms") ? Number.parseFloat(raw) : Number.parseFloat(raw) * 1000;
+  return Number.isFinite(amount) ? Math.round(amount * 0.8) : 224;
+}
+
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const [present, setPresent] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    let frame = 0;
+    const sync = () => {
+      header.toggleAttribute("data-scrolled", window.scrollY > 8);
+    };
+    const onScroll = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(sync);
+    };
+    sync();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (open || !present) return;
+    const id = window.setTimeout(() => setPresent(false), navCloseDelay());
+    return () => window.clearTimeout(id);
+  }, [open, present]);
+
+  const close = () => setOpen(false);
+  const toggle = () => {
+    if (open) close();
+    else {
+      setPresent(true);
+      setOpen(true);
+    }
+  };
+
   return (
     <header
+      ref={headerRef}
       data-site-header
       className="sticky top-0 z-40 min-h-[var(--size-header)] border-b border-fg/10 bg-bg/80 backdrop-blur-md"
     >
       <div className="flex min-h-[var(--size-header)] w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 px-5 py-1 md:px-12">
-        <Wordmark priority />
+        <Wordmark priority viewTransition />
         <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 sm:gap-4">
           <nav aria-label={HEADER_NAV_LABEL.text} className="hidden items-center gap-8 md:flex">
             {NAV_LINKS.map((link) => (
@@ -40,7 +87,7 @@ export function SiteHeader() {
             className="min-h-11 min-w-11 px-2 md:hidden"
             aria-expanded={open}
             aria-controls="mobile-sections"
-            onClick={() => setOpen((value) => !value)}
+            onClick={toggle}
           >
             {HEADER_MENU.text}
           </Button>
@@ -58,21 +105,26 @@ export function SiteHeader() {
       <nav
         id="mobile-sections"
         aria-label={HEADER_MOBILE_NAV.text}
-        hidden={!open}
-        className="flex flex-col gap-1 border-t border-fg/10 px-5 py-3 md:hidden"
+        hidden={!present}
+        data-open={open ? "true" : "false"}
+        className="mobile-sections border-t border-fg/10 md:hidden"
       >
-        {open
-          ? NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="inline-flex min-h-11 items-center text-fg"
-                onClick={() => setOpen(false)}
-              >
-                {link.block.text}
-              </a>
-            ))
-          : null}
+        <div className="mobile-sections-clip">
+          <div className="flex flex-col gap-1 px-5 py-3">
+            {present
+              ? NAV_LINKS.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    className="inline-flex min-h-11 items-center text-fg"
+                    onClick={close}
+                  >
+                    {link.block.text}
+                  </a>
+                ))
+              : null}
+          </div>
+        </div>
       </nav>
     </header>
   );
