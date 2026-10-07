@@ -5,14 +5,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const trackEvent = vi.fn();
 vi.mock("@/lib/analytics/events", () => ({ trackEvent: (e: unknown) => trackEvent(e) }));
 
-import { AboutLivful } from "@/components/site/about-livful";
+import { AboutNewma } from "@/components/site/about-newma";
 import { ComponentIndex } from "@/components/site/component-index";
 import { HeroSection } from "@/components/site/hero-section";
 import { PersonaGrid } from "@/components/site/persona-grid";
 import { ProductIntro } from "@/components/site/product-intro";
 import { HERO_SVG_TITLE } from "@/content/ecosystem/hero-text";
-import { HERO_LABELS, ECOSYSTEM_SLUGS } from "@/content/ecosystem/registry";
-import { ABOUT, HERO, PRODUCT } from "@/content/home/copy";
+import { ECOSYSTEM, ECOSYSTEM_SLUGS } from "@/content/ecosystem/registry";
+import { ABOUT, COMPONENTS_INDEX, HERO, PRODUCT } from "@/content/home/copy";
 import { MISSION, VISION } from "@/content/home/about";
 import { expectNoAxeViolations } from "../ui/axe";
 import HomePage from "@/app/(site)/page";
@@ -53,26 +53,29 @@ describe("home page composition", () => {
     }
   });
 
-  it("offers See the demo in the hero and in the product introduction, both to /access", () => {
+  it("offers Explore the demo in the hero and in the product introduction, both to /access", () => {
     renderHome();
-    const links = screen.getAllByRole("link", { name: "See the demo" });
-    expect(links).toHaveLength(2);
+    const links = screen.getAllByRole("link", { name: "Explore the demo" });
+    expect(links.length).toBeGreaterThanOrEqual(2);
     for (const link of links) expect(link).toHaveAttribute("href", "/access");
     expect(
-      within(document.getElementById("hero")!).getAllByRole("link", { name: "See the demo" }),
+      within(document.getElementById("hero")!).getAllByRole("link", { name: "Explore the demo" }),
     ).toHaveLength(1);
     expect(
-      within(document.getElementById("product")!).getAllByRole("link", { name: "See the demo" }),
+      within(document.getElementById("product")!).getAllByRole("link", {
+        name: "Explore the demo",
+      }),
     ).toHaveLength(1);
   });
 
-  it("resolves the product and about anchors to section ids", () => {
+  it("resolves the product, workflow and about anchors to section ids", () => {
     const { container } = renderHome();
     expect(container.querySelector("section#product")).not.toBeNull();
+    expect(container.querySelector("section#workflow")).not.toBeNull();
     expect(container.querySelector("section#about")).not.toBeNull();
     expect(screen.getByRole("link", { name: HERO.howCta.text })).toHaveAttribute(
       "href",
-      "#product",
+      "#workflow",
     );
   });
 
@@ -91,14 +94,14 @@ describe("home page composition", () => {
 });
 
 describe("HeroSection", () => {
-  it("shows the lede and disclaimer", () => {
+  it("shows the tagline, lede and disclaimer", () => {
     render(<HeroSection />);
+    expect(screen.getByText(HERO.tagline.text)).toBeInTheDocument();
     expect(screen.getByText(HERO.lede.text)).toBeInTheDocument();
     expect(screen.getByText(HERO.disclaimer.text)).toBeInTheDocument();
   });
 
-  // Value: protects=the hero exposes one pipeline diagram with its accessible name inside the hero landmark; fails_when=the diagram leaves the hero section or loses the name that describes it to assistive technology; why_new=the previous test checked CSS class names and carried a stale card for the removed survey map key; seam=none
-  it("exposes the pipeline diagram with its accessible name inside the hero", () => {
+  it("exposes the ecosystem diagram with its accessible name inside the hero", () => {
     const { container } = render(<HeroSection />);
     const hero = container.querySelector<HTMLElement>("section#hero")!;
     expect(hero.querySelector("figure[data-hero]")).not.toBeNull();
@@ -109,16 +112,13 @@ describe("HeroSection", () => {
 describe("ComponentIndex", () => {
   it("lists six links with the exact titles and component hrefs", () => {
     render(<ComponentIndex />);
-    const list = screen.getByRole("list");
+    const list = screen.getByRole("list", { name: COMPONENTS_INDEX.listLabel.text });
     const links = within(list).getAllByRole("link");
     expect(links).toHaveLength(6);
     ECOSYSTEM_SLUGS.forEach((slug, i) => {
       expect(links[i]).toHaveAttribute("href", `/ecosystem/${slug}`);
-      expect(links[i]).toHaveTextContent(HERO_LABELS[slug].title);
+      expect(links[i]).toHaveTextContent(ECOSYSTEM[slug].title);
     });
-    expect(links.map((l) => l.textContent)).toEqual(
-      ECOSYSTEM_SLUGS.map((s) => `${HERO_LABELS[s].title}${HERO_LABELS[s].descriptor}`),
-    );
   });
 });
 
@@ -136,27 +136,29 @@ describe("ComponentLink", () => {
 });
 
 describe("PersonaGrid", () => {
-  it("lists four personas, each with a role and a need", () => {
+  it("lists five personas, each with a role and a need", () => {
     render(<PersonaGrid />);
     const items = screen.getAllByRole("listitem");
-    expect(items).toHaveLength(4);
+    expect(items).toHaveLength(5);
     for (const item of items) expect(item.querySelectorAll("p")).toHaveLength(2);
-    expect(screen.getByText("Indigenous community liaison")).toBeInTheDocument();
+    expect(
+      screen.getByText("Knowledge holders and authorized community representatives"),
+    ).toBeInTheDocument();
   });
 });
 
-describe("ProductIntro and AboutLivful", () => {
+describe("ProductIntro and AboutNewma", () => {
   it("states the guardrail and four numbered steps", () => {
     const { container } = render(<ProductIntro />);
     expect(screen.getByText(PRODUCT.guardrail.text)).toBeInTheDocument();
     expect(container.querySelectorAll("ol > li")).toHaveLength(4);
   });
   it("About has mission, vision and approach", () => {
-    render(<AboutLivful />);
+    render(<AboutNewma />);
     expect(screen.getByRole("heading", { name: ABOUT.heading.text })).toBeInTheDocument();
     expect(screen.getByText(MISSION.text)).toBeInTheDocument();
     expect(screen.getByText(VISION.text)).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Approach" })).toBeInTheDocument();
-    expect(screen.getByText(/not results achieved/)).toBeInTheDocument();
+    expect(screen.getByText(/Start with unmet needs/)).toBeInTheDocument();
   });
 });

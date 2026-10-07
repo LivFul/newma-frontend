@@ -27,7 +27,10 @@ for (const slug of SLUGS) {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(TITLES[slug]);
     await expect(page.getByRole("heading", { level: 2, name: "Sources" })).toBeVisible();
     expect(await page.locator("#sources-heading + ol > li").count()).toBeGreaterThanOrEqual(1);
-    const demo = page.getByRole("link", { name: "See it in the demo" });
+    const demo = page
+      .locator("#demo-heading")
+      .locator("..")
+      .getByRole("link", { name: "Explore the demo" });
     await expect(demo).toHaveAttribute("href", "/access");
     await expect(page.locator("#demo-heading").locator("..")).toContainText(DEMO_ROUTES[slug]);
   });
@@ -65,12 +68,11 @@ test("/access answers 200 with no query string needed", async ({ request }) => {
   expect(response.status()).toBe(200);
 });
 
-test("the provenance page says optional and off-chain above the fold", async ({ page }) => {
+test("the provenance page states verification limits above the fold", async ({ page }) => {
   await page.goto("/ecosystem/provenance-dlt");
   const callout = page.getByRole("note");
-  await expect(callout).toContainText("optional");
-  await expect(callout).toContainText("off-chain");
-  await expect(callout).toContainText("Optional, simulated");
+  await expect(callout).toContainText("Digital verification");
+  await expect(callout).toContainText("scientific validity");
   const box = (await callout.boundingBox())!;
   expect(box.y + box.height).toBeLessThanOrEqual(page.viewportSize()!.height);
   await expect(page.locator("main")).toContainText(/off-chain/i);

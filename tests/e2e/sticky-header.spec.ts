@@ -75,7 +75,9 @@ test("there is no horizontal scroll at 320 px width", async ({ page }) => {
   );
   expect(overflow).toBeLessThanOrEqual(0);
   await expect(headerAccess(page)).toBeVisible();
-  await expect(page.getByRole("link", { name: "LivFul NEWMA home" }).first()).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "NEWMA by LivFul Therapeutics" }).first(),
+  ).toBeVisible();
 });
 
 type FocusState = null | "foreign" | { inHeader: boolean; isSkip: boolean; top: number };
@@ -158,8 +160,10 @@ test("in-page anchors land below the sticky header", async ({ page, isMobile }) 
     .locator("[data-site-header]")
     .evaluate((el) => el.getBoundingClientRect().height);
   for (const [name, id] of [
-    ["Product", "product"],
-    ["About LivFul", "about"],
+    ["Overview", "product"],
+    ["How it works", "workflow"],
+    ["Ecosystem", "components"],
+    ["About Newma", "about"],
   ] as const) {
     await page.locator("[data-site-header]").getByRole("link", { name }).click();
     await expect(page).toHaveURL(new RegExp(`#${id}$`));

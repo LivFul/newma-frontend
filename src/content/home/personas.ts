@@ -8,26 +8,30 @@ const persona = (id: string, role: string, need: string): Persona =>
     need: Object.freeze({ id: `${id}.need`, text: need, claims: Object.freeze(["C-25"]) }),
   });
 
-// Paraphrased from PRD 2 (Target Personas). Role names are job roles, never organisations.
 export const PERSONAS: readonly Persona[] = Object.freeze([
   persona(
     "home.persona.computational",
-    "Computational biologist",
-    "Needs reliable chemical identities, reproducible runs and a clear reason a candidate merits testing.",
+    "Computational biologists",
+    "Evaluate candidates through curated chemical identities, reproducible analyses and a clear rationale for experimental testing.",
   ),
   persona(
     "home.persona.wetlab",
-    "Wet-lab scientist or CRO",
-    "Needs unambiguous materials, protocols and controls, so accepted observations link to the right batch and hypothesis.",
+    "Laboratory scientists and research partners",
+    "Work from defined materials, protocols and controls, with results linked to the correct sample and research question.",
   ),
   persona(
-    "home.persona.liaison",
-    "Indigenous community liaison",
-    "Needs understandable consent, control over disclosure and visible benefit obligations, without exposing confidential knowledge.",
+    "home.persona.knowledge",
+    "Knowledge holders and authorized community representatives",
+    "Review permitted uses, disclosure restrictions and benefit obligations while protecting confidential knowledge.",
   ),
   persona(
     "home.persona.biopharma",
-    "Biopharma partner",
-    "Needs secure discovery access and traceable evidence to judge scientific and commercial readiness.",
+    "Biopharma partners",
+    "Assess research opportunities through traceable evidence, documented use rights and a clear account of what remains to be established.",
+  ),
+  persona(
+    "home.persona.admin",
+    "Administrators and reviewers",
+    "Oversee access, review requests, place work on hold and examine the records behind research decisions.",
   ),
 ]);

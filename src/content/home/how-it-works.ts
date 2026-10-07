@@ -8,27 +8,25 @@ const step = (id: string, title: string, text: string): Step =>
     text: Object.freeze({ id: `${id}.text`, text, claims: Object.freeze(["C-24"]) }),
   });
 
-// The four steps are a true sequence, so they are numbered (by CSS counters, not by copy).
-// Sources: TA 2 (agentic discovery), TA 1 and 2 (durable workflows), TA 3 (wet-lab loop), TA 4 (provenance).
 export const HOW_IT_WORKS: readonly Step[] = Object.freeze([
   step(
-    "home.how.agentic",
-    "Agentic discovery",
-    "A scientist submits a query, an objective and constraints. The agent is designed to check access and rights first, retrieve only within the authorized scope, and return ranked hypotheses with their limitations.",
+    "home.how.define",
+    "Define the research question",
+    "Set the scientific objective, permitted uses and project constraints. Begin with knowledge and materials authorized for the intended research.",
   ),
   step(
-    "home.how.screening",
-    "Durable screening",
-    "Screening requests are designed to run as durable workflows with budgets, bounded retries, cancellation and holds, recording inputs, versions, settings and seeds.",
+    "home.how.prioritize",
+    "Prioritize what to test",
+    "Use curated chemistry and approved computational methods to rank hypotheses, with supporting sources, reproducibility records and explicit uncertainty.",
   ),
   step(
-    "home.how.wetlab",
-    "Wet-lab loop",
-    "Scientists approve assay requests. Results return with raw data, replicates and uncertainty, and only observations a scientist accepts count as evidence.",
+    "home.how.test",
+    "Test under scientific supervision",
+    "Scientists review and approve experiments. Laboratory results return with material identity, protocols, controls and raw data for assessment.",
   ),
   step(
-    "home.how.provenance",
-    "Signed provenance",
-    "Decisions and records are designed to carry signed, versioned provenance. A ledger layer is an optional extension, and authoritative records stay off-chain.",
+    "home.how.record",
+    "Build a traceable evidence record",
+    "Connect reviewed observations to their sources, materials and decisions. Use accepted findings, including negative results, to inform subsequent research.",
   ),
 ]);

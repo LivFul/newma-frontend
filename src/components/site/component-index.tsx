@@ -1,11 +1,10 @@
-import { ECOSYSTEM_SLUGS, HERO_LABELS } from "@/content/ecosystem/registry";
+import { ECOSYSTEM, ECOSYSTEM_MAP_KEY, ECOSYSTEM_SLUGS } from "@/content/ecosystem/registry";
 import { COMPONENTS_INDEX } from "@/content/home/copy";
 import { LeafIcon } from "@/components/brand/leaf-icon";
 import { PillIcon } from "@/components/brand/pill-icon";
 import { ComponentLink } from "./component-link";
 import { PlateSwatch } from "./plate-swatch";
-import { CONTAINER, H2, SECTION } from "./type";
-
+import { CONTAINER, H2, H3_TITLE, SECTION } from "./type";
 export function ComponentIndex() {
   return (
     <section
@@ -25,6 +24,7 @@ export function ComponentIndex() {
         </div>
         <ul
           role="list"
+          aria-label={COMPONENTS_INDEX.listLabel.text}
           className="grid min-w-0 gap-4 [counter-reset:key] md:grid-cols-2 lg:grid-cols-3"
         >
           {ECOSYSTEM_SLUGS.map((slug, index) => (
@@ -40,15 +40,45 @@ export function ComponentIndex() {
                     <PillIcon className="h-7 w-auto" />
                   )}
                   <PlateSwatch slug={slug} outline="var(--color-plate-fg)" />
-                  {HERO_LABELS[slug].title}
+                  {ECOSYSTEM[slug].title}
                 </span>
                 <span className="block text-plate-muted group-hover:text-plate-fg group-focus-visible:text-plate-fg">
-                  {HERO_LABELS[slug].descriptor}
+                  {ECOSYSTEM[slug].homeSummary}
                 </span>
               </ComponentLink>
             </li>
           ))}
         </ul>
+        <figure className="space-y-4 border-t border-plate-border/50 pt-10">
+          <h3 className={H3_TITLE}>{COMPONENTS_INDEX.diagramHeading.text}</h3>
+          <p className="max-w-[52ch] text-lg leading-relaxed text-plate-muted">
+            {COMPONENTS_INDEX.diagramIntro.text}
+          </p>
+          <ol role="list" className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {ECOSYSTEM_SLUGS.map((slug, index) => (
+              <li key={slug} className="flex gap-3 text-plate-muted">
+                <span className="font-mono text-sm">{index + 1}.</span>
+                <span>
+                  <strong className="font-medium text-plate-fg">{ECOSYSTEM[slug].title}</strong>
+                  {" \u2014 "}
+                  {ECOSYSTEM[slug].descriptor}
+                </span>
+              </li>
+            ))}
+          </ol>
+          <figcaption className="max-w-[70ch] space-y-4 text-sm leading-relaxed text-plate-muted">
+            <p>{COMPONENTS_INDEX.diagramCaption.text}</p>
+            <dl className="grid gap-2 sm:grid-cols-3">
+              {ECOSYSTEM_MAP_KEY.map((item) => (
+                <div key={item.label}>
+                  <dt className="font-medium text-plate-fg">{item.label}</dt>
+                  <dd>{item.text}</dd>
+                </div>
+              ))}
+            </dl>
+          </figcaption>
+          <p className="sr-only">{COMPONENTS_INDEX.diagramAlt.text}</p>
+        </figure>
       </div>
     </section>
   );

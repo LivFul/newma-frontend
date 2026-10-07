@@ -25,9 +25,10 @@ describe("brand constants", () => {
     expect(BRAND_HEX.ecoOptional).toBe(eco["--color-eco-optional"]);
   });
 
-  // Value: protects=warning/success stroke inks used by next/og cards on the light paper; fails_when=color.css retunes them without lib/brand.ts; why_new=OG cards drew ochre/sage fills at 1.5:1 on paper; seam=none
-  it("mirrors the warning and success stroke inks too", () => {
+  // Value: protects=warning/success/compute stroke inks used by next/og cards on the light paper; fails_when=color.css retunes them without lib/brand.ts; why_new=OG cards drew ochre/sage fills at 1.5:1 on paper; seam=none
+  it("mirrors the warning, success and compute stroke inks too", () => {
     expect(BRAND_HEX.warningInk).toBe(vars["--color-warning-ink"]);
     expect(BRAND_HEX.successInk).toBe(vars["--color-success-ink"]);
+    expect(BRAND_HEX.ecoComputeInk).toBe(eco["--color-eco-compute-ink"]);
   });
 });

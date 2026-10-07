@@ -7,7 +7,7 @@ export const OG_CONTENT_TYPE = "image/png";
 
 const TONE_HEX: Readonly<Record<ToneToken, string>> = {
   "--color-accent": BRAND_HEX.accent,
-  "--color-eco-compute": BRAND_HEX.ecoCompute,
+  "--color-eco-compute": BRAND_HEX.ecoComputeInk,
   "--color-warning": BRAND_HEX.warningInk,
   "--color-success": BRAND_HEX.successInk,
   "--color-border-strong": BRAND_HEX.muted,

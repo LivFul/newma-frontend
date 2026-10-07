@@ -23,8 +23,8 @@ export const SCENE_COLORS = Object.freeze({
   success: 0x8dbab3,
   /** --color-plate-danger */
   danger: 0xf08e7c,
-  /** --color-plate-compute */
-  compute: 0xe0a36c,
+  /** --color-plate-compute (Agentic Compute and workflow learning loop) */
+  compute: 0xb69cff,
 });
 
 export const LANE_COLORS: Readonly<Record<LaneId, number>> = Object.freeze({

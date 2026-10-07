@@ -8,7 +8,7 @@ test("home responds 200 with the hero heading, main landmark and skip link first
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: "From authorized knowledge to evidence-backed discovery decisions",
+      name: "NEWMA",
     }),
   ).toBeVisible();
   await expect(page.locator("main#main")).toHaveCount(1);

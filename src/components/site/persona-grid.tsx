@@ -3,7 +3,7 @@ import { LeafIcon } from "@/components/brand/leaf-icon";
 
 export function PersonaGrid() {
   return (
-    <ul role="list" className="grid gap-x-10 gap-y-10 md:grid-cols-2 lg:grid-cols-4">
+    <ul role="list" className="grid gap-x-10 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
       {PERSONAS.map((persona) => (
         <li
           key={persona.role.id}

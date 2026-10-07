@@ -6,8 +6,6 @@ import { AccessLink } from "./access-link";
 import { PersonaGrid } from "./persona-grid";
 import { CONTAINER, H2, H3_TITLE, SECTION, STATEMENT } from "./type";
 
-// Every step marker is the pill at its own width (about 49px), so the text is pushed clear of it on
-// phones, and the connecting line runs through the centre of the markers.
 const WAYPOINT =
   "relative grid content-start gap-3 pl-16 lg:pl-0 lg:pt-16 " + "[counter-increment:step]";
 
@@ -25,7 +23,10 @@ export function ProductIntro() {
             <h2 id="product-heading" className={H2}>
               {PRODUCT.heading.text}
             </h2>
-            <p className={`${STATEMENT} max-w-[30ch]`}>{PRODUCT.what.text}</p>
+            <p className={`${STATEMENT} max-w-[44ch]`}>{PRODUCT.what.text}</p>
+            <p className="max-w-[52ch] text-lg leading-relaxed text-fg-muted">
+              {PRODUCT.whatDetail.text}
+            </p>
           </div>
           <div className="relative overflow-hidden rounded-lg border border-border/80 bg-bg-elevated p-6 shadow-sm lg:col-span-5 lg:mt-3">
             <div
@@ -40,6 +41,12 @@ export function ProductIntro() {
               <h3 className={H3_TITLE}>{PRODUCT.problemHeading.text}</h3>
               <p className="max-w-[48ch] text-lg leading-relaxed text-fg-muted">
                 {PRODUCT.problem.text}
+              </p>
+              <p className="max-w-[48ch] leading-relaxed text-fg-muted">
+                {PRODUCT.problemDetail.text}
+              </p>
+              <p className="max-w-[48ch] leading-relaxed text-fg-muted">
+                {PRODUCT.problemSolution.text}
               </p>
             </div>
           </div>
@@ -63,7 +70,6 @@ export function ProductIntro() {
                     className="absolute top-0 left-0 grid h-9 place-items-center lg:left-1/2 lg:-translate-x-1/2"
                   >
                     <PillIcon fit="shape" className="h-9 w-auto" />
-                    {/* Light type: the pill is dark. */}
                     <span className="absolute font-mono text-[0.65rem] text-accent-fg">
                       {String(index + 1).padStart(2, "0")}
                     </span>

@@ -3,8 +3,6 @@ import type { EcosystemEntry } from "@/content/ecosystem/registry";
 import { ComponentPlate } from "./component-plate";
 import { RouteStack } from "./route-stack";
 
-// The detail page's title block: the component's plate, its name, any callout (kept above the fold:
-// the optional / off-chain claim must not sit below it), the summary and the proposal note.
 export function DetailHeader({ entry }: { entry: EcosystemEntry }) {
   return (
     <header className="space-y-6">
@@ -15,6 +13,9 @@ export function DetailHeader({ entry }: { entry: EcosystemEntry }) {
       <h1 className="font-display text-4xl leading-[1.0] font-medium tracking-[-0.035em] text-balance [overflow-wrap:anywhere] sm:text-5xl xl:text-6xl">
         {entry.title}
       </h1>
+      <p className="max-w-[44ch] text-2xl leading-snug font-medium tracking-[-0.015em]">
+        {entry.headline}
+      </p>
       {entry.callout ? (
         <p
           role="note"
@@ -23,7 +24,6 @@ export function DetailHeader({ entry }: { entry: EcosystemEntry }) {
           {entry.callout.text}
         </p>
       ) : null}
-      <p className="max-w-[44ch] text-xl leading-snug">{entry.summary}</p>
       <p className="max-w-[52ch] text-sm leading-relaxed text-fg-muted">
         {DETAIL_COPY.proposed.text}
       </p>

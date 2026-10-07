@@ -15,7 +15,6 @@ test("without JavaScript the six components are working links inside the svg", a
 test("without JavaScript every label is visible and each link navigates", async ({ page }) => {
   for (const slug of SLUGS) {
     await page.goto("/");
-    // Interface carries three titles (one per face); the first is the part's own.
     const title = page.locator(`svg g[data-slug="${slug}"] text.eco-title`).first();
     await expect(title).toBeVisible();
     await heroLink(page, slug).click();

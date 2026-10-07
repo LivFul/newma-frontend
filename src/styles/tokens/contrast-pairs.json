@@ -70,12 +70,12 @@
     "min": 3
   },
   {
-    "fg": "--color-eco-compute",
+    "fg": "--color-eco-compute-ink",
     "bg": "--color-bg",
     "min": 4.5
   },
   {
-    "fg": "--color-eco-compute",
+    "fg": "--color-eco-compute-ink",
     "bg": "--color-bg-elevated",
     "min": 4.5
   },

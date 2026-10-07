@@ -63,7 +63,7 @@ test("the workflow sits between the product introduction and the six components"
 test("the six components index is unchanged by the new section", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("#components").getByRole("link")).toHaveCount(6);
-  await expect(page.getByRole("link", { name: "See the demo" })).toHaveCount(2);
+  await expect(page.getByRole("link", { name: "Explore the demo" })).toHaveCount(4);
 });
 
 test.describe("without JavaScript", () => {

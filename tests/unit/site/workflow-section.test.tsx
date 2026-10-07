@@ -33,7 +33,7 @@ describe("WorkflowSection", () => {
 
   it("adds no demo link of its own", () => {
     render(<WorkflowSection />);
-    expect(screen.queryByRole("link", { name: "See the demo" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Explore the demo" })).toBeNull();
   });
 
   it("is axe clean", async () => {

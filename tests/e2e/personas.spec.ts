@@ -9,7 +9,7 @@ test("each persona icon sits inline, left of its role title", async ({ page }) =
   const cards = page.locator("#product ul[role='list'] > li").filter({ has: page.locator("svg") });
   await cards.first().scrollIntoViewIfNeeded();
   const count = await cards.count();
-  expect(count).toBe(4);
+  expect(count).toBe(5);
 
   for (let index = 0; index < count; index += 1) {
     const card = cards.nth(index);

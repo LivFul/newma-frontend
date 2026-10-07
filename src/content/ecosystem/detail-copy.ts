@@ -6,23 +6,25 @@ const block = (id: string, text: string, claims: readonly string[] = []): CopyBl
 
 const ALL_PAGES = ["C-40", "C-41", "C-42", "C-43", "C-44", "C-45"] as const;
 
-// Fixed headings and sentences shared by the six detail pages.
 export const DETAIL_COPY = Object.freeze({
   relatedHeading: block("detail.related.heading", "Other components", ["C-48"]),
   fitHeading: block("detail.fit.heading", "How it fits the platform"),
+  descriptionHeading: block("detail.description.heading", "Description", ALL_PAGES),
+  functionsHeading: block("detail.functions.heading", "Designed functions", ALL_PAGES),
+  handoffHeading: block("detail.handoff.heading", "Handoff", ALL_PAGES),
   proposed: block(
     "detail.proposed",
     "This page describes a proposed architecture. It is not evidence of an existing deployment.",
     ALL_PAGES,
   ),
   sourcesHeading: block("detail.sources.heading", "Sources"),
-  demoHeading: block("detail.demo.heading", "See it in the demo"),
-  demoCta: block("detail.demo.cta", "See it in the demo", ["C-47"]),
+  demoHeading: block("detail.demo.heading", "Explore the demo"),
+  demoCta: block("detail.demo.cta", "Explore the demo", ["C-47"]),
   ogAlt: block("detail.og.alt", "A NEWMA ecosystem component", ["C-50"]),
   signIn: block("detail.demo.signin", "Opens Demo sign-in.", ["C-47"]),
+  backToEcosystem: block("detail.back.ecosystem", "Back to ecosystem", ["C-48"]),
 });
 
-/** What the demo block says after "Opens Demo sign-in." (claim C-47). */
 export function demoInstruction(entry: EcosystemEntry): string {
   const { href, workflow } = entry.demo;
   return href === "/demo"
@@ -35,6 +37,5 @@ export function demoLabelsSentence(entry: EcosystemEntry): string | null {
   return labels.length === 0 ? null : `In the demo this is labelled ${labels.join(", ")}.`;
 }
 
-/** Page title of a component page (claim C-50, derived). */
 export const detailTitle = (entry: EcosystemEntry): string =>
   `${entry.title} \u2014 NEWMA ecosystem`;

@@ -1,5 +1,4 @@
 import type { CopyBlock } from "../types";
-import { HERO } from "./copy";
 
 const block = (id: string, text: string, claims: readonly string[]): CopyBlock =>
   Object.freeze({ id, text, claims: Object.freeze([...claims]) });
@@ -8,15 +7,21 @@ const block = (id: string, text: string, claims: readonly string[]): CopyBlock =
 export const WORDMARK = Object.freeze({
   org: block("chrome.wordmark.org", "LivFul", []),
   product: block("chrome.wordmark.product", "NEWMA", []),
-  homeLabel: block("chrome.wordmark.label", "LivFul NEWMA home", []),
+  homeLabel: block("chrome.wordmark.label", "NEWMA by LivFul Therapeutics", []),
 });
 
 export const NAV_LINKS = Object.freeze([
-  Object.freeze({ block: block("chrome.nav.product", "Product", []), href: "/#product" }),
-  Object.freeze({ block: block("chrome.nav.about", "About LivFul", []), href: "/#about" }),
+  Object.freeze({ block: block("chrome.nav.overview", "Overview", []), href: "/#product" }),
+  Object.freeze({
+    block: block("chrome.nav.how", "How it works", []),
+    href: "/#workflow",
+  }),
+  Object.freeze({ block: block("chrome.nav.ecosystem", "Ecosystem", []), href: "/#components" }),
+  Object.freeze({ block: block("chrome.nav.about", "About Newma", []), href: "/#about" }),
 ]);
 
 export const ACCESS_LABEL = block("chrome.access", "Access NEWMA", ["C-21"]);
+export const DEMO_CTA = block("chrome.demo", "Explore the demo", ["C-21"]);
 
 // Staff-only tool on its own origin behind Cloudflare Access; a navigation label, so no claim.
 export const AVELOZ_LINK = Object.freeze({
@@ -26,21 +31,29 @@ export const AVELOZ_LINK = Object.freeze({
   href: "https://aveloz.livful.com",
 });
 
-// Assumption A-P4-02: no contact detail exists in any source.
-export const FOOTER_CONTACT = block(
-  "chrome.footer.contact",
-  "Contact details to be supplied by LivFul.",
+export const FOOTER_DESCRIPTOR = block(
+  "chrome.footer.descriptor",
+  "Connecting authorized botanical knowledge with computational research and experimental evidence.",
   ["C-29"],
 );
-export const FOOTER_DISCLAIMER = HERO.disclaimer;
-export const FOOTER_LEGAL_LINKS = Object.freeze([
+
+export const FOOTER_DISCLAIMER = block(
+  "chrome.footer.disclaimer",
+  "NEWMA is in development. The demo uses synthetic data and does not establish scientific performance, production readiness or regulatory compliance.",
+  ["C-21"],
+);
+
+export const FOOTER_LINKS = Object.freeze([
+  Object.freeze({ block: DEMO_CTA, href: "/access" }),
+  Object.freeze({ block: block("chrome.footer.about", "About Newma", []), href: "/#about" }),
   Object.freeze({
     block: block("chrome.footer.privacy", "Privacy", ["C-30"]),
     href: "/legal/privacy",
   }),
   Object.freeze({ block: block("chrome.footer.terms", "Terms", ["C-30"]), href: "/legal/terms" }),
 ]);
-export const FOOTER_NAV_LABEL = block("chrome.footer.nav", "Legal", ["C-30"]);
+
+export const FOOTER_NAV_LABEL = block("chrome.footer.nav", "Footer", ["C-30"]);
 export const HEADER_NAV_LABEL = block("chrome.header.nav", "Sections", []);
 export const HEADER_MENU = block("chrome.header.menu", "Menu", []);
 export const HEADER_MOBILE_NAV = block("chrome.header.mobile", "Mobile sections", []);

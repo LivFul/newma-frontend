@@ -1,7 +1,5 @@
 import type { CopyBlock } from "../types";
 
-// Text read by assistive technology for the hero graphic (claim C-48): a design-intent description of
-// the TA section 1 flow, with the provenance component named as optional.
 export const HERO_SVG_TITLE: CopyBlock = Object.freeze({
   id: "hero.svg.title",
   text: "NEWMA ecosystem diagram",
@@ -10,11 +8,7 @@ export const HERO_SVG_TITLE: CopyBlock = Object.freeze({
 
 export const HERO_SVG_DESC: CopyBlock = Object.freeze({
   id: "hero.svg.desc",
-  text:
-    "Six proposed components, each linking to its page. Interface is the input for people and for " +
-    "other applications through an API. Agentic Compute and Scientific Review refine work in a " +
-    "loop over the Data and Knowledge records, with Provenance and DLT as an optional extension. " +
-    "Wet Lab is the validation step.",
+  text: "NEWMA\u2019s proposed discovery pathway connects authorized medicinal plant knowledge, computational hypotheses, material confirmation, approved experiments and reviewed results. Evidence checkpoints guide advancement, while access restrictions protect knowledge and materials outside the authorized research scope.",
   claims: Object.freeze(["C-48"]),
 });
 
