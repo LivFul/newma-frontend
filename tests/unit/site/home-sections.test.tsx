@@ -101,7 +101,7 @@ describe("HeroSection", () => {
     expect(screen.getByText(HERO.disclaimer.text)).toBeInTheDocument();
   });
 
-  it("exposes the pipeline diagram with its accessible name inside the hero", () => {
+  it("exposes the ecosystem diagram with its accessible name inside the hero", () => {
     const { container } = render(<HeroSection />);
     const hero = container.querySelector<HTMLElement>("section#hero")!;
     expect(hero.querySelector("figure[data-hero]")).not.toBeNull();

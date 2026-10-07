@@ -5,12 +5,6 @@ const WCAG_AUTO_MOTION_LIMIT_MS = 5000;
 // The hero background lines are an ambient, slow, deliberate loop that was asked for by name; every
 // other animation on the page must stay finite and short.
 const AMBIENT_LOOP = "botanical-drift";
-// The pipeline diagram's own deliberate loops (a slowly turning loop and pulsing chevrons). Like the
-// background lines they may run forever, but only by moving transform or opacity.
-const PIPELINE_LOOPS: Readonly<Record<string, readonly string[]>> = {
-  "loop-spin": ["transform"],
-  "chevron-pulse": ["opacity", "transform"],
-};
 
 type Running = { name: string; endMs: number; properties: string[] };
 
@@ -46,16 +40,8 @@ test("the hero lines drift by transform and nothing else loops", async ({ page }
   expect(drift?.endMs, "an endless loop").toBeGreaterThan(1e9);
   expect(drift?.properties).toEqual(["transform"]);
 
-  for (const { name, endMs, properties } of animations) {
+  for (const { name, endMs } of animations) {
     if (name === AMBIENT_LOOP) continue;
-    const allowed = PIPELINE_LOOPS[name];
-    if (allowed) {
-      expect(
-        properties.every((property) => allowed.includes(property)),
-        `loop ${name}`,
-      ).toBe(true);
-      continue;
-    }
     expect(endMs, `animation ${name}`).toBeLessThanOrEqual(WCAG_AUTO_MOTION_LIMIT_MS);
   }
 

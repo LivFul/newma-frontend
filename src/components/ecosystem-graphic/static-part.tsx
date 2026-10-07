@@ -10,10 +10,9 @@ export function StaticPart({ geometry, index, children }: PartProps) {
     "--ex": `${geometry.exploded.x}px`,
     "--ey": `${geometry.exploded.y}px`,
     "--i": index,
-    "--eco-depth": geometry.depth,
   } as CSSProperties;
   return (
-    <g className="eco-part" data-slug={geometry.slug} data-depth={geometry.depth} style={style}>
+    <g className="eco-part" data-slug={geometry.slug} style={style}>
       {children}
     </g>
   );
