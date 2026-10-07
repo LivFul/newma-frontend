@@ -230,7 +230,11 @@ Buttons are pills. Cards use 1.25rem corners. The leaf and the capsule are the o
 
 Tokens: fast 150ms, base 280ms, slow 600ms. Animate transform and opacity only. `prefers-reduced-motion: reduce` zeros every duration.
 
-Springs are CSS `linear()` curves sampled from damped-spring step responses, with a cubic-bezier fallback. `--motion-spring-settle` (critically damped, no overshoot) drives entrances, reveals, card lift and the mobile menu. `--motion-spring-snappy` (about 7% overshoot) is for the `scale` of pressable controls only: hover lifts to 1.025, press sinks to 0.97, and a transition retargets from its live value, so a press or lift can be interrupted mid-flight. Colour, filter and shadow never use the overshooting curve. Stagger steps are literal class names in `src/components/site/type.ts` so Tailwind can generate them.
+Springs are CSS `linear()` curves sampled from damped-spring step responses, with a cubic-bezier fallback. `--motion-spring-settle` (critically damped, no overshoot) drives entrances, reveals, card lift and the mobile menu. `--motion-spring-snappy` (about 16% overshoot) is for the `scale` of pressable controls only: hover lifts to 1.04, press sinks to 0.96, and a transition retargets from its live value, so a press or lift can be interrupted mid-flight. Position carries over on interruption; velocity does not, because CSS restarts the curve. Colour, filter and shadow never use the overshooting curve.
+
+Only the hero cascades: its four items rise in 60ms steps, the one orchestrated entrance on the page. Section reveals rise as a whole and their children only fade in with them. Stagger steps are literal class names in `src/components/site/type.ts` so Tailwind can generate them, and the step index is a type, so an out-of-range step fails to compile.
+
+The hero's diagram sits on a scrim, not a card: a feathered, borderless wash with no blur, densest under the caption and hint (`--hero-scrim-text`) and lightest at the top where only the photo shows. `tests/unit/site/hero-stage.test.ts` proves AA for the muted caption text from that alpha over a black photo pixel, so the check does not depend on viewport width.
 
 ## Components
 

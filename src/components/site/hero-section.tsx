@@ -50,7 +50,7 @@ export function HeroSection() {
         </div>
         <div className="relative px-5 py-8 md:px-12 lg:col-span-6">
           <div
-            className="hero-stage absolute inset-x-8 inset-y-4 hidden lg:block"
+            className="hero-stage absolute -inset-x-6 -inset-y-14 hidden lg:block"
             aria-hidden="true"
           />
           <div className="relative">

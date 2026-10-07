@@ -90,11 +90,11 @@ describe("hero background and installed-app contracts", () => {
   });
 
   it("fades the hero entrance with compositor properties only, and only when motion is allowed", () => {
-    const frames = blockAfter(globals, "@keyframes hero-fade-up");
+    const frames = blockAfter(globals, "@keyframes hero-rise");
     expect(frames).toContain("opacity");
     expect(frames).toContain("transform");
     expect(frames).not.toMatch(/background|width|height|top|left/);
-    const use = globals.indexOf("animation: hero-fade-up");
+    const use = globals.indexOf("animation: hero-rise");
     expect(use).toBeGreaterThan(0);
     expect(globals.slice(globals.lastIndexOf("@media", use))).toMatch(
       /^@media \(prefers-reduced-motion: no-preference\)/,
