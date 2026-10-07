@@ -2,6 +2,11 @@
   --motion-duration-fast: 150ms;
   --motion-duration-base: 280ms;
   --motion-duration-slow: 600ms;
+  --motion-duration-reveal: 400ms;
+  --motion-stagger-tight: 60ms;
+  --motion-stagger-base: 80ms;
+  --motion-distance-sm: 8px;
+  --motion-distance-md: 16px;
   --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --motion-ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
   /* Tailwind transition-* utilities consume the tokens. */
@@ -14,6 +19,11 @@
     --motion-duration-fast: 0ms;
     --motion-duration-base: 0ms;
     --motion-duration-slow: 0ms;
+    --motion-duration-reveal: 0ms;
+    --motion-stagger-tight: 0ms;
+    --motion-stagger-base: 0ms;
+    --motion-distance-sm: 0px;
+    --motion-distance-md: 0px;
   }
   /* Safety net for any animation or transition that bypasses the tokens. */
   *,

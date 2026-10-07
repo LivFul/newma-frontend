@@ -96,6 +96,7 @@ describe("WorkflowViewer", () => {
     expect(await screen.findByRole("button", { name: LABELS.explore })).toBeInTheDocument();
     expect(sceneLoaded).not.toHaveBeenCalled();
     expect(screen.queryByTestId("scene")).toBeNull();
+    expect(document.querySelector(".workflow-swap")).not.toBeNull();
   });
 
   it("has a status region that is empty until something happens", async () => {
@@ -114,6 +115,17 @@ describe("WorkflowViewer", () => {
     expect(screen.getByRole("status")).toHaveTextContent(LABELS.ready);
     expect(screen.getByRole("button", { name: LABELS.close })).toBeInTheDocument();
     expect(sceneLoaded).toHaveBeenCalledTimes(1);
+  });
+
+  // Value: protects=the 3D scene crossfades with the same class as the diagram; fails_when=the scene branch drops workflow-swap; why_new=the existing assertion only finds the class on the diagram; seam=none
+  it("crossfades the scene with the same swap class as the diagram", async () => {
+    const user = userEvent.setup();
+    await renderViewer();
+    expect(screen.getByText("static diagram").closest(".workflow-swap")).not.toBeNull();
+    await user.click(await screen.findByRole("button", { name: LABELS.explore }));
+    const scene = await screen.findByTestId("scene");
+    expect(scene.closest(".workflow-swap")).not.toBeNull();
+    expect(screen.queryByText("static diagram")).toBeNull();
   });
 
   it("returns to the diagram from the back button and keeps focus on the same control", async () => {

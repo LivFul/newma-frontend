@@ -9,6 +9,8 @@ type WordmarkProps = {
   /** Size classes. The lockup is wide, so phones use a fixed width and larger screens use height. */
   imageClassName?: string;
   priority?: boolean;
+  /** Names the lockup for a cross-route view transition. Only one instance may opt in. */
+  viewTransition?: boolean;
   children?: ReactNode;
 };
 
@@ -19,6 +21,7 @@ export function Wordmark({
   label = WORDMARK.homeLabel.text,
   imageClassName = "h-auto w-28 max-w-[min(100%,9rem)] sm:h-10 sm:w-auto sm:max-w-none",
   priority = false,
+  viewTransition = false,
   children,
 }: WordmarkProps) {
   return (
@@ -34,6 +37,7 @@ export function Wordmark({
         height={156}
         priority={priority}
         className={imageClassName}
+        style={viewTransition ? { viewTransitionName: "wordmark" } : undefined}
       />
       {children}
     </Link>

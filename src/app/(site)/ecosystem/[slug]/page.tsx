@@ -6,7 +6,6 @@ import { DemoLink } from "@/components/site/demo-link";
 import { DetailHeader } from "@/components/site/detail-header";
 import { JsonLd } from "@/components/site/json-ld";
 import { RelatedComponents } from "@/components/site/related-components";
-import { SourcesList } from "@/components/site/sources-list";
 import { DETAIL_COPY, detailTitle } from "@/content/ecosystem/detail-copy";
 import {
   ECOSYSTEM,
@@ -55,7 +54,6 @@ export default async function EcosystemPage({ params }: Params) {
             </h2>
             <p className="mt-4 max-w-[52ch] text-xl leading-snug text-fg-muted">{entry.fit}</p>
           </section>
-          <SourcesList entry={entry} />
           <DemoLink entry={entry} />
           <RelatedComponents current={slug} />
           <p className="mt-10">

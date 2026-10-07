@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { EcosystemGraphic } from "@/components/ecosystem-graphic/ecosystem-graphic";
 import { HERO } from "@/content/home/copy";
 import { AccessLink } from "./access-link";
+import { heroEntrance } from "./type";
 
 export function HeroSection() {
   return (
@@ -15,19 +16,23 @@ export function HeroSection() {
         }}
         aria-hidden="true"
       />
-      <div className="grid lg:grid-cols-12">
-        <div className="flex flex-col justify-center gap-7 px-5 pt-12 pb-8 md:px-12 md:py-20 lg:col-span-6">
+      <div className="grid min-h-[calc(100dvh-var(--size-header))] items-center lg:grid-cols-12">
+        <div className="flex flex-col justify-center gap-8 px-5 py-16 md:px-12 md:py-20 lg:col-span-6">
           <h1
             id="hero-heading"
             className="font-display text-display leading-[0.98] font-medium tracking-display text-balance [overflow-wrap:anywhere]"
           >
             {HERO.title.text}
           </h1>
-          <p className="max-w-[46ch] text-xl font-medium leading-snug tracking-[-0.01em]">
+          <p
+            className={`${heroEntrance(1)} max-w-[46ch] text-xl font-medium leading-snug tracking-[-0.01em]`}
+          >
             {HERO.tagline.text}
           </p>
-          <p className="max-w-[46ch] text-lg leading-relaxed text-fg-muted">{HERO.lede.text}</p>
-          <div className="flex flex-wrap items-center gap-3">
+          <p className={`${heroEntrance(2)} max-w-[46ch] text-lg leading-relaxed text-fg-muted`}>
+            {HERO.lede.text}
+          </p>
+          <div className={`${heroEntrance(3)} flex flex-wrap items-center gap-3`}>
             <AccessLink variant="primary" size="lg" className="min-h-12">
               {HERO.demoCta.text}
             </AccessLink>
@@ -35,11 +40,11 @@ export function HeroSection() {
               <a href="#workflow">{HERO.howCta.text}</a>
             </Button>
           </div>
-          <p className="max-w-[52ch] text-base leading-relaxed text-fg-muted">
+          <p className={`${heroEntrance(4)} max-w-[52ch] text-base leading-relaxed text-fg-muted`}>
             {HERO.disclaimer.text}
           </p>
         </div>
-        <div className="relative px-4 pt-4 pb-8 sm:px-8 lg:col-span-6 lg:px-10 lg:pt-16">
+        <div className="relative px-5 py-8 md:px-12 lg:col-span-6">
           <EcosystemGraphic />
         </div>
       </div>

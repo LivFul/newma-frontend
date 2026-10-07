@@ -5,8 +5,6 @@ import {
   ECOSYSTEM,
   ECOSYSTEM_SLUGS,
   metaDescription,
-  SOURCE_TITLES,
-  sourceLabel,
   type DemoHref,
 } from "@/content/ecosystem/registry";
 
@@ -28,16 +26,11 @@ describe("ecosystem registry", () => {
     for (const slug of ECOSYSTEM_SLUGS) expect(ECOSYSTEM[slug].slug).toBe(slug);
   });
 
-  it("gives every entry a summary, a fit sentence and at least two sources", () => {
+  it("gives every entry a summary and a fit sentence", () => {
     for (const slug of ECOSYSTEM_SLUGS) {
       const entry = ECOSYSTEM[slug];
       expect(entry.summary.length, slug).toBeGreaterThan(60);
       expect(entry.fit.length, slug).toBeGreaterThan(30);
-      expect(entry.sources.length, slug).toBeGreaterThanOrEqual(2);
-      for (const source of entry.sources) {
-        expect(Object.keys(SOURCE_TITLES)).toContain(source.doc);
-        expect(source.section).toMatch(/^[0-9A-Z.]+$/);
-      }
     }
   });
 
@@ -64,10 +57,11 @@ describe("ecosystem registry", () => {
     expect(files).toEqual([...ECOSYSTEM_SLUGS].map((s) => `${s}.mdx`).sort());
   });
 
-  it("states optional and off-chain on the provenance entry", () => {
+  it("states trust, security and off-chain on the provenance entry", () => {
     const entry = ECOSYSTEM["provenance-dlt"];
-    const text = `${entry.summary} ${entry.fit}`.toLowerCase();
-    expect(text).toContain("optional");
+    const text = `${entry.summary} ${entry.summaryDetail} ${entry.fit}`.toLowerCase();
+    expect(text).toContain("trust");
+    expect(text).toContain("security");
     expect(text).toContain("off-chain");
     expect(entry.callout?.text).toBe(
       "Digital verification supports record review; it does not independently establish consent, material identity or scientific validity.",
@@ -82,7 +76,7 @@ describe("ecosystem registry", () => {
       "Mock ELN",
       "Demo sign-in",
       "Demo signature, not production key",
-      "Optional, simulated",
+      "Simulated",
     ]);
     for (const slug of ECOSYSTEM_SLUGS) {
       for (const label of ECOSYSTEM[slug].demo.labels) expect(allowed.has(label), label).toBe(true);
@@ -93,24 +87,13 @@ describe("ecosystem registry", () => {
       "Simulated compute",
     ]);
     expect([...ECOSYSTEM["wet-lab"].demo.labels]).toEqual(["Mock ELN"]);
-    expect([...ECOSYSTEM["provenance-dlt"].demo.labels]).toEqual(["Optional, simulated"]);
+    expect([...ECOSYSTEM["provenance-dlt"].demo.labels]).toEqual(["Simulated"]);
     expect([...ECOSYSTEM["scientific-review"].demo.labels]).toEqual([
       "Demo signature, not production key",
     ]);
   });
 
-  it("cites only the three closed documents", () => {
-    expect(SOURCE_TITLES).toEqual({
-      TA: "NEWMA Technology Architecture and Workflows",
-      ARCH: "NEWMA technological architecture and technology stack",
-      PRD: "NEWMA Product Requirements Document v1.0",
-    });
-    expect(sourceLabel({ doc: "TA", section: "4" })).toBe(
-      "NEWMA Technology Architecture and Workflows § 4",
-    );
-  });
-
-  it("declares a C-4x claim for every page, plus the optional statement on provenance", () => {
+  it("declares a C-4x claim for every page, plus the verification statement on provenance", () => {
     ECOSYSTEM_SLUGS.forEach((slug, i) => {
       expect(ECOSYSTEM[slug].claims).toContain(`C-4${i}`);
     });
