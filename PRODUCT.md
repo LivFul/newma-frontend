@@ -30,6 +30,7 @@ The demo platform (`/demo`, W1–W10 + guided tour) is used by those same visito
 ## Surfaces
 
 - Public site: homepage, six ecosystem component pages (`/ecosystem/<slug>`), legal pages.
+- PWA: install prompt (service worker at `/sw.js`) and offline fallback (`/offline`).
 - Demo access: persona sign-in (`/access`).
 - Demo platform: workflow workspaces W1–W10, jobs, guided tour.
 
