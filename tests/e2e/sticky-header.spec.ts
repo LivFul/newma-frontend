@@ -75,7 +75,9 @@ test("there is no horizontal scroll at 320 px width", async ({ page }) => {
   );
   expect(overflow).toBeLessThanOrEqual(0);
   await expect(headerAccess(page)).toBeVisible();
-  await expect(page.getByRole("link", { name: "NEWMA by LivFul Therapeutics" }).first()).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "NEWMA by LivFul Therapeutics" }).first(),
+  ).toBeVisible();
 });
 
 type FocusState = null | "foreign" | { inHeader: boolean; isSkip: boolean; top: number };
