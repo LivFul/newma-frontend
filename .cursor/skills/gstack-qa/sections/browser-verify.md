@@ -1,5 +1,6 @@
 <!-- AUTO-GENERATED from browser-verify.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
+
 # Browser repair verification
 
 Use this section only for a browser defect. Re-run the original interaction and an

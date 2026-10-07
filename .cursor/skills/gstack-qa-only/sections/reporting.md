@@ -1,5 +1,6 @@
 <!-- AUTO-GENERATED from reporting.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
+
 # Finalize a report from retained evidence
 
 Complete these steps before the final report Write. They use retained results, not

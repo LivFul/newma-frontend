@@ -1,5 +1,6 @@
 <!-- AUTO-GENERATED from browser-setup.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
+
 # Browser setup
 
 Read this section only for an explicitly selected browser surface. Functional-only
@@ -83,23 +84,23 @@ If `NEEDS_SETUP`, follow the **Browser access decision** above for ./setup autho
 
 Every `aside repl` script in this skill maps onto `$B` commands. State persists between calls, so a flow is a command sequence, not one script; navigation invalidates `snapshot` refs (re-snapshot before clicking by ref); start every pass with an explicit `$B goto`.
 
-| Aside script step | `$B` equivalent |
-|---|---|
-| `openTab(url)` / `pg.goto(url)` | `$B goto <url>` |
-| `snapshot(pg, { interactive: true })` → `s.tree` | `$B snapshot -i` |
-| `pg.locator("e12").click()` | `$B click @e12` |
-| `pg.fill(sel, text)` | `$B fill @eN "text"` |
-| `DIFF_START`/`DIFF_END` (`s.diff`) | `$B snapshot -D` |
-| `CONSOLE_ERRORS=` (the console hook) | `$B console --errors` |
-| `pg.screenshot({ path })` + the `ASIDE_DIR` copy | `$B screenshot <path>` (already on disk) |
-| `annotatedScreenshot(pg)` | `$B snapshot -i -a -o <path>` |
-| the responsive loop (`Emulation.setDeviceMetricsOverride`) | `$B responsive <prefix>` |
-| the links script (`LINK <status> <url>`) | `$B links` (`text → href`, no status); for statuses run the HEAD-fetch loop via `$B js` |
-| `document.body.innerText` (`TEXT_START`/`TEXT_END`) | `$B text` |
-| `NAV=` / `RESOURCES=` | `$B perf` (+ `$B js "<expr>"` for resources) |
-| `pg.evaluate(() => ...)` | `$B js "<expr>"` (`$B eval <file>` for multi-line) |
-| `pg.pdf({ path })` | `$B pdf <out> [flags]` |
-| `closeTab(pg)` | nothing (daemon tabs persist); `$B closetab` when done |
+| Aside script step                                          | `$B` equivalent                                                                         |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `openTab(url)` / `pg.goto(url)`                            | `$B goto <url>`                                                                         |
+| `snapshot(pg, { interactive: true })` → `s.tree`           | `$B snapshot -i`                                                                        |
+| `pg.locator("e12").click()`                                | `$B click @e12`                                                                         |
+| `pg.fill(sel, text)`                                       | `$B fill @eN "text"`                                                                    |
+| `DIFF_START`/`DIFF_END` (`s.diff`)                         | `$B snapshot -D`                                                                        |
+| `CONSOLE_ERRORS=` (the console hook)                       | `$B console --errors`                                                                   |
+| `pg.screenshot({ path })` + the `ASIDE_DIR` copy           | `$B screenshot <path>` (already on disk)                                                |
+| `annotatedScreenshot(pg)`                                  | `$B snapshot -i -a -o <path>`                                                           |
+| the responsive loop (`Emulation.setDeviceMetricsOverride`) | `$B responsive <prefix>`                                                                |
+| the links script (`LINK <status> <url>`)                   | `$B links` (`text → href`, no status); for statuses run the HEAD-fetch loop via `$B js` |
+| `document.body.innerText` (`TEXT_START`/`TEXT_END`)        | `$B text`                                                                               |
+| `NAV=` / `RESOURCES=`                                      | `$B perf` (+ `$B js "<expr>"` for resources)                                            |
+| `pg.evaluate(() => ...)`                                   | `$B js "<expr>"` (`$B eval <file>` for multi-line)                                      |
+| `pg.pdf({ path })`                                         | `$B pdf <out> [flags]`                                                                  |
+| `closeTab(pg)`                                             | nothing (daemon tabs persist); `$B closetab` when done                                  |
 
 Label `$B` output with the same evidence lines (`URL=`, `CONSOLE_ERRORS=`, `DIFF_START`/`DIFF_END`) so the report reads identically.
 

@@ -5,6 +5,7 @@ description: |
   Use when: "security audit", "threat model", "OWASP", "CSO review", "recheck a vulnerability".
   Voice triggers (speech-to-text aliases): "see-so", "see so", "security review", "security check", "vulnerability scan", "run security".
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 
@@ -20,19 +21,19 @@ Do not send findings, source, secrets, harnesses, or bundles to gbrain, telemetr
 
 ## Arguments
 
-| Invocation | Contract |
-|---|---|
-| `/cso` | Static daily investigation; supported findings and coverage. No application execution. |
-| `/cso --comprehensive` | With a matching qualified runtime catalog profile, adds isolated setup, reproduction, and up to three repair candidates. An authenticated out-of-process assertion witness can produce a `runtime_tested` bundle; project-test completion remains `self_reported`. `tested` is reserved for a future target-independent completion witness and is not emitted today. |
-| `/cso --doctor` | Diagnose prerequisites in 30 seconds; no downloads. Ready images must match an exact local catalog digest. |
-| `/cso --resume <run>` | Continue the retained snapshot under its original policy and budget. |
-| `/cso --replay <bundle>` | Repeat verification with matching recorded inputs. |
-| `/cso --recheck <finding>` | Fresh current-source investigation; closure requires new evidence. |
-| `--infra`, `--code`, `--skills`, `--supply-chain`, `--owasp`, `--scope <domain>` | Select one audit scope. |
-| `--diff` | Constrain findings to branch/worktree changes and their affected security paths. |
-| `--base <ref>` | Select the comparison base, including for diff mode. |
-| `--budget <seconds>` | Bound wall-clock investigation time, including setup. |
-| `--offline` | Disable helper, scanner, download, and advisory network access. |
+| Invocation                                                                       | Contract                                                                                                                                                                                                                                                                                                                                                             |
+| -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/cso`                                                                           | Static daily investigation; supported findings and coverage. No application execution.                                                                                                                                                                                                                                                                               |
+| `/cso --comprehensive`                                                           | With a matching qualified runtime catalog profile, adds isolated setup, reproduction, and up to three repair candidates. An authenticated out-of-process assertion witness can produce a `runtime_tested` bundle; project-test completion remains `self_reported`. `tested` is reserved for a future target-independent completion witness and is not emitted today. |
+| `/cso --doctor`                                                                  | Diagnose prerequisites in 30 seconds; no downloads. Ready images must match an exact local catalog digest.                                                                                                                                                                                                                                                           |
+| `/cso --resume <run>`                                                            | Continue the retained snapshot under its original policy and budget.                                                                                                                                                                                                                                                                                                 |
+| `/cso --replay <bundle>`                                                         | Repeat verification with matching recorded inputs.                                                                                                                                                                                                                                                                                                                   |
+| `/cso --recheck <finding>`                                                       | Fresh current-source investigation; closure requires new evidence.                                                                                                                                                                                                                                                                                                   |
+| `--infra`, `--code`, `--skills`, `--supply-chain`, `--owasp`, `--scope <domain>` | Select one audit scope.                                                                                                                                                                                                                                                                                                                                              |
+| `--diff`                                                                         | Constrain findings to branch/worktree changes and their affected security paths.                                                                                                                                                                                                                                                                                     |
+| `--base <ref>`                                                                   | Select the comparison base, including for diff mode.                                                                                                                                                                                                                                                                                                                 |
+| `--budget <seconds>`                                                             | Bound wall-clock investigation time, including setup.                                                                                                                                                                                                                                                                                                                |
+| `--offline`                                                                      | Disable helper, scanner, download, and advisory network access.                                                                                                                                                                                                                                                                                                      |
 
 ## Mode Resolution
 
@@ -40,14 +41,14 @@ Resolve flags before sections. Scope flags are **mutually exclusive**; reject co
 
 Phases 0, 1, 12, 13, and 14 always run for an investigation. Select the remaining phases as follows:
 
-| Scope | Phases from the audit section |
-|---|---|
-| default | 2–11 |
-| `--infra` | 2–6 |
-| `--code` | 7, 9–11 |
-| `--skills` | 8 |
-| `--supply-chain` | 3 |
-| `--owasp` | 9 |
+| Scope              | Phases from the audit section                                      |
+| ------------------ | ------------------------------------------------------------------ |
+| default            | 2–11                                                               |
+| `--infra`          | 2–6                                                                |
+| `--code`           | 7, 9–11                                                            |
+| `--skills`         | 8                                                                  |
+| `--supply-chain`   | 3                                                                  |
+| `--owasp`          | 9                                                                  |
 | `--scope <domain>` | Relevant checks for the named domain; record their exact coverage. |
 
 Diff mode may read unchanged callers, middleware, schemas, configuration, and dependencies needed for assessment. Report out-of-scope variants as follow-up scope. Historical-secret coverage uses only the helper's pinned base/snapshot.
@@ -124,12 +125,12 @@ For each candidate record affected-version evidence, direct/transitive relations
 
 When the helper selects a matching qualified runtime catalog profile, comprehensive preparation uses this declared matrix:
 
-| Stack | Declared public acquisition inputs | Offline execution |
-|---|---|---|
-| Node | npm lock/shrinkwrap v2–3; frozen acquisition with lifecycle scripts disabled | Contained workspaces, build hooks, app, and tests |
-| Bun | Text `bun.lock`; frozen acquisition with scripts and automatic installs disabled | App/workspace hooks and tests |
-| Python | `uv.lock` with local packages excluded, or fully pinned hashed requirements; matching public wheels | Local/editable packages and known build backends |
-| Rails | `Gemfile.lock` parsed as inert data; exact public gems | Gemfile evaluation, native extensions, and Rails boot |
+| Stack  | Declared public acquisition inputs                                                                  | Offline execution                                     |
+| ------ | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Node   | npm lock/shrinkwrap v2–3; frozen acquisition with lifecycle scripts disabled                        | Contained workspaces, build hooks, app, and tests     |
+| Bun    | Text `bun.lock`; frozen acquisition with scripts and automatic installs disabled                    | App/workspace hooks and tests                         |
+| Python | `uv.lock` with local packages excluded, or fully pinned hashed requirements; matching public wheels | Local/editable packages and known build backends      |
+| Rails  | `Gemfile.lock` parsed as inert data; exact public gems                                              | Gemfile evaluation, native extensions, and Rails boot |
 
 Python `--no-build` alone does not exclude every first-party build. Private/VCS dependencies, outside paths, unsupported locks/platforms, incomplete build dependencies, or missing native libraries become exact prerequisites; never rewrite locks or permit unrestricted network execution. Rails uses synthetic test configuration for every database connection, credentials, storage, mail, and jobs. SQLite and disposable PostgreSQL are supported only when the reviewed runtime catalog and qualification checks say so.
 
@@ -175,33 +176,33 @@ The default scope is the repository. Include global/user skill settings only whe
 
 **Source version: OWASP Top 10:2025** ([official taxonomy](https://owasp.org/Top10/2025/0x00_2025-Introduction/)). Map actual tested invariants to the current categories, including SSRF under access control and exceptional-condition handling:
 
-| ID | Domain | Investigation focus |
-|---|---|---|
-| A01 | Broken Access Control | Object/tenant/function authorization, traversal, SSRF, origin boundaries |
-| A02 | Security Misconfiguration | Reachable debug/admin surfaces, effective production configuration |
-| A03 | Software Supply Chain Failures | Dependency/build/release trust; use Phase 3 and 4 evidence |
-| A04 | Cryptographic Failures | Secret lifecycle, transport/storage protection, security-sensitive randomness |
-| A05 | Injection | SQL/command/template/HTML sinks with attacker-controlled input |
-| A06 | Insecure Design | Business invariants, abuse paths, races, resource and financial limits |
-| A07 | Authentication Failures | Session lifecycle, recovery, token/audience checks, credential attacks |
-| A08 | Software or Data Integrity Failures | Artifact integrity, deserialization, trusted state transitions |
-| A09 | Security Logging and Alerting Failures | Security-event disclosure, tampering, detection-critical blind spots |
-| A10 | Mishandling of Exceptional Conditions | Fail-open paths, cleanup/rollback failures, partial state changes |
+| ID  | Domain                                 | Investigation focus                                                           |
+| --- | -------------------------------------- | ----------------------------------------------------------------------------- |
+| A01 | Broken Access Control                  | Object/tenant/function authorization, traversal, SSRF, origin boundaries      |
+| A02 | Security Misconfiguration              | Reachable debug/admin surfaces, effective production configuration            |
+| A03 | Software Supply Chain Failures         | Dependency/build/release trust; use Phase 3 and 4 evidence                    |
+| A04 | Cryptographic Failures                 | Secret lifecycle, transport/storage protection, security-sensitive randomness |
+| A05 | Injection                              | SQL/command/template/HTML sinks with attacker-controlled input                |
+| A06 | Insecure Design                        | Business invariants, abuse paths, races, resource and financial limits        |
+| A07 | Authentication Failures                | Session lifecycle, recovery, token/audience checks, credential attacks        |
+| A08 | Software or Data Integrity Failures    | Artifact integrity, deserialization, trusted state transitions                |
+| A09 | Security Logging and Alerting Failures | Security-event disclosure, tampering, detection-critical blind spots          |
+| A10 | Mishandling of Exceptional Conditions  | Fail-open paths, cleanup/rollback failures, partial state changes             |
 
 **Selected ASVS version: 5.0.0** ([official standard](https://owasp.org/www-project-application-security-verification-standard/), [pinned requirements](https://raw.githubusercontent.com/OWASP/ASVS/v5.0.0/5.0/docs_en/OWASP_Application_Security_Verification_Standard_5.0.0_en.csv)). Use these selected requirements where applicable, recording the invariant and test/inspection evidence:
 
-| Requirement | Assessment oracle |
-|---|---|
-| `v5.0.0-1.2.1` | Untrusted output preserves the intended HTML/HTTP context. |
-| `v5.0.0-1.2.4` | Data values cannot alter database query structure. |
-| `v5.0.0-1.2.5` | Untrusted arguments cannot introduce operating-system commands. |
-| `v5.0.0-1.3.6` | Outbound requests enforce permitted destinations and protocols. |
-| `v5.0.0-2.4.1` | Abusive call volume cannot bypass defined resource limits. |
-| `v5.0.0-5.3.2` | File paths cannot escape their intended source/destination. |
-| `v5.0.0-7.4.1` | A terminated session cannot continue authorizing requests. |
-| `v5.0.0-8.2.2` | Object access requires that caller's permission. |
-| `v5.0.0-8.4.1` | Operations preserve tenant isolation. |
-| `v5.0.0-16.5.3` | Exceptions preserve security checks and fail safely. |
+| Requirement     | Assessment oracle                                               |
+| --------------- | --------------------------------------------------------------- |
+| `v5.0.0-1.2.1`  | Untrusted output preserves the intended HTML/HTTP context.      |
+| `v5.0.0-1.2.4`  | Data values cannot alter database query structure.              |
+| `v5.0.0-1.2.5`  | Untrusted arguments cannot introduce operating-system commands. |
+| `v5.0.0-1.3.6`  | Outbound requests enforce permitted destinations and protocols. |
+| `v5.0.0-2.4.1`  | Abusive call volume cannot bypass defined resource limits.      |
+| `v5.0.0-5.3.2`  | File paths cannot escape their intended source/destination.     |
+| `v5.0.0-7.4.1`  | A terminated session cannot continue authorizing requests.      |
+| `v5.0.0-8.2.2`  | Object access requires that caller's permission.                |
+| `v5.0.0-8.4.1`  | Operations preserve tenant isolation.                           |
+| `v5.0.0-16.5.3` | Exceptions preserve security checks and fail safely.            |
 
 Read the pinned standard before adding further requirement mappings. Do not invent IDs, map old IDs onto v5, or claim complete ASVS compliance from a partial audit.
 

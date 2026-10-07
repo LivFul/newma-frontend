@@ -1,5 +1,6 @@
 <!-- AUTO-GENERATED from qa-patterns.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
+
 # Browser QA methodology
 
 Run only for selected browser surfaces. Map diffs with source before probes; discovery stays black-box, diagnosis caller-owned.
@@ -47,12 +48,15 @@ Use the supplied URL or first responder/staging/preview; ask if none. Test chang
 **No identifiable pages:** use Quick plus discovered interactions, even for backend/config/infrastructure changes.
 
 ### Full (default with a URL)
+
 Visit every reachable page (5-15 minutes). Score health; document 5-10 evidenced issues, never invent any.
 
 ### Quick (`--quick`)
+
 30 seconds: homepage + top 5 navigation targets. Check loads/console/broken links; score per Health Score Rubric; skip detailed issues/checklist, never the shared loop's gates.
 
 ### Regression (`--regression <baseline>`)
+
 Run Full; append fixed/new issues and score delta. Preserve the supplied prior baseline.
 
 ## Workflow
@@ -162,49 +166,59 @@ Report score, Top 3 Things to Fix by severity, console health, severity counts, 
 Compute each category score (0-100), then take the weighted average.
 
 ### Counting
+
 - Deduplicate the same root cause across pages. Use one primary category, first applicable: Links (navigation), Accessibility (access barriers), Functional (behavior), Performance (speed), Visual (layout), Content (copy), UX (friction), Console (remaining errors). No double deductions.
 - Exclude **untested** categories; label partial scores **provisional** with coverage. None tested: "not scored". Compare only identical coverage.
 
 ### Console (weight: 15%)
+
 Deduplicate reproducible errors/exceptions by message+source across pages. Exclude warnings, info, and defects scored elsewhere.
+
 - 0 errors → 100
 - 1-3 errors → 70
 - 4-10 errors → 40
 - 11+ errors → 10
 
 ### Links (weight: 10%)
+
 Count unique broken destinations, including client-side routes: repeatable 4xx/5xx, missing routes/anchors, or timeouts. Exclude expected auth redirects and resource/API requests.
+
 - 0 broken → 100
 - Each broken link → -15 (minimum 0)
 
 ### Per-Category Scoring (Visual, Functional, UX, Content, Performance, Accessibility)
+
 Start at 100; deduct per finding:
+
 - Critical issue → -25
 - High issue → -15
 - Medium issue → -8
 - Low issue → -3
-Floor: 0.
+  Floor: 0.
 
 Use the highest applicable severity; record impact/workaround:
+
 - **Critical:** data loss, security/privacy exposure, or core app unusable for all users.
 - **High:** core/major task blocked without a workaround.
 - **Medium:** task impaired but a workaround exists.
 - **Low:** cosmetic/copy/friction issue without lost task completion.
-Console/Links use counts instead.
+  Console/Links use counts instead.
 
 ### Weights
-| Category | Weight |
-|----------|--------|
-| Console | 15% |
-| Links | 10% |
-| Visual | 10% |
-| Functional | 20% |
-| UX | 15% |
-| Performance | 10% |
-| Content | 5% |
-| Accessibility | 15% |
+
+| Category      | Weight |
+| ------------- | ------ |
+| Console       | 15%    |
+| Links         | 10%    |
+| Visual        | 10%    |
+| Functional    | 20%    |
+| UX            | 15%    |
+| Performance   | 10%    |
+| Content       | 5%     |
+| Accessibility | 15%    |
 
 ### Final Score
+
 Use decimal weights (15% = 0.15): `score = Σ (category_score × weight) / Σ tested weights`. Round only the final score to the nearest integer (0.5 rounds up).
 
 ---

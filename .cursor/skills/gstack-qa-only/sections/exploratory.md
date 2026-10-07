@@ -1,5 +1,6 @@
 <!-- AUTO-GENERATED from exploratory.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
+
 # Shared exploratory QA
 
 The **caller** (/qa, /qa-only, /review or /ship) owns decisions, tests, fixes and publication. Discovery writes only reports/evidence
@@ -8,6 +9,7 @@ and owned fixture state; no workflows, framework installs or publication.
 ## 0. Preparation gate
 
 Complete these Reads in order before writing charters or probing:
+
 1. Read `sections/scope.md` relative to the installed `gstack-qa` SKILL.md directory in full and select the surfaces.
 2. Read the selected surface methods below in full.
 
@@ -30,23 +32,23 @@ Missing or unreadable assets, prerequisites or permission block affected probes,
 Reuse resolved REPORT_DIR; otherwise own a fresh `.gstack/qa-reports` subdirectory.
 Write a **charter** per behavior: contract, risk, entrypoint, isolation, exit condition, source, commands and inputs. Save charters as Markdown in the report.
 
-
 For /qa and /qa-only:
+
 - Browser Quick: SECONDS=30. Browser Full/Regression: SECONDS=900.
 - Functional Full, Quick and Regression have no default total timer.
-Set SECONDS to the shorter mode/caller limit; an unlimited mode uses the caller's bound.
-Without a total time limit, do not start D; announce finite command timeouts.
-Stop when scoped contracts are tested or blocked.
-Clocks/checkpoints use REPORT_DIR; mixed standalone runs use REPORT_DIR/browser and REPORT_DIR/functional, with one final report at REPORT_DIR. Caller paths win.
-R = owned probe directory; D = R/deadline.json. Quote paths.
-G = `$GSTACK_BIN/gstack-qa-deadline`; Q = `$GSTACK_BIN/gstack-qa-evidence`.
-Start once before baseline: `bun G start D SECONDS [EARLIER_UTC]` if bounded.
-EARLIER_UTC = caller's absolute deadline, if set.
-Functional: `bun Q capture R NNN [--public] --deadline D -- COMMAND ARGS`.
-Unbounded: use `--timeout-ms MS` instead. Use fresh three-digit IDs.
---public requires approved public/synthetic output; Q screens credentials. For complete private captures, await a safe Read of `R/.qa-evidence/NNN/observation.json`. Sensitive/incomplete captures cannot anchor checkpoints.
-Bounded browsers: `bun G run D -- COMMAND ARGS`. No detached probes.
-Never reset D/bypass G. Expiry or invalid/missing D stops probes; report unfinished coverage. QA_DEADLINE receipts are not observations.
+  Set SECONDS to the shorter mode/caller limit; an unlimited mode uses the caller's bound.
+  Without a total time limit, do not start D; announce finite command timeouts.
+  Stop when scoped contracts are tested or blocked.
+  Clocks/checkpoints use REPORT_DIR; mixed standalone runs use REPORT_DIR/browser and REPORT_DIR/functional, with one final report at REPORT_DIR. Caller paths win.
+  R = owned probe directory; D = R/deadline.json. Quote paths.
+  G = `$GSTACK_BIN/gstack-qa-deadline`; Q = `$GSTACK_BIN/gstack-qa-evidence`.
+  Start once before baseline: `bun G start D SECONDS [EARLIER_UTC]` if bounded.
+  EARLIER_UTC = caller's absolute deadline, if set.
+  Functional: `bun Q capture R NNN [--public] --deadline D -- COMMAND ARGS`.
+  Unbounded: use `--timeout-ms MS` instead. Use fresh three-digit IDs.
+  --public requires approved public/synthetic output; Q screens credentials. For complete private captures, await a safe Read of `R/.qa-evidence/NNN/observation.json`. Sensitive/incomplete captures cannot anchor checkpoints.
+  Bounded browsers: `bun G run D -- COMMAND ARGS`. No detached probes.
+  Never reset D/bypass G. Expiry or invalid/missing D stops probes; report unfinished coverage. QA_DEADLINE receipts are not observations.
 
 ## 2. Probe loop
 

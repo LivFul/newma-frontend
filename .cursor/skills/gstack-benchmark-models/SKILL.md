@@ -9,6 +9,7 @@ description: |
   "which model is best for X", "cross-model comparison", "model shootout". (gstack)
   Voice triggers (speech-to-text aliases): "compare models", "model shootout", "which model is best".
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 
@@ -98,6 +99,7 @@ The user has context you do not. Cross-model agreement is a recommendation, not 
 ## Completion Status Protocol
 
 When completing a skill workflow, report status using one of:
+
 - **DONE** — completed with evidence.
 - **DONE_WITH_CONCERNS** — completed, but list concerns.
 - **BLOCKED** — cannot proceed; state blocker and what was tried.
@@ -170,6 +172,7 @@ If not found, stop and tell the user to reinstall gstack.
 ## Step 1: Choose a prompt
 
 Use AskUserQuestion with the preamble format:
+
 - **Re-ground:** current project + branch.
 - **Simplify:** "A cross-model benchmark runs the same prompt through 2-3 AI models and shows you how they compare on speed, cost, and output quality. What prompt should we use?"
 - **RECOMMENDATION:** A because benchmarking against a real skill exposes tool-use differences, not just raw generation.
@@ -197,6 +200,7 @@ Show the dry-run output. The "Adapter availability" section tells the user which
 If ALL three show NOT READY: stop with a clear message — benchmark can't run without at least one authed provider. Suggest `claude login`, `codex login`, or `gemini login` / `export GOOGLE_API_KEY`.
 
 If at least one is OK: AskUserQuestion:
+
 - **Simplify:** "Which models should we include? The dry-run above showed which are authed. Unauthed ones will be skipped cleanly — they won't abort the batch."
 - **RECOMMENDATION:** A (all authed providers) because running as many as possible gives the richest comparison.
 - **Options:**
@@ -213,6 +217,7 @@ If at least one is OK: AskUserQuestion:
 ```
 
 If judge is available, AskUserQuestion:
+
 - **Simplify:** "The quality judge scores each model's output on a 0-10 scale using Anthropic's Claude as a tiebreaker. Adds about USD 0.05/run. Recommended if you care about output quality, not just latency and cost."
 - **RECOMMENDATION:** A — the whole point is comparing quality, not just speed.
 - **Options:**
@@ -240,6 +245,7 @@ Stream the output as it arrives. This is slow — each provider runs the prompt 
 ## Step 5: Interpret results
 
 After the table prints, summarize for the user:
+
 - **Fastest** — provider with lowest latency.
 - **Cheapest** — provider with lowest cost.
 - **Highest quality** (if `--judge` ran) — provider with highest score.
@@ -252,6 +258,7 @@ If any provider hit an error (auth/timeout/rate_limit), call it out with the rem
 ## Step 6: Offer to save results
 
 AskUserQuestion:
+
 - **Simplify:** "Save this benchmark as JSON so you can compare future runs against it?"
 - **RECOMMENDATION:** A — skill performance drifts as providers update their models; a saved baseline catches quality regressions.
 - **Options:**

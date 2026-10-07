@@ -8,6 +8,7 @@ description: |
   PDF", "turn this markdown into a PDF", or "generate a document". (gstack)
   Voice triggers (speech-to-text aliases): "make this a pdf", "make it a pdf", "export to pdf", "turn this into a pdf", "turn this markdown into a pdf", "generate a pdf", "make a pdf from", "pdf this markdown".
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 
@@ -69,6 +70,7 @@ If `MAKE_PDF_READY` is printed: `$P` is the binary path for the rest of
 the skill. Use `$P` (not an explicit path) so the skill body stays portable.
 
 Core commands:
+
 - `$P generate <input.md> [output.pdf]` — render markdown to PDF (80% use case)
 - `$P generate --cover --toc essay.md out.pdf` — full publication layout
 - `$P generate --watermark DRAFT memo.md draft.pdf` — diagonal DRAFT watermark
@@ -77,6 +79,7 @@ Core commands:
 - `$P --help` — full flag reference
 
 Output contract:
+
 - `stdout`: ONLY the output path on success. One line.
 - `stderr`: progress (`Rendering HTML... Generating PDF...`) unless `--quiet`.
 - Exit 0 success / 1 bad args / 2 render error / 3 Paged.js timeout / 4 no browser available (open the Aside app, or run `./setup` to build gstack's own browser).
@@ -135,6 +138,7 @@ The user has context you do not. Cross-model agreement is a recommendation, not 
 ## Completion Status Protocol
 
 When completing a skill workflow, report status using one of:
+
 - **DONE** — completed with evidence.
 - **DONE_WITH_CONCERNS** — completed, but list concerns.
 - **BLOCKED** — cannot proceed; state blocker and what was tried.
@@ -214,7 +218,8 @@ DOCX need one to rasterize; without it they embed as source text).
 ### 80% case — memo/letter
 
 One command, no flags. Gets a clean PDF with running header + page numbers
-+ CONFIDENTIAL footer by default.
+
+- CONFIDENTIAL footer by default.
 
 ```bash
 $P generate letter.md                 # writes /tmp/letter.pdf
@@ -265,12 +270,12 @@ raw code.
 
 Fence info-string options:
 
-```
+````
 ```mermaid title="Auth flow"        ← caption + aria-label
 ```mermaid render=false             ← keep it as a code block (today's behavior)
 ```mermaid page=landscape           ← force this diagram onto a landscape page
 ```mermaid page=portrait            ← veto auto-landscape for this diagram
-```
+````
 
 A ` ```excalidraw ` fence contains a full .excalidraw scene file (what
 excalidraw.com saves). Authoring NEW diagrams from English is `/diagram`'s

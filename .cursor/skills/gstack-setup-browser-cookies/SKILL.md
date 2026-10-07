@@ -6,6 +6,7 @@ description: |
   Use before QA testing authenticated pages. Use when asked to "import cookies",
   "login to the site", or "authenticate the browser". (gstack)
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 
@@ -95,6 +96,7 @@ The user has context you do not. Cross-model agreement is a recommendation, not 
 ## Completion Status Protocol
 
 When completing a skill workflow, report status using one of:
+
 - **DONE** — completed with evidence.
 - **DONE_WITH_CONCERNS** — completed, but list concerns.
 - **BLOCKED** — cannot proceed; state blocker and what was tried.
@@ -164,6 +166,7 @@ fi
 ```
 
 If `NEEDS_SETUP`:
+
 1. Tell the user: "gstack browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
 2. Run: `cd <SKILL_DIR> && ./setup`
 3. If `bun` is not installed:
@@ -194,6 +197,7 @@ If `NEEDS_SETUP`:
 ```bash
 $B status
 ```
+
 If status says `Mode: cdp`, stop: the real browser already has sessions.
 
 ## 2. Confirm options before import

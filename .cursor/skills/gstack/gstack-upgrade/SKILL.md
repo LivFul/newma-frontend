@@ -6,6 +6,7 @@ description: |
   "update gstack", or "get latest version".
   Voice triggers (speech-to-text aliases): "upgrade the tools", "update the tools", "gee stack upgrade", "g stack upgrade".
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 
@@ -20,6 +21,7 @@ This section is referenced by all skill preambles when they detect `UPGRADE_AVAI
 ### Step 1: Ask the user (or auto-upgrade)
 
 First, check if auto-upgrade is enabled:
+
 ```bash
 _AUTO=""
 [ "${GSTACK_AUTO_UPGRADE:-}" = "1" ] && _AUTO="true"
@@ -30,18 +32,22 @@ echo "AUTO_UPGRADE=$_AUTO"
 **If `AUTO_UPGRADE=true` or `AUTO_UPGRADE=1`:** Skip AskUserQuestion. Log "Auto-upgrading gstack v{old} → v{new}..." and proceed directly to Step 2. On setup failure, follow Step 4's install-specific recovery: vendored installs restore their backup; git installs stop with the pre-upgrade commit recorded, without a destructive reset. Never claim restoration unless it actually succeeded.
 
 **Otherwise**, use AskUserQuestion:
+
 - Question: "gstack **v{new}** is available (you're on v{old}). Upgrade now?"
 - Options: ["Yes, upgrade now", "Always keep me up to date", "Not now", "Never ask again"]
 
 **If "Yes, upgrade now":** Proceed to Step 2.
 
 **If "Always keep me up to date":**
+
 ```bash
 ~/.cursor/skills/gstack/bin/gstack-config set auto_upgrade true
 ```
+
 Tell user: "Auto-upgrade enabled. Future updates will install automatically." Then proceed to Step 2.
 
 **If "Not now":** Write snooze state with escalating backoff (first snooze = 24h, second = 48h, third+ = 1 week), then continue with the current skill. Do not mention the upgrade again.
+
 ```bash
 _SNOOZE_FILE="$HOME/.gstack/update-snoozed"
 _REMOTE_VER="{new}"
@@ -57,14 +63,17 @@ _NEW_LEVEL=$((_CUR_LEVEL + 1))
 [ "$_NEW_LEVEL" -gt 3 ] && _NEW_LEVEL=3
 echo "$_REMOTE_VER $_NEW_LEVEL $(date +%s)" > "$_SNOOZE_FILE"
 ```
+
 Note: `{new}` is the remote version from the `UPGRADE_AVAILABLE` output — substitute it from the update check result.
 
 Tell user the snooze duration: "Next reminder in 24h" (or 48h or 1 week, depending on level). Tip: "Set `auto_upgrade: true` in `~/.gstack/config.yaml` for automatic upgrades."
 
 **If "Never ask again":**
+
 ```bash
 ~/.cursor/skills/gstack/bin/gstack-config set update_check false
 ```
+
 Tell user: "Update checks disabled. Run `~/.cursor/skills/gstack/bin/gstack-config set update_check true` to re-enable."
 Continue with the current skill.
 
@@ -117,6 +126,7 @@ Use the install type and directory detected in Step 2:
 Fast-forward first (#2517) — the same policy the session-update auto-upgrade
 uses. `--autostash` carries local edits over the pull; render-footprint dirt
 is discarded first because it is regenerable and poisons stashes (#2569):
+
 ```bash
 cd "$INSTALL_DIR"
 # Discard render-footprint dirt (#2569): pre-v1.67 gbrain-enabled installs
@@ -159,9 +169,11 @@ STASH_OUTPUT=$(git stash 2>&1)
 git reset --hard origin/main
 ./setup --host cursor
 ```
+
 If `$STASH_OUTPUT` contains "Saved working directory", warn the user: "Note: local changes were stashed (any modified generated SKILL.md/sections files were discarded first — they regenerate on setup). Run `git stash pop` in the skill directory to restore your own changes."
 
 **For vendored installs** (vendored, vendored-global):
+
 ```bash
 PARENT=$(dirname "$INSTALL_DIR")
 # A stale .bak from a previously crashed upgrade would make the mv below NEST
@@ -219,9 +231,11 @@ if ! grep -qF '.cursor/skills/gstack/' .gitignore 2>/dev/null; then
 fi
 rm -rf "$LOCAL_GSTACK"
 ```
+
 Tell user: "Removed vendored copy at `$LOCAL_GSTACK` (team mode active — global install is the source of truth). Commit the `.gitignore` change when ready."
 
 **If `LOCAL_GSTACK` is non-empty AND `TEAM_MODE` is NOT `true`:** Update it by copying from the freshly-upgraded primary install (same approach as README vendored install):
+
 ```bash
 [ -e "$LOCAL_GSTACK.bak" ] && { echo "ERROR: stale vendored backup; inspect it before retrying." >&2; exit 1; }
 mv "$LOCAL_GSTACK" "$LOCAL_GSTACK.bak" || exit 1
@@ -235,6 +249,7 @@ else
   exit 1
 fi
 ```
+
 Only on `LOCAL_SYNC_OK`, tell user: "Also updated vendored copy at `$LOCAL_GSTACK` — commit `.cursor/skills/gstack/` when you're ready." Otherwise stop and report the recovery outcome; do not continue migrations or announce success.
 
 ### Step 4.75: Run version migrations
@@ -324,6 +339,7 @@ rm -f ~/.gstack/update-snoozed
 Read `$INSTALL_DIR/CHANGELOG.md`. Find all version entries between the old version and the new version. Summarize as 5-7 bullets grouped by theme. Don't overwhelm — focus on user-facing changes. Skip internal refactors unless they're significant.
 
 Format:
+
 ```
 gstack v{new} — upgraded from v{old}!
 
@@ -346,10 +362,12 @@ After showing What's New, continue with whatever skill the user originally invok
 When invoked directly as `/gstack-upgrade` (not from a preamble):
 
 1. Force a fresh update check (bypass cache):
+
 ```bash
 ~/.cursor/skills/gstack/bin/gstack-update-check --force 2>/dev/null || \
 .cursor/skills/gstack/bin/gstack-update-check --force 2>/dev/null || true
 ```
+
 Use the output to determine if an upgrade is available.
 
 2. If `UPGRADE_AVAILABLE <old> <new>`: follow Steps 2-6 above.
@@ -363,6 +381,7 @@ Run the Step 2 bash block above to detect the primary install type and directory
 **If `LOCAL_GSTACK` is non-empty AND `TEAM_MODE` is `true`:** Remove the vendored copy using the Step 4.5 team-mode removal bash block above. Tell user: "Global v{version} is up to date. Removed stale vendored copy (team mode active). Commit the `.gitignore` change when ready."
 
 **If `LOCAL_GSTACK` is non-empty AND `TEAM_MODE` is NOT `true`**, compare versions:
+
 ```bash
 PRIMARY_VER=$(cat "$INSTALL_DIR/VERSION" 2>/dev/null || echo "unknown")
 LOCAL_VER=$(cat "$LOCAL_GSTACK/VERSION" 2>/dev/null || echo "unknown")

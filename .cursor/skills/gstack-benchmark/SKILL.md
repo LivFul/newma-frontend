@@ -8,6 +8,7 @@ description: |
   "bundle size", "load time". (gstack)
   Voice triggers (speech-to-text aliases): "speed test", "check performance".
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 
@@ -97,6 +98,7 @@ The user has context you do not. Cross-model agreement is a recommendation, not 
 ## Completion Status Protocol
 
 When completing a skill workflow, report status using one of:
+
 - **DONE** — completed with evidence.
 - **DONE_WITH_CONCERNS** — completed, but list concerns.
 - **BLOCKED** — cannot proceed; state blocker and what was tried.
@@ -206,23 +208,23 @@ If `NEEDS_SETUP`: tell the user "gstack's own browser needs a one-time build (~1
 
 Every `aside repl` script in this skill maps onto `$B` commands. State persists between calls, so a flow is a command sequence, not one script; navigation invalidates `snapshot` refs (re-snapshot before clicking by ref); start every pass with an explicit `$B goto`.
 
-| Aside script step | `$B` equivalent |
-|---|---|
-| `openTab(url)` / `pg.goto(url)` | `$B goto <url>` |
-| `snapshot(pg, { interactive: true })` → `s.tree` | `$B snapshot -i` |
-| `pg.locator("e12").click()` | `$B click @e12` |
-| `pg.fill(sel, text)` | `$B fill @eN "text"` |
-| `DIFF_START`/`DIFF_END` (`s.diff`) | `$B snapshot -D` |
-| `CONSOLE_ERRORS=` (the console hook) | `$B console --errors` |
-| `pg.screenshot({ path })` + the `ASIDE_DIR` copy | `$B screenshot <path>` (already on disk) |
-| `annotatedScreenshot(pg)` | `$B snapshot -i -a -o <path>` |
-| the responsive loop (`Emulation.setDeviceMetricsOverride`) | `$B responsive <prefix>` |
-| the links script (`LINK <status> <url>`) | `$B links` (`text → href`, no status); for statuses run the HEAD-fetch loop via `$B js` |
-| `document.body.innerText` (`TEXT_START`/`TEXT_END`) | `$B text` |
-| `NAV=` / `RESOURCES=` | `$B perf` (+ `$B js "<expr>"` for resources) |
-| `pg.evaluate(() => ...)` | `$B js "<expr>"` (`$B eval <file>` for multi-line) |
-| `pg.pdf({ path })` | `$B pdf <out> [flags]` |
-| `closeTab(pg)` | nothing (daemon tabs persist); `$B closetab` when done |
+| Aside script step                                          | `$B` equivalent                                                                         |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `openTab(url)` / `pg.goto(url)`                            | `$B goto <url>`                                                                         |
+| `snapshot(pg, { interactive: true })` → `s.tree`           | `$B snapshot -i`                                                                        |
+| `pg.locator("e12").click()`                                | `$B click @e12`                                                                         |
+| `pg.fill(sel, text)`                                       | `$B fill @eN "text"`                                                                    |
+| `DIFF_START`/`DIFF_END` (`s.diff`)                         | `$B snapshot -D`                                                                        |
+| `CONSOLE_ERRORS=` (the console hook)                       | `$B console --errors`                                                                   |
+| `pg.screenshot({ path })` + the `ASIDE_DIR` copy           | `$B screenshot <path>` (already on disk)                                                |
+| `annotatedScreenshot(pg)`                                  | `$B snapshot -i -a -o <path>`                                                           |
+| the responsive loop (`Emulation.setDeviceMetricsOverride`) | `$B responsive <prefix>`                                                                |
+| the links script (`LINK <status> <url>`)                   | `$B links` (`text → href`, no status); for statuses run the HEAD-fetch loop via `$B js` |
+| `document.body.innerText` (`TEXT_START`/`TEXT_END`)        | `$B text`                                                                               |
+| `NAV=` / `RESOURCES=`                                      | `$B perf` (+ `$B js "<expr>"` for resources)                                            |
+| `pg.evaluate(() => ...)`                                   | `$B js "<expr>"` (`$B eval <file>` for multi-line)                                      |
+| `pg.pdf({ path })`                                         | `$B pdf <out> [flags]`                                                                  |
+| `closeTab(pg)`                                             | nothing (daemon tabs persist); `$B closetab` when done                                  |
 
 Label `$B` output with the same evidence lines (`URL=`, `CONSOLE_ERRORS=`, `DIFF_START`/`DIFF_END`) so the report reads identically.
 
@@ -239,9 +241,11 @@ You are a **Performance Engineer** who has optimized apps serving millions of re
 Your job is to measure, baseline, compare, and alert. You drive the Aside browser and read `performance.getEntries()` straight from the live page — real numbers from a real browser, not estimates.
 
 ## User-invocable
+
 When the user types `/benchmark`, run this skill.
 
 ## Arguments
+
 - `/benchmark <url>` — full performance audit with baseline comparison
 - `/benchmark <url> --baseline` — capture baseline (run before making changes)
 - `/benchmark <url> --quick` — single-pass timing check (no baseline needed)
@@ -264,6 +268,7 @@ mkdir -p .gstack/benchmark-reports/baselines
 Same as /canary — auto-discover from navigation or use `--pages`.
 
 If `--diff` mode:
+
 ```bash
 git diff $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || gh repo view --json defaultBranchRef -q .defaultBranchRef.name 2>/dev/null || echo main)...HEAD --name-only
 ```
@@ -290,6 +295,7 @@ await closeTab(pg); console.log("GSTACK_STEP_OK");
 `NAV=` is the navigation timing entry, `PAINT=` the paint entries (FCP lives here), `LCP=` the largest-contentful-paint start time (`null` if the page emitted no LCP entry within 3s), `RESOURCES=` the 15 slowest resources, `SCRIPTS=` / `CSS=` the bundle inventory, `SUMMARY=` request count, total transfer, and requests by type. A missing `GSTACK_STEP_OK` or a line starting with `[error` means the page did not load — record it as a failure, not a slow page.
 
 Extract key metrics from the labelled lines (`NAV=` unless stated otherwise):
+
 - **TTFB** (Time to First Byte): `responseStart - requestStart`
 - **FCP** (First Contentful Paint): the `first-contentful-paint` entry in `PAINT=`
 - **LCP** (Largest Contentful Paint): the `LCP=` line (`null` if the page emitted no LCP entry — record it as missing, not 0)
@@ -321,8 +327,8 @@ Save metrics to baseline file:
       "js_bundle_bytes": 450000,
       "css_bundle_bytes": 85000,
       "largest_resources": [
-        {"name": "main.js", "size": 320000, "duration": 180},
-        {"name": "vendor.js", "size": 130000, "duration": 90}
+        { "name": "main.js", "size": 320000, "duration": 180 },
+        { "name": "vendor.js", "size": 130000, "duration": 90 }
       ]
     }
   }
@@ -365,12 +371,13 @@ REGRESSIONS DETECTED: 4
 ```
 
 **Regression thresholds:**
+
 - Timing metrics: >50% increase OR >500ms absolute increase = REGRESSION
 - Timing metrics: >20% increase = WARNING
 - Bundle size and total transfer: >25% increase = REGRESSION
 - Bundle size and total transfer: >10% increase = WARNING
 - Request count: >30% increase = WARNING (no separate regression threshold)
-Apply REGRESSION before WARNING; otherwise OK. Negative deltas are improvements.
+  Apply REGRESSION before WARNING; otherwise OK. Negative deltas are improvements.
 
 ### Phase 6: Slowest Resources
 

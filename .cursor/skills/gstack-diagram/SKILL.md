@@ -8,6 +8,7 @@ description: |
   Use when asked to "make a diagram", "draw the architecture", "create a
   flowchart", "diagram this", or "visualize this flow". (gstack)
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 
@@ -97,6 +98,7 @@ The user has context you do not. Cross-model agreement is a recommendation, not 
 ## Completion Status Protocol
 
 When completing a skill workflow, report status using one of:
+
 - **DONE** — completed with evidence.
 - **DONE_WITH_CONCERNS** — completed, but list concerns.
 - **BLOCKED** — cannot proceed; state blocker and what was tried.
@@ -149,11 +151,11 @@ Skills that run plan reviews (`/plan-*-review`, `/codex review`) include the EXI
 
 Every run emits a **triplet**, never a dead pixel dump:
 
-| Artifact | What it's for |
-|---|---|
-| `<slug>.mmd` | the mermaid source — the LLM-friendly interchange format |
-| `<slug>.excalidraw` | editable scene — open it at excalidraw.com, move a box, keep working |
-| `<slug>.svg` + `<slug>.png` | crisp vector for docs + raster for chat/issues/READMEs |
+| Artifact                    | What it's for                                                        |
+| --------------------------- | -------------------------------------------------------------------- |
+| `<slug>.mmd`                | the mermaid source — the LLM-friendly interchange format             |
+| `<slug>.excalidraw`         | editable scene — open it at excalidraw.com, move a box, keep working |
+| `<slug>.svg` + `<slug>.png` | crisp vector for docs + raster for chat/issues/READMEs               |
 
 Rendering is fully offline: the diagram-render bundle
 (`lib/diagram-render/dist/diagram-render.html`) is one self-contained page, and
@@ -234,7 +236,7 @@ is 1950px wide (300dpi of a 6.5in placement). Success prints one `OK <path>`
 line per artifact. Read the output for two other lines:
 
 - A hard `ERROR:` line (e.g. `ERROR: render script did not finish: Error: Parse
-  error on line 4: ...`) is a mermaid parse error. Nothing was copied out. Show
+error on line 4: ...`) is a mermaid parse error. Nothing was copied out. Show
   the error to the user, fix the `.mmd`, and retry — do not hand the user a
   broken source file.
 - A `PAGE_ERRORS=[...]` entry containing `Error processing Mermaid diagram`

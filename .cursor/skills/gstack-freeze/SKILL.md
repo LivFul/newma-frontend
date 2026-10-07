@@ -7,10 +7,11 @@ description: |
   Use when asked to "freeze", "restrict edits", "only edit this folder",
   or "lock down edits". (gstack)
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
-> **Safety Advisory:** This skill includes safety checks that verify file edits are within the allowed scope boundary before applying, and verify file writes are within the allowed scope boundary before applying. When using this skill, always pause and verify before executing potentially destructive operations. If uncertain about a command's safety, ask the user for confirmation before proceeding.
 
+> **Safety Advisory:** This skill includes safety checks that verify file edits are within the allowed scope boundary before applying, and verify file writes are within the allowed scope boundary before applying. When using this skill, always pause and verify before executing potentially destructive operations. If uncertain about a command's safety, ask the user for confirmation before proceeding.
 
 # /freeze — Restrict Edits to a Directory
 
@@ -32,6 +33,7 @@ Ask the user which directory to restrict edits to. Use AskUserQuestion:
 Once the user provides a directory path:
 
 Set the user-selected boundary with the shared state writer. It resolves the physical absolute path and serializes replacement with investigation cleanup:
+
 ```bash
 bash "$HOME/.cursor/skills/gstack/freeze/bin/freeze-state.sh" set "<user-provided-path>"
 ```

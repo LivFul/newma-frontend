@@ -1,5 +1,6 @@
 <!-- AUTO-GENERATED from scope.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
+
 ### Select the surface before setup
 
 1. **Select the target.** Read the request, project instructions, docs, commands and

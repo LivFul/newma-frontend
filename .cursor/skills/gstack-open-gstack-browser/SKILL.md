@@ -8,6 +8,7 @@ description: |
   "open chrome", "real browser", "launch chrome", "side panel", or "control my browser".
   Voice triggers (speech-to-text aliases): "show me the browser".
 ---
+
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 
@@ -97,6 +98,7 @@ The user has context you do not. Cross-model agreement is a recommendation, not 
 ## Completion Status Protocol
 
 When completing a skill workflow, report status using one of:
+
 - **DONE** — completed with evidence.
 - **DONE_WITH_CONCERNS** — completed, but list concerns.
 - **BLOCKED** — cannot proceed; state blocker and what was tried.
@@ -165,6 +167,7 @@ fi
 ```
 
 If `NEEDS_SETUP`:
+
 1. Tell the user: "gstack browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
 2. Run: `cd <SKILL_DIR> && ./setup`
 3. If `bun` is not installed:
@@ -222,6 +225,7 @@ $B connect
 ```
 
 This launches GStack Browser (rebranded Chromium) in headed mode with:
+
 - A visible window you can watch (not your regular Chrome — it stays untouched)
 - The gstack sidebar extension auto-loaded via `launchPersistentContext`
 - Anti-bot stealth patches (sites like Google and NYTimes work without captchas)
@@ -270,6 +274,7 @@ Use AskUserQuestion:
 > (not your regular Chrome) with a golden shimmer line at the top of the page.
 >
 > The Side Panel extension should be auto-loaded. To open it:
+>
 > 1. Look for the **puzzle piece icon** (Extensions) in the toolbar — it may
 >    already show the gstack icon if the extension loaded successfully
 > 2. Click the **puzzle piece** → find **gstack browse** → click the **pin icon**
@@ -280,6 +285,7 @@ Use AskUserQuestion:
 > Playwright-controlled Chrome).
 
 Options:
+
 - A) I can see the Side Panel — let's go!
 - B) I can see Chrome but can't find the extension
 - C) Something went wrong
@@ -348,21 +354,25 @@ Tell the user:
 > You're all set! Here's what you can do with the connected Chrome:
 >
 > **Watch Claude work in real time:**
+>
 > - Run any gstack skill (`/qa`, `/design-review`, `/benchmark`) and watch
 >   every action happen in the visible Chrome window + Side Panel feed
 > - No cookie import needed — the Playwright browser shares its own session
 >
 > **Control the browser directly:**
+>
 > - **Sidebar chat** — type natural language in the Side Panel and the sidebar
 >   agent executes it (e.g., "fill in the login form and submit")
 > - **Browse commands** — `$B goto <url>`, `$B click <sel>`, `$B fill <sel> <val>`,
 >   `$B snapshot -i` — all visible in Chrome + Side Panel
 >
 > **Window management:**
+>
 > - `$B focus` — bring Chrome to the foreground anytime
 > - `$B disconnect` — close headed Chrome and return to headless mode
 >
 > **What skills look like in headed mode:**
+>
 > - `/qa` runs its full test suite in the visible browser — you see every page
 >   load, every click, every assertion
 > - `/design-review` takes screenshots in the real browser — same pixels you see
