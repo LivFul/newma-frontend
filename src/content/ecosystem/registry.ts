@@ -31,16 +31,6 @@ export const HERO_INTERFACE_FACES = Object.freeze({
   apps: Object.freeze({ title: "API", descriptor: "MCP for other applications" }),
 });
 
-export type SourceDoc = "TA" | "ARCH" | "PRD";
-export const SOURCE_TITLES: Readonly<Record<SourceDoc, string>> = Object.freeze({
-  TA: "NEWMA Technology Architecture and Workflows",
-  ARCH: "NEWMA technological architecture and technology stack",
-  PRD: "NEWMA Product Requirements Document v1.0",
-});
-export type Source = Readonly<{ doc: SourceDoc; section: string }>;
-export const sourceLabel = (source: Source): string =>
-  `${SOURCE_TITLES[source.doc]} \u00a7 ${source.section}`;
-
 export type DemoHref =
   | "/demo"
   | "/demo/w3-agent"
@@ -69,7 +59,6 @@ export type EcosystemEntry = Readonly<{
   descriptor: string;
   designedFunctions: readonly CopyBlock[];
   handoff: CopyBlock;
-  sources: readonly Source[];
   demo: DemoLink;
   claims: readonly string[];
   callout?: CopyBlock;
@@ -80,7 +69,6 @@ const entry = (value: Omit<EcosystemEntry, "title" | "descriptor">): EcosystemEn
     ...value,
     title: HERO_LABELS[value.slug].title,
     descriptor: HERO_LABELS[value.slug].descriptor,
-    sources: Object.freeze(value.sources.map((s) => Object.freeze(s))),
     demo: Object.freeze({ ...value.demo, labels: Object.freeze([...value.demo.labels]) }),
     designedFunctions: Object.freeze([...value.designedFunctions]),
     claims: Object.freeze(
@@ -99,10 +87,6 @@ export const ECOSYSTEM: Readonly<Record<EcosystemSlug, EcosystemEntry>> = Object
     homeSummary:
       "Define research questions, review findings and collaborate within your project\u2019s authorized access.",
     fit: "Every request from the Interface is designed to pass an API layer that checks identity, permissions and rights policy before any other component acts.",
-    sources: [
-      { doc: "TA", section: "1" },
-      { doc: "ARCH", section: "2A" },
-    ],
     designedFunctions: Object.freeze([
       fn(
         "ecosystem.interface.fn.submit",
@@ -143,11 +127,6 @@ export const ECOSYSTEM: Readonly<Record<EcosystemSlug, EcosystemEntry>> = Object
     homeSummary:
       "Coordinate computational research and screening within approved methods, budgets and permissions. Return ranked hypotheses with supporting sources and uncertainty.",
     fit: "It is designed to receive requests from the Interface and pass reviewable computational evidence to Scientific Review; it never approves advancement.",
-    sources: [
-      { doc: "TA", section: "2" },
-      { doc: "ARCH", section: "2B" },
-      { doc: "ARCH", section: "2C" },
-    ],
     designedFunctions: Object.freeze([
       fn(
         "ecosystem.agentic.fn.translate",
@@ -189,11 +168,6 @@ export const ECOSYSTEM: Readonly<Record<EcosystemSlug, EcosystemEntry>> = Object
     homeSummary:
       "Keep scientists responsible for experiment approval, evidence acceptance and candidate advancement.",
     fit: "It is designed to sit between computation and the laboratory and to gate every step toward a confirmed hit with independent mandatory conditions.",
-    sources: [
-      { doc: "TA", section: "2" },
-      { doc: "TA", section: "3" },
-      { doc: "PRD", section: "3.3" },
-    ],
     designedFunctions: Object.freeze([
       fn(
         "ecosystem.review.fn.rationale",
@@ -237,11 +211,6 @@ export const ECOSYSTEM: Readonly<Record<EcosystemSlug, EcosystemEntry>> = Object
     homeSummary:
       "Connect approved assay requests to materials, protocols, controls and experimental results.",
     fit: "Results are designed to flow back to Scientific Review, and only observations a scientist accepts become evidence that updates later prioritization.",
-    sources: [
-      { doc: "TA", section: "3" },
-      { doc: "ARCH", section: "2D" },
-      { doc: "PRD", section: "3.3" },
-    ],
     designedFunctions: Object.freeze([
       fn(
         "ecosystem.wetlab.fn.carry",
@@ -280,11 +249,6 @@ export const ECOSYSTEM: Readonly<Record<EcosystemSlug, EcosystemEntry>> = Object
     homeSummary:
       "Link authorized source knowledge, botanical materials, chemical identities and reviewed observations in a shared evidence record.",
     fit: "Every other component is designed to read and write through it, and it keeps each record linked from its botanical source to the assay observation.",
-    sources: [
-      { doc: "TA", section: "1" },
-      { doc: "ARCH", section: "2E" },
-      { doc: "PRD", section: "3.5" },
-    ],
     designedFunctions: Object.freeze([
       fn(
         "ecosystem.data.fn.connect",
@@ -320,15 +284,10 @@ export const ECOSYSTEM: Readonly<Record<EcosystemSlug, EcosystemEntry>> = Object
     summary:
       "Provenance & DLT is designed to associate decisions and records with signed, versioned provenance: a documented history of their origin and changes. Authoritative records remain off-chain.",
     summaryDetail:
-      "A distributed-ledger layer is an optional extension for anchoring provenance between partners. Agreed benefit obligations stay associated with the relevant records.",
+      "The distributed-ledger layer anchors provenance between partners and brings trust and security to the platform. Authoritative research records remain off-chain, and agreed benefit obligations stay associated with the relevant records.",
     homeSummary:
-      "Track the origin and history of records through signed, versioned provenance. An optional distributed-ledger layer could support verification between partners while authoritative research records remain off-chain.",
-    fit: "It is optional: the signed-log baseline comes first, and ledger, scoped proofs and settlement contracts are added only for a defined need.",
-    sources: [
-      { doc: "TA", section: "4" },
-      { doc: "ARCH", section: "2F" },
-      { doc: "PRD", section: "3.4" },
-    ],
+      "Track the origin and history of records through signed, versioned provenance. The distributed-ledger layer supports verification between partners while authoritative research records remain off-chain.",
+    fit: "Every record and decision is designed to connect through this layer, bringing trust, security and verifiable history to the platform.",
     designedFunctions: Object.freeze([
       fn(
         "ecosystem.provenance.fn.maintain",
@@ -345,7 +304,7 @@ export const ECOSYSTEM: Readonly<Record<EcosystemSlug, EcosystemEntry>> = Object
       ),
       fn(
         "ecosystem.provenance.fn.anchor",
-        "Allow optional ledger anchoring without placing authoritative research records on-chain.",
+        "Anchor provenance between partners without placing authoritative research records on-chain.",
         ["C-45"],
       ),
     ]),
@@ -357,7 +316,7 @@ export const ECOSYSTEM: Readonly<Record<EcosystemSlug, EcosystemEntry>> = Object
     demo: {
       href: "/demo/w6-provenance",
       workflow: "Signed provenance",
-      labels: ["Optional, simulated"],
+      labels: ["Simulated"],
     },
     claims: ["C-45", "C-46"],
     callout: Object.freeze({

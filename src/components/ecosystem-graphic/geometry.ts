@@ -28,7 +28,7 @@ export type PartGeometry = Readonly<{
   glyph: GlyphKey;
   dashed: boolean;
 }>;
-export type EdgeKind = "flow" | "rail" | "optional";
+export type EdgeKind = "flow" | "rail";
 export type Edge = Readonly<{
   id: string;
   from: EcosystemSlug;
@@ -96,7 +96,7 @@ export const PARTS: readonly PartGeometry[] = Object.freeze(
       ),
       tone: TONES[slug],
       glyph: GLYPHS[slug],
-      dashed: slug === "provenance-dlt",
+      dashed: false,
     }),
   ),
 );
@@ -152,12 +152,11 @@ export const EDGES: readonly Edge[] = Object.freeze([
   edge("agentic-compute", "data-knowledge", "rail", railPath("agentic-compute")),
   edge("scientific-review", "data-knowledge", "rail", railPath("scientific-review")),
   edge("wet-lab", "data-knowledge", "rail", railPath("wet-lab")),
-  // Signed-log baseline first; ledger and anchoring are optional extensions.
+  edge("provenance-dlt", "data-knowledge", "rail", railPath("provenance-dlt")),
   edge(
     "data-knowledge",
     "provenance-dlt",
-    "optional",
+    "flow",
     line(bottom("data-knowledge"), top("provenance-dlt")),
-    true,
   ),
 ]);

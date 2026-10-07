@@ -11,7 +11,6 @@ import DetailRoute, {
   generateStaticParams,
 } from "@/app/(site)/ecosystem/[slug]/page";
 import { ECOSYSTEM, ECOSYSTEM_SLUGS } from "@/content/ecosystem/registry";
-import { sourceLabel } from "@/content/ecosystem/registry";
 import { expectNoAxeViolations } from "../ui/axe";
 
 async function renderSlug(slug: string) {
@@ -53,13 +52,9 @@ describe("ecosystem detail route", () => {
         expect(screen.getByText(/proposed architecture/i)).toBeInTheDocument();
       });
 
-      it("lists its sources as an ordered list of document and section", async () => {
-        const entry = ECOSYSTEM[slug];
+      it("does not render a Sources section", async () => {
         await renderSlug(slug);
-        const heading = screen.getByRole("heading", { level: 2, name: "Sources" });
-        const list = heading.parentElement!.querySelector("ol")!;
-        const items = within(list).getAllByRole("listitem");
-        expect(items.map((li) => li.textContent)).toEqual(entry.sources.map(sourceLabel));
+        expect(screen.queryByRole("heading", { level: 2, name: "Sources" })).toBeNull();
       });
 
       it("ends with a demo block whose link is exactly /access and names the workflow and route", async () => {
