@@ -1,5 +1,3 @@
-import { LeafIcon } from "@/components/brand/leaf-icon";
-import { PillIcon } from "@/components/brand/pill-icon";
 import { Button } from "@/components/ui/button";
 import { EcosystemGraphic } from "@/components/ecosystem-graphic/ecosystem-graphic";
 import { HERO } from "@/content/home/copy";
@@ -40,10 +38,6 @@ export function HeroSection() {
           <p className="max-w-[52ch] text-base leading-relaxed text-fg-muted">
             {HERO.disclaimer.text}
           </p>
-          <div className="flex items-center gap-3 pt-2" aria-hidden="true">
-            <LeafIcon className="h-8 w-auto" />
-            <PillIcon className="h-8 w-auto" />
-          </div>
         </div>
         <div className="relative px-4 pt-4 pb-8 sm:px-8 lg:col-span-6 lg:px-10 lg:pt-16">
           <EcosystemGraphic />
