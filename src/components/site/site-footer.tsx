@@ -24,7 +24,7 @@ export function SiteFooter() {
           aria-label={FOOTER_NAV_LABEL.text}
           className="flex flex-col items-start gap-4 md:items-end"
         >
-          <ul role="list" className="flex flex-wrap gap-x-6 gap-y-2">
+          <ul role="list" className="flex max-w-full flex-wrap gap-x-6 gap-y-2">
             {FOOTER_LINKS.map((link) => (
               <li key={link.href}>
                 <Link

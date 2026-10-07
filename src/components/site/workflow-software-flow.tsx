@@ -13,7 +13,9 @@ export function WorkflowSoftwareFlow() {
         {WORKFLOW_SOFTWARE.heading.text}
       </h3>
       <p className="max-w-[60ch] leading-relaxed text-fg-muted">{WORKFLOW_SOFTWARE.intro.text}</p>
-      <p className="font-mono text-sm leading-relaxed text-fg">{WORKFLOW_SOFTWARE.chain.text}</p>
+      <p className="break-words font-mono text-sm leading-relaxed text-fg">
+        {WORKFLOW_SOFTWARE.chain.text}
+      </p>
       <p className="max-w-[60ch] leading-relaxed text-fg-muted">{WORKFLOW_SOFTWARE.body.text}</p>
       <p className="max-w-[60ch] text-sm leading-relaxed text-fg-muted">
         {WORKFLOW_SOFTWARE.disclaimer.text}
