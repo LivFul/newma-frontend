@@ -17,7 +17,6 @@ export const DETAIL_COPY = Object.freeze({
     "This page describes a proposed architecture. It is not evidence of an existing deployment.",
     ALL_PAGES,
   ),
-  sourcesHeading: block("detail.sources.heading", "Sources"),
   demoHeading: block("detail.demo.heading", "Explore the demo"),
   demoCta: block("detail.demo.cta", "Explore the demo", ["C-47"]),
   ogAlt: block("detail.og.alt", "A NEWMA ecosystem component", ["C-50"]),
