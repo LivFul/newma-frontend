@@ -46,9 +46,7 @@ export function HeroSection() {
           </div>
         </div>
         <div className="relative px-4 pt-4 pb-8 sm:px-8 lg:col-span-6 lg:px-10 lg:pt-16">
-          <div className="glass px-3 pt-6 pb-4">
-            <EcosystemGraphic />
-          </div>
+          <EcosystemGraphic />
         </div>
       </div>
     </section>
