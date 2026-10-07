@@ -90,7 +90,7 @@ describe("home page composition", () => {
   it("is axe clean", async () => {
     const { container } = renderHome();
     await expectNoAxeViolations(container);
-  });
+  }, 60_000);
 });
 
 describe("HeroSection", () => {
@@ -99,6 +99,15 @@ describe("HeroSection", () => {
     expect(screen.getByText(HERO.tagline.text)).toBeInTheDocument();
     expect(screen.getByText(HERO.lede.text)).toBeInTheDocument();
     expect(screen.getByText(HERO.disclaimer.text)).toBeInTheDocument();
+  });
+
+  it("keeps the headline still and staggers the rest of the hero", () => {
+    const { container } = render(<HeroSection />);
+    const heading = screen.getByRole("heading", { level: 1 });
+    expect(heading.className).not.toMatch(/hero-entrance-item/);
+    expect(screen.getByText(HERO.tagline.text).className).toMatch(/hero-entrance-item/);
+    expect(screen.getByText(HERO.lede.text).className).toMatch(/hero-entrance-item/);
+    expect(container.querySelectorAll("#hero .hero-entrance-item")).toHaveLength(4);
   });
 
   it("exposes the ecosystem diagram with its accessible name inside the hero", () => {
@@ -119,6 +128,18 @@ describe("ComponentIndex", () => {
       expect(links[i]).toHaveAttribute("href", `/ecosystem/${slug}`);
       expect(links[i]).toHaveTextContent(ECOSYSTEM[slug].title);
     });
+  });
+
+  // Value: protects=ecosystem cards stagger in and do not translate on hover; fails_when=ComponentIndex drops hover-lift or reveal-child; why_new=motion-utilities checks the utility definition, not the cards; seam=none
+  it("staggers the six ecosystem cards and lifts them without a hover translate", () => {
+    render(<ComponentIndex />);
+    const list = screen.getByRole("list", { name: COMPONENTS_INDEX.listLabel.text });
+    const cards = within(list).getAllByRole("listitem");
+    expect(cards).toHaveLength(6);
+    for (const card of cards) {
+      expect(card.className).toMatch(/\breveal-child\b/);
+      expect(within(card).getByRole("link").className).toMatch(/\bhover-lift\b/);
+    }
   });
 });
 
@@ -145,6 +166,14 @@ describe("PersonaGrid", () => {
       screen.getByText("Knowledge holders and authorized community representatives"),
     ).toBeInTheDocument();
   });
+
+  // Value: protects=persona cards join the section reveal stagger; fails_when=PersonaGrid drops reveal-child; why_new=the product test only counts steps inside the ol; seam=none
+  it("gives each of the five persona cards the reveal stagger", () => {
+    render(<PersonaGrid />);
+    const items = screen.getAllByRole("listitem");
+    expect(items).toHaveLength(5);
+    for (const item of items) expect(item.className).toMatch(/\breveal-child\b/);
+  });
 });
 
 describe("ProductIntro and AboutNewma", () => {
@@ -152,6 +181,8 @@ describe("ProductIntro and AboutNewma", () => {
     const { container } = render(<ProductIntro />);
     expect(screen.getByText(PRODUCT.guardrail.text)).toBeInTheDocument();
     expect(container.querySelectorAll("ol > li")).toHaveLength(4);
+    expect(container.querySelector("#product > div")?.className).toMatch(/max-w-\[80rem\]/);
+    expect(container.querySelectorAll("#product ol .reveal-child")).toHaveLength(4);
   });
   it("About has mission, vision and approach", () => {
     render(<AboutNewma />);

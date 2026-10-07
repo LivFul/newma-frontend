@@ -61,6 +61,7 @@ describe("ecosystem geometry", () => {
       "agentic-compute>scientific-review",
       "agentic-compute>wet-lab",
       "wet-lab>scientific-review",
+      "data-knowledge>provenance-dlt",
     ]);
     const rail = EDGES.filter((e) => e.kind === "rail");
     expect(rail.map((e) => e.from)).toEqual([
@@ -68,16 +69,14 @@ describe("ecosystem geometry", () => {
       "agentic-compute",
       "scientific-review",
       "wet-lab",
+      "provenance-dlt",
     ]);
     expect(rail.every((e) => e.to === "data-knowledge")).toBe(true);
   });
 
-  it("draws the provenance part and its edge dashed, and nothing else", () => {
-    const dashedParts = PARTS.filter((p) => p.dashed).map((p) => p.slug);
-    expect(dashedParts).toEqual(["provenance-dlt"]);
-    const dashedEdges = EDGES.filter((e) => e.dashed);
-    expect(dashedEdges.map((e) => `${e.from}>${e.to}`)).toEqual(["data-knowledge>provenance-dlt"]);
-    expect(dashedEdges[0]?.kind).toBe("optional");
+  it("draws no dashed parts or edges", () => {
+    expect(PARTS.filter((p) => p.dashed).map((p) => p.slug)).toEqual([]);
+    expect(EDGES.filter((e) => e.dashed).map((e) => `${e.from}>${e.to}`)).toEqual([]);
   });
 
   it("gives every part a distinct glyph", () => {

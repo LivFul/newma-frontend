@@ -3,7 +3,7 @@
 @theme {
   --color-eco-compute: #b69cff; /* Agentic Compute (violet, aligned with the workflow learning loop) */
   --color-eco-compute-ink: #553d99; /* Agentic Compute strokes on survey paper */
-  --color-eco-optional: #a8442a; /* Provenance & DLT, always paired with a dashed stroke */
+  --color-eco-optional: #a8442a; /* Provenance & DLT */
   --font-display: var(--font-geologica), ui-sans-serif, system-ui, sans-serif;
   --text-display: clamp(2.5rem, 1.4rem + 3.6vw, 4.75rem);
   --tracking-display: -0.04em;

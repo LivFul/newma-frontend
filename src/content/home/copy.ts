@@ -91,7 +91,7 @@ export const COMPONENTS_INDEX = Object.freeze({
   ),
   diagramAlt: block(
     "home.components.diagram.alt",
-    "Interface provides the research workspace. Agentic Compute coordinates authorized computational work. Scientific Review governs experiment approval and observation acceptance. Wet Lab connects approved assays with experimental results. Data & Knowledge maintains the connected evidence record. Provenance & DLT supports record history and optional ledger anchoring. These are connected responsibilities, rather than a single sequence of scientific advancement.",
+    "Interface provides the research workspace. Agentic Compute coordinates authorized computational work. Scientific Review governs experiment approval and observation acceptance. Wet Lab connects approved assays with experimental results. Data & Knowledge maintains the connected evidence record. Provenance & DLT brings trust and security through record history and ledger verification. These are connected responsibilities, rather than a single sequence of scientific advancement.",
     ["C-48"],
   ),
 });

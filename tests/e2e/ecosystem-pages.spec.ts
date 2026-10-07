@@ -21,12 +21,11 @@ const DEMO_ROUTES: Record<Slug, string> = {
 };
 
 for (const slug of SLUGS) {
-  test(`/ecosystem/${slug} renders its title, sources and demo link`, async ({ page }) => {
+  test(`/ecosystem/${slug} renders its title and demo link`, async ({ page }) => {
     const response = await page.goto(`/ecosystem/${slug}`);
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(TITLES[slug]);
-    await expect(page.getByRole("heading", { level: 2, name: "Sources" })).toBeVisible();
-    expect(await page.locator("#sources-heading + ol > li").count()).toBeGreaterThanOrEqual(1);
+    await expect(page.getByRole("heading", { level: 2, name: "Sources" })).toHaveCount(0);
     const demo = page
       .locator("#demo-heading")
       .locator("..")

@@ -268,16 +268,20 @@ export function WorkflowViewer({
         ) : null}
       </div>
       {shown && Scene ? (
-        <SceneBoundary key={attempt} onError={sceneCrashed}>
-          <Scene
-            aspect={aspect}
-            height={sceneHeightFor(diagramSize, viewportHeight)}
-            onReady={ready}
-            onFailure={sceneFailed}
-          />
-        </SceneBoundary>
+        <div className="workflow-swap">
+          <SceneBoundary key={attempt} onError={sceneCrashed}>
+            <Scene
+              aspect={aspect}
+              height={sceneHeightFor(diagramSize, viewportHeight)}
+              onReady={ready}
+              onFailure={sceneFailed}
+            />
+          </SceneBoundary>
+        </div>
       ) : (
-        <div ref={diagram}>{children}</div>
+        <div ref={diagram} className="workflow-swap">
+          {children}
+        </div>
       )}
     </div>
   );
