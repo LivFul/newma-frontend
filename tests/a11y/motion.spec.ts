@@ -19,9 +19,27 @@ const buttonTransitionDuration = async (page: import("@playwright/test").Page) =
   return button.evaluate((el) => getComputedStyle(el).transitionDuration);
 };
 
-test("buttons transition over the fast motion token", async ({ page }) => {
+// Colour feedback rides the fast token; the press and hover scale is a spring and needs the base token
+// to read. Both are asserted per property, so neither channel can drift to instant or sluggish.
+test("buttons transition colour over the fast token and scale over the base spring token", async ({
+  page,
+}) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  expect(await buttonTransitionDuration(page)).toBe("0.15s");
+  await gotoHydrated(page, "/primitives");
+  const button = page.getByRole("button", { name: "Primary" });
+  const byProperty = await button.evaluate((el) => {
+    const style = getComputedStyle(el);
+    const properties = style.transitionProperty.split(",").map((p) => p.trim());
+    const durations = style.transitionDuration.split(",").map((d) => d.trim());
+    const timing = style.transitionTimingFunction;
+    return { properties, durations, springScale: timing.includes("linear(") };
+  });
+  const durationOf = (property: string): string =>
+    byProperty.durations[byProperty.properties.indexOf(property)] ?? "missing";
+  expect(durationOf("background-color")).toBe("0.15s");
+  expect(durationOf("color")).toBe("0.15s");
+  expect(durationOf("scale")).toBe("0.28s");
+  expect(byProperty.springScale).toBe(true);
 });
 
 test("reduced-motion users get no perceptible transition", async ({ page }) => {

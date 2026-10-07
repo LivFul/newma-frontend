@@ -230,6 +230,8 @@ Buttons are pills. Cards use 1.25rem corners. The leaf and the capsule are the o
 
 Tokens: fast 150ms, base 280ms, slow 600ms. Animate transform and opacity only. `prefers-reduced-motion: reduce` zeros every duration.
 
+Springs are CSS `linear()` curves sampled from damped-spring step responses, with a cubic-bezier fallback. `--motion-spring-settle` (critically damped, no overshoot) drives entrances, reveals, card lift and the mobile menu. `--motion-spring-snappy` (about 7% overshoot) is for the `scale` of pressable controls only: hover lifts to 1.025, press sinks to 0.97, and a transition retargets from its live value, so a press or lift can be interrupted mid-flight. Colour, filter and shadow never use the overshooting curve. Stagger steps are literal class names in `src/components/site/type.ts` so Tailwind can generate them.
+
 ## Components
 
 ### Buttons

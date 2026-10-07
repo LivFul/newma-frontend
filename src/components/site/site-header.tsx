@@ -65,7 +65,7 @@ export function SiteHeader() {
     <header
       ref={headerRef}
       data-site-header
-      className="sticky top-0 z-40 min-h-[var(--size-header)] border-b border-fg/10 bg-bg/80 backdrop-blur-md"
+      className="sticky top-0 z-40 min-h-[var(--size-header)] border-b border-fg/10 bg-bg/80 backdrop-blur-md backdrop-saturate-150"
     >
       <div className="flex min-h-[var(--size-header)] w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 px-5 py-1 md:px-12">
         <Wordmark priority viewTransition />
@@ -91,7 +91,11 @@ export function SiteHeader() {
           >
             {HEADER_MENU.text}
           </Button>
-          <Button asChild variant="ghost" className="min-h-11 px-2 text-sm sm:px-3 sm:text-base">
+          <Button
+            asChild
+            variant="ghost"
+            className="min-h-11 px-2 text-sm font-normal text-fg-muted hover:text-fg sm:px-3 sm:text-base"
+          >
             <a href={AVELOZ_LINK.href} rel="noopener" aria-label={AVELOZ_LINK.block.text}>
               {AVELOZ_LINK.short.text}
               <span className="sr-only sm:not-sr-only">{AVELOZ_LINK.suffix.text}</span>

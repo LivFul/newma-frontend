@@ -207,23 +207,30 @@ main[tabindex="-1"]:focus-visible {
   /* backwards, not both: the finished animation must not leave a transform on the section, which would
      make it the containing block of its fixed and sticky descendants. */
   .reveal-in {
-    animation: reveal-up var(--motion-duration-reveal) var(--motion-ease-emphasized) backwards;
+    animation: reveal-up var(--motion-duration-reveal) var(--motion-spring-settle) backwards;
   }
   @media (prefers-reduced-motion: no-preference) {
+    /* The hero is the one authored moment: it rises further and settles slower than the reveals below. */
     .hero-entrance-item {
-      animation: hero-fade-up var(--motion-duration-reveal) var(--motion-ease-emphasized) backwards;
+      animation: hero-rise var(--motion-duration-slow) var(--motion-spring-settle) backwards;
       animation-delay: calc(var(--hero-i, 0) * var(--motion-stagger-tight));
     }
     .reveal-in .reveal-child {
-      animation: hero-fade-up var(--motion-duration-reveal) var(--motion-ease-emphasized) backwards;
+      animation: hero-fade-up var(--motion-duration-reveal) var(--motion-spring-settle) backwards;
       animation-delay: calc(var(--reveal-i, 0) * var(--motion-stagger-base));
+    }
+    /* Starts at rest and already visible, so it never delays the LCP paint: scale only, no opacity. */
+    .hero-photo {
+      transform-origin: 75% 50%;
+      animation: hero-photo-settle calc(var(--motion-duration-slow) * 2) var(--motion-spring-settle)
+        backwards;
     }
     .mobile-sections:not([hidden]) {
       display: grid;
       grid-template-rows: 1fr;
       opacity: 1;
       transition:
-        grid-template-rows var(--motion-duration-base) var(--motion-ease-standard),
+        grid-template-rows var(--motion-duration-base) var(--motion-spring-settle),
         opacity var(--motion-duration-base) var(--motion-ease-standard);
     }
     .mobile-sections:not([hidden])[data-open="false"] {
@@ -271,13 +278,63 @@ main[tabindex="-1"]:focus-visible {
   }
   .hover-lift {
     transition:
-      background-color var(--motion-duration-fast) var(--motion-ease-standard),
-      border-color var(--motion-duration-fast) var(--motion-ease-standard),
-      box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
+      background-color var(--motion-duration-base) var(--motion-spring-settle),
+      border-color var(--motion-duration-base) var(--motion-spring-settle),
+      box-shadow var(--motion-duration-base) var(--motion-spring-settle);
   }
   .hover-lift:hover,
   .hover-lift:focus-visible {
     box-shadow: var(--shadow-md);
+  }
+
+  /* Pressable controls. Scale sits on the individual `scale` property so it never fights a
+     `transform` set elsewhere, and its spring is the only part that overshoots: colour, filter and
+     shadow ride the plain standard ease. Because a transition retargets from the live value, a
+     press released mid-lift (or a lift started mid-press) reverses from where it is, not from the end. */
+  .btn-spring {
+    transition:
+      scale var(--motion-duration-base) var(--motion-spring-snappy),
+      color var(--motion-duration-fast) var(--motion-ease-standard),
+      background-color var(--motion-duration-fast) var(--motion-ease-standard),
+      border-color var(--motion-duration-fast) var(--motion-ease-standard),
+      box-shadow var(--motion-duration-base) var(--motion-ease-standard),
+      filter var(--motion-duration-fast) var(--motion-ease-standard);
+  }
+  @media (hover: hover) {
+    .btn-lift:where(:not(:disabled, [aria-disabled="true"])):hover {
+      scale: 1.025;
+    }
+  }
+  .btn-spring:where(:not(:disabled, [aria-disabled="true"])):active {
+    scale: 0.97;
+  }
+
+  /* Hero stage. The photo fades out toward its left and bottom edges so it reads as light behind the
+     diagram, not a second panel; the plate sits between photo and diagram and is the surface the
+     diagram caption and hint are read against. Both are decorative and carry no content. */
+  .hero-photo {
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0%, var(--color-fg) 38%),
+      linear-gradient(to bottom, var(--color-fg) 72%, transparent 100%);
+    mask-image:
+      linear-gradient(to right, transparent 0%, var(--color-fg) 38%),
+      linear-gradient(to bottom, var(--color-fg) 72%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+  .hero-stage {
+    border-radius: var(--radius-lg);
+    border: 1px solid color-mix(in srgb, var(--color-bg-elevated) 70%, var(--color-border));
+    background-color: color-mix(in srgb, var(--color-bg-elevated) 80%, transparent);
+    box-shadow:
+      var(--shadow-lg),
+      inset 0 1px 0 var(--color-bg-elevated);
+  }
+  @supports (backdrop-filter: blur(1px)) {
+    .hero-stage {
+      background-color: color-mix(in srgb, var(--color-bg-elevated) 62%, transparent);
+      backdrop-filter: blur(14px) saturate(1.4);
+    }
   }
 
   .plate-surface {
@@ -333,6 +390,24 @@ main[tabindex="-1"]:focus-visible {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-distance-lg));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes hero-photo-settle {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
   }
 }
 @keyframes dialog-fade-in {
@@ -408,8 +483,8 @@ main[tabindex="-1"]:focus-visible {
 /* Unlayered so these beat the header's Tailwind background utility. */
 [data-site-header] {
   transition:
-    background-color var(--motion-duration-fast) var(--motion-ease-standard),
-    border-color var(--motion-duration-fast) var(--motion-ease-standard);
+    background-color var(--motion-duration-base) var(--motion-ease-standard),
+    border-color var(--motion-duration-base) var(--motion-ease-standard);
 }
 [data-site-header][data-scrolled] {
   background-color: color-mix(in srgb, var(--color-bg) 95%, transparent);
