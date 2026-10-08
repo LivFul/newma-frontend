@@ -191,7 +191,7 @@ describe("createStage render on demand", () => {
   });
 
   it("draws exactly one more frame for each invalidate and for a resize", () => {
-    const { stage, renderer } = start(true);
+    const { element, stage, renderer } = start(true);
     tick();
 
     stage.invalidate();
@@ -200,6 +200,11 @@ describe("createStage render on demand", () => {
     expect(renderer.render).toHaveBeenCalledTimes(2);
     expect(frames.size).toBe(0);
 
+    // A real size change clears the buffer, so it is drawn again; the same size draws nothing.
+    resizeObserved();
+    tick();
+    expect(renderer.render).toHaveBeenCalledTimes(2);
+    Object.defineProperty(element, "clientWidth", { configurable: true, value: 640 });
     resizeObserved();
     tick();
     expect(renderer.render).toHaveBeenCalledTimes(3);
