@@ -72,7 +72,13 @@ describe("Wordmark", () => {
     const guarded = cssBlockAfter(css, "@media screen and (forced-colors: none)");
     expect(guarded).toMatch(/\[data-tone="dark"\] \.wordmark-light\s*\{\s*display:\s*none;/);
     expect(guarded).toMatch(/\[data-tone="dark"\] \.wordmark-dark\s*\{\s*display:\s*block;/);
-    // Nowhere else may a dark tone swap the lockup (forced-colours dark themes pick by colour scheme).
+    expect(guarded).toMatch(
+      /html\[data-theme="dark"\] \[data-site-header\] \.wordmark-light\s*\{\s*display:\s*none;/,
+    );
+    expect(guarded).toMatch(
+      /html\[data-theme="dark"\] \[data-site-header\] \.wordmark-dark\s*\{\s*display:\s*block;/,
+    );
+    // No other dark-tone swap hooks (forced-colours dark themes pick by colour scheme).
     const elsewhere = css.replace(guarded, "");
     expect(elsewhere).not.toMatch(/\[data-tone="dark"\] \.wordmark-(light|dark)/);
   });

@@ -21,6 +21,10 @@ test("applies stored dark tokens, updates theme-color, and scrolls with header t
     .poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor))
     .toBe(NIGHT_RGB);
   await expect(page.locator("#newma-theme-color")).toHaveAttribute("content", "#06242b");
+  await expect(
+    page.locator("[data-site-header] img.wordmark-light"),
+  ).toBeHidden();
+  await expect(page.locator("[data-site-header] img.wordmark-dark")).toBeVisible();
 
   await page.getByRole("radio", { name: "Light" }).click();
   await expect
