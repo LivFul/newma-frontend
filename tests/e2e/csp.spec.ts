@@ -7,6 +7,7 @@ import type { Page } from "@playwright/test";
 import { WORKFLOW_CONTROLS } from "../../src/content/home/workflow";
 import { buildCsp } from "../../src/lib/security/csp";
 import { needsBackend, signIn } from "../support/demo";
+import { servesNextDev } from "../support/target";
 import { expect, test } from "../support/test";
 
 const HEADER = "content-security-policy-report-only";
@@ -82,8 +83,13 @@ test("the three.js workflow view runs with zero CSP violations @csp", async ({ p
 
 test("/access gets a fresh nonce policy without 'unsafe-inline' for scripts @csp", async ({
   page,
+  request,
 }) => {
   test.skip(!!process.env.CSP_INJECT, "an injected policy carries no nonce");
+  test.skip(
+    await servesNextDev(request),
+    "next dev adds 'unsafe-eval' to script-src; preview-e2e checks the production policy",
+  );
   const read = await collectViolations(page);
   const policies: string[] = [];
   for (let i = 0; i < 2; i += 1) {

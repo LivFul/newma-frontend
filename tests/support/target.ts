@@ -17,6 +17,31 @@ export function targetKind(baseURL: string | undefined): TargetKind {
   return host === new URL(PRODUCTION_ORIGIN).hostname ? "production" : "preview";
 }
 
+// One answer per worker: the server under test does not change during a run.
+let nextDev: Promise<boolean> | undefined;
+
+/**
+ * True when the server under test is `next dev`. Dev differs from a build in ways some specs assert
+ * on (the CSP allows 'unsafe-eval', static metadata images resolve against the local host, build
+ * chunks are not immutable), so those specs skip or narrow there and the preview-e2e job covers the
+ * build. Read from the server, not the environment: locally Playwright reuses whatever already
+ * listens on the port, which may be `pnpm start`. Only dev pages load Next's devtools chunk.
+ */
+export function servesNextDev(request: APIRequestContext): Promise<boolean> {
+  nextDev ??= request
+    .get("/")
+    .then(async (response) => {
+      // A failed probe must not read as "a build": the spec would then assert production behaviour.
+      if (!response.ok()) throw new Error(`servesNextDev: GET / answered ${response.status()}`);
+      return (await response.text()).includes("next-devtools");
+    })
+    .catch((error: unknown) => {
+      nextDev = undefined; // Let the next spec probe again instead of reusing the failure.
+      throw error;
+    });
+  return nextDev;
+}
+
 /**
  * True when Next resolves static Open Graph images against the deployment's own host: on a Vercel
  * preview, or on a local build made with Vercel's system variables set to emulate one
