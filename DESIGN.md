@@ -258,7 +258,7 @@ Elevated white on light grounds, `.surface-material` on plates. Not glass. The s
 
 ### Navigation
 
-A sticky, floating Liquid Glass capsule with the newmA wordmark. On mobile the capsule grows into a rounded glass sheet for section links. The footer is a Night band with the reversed logo and byline.
+A sticky, floating Liquid Glass capsule with the newmA wordmark. On mobile the capsule grows into a rounded glass sheet for section links. The footer is a Night band with the reversed logo and byline on screen and in a dark forced-colours theme; print and a light forced-colours theme show the dark-ink logo instead.
 
 ### Ecosystem diagram
 
