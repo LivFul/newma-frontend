@@ -27,18 +27,11 @@ vi.mock("three", async (importOriginal) => {
     toneMapping = 0;
     render = vi.fn();
     setSize = vi.fn();
-    setDrawingBufferSize = vi.fn((_width: number, _height: number, ratio: number) => {
-      this.pixelRatio = ratio;
-    });
+    setDrawingBufferSize = vi.fn();
     dispose = vi.fn();
     forceContextLoss = vi.fn();
-    pixelRatio = 1;
-    setPixelRatio = vi.fn((ratio: number) => {
-      this.pixelRatio = ratio;
-    });
-    getPixelRatio() {
-      return this.pixelRatio;
-    }
+    // Kept only so the resize test can assert the stage never calls it.
+    setPixelRatio = vi.fn();
     constructor() {
       renderers.push(this);
     }
