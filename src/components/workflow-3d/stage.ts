@@ -3,6 +3,10 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { SCENE_COLORS } from "./palette";
 
 const MAX_PIXEL_RATIO = 2;
+/** Drawing-buffer budget (device pixels). The canvas breaks out to 95vw, so on a large monitor its CSS
+ * box alone is about twice the old column's; trading resolution for size keeps the per-frame fill (and
+ * the antialiasing buffers) near what the column cost. */
+const MAX_DRAWING_PIXELS = 4_000_000;
 const FLIGHT_MS = 900;
 /** Pan speed as a fraction of the camera-to-target distance per second. */
 const PAN_RATE = 0.5;
@@ -83,6 +87,15 @@ function groundAxis(camera: THREE.Camera, column: 0 | 1, fallback: THREE.Vector3
   const axis = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, column);
   axis.y = 0;
   return axis.lengthSq() < 1e-6 ? fallback.clone() : axis.normalize();
+}
+
+/** The renderer's pixel ratio for a canvas of this CSS size: the device ratio, capped at
+ * MAX_PIXEL_RATIO and at whatever keeps the buffer within MAX_DRAWING_PIXELS, but never below 1 (or the
+ * device's own ratio when that is lower), so a large canvas trades sharpness, not legibility. */
+export function pixelRatioFor(width: number, height: number, deviceRatio: number): number {
+  const ratio = Math.min(deviceRatio, MAX_PIXEL_RATIO);
+  const budget = Math.sqrt(MAX_DRAWING_PIXELS / (width * height));
+  return Math.max(Math.min(ratio, 1), Math.min(ratio, budget));
 }
 
 export function createStage(container: HTMLElement, options: StageOptions): Stage {
@@ -174,6 +187,10 @@ export function createStage(container: HTMLElement, options: StageOptions): Stag
     const resize = () => {
       const { clientWidth, clientHeight } = container;
       if (clientWidth === 0 || clientHeight === 0) return;
+      // setPixelRatio reallocates the drawing buffer at the old size, so it runs only when the ratio
+      // actually changes; setSize then allocates once at the new size.
+      const ratio = pixelRatioFor(clientWidth, clientHeight, window.devicePixelRatio);
+      if (ratio !== renderer.getPixelRatio()) renderer.setPixelRatio(ratio);
       renderer.setSize(clientWidth, clientHeight);
       camera.aspect = clientWidth / clientHeight;
       camera.updateProjectionMatrix();
