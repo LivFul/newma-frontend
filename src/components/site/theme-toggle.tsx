@@ -13,14 +13,14 @@ import { useThemePreference } from "@/lib/theme/use-theme-preference";
 import type { ThemePreference } from "@/lib/theme/state";
 
 const segment = cva(
-  "inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-2.5 text-sm transition-colors " +
+  "inline-flex size-9 items-center justify-center rounded-full transition-colors " +
     "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus " +
     "text-fg-muted hover:bg-fg/[0.06] hover:text-fg " +
     "data-[state=checked]:bg-fg/10 data-[state=checked]:text-fg",
 );
 
 function ThemeIcon({ mode }: { mode: ThemePreference }) {
-  const common = { width: 18, height: 18, "aria-hidden": true as const };
+  const common = { width: 15, height: 15, "aria-hidden": true as const };
   if (mode === "light") {
     return (
       <svg {...common} viewBox="0 0 24 24" fill="none">
@@ -68,7 +68,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
 
   return (
     <RadixRadio.Root
-      className={cn("glass-control inline-flex items-center gap-0.5 rounded-full p-0.5", className)}
+      className={cn("inline-flex items-center gap-0", className)}
       aria-label={THEME_GROUP_LABEL.text}
       value={preference}
       onValueChange={(value) => {
