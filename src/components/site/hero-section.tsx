@@ -20,11 +20,13 @@ export function HeroSection() {
         className="hero-stage pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-[48%] lg:block"
         aria-hidden="true"
       />
-      <div className="grid min-h-[calc(100dvh-var(--size-header))] items-center lg:grid-cols-12">
+      {/* Capped at the sections' 80rem container plus its gutters, so the copy lines up with the content
+          below and the two halves stop drifting apart on wide screens. The photo layers stay full-bleed. */}
+      <div className="mx-auto grid min-h-[calc(100dvh-var(--size-header))] w-full max-w-[86rem] items-center lg:grid-cols-12">
         <div className="flex flex-col justify-center gap-10 px-5 py-16 md:px-12 md:py-20 lg:col-span-6">
           <h1
             id="hero-heading"
-            className="font-display text-display leading-[0.98] font-medium tracking-display text-balance [overflow-wrap:anywhere]"
+            className="font-display text-display leading-[0.98] font-bold tracking-display text-balance [overflow-wrap:anywhere]"
           >
             {HERO.title.text}
           </h1>
@@ -47,15 +49,19 @@ export function HeroSection() {
                 <a href="#workflow">{HERO.howCta.text}</a>
               </Button>
             </div>
-            <p className={`${heroEntrance(4)} max-w-[52ch] text-sm leading-relaxed text-fg-muted`}>
+            <p
+              className={`${heroEntrance(4)} max-w-[52ch] text-base leading-relaxed text-fg-muted`}
+            >
               {HERO.disclaimer.text}
             </p>
           </div>
         </div>
-        <div className="relative px-5 py-8 md:px-12 lg:col-span-6">
+        {/* On wide screens the diagram hugs the copy column (hero-eco, ecosystem-graphic.css) instead of
+            centring in its half, which left a wide empty gutter between the two. */}
+        <div className="hero-eco relative px-5 py-8 md:px-12 lg:col-span-6 lg:pl-4">
           <div className="relative">
             <div
-              className="hero-caption-scrim absolute -inset-x-20 -bottom-24 hidden h-96 lg:block"
+              className="hero-caption-scrim pointer-events-none absolute -right-12 -bottom-8 -left-16 hidden h-96 lg:block"
               aria-hidden="true"
             />
             <div className="relative">

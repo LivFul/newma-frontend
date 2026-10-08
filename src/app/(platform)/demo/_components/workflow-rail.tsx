@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LeafIcon } from "@/components/brand/leaf-icon";
-import { PillIcon } from "@/components/brand/pill-icon";
+import { CapsuleIcon } from "@/components/brand/capsule-icon";
 import { WORKFLOWS } from "@/lib/demo/workflows";
 import { cn } from "@/lib/cn";
 
@@ -12,9 +11,9 @@ const UTILITY_LINKS = Object.freeze([
   { href: "/demo/tour", label: "Guided tour" },
 ]);
 
-// Drawn in the survey's linework: one stroke weight, square caps.
+// The brand capsule in one colour, so it follows the row's text through the current-page inversion.
 function SheetIcon() {
-  return <LeafIcon className="size-4" gradient={false} />;
+  return <CapsuleIcon tone="mono" className="size-4" />;
 }
 const isActive = (pathname: string, href: string): boolean =>
   href === "/demo" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
@@ -77,7 +76,7 @@ export function WorkflowRail() {
               className={cn(ITEM, "whitespace-nowrap")}
             >
               <span className="w-8 max-xl:hidden">
-                <PillIcon className="size-4" gradient={false} />
+                <SheetIcon />
               </span>
               {link.label}
             </Link>

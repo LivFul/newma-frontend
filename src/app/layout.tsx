@@ -1,23 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { Geologica, Martian_Mono } from "next/font/google";
+import { Geist_Mono, Work_Sans } from "next/font/google";
 import "./globals.css";
 import { HOME_META } from "@/content/home/copy";
 import { BACKGROUND_HEX, BRAND_HEX } from "@/lib/brand";
 import { siteUrl } from "@/lib/site";
 
-const geologica = Geologica({
+// Brand pack v1.0 typefaces: Work Sans (headlines, UI, body) and Geist Mono (bylines, labels, data).
+const workSans = Work_Sans({
   subsets: ["latin"],
-  axes: ["SHRP"],
-  variable: "--font-geologica",
+  variable: "--font-work-sans",
   display: "swap",
 });
-const martian = Martian_Mono({
+const geistMono = Geist_Mono({
   subsets: ["latin"],
-  variable: "--font-martian",
+  variable: "--font-geist-mono",
   display: "swap",
 });
 
-const ICON_VERSION = "v2";
+const ICON_VERSION = "v3";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: `/brand/apple-touch-icon.png?${ICON_VERSION}`, sizes: "180x180" }],
     shortcut: `/favicon.ico?${ICON_VERSION}`,
-    other: [{ rel: "mask-icon", url: "/brand/safari-pinned-tab.svg", color: "#0b404d" }],
+    other: [{ rel: "mask-icon", url: "/brand/safari-pinned-tab.svg", color: BRAND_HEX.night }],
   },
 };
 
@@ -47,7 +47,7 @@ export const viewport: Viewport = {
   colorScheme: "light",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: BACKGROUND_HEX },
-    { media: "(prefers-color-scheme: dark)", color: BRAND_HEX.foreground },
+    { media: "(prefers-color-scheme: dark)", color: BRAND_HEX.night },
   ],
   viewportFit: "cover",
 };
@@ -57,9 +57,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`h-full antialiased ${geologica.variable} ${martian.variable}`}
+      className={`h-full antialiased ${workSans.variable} ${geistMono.variable}`}
     >
-      <body className="flex min-h-full flex-col">
+      {/* Extensions such as Grammarly stamp attributes on <body> before hydration; this silences only
+          that element's attribute check, never its children. */}
+      <body className="flex min-h-full flex-col" suppressHydrationWarning>
         <a
           href="#main"
           className="sr-only top-0 left-0 focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-fg focus:px-4 focus:py-2 focus:text-bg"

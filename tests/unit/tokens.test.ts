@@ -84,12 +84,10 @@ describe("design tokens", () => {
     const base = parseCssVars(css.split("@media")[0]);
     expect(base["--motion-duration-reveal"]).toBe("400ms");
     expect(base["--motion-stagger-tight"]).toBe("60ms");
-    expect(base["--motion-stagger-base"]).toBe("80ms");
     expect(base["--motion-distance-sm"]).toBe("8px");
     expect(base["--motion-distance-md"]).toBe("16px");
     const block = css.split("@media (prefers-reduced-motion: reduce)")[1]!;
     expect(block).toMatch(/--motion-stagger-tight\s*:\s*0ms/);
-    expect(block).toMatch(/--motion-stagger-base\s*:\s*0ms/);
     expect(block).toMatch(/--motion-distance-sm\s*:\s*0px/);
     expect(block).toMatch(/--motion-distance-md\s*:\s*0px/);
   });

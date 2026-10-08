@@ -104,16 +104,6 @@ test.describe("keyboard", () => {
     await expect(toggle).toHaveAttribute("aria-pressed", "false");
     await expect(heroSvg(page)).toHaveAttribute("data-view", "assembled");
   });
-
-  test("Keyboard help opens and closes with the keyboard", async ({ page }) => {
-    await gotoHeroReady(page);
-    const summary = page.getByText("Keyboard help");
-    await summary.focus();
-    await page.keyboard.press("Enter");
-    await expect(page.locator("details.eco-help")).toHaveAttribute("open", "");
-    await page.keyboard.press("Space");
-    await expect(page.locator("details.eco-help")).not.toHaveAttribute("open", "");
-  });
 });
 
 test.describe("touch", () => {

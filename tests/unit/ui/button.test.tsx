@@ -30,13 +30,15 @@ describe("Button", () => {
     expect(buttonVariants({ variant: "danger" })).toContain("bg-danger");
     expect(buttonVariants()).toContain("bg-brand");
   });
-  // Value: protects=filled variants keep border-transparent (forced-colors still draws an outline) while secondary draws an ink border; fails_when=a variant loses its border colour so no outline shows in forced colours; why_new=old negative assertion became vacuous when the base class dropped border-transparent; seam=none
+  // Value: protects=filled variants keep border-transparent (forced-colors still draws an outline) while secondary draws a glass rim; fails_when=a variant loses its border colour so no outline shows in forced colours; why_new=old negative assertion became vacuous when the base class dropped border-transparent; seam=none
   it("gives filled variants a transparent border and secondary an ink border", () => {
     for (const variant of ["primary", "danger", "ghost"] as const) {
       expect(buttonVariants({ variant }), variant).toContain("border-transparent");
     }
     const secondary = buttonVariants({ variant: "secondary" });
-    expect(secondary).toContain("border-fg");
+    // Secondary is a glass control: `.glass-control` draws its rim, and forced colours swap in ButtonText.
+    expect(secondary).toMatch(/\bglass-control\b/);
+    expect(secondary).toContain("forced-colors:border-[ButtonText]");
     expect(secondary).not.toContain("border-transparent");
   });
   it("sizes with min-height and padding and styles aria-disabled like disabled", () => {

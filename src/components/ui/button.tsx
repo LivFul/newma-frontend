@@ -10,9 +10,13 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
+        // Tinted Liquid Glass: the one prominent action per view (HIG, Buttons). Ink on the Plant gradient.
         primary:
-          "btn-lift border-transparent bg-brand text-accent-fg shadow-glow hover:brightness-110 forced-colors:border-[ButtonText] forced-colors:bg-none",
-        secondary: "btn-lift bg-transparent text-fg border-fg/40 hover:bg-fg hover:text-bg",
+          "glass-prominent btn-lift border-transparent bg-brand font-semibold text-prominent-fg hover:brightness-110 forced-colors:border-[ButtonText] forced-colors:bg-none",
+        // Glass control: translucent with the glass rim, no blur layer (only the header blurs); firms up
+        // on hover, never below what reduce-transparency or increased contrast require.
+        secondary:
+          "glass-control btn-lift text-fg hover:[--glass-control-tint:var(--glass-hover-tint)] forced-colors:border-[ButtonText]",
         ghost: "border-transparent text-fg underline-offset-4 hover:bg-bg-deep/80 hover:underline",
         danger: "border-transparent bg-danger text-danger-fg hover:bg-fg",
       },

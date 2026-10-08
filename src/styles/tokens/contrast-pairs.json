@@ -30,6 +30,11 @@
     "min": 4.5
   },
   {
+    "fg": "--color-prominent-fg",
+    "bg": "--color-prominent",
+    "min": 4.5
+  },
+  {
     "fg": "--color-danger-fg",
     "bg": "--color-danger",
     "min": 4.5

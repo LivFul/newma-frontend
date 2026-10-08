@@ -4,7 +4,6 @@
   --motion-duration-slow: 600ms;
   --motion-duration-reveal: 400ms;
   --motion-stagger-tight: 60ms;
-  --motion-stagger-base: 80ms;
   --motion-distance-sm: 8px;
   --motion-distance-md: 16px;
   --motion-distance-lg: 24px;
@@ -27,7 +26,6 @@
     --motion-duration-slow: 0ms;
     --motion-duration-reveal: 0ms;
     --motion-stagger-tight: 0ms;
-    --motion-stagger-base: 0ms;
     --motion-distance-sm: 0px;
     --motion-distance-md: 0px;
     --motion-distance-lg: 0px;

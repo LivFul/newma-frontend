@@ -3,6 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { contrastRatio, parseCssVars } from "@/lib/a11y/contrast";
 import { heroEntrance } from "@/components/site/type";
+import { cssBlockAfter as blockAfter } from "../../support/css-block";
 
 const SRC = path.resolve(__dirname, "../../../src");
 const globals = readFileSync(path.join(SRC, "app/globals.css"), "utf8");
@@ -10,21 +11,6 @@ const heroSource = readFileSync(path.join(SRC, "components/site/hero-section.tsx
 const typeSource = readFileSync(path.join(SRC, "components/site/type.ts"), "utf8");
 const colors = parseCssVars(readFileSync(path.join(SRC, "styles/tokens/color.css"), "utf8"));
 const WCAG_AA_TEXT = 4.5;
-
-function blockAfter(css: string, marker: string): string {
-  const at = css.indexOf(marker);
-  expect(at, marker).toBeGreaterThanOrEqual(0);
-  const open = css.indexOf("{", at);
-  let depth = 0;
-  for (let i = open; i < css.length; i++) {
-    if (css[i] === "{") depth += 1;
-    else if (css[i] === "}") {
-      depth -= 1;
-      if (depth === 0) return css.slice(open, i + 1);
-    }
-  }
-  throw new Error(`unclosed ${marker}`);
-}
 
 const channels = (hex: string): number[] => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
 const toHex = (rgb: number[]): string =>
@@ -62,14 +48,29 @@ describe("hero stage scrim", () => {
   });
 
   // Value: protects=the caption text starts inside the scrim's dense core, not in its side feather, so the proved alpha is the alpha the text actually sits on; fails_when=the scrim is inset less than its horizontal feather is wide; why_new=at 1024px the caption starts 48px inside the figure while the feather was 80px wide, so part of the text sat on a partly faded scrim and contrast fell from 5.3:1 to 4.8:1; seam=none
-  it("insets the caption scrim at least as far as its horizontal feather", () => {
-    const inset = Number(/hero-caption-scrim[^"]*-inset-x-(\d+)/.exec(heroSource)?.[1]) * 4;
+  // Each side is checked on its own: the right edge stops at the hero's 48px gutter (so it never adds
+  // scrollable overflow), with a matching shorter feather.
+  it("insets the caption scrim at least as far as its horizontal feather, on each side", () => {
+    const classes = /className="([^"]*hero-caption-scrim[^"]*)"/.exec(heroSource)?.[1] ?? "";
+    const insetPx = (side: "left" | "right") =>
+      Number(new RegExp(`(?:^|\\s)-${side}-(\\d+)(?:\\s|$)`).exec(classes)?.[1]) * 4;
     const mask = blockAfter(globals, ".hero-caption-scrim {");
-    const feather =
+    const leftFeather =
       Number(/to right,\s*transparent 0,\s*var\(--color-fg\) ([\d.]+)rem/.exec(mask)?.[1]) * 16;
-    expect(inset).toBeGreaterThan(0);
-    expect(feather).toBeGreaterThan(0);
-    expect(inset).toBeGreaterThanOrEqual(feather);
+    const rightFeather =
+      Number(
+        /var\(--color-fg\) calc\(100% - ([\d.]+)rem\),\s*transparent 100%\s*\),\s*linear-gradient\(\s*to bottom/.exec(
+          mask,
+        )?.[1],
+      ) * 16;
+    for (const [inset, feather] of [
+      [insetPx("left"), leftFeather],
+      [insetPx("right"), rightFeather],
+    ]) {
+      expect(inset).toBeGreaterThan(0);
+      expect(feather).toBeGreaterThan(0);
+      expect(inset).toBeGreaterThanOrEqual(feather);
+    }
   });
 
   // Value: protects=the wash covers exactly the photo's box, so it is flush with the hero's top, right and bottom and never leaves a gap under the header; fails_when=the stage is sized or offset on its own again; why_new=an offset box bled 56px above the hero and 24px past the viewport, and floated away from the photo whenever the hero was taller than its content; seam=none
@@ -86,8 +87,11 @@ describe("hero stage scrim", () => {
     expect(globals).toMatch(/\.hero-photo,\s*\.hero-stage\s*\{[^}]*mask-image/);
   });
 
+  // Value: protects=the hero photo stays still, so the stage wash, scrims and contrast proofs always sit over a fixed image; fails_when=any rule targeting .hero-photo declares an animation, under whatever keyframe name; why_new=the earlier check only rejected one old keyframe name and missed any other; seam=none
   it("does not animate the photo behind the stage", () => {
-    expect(globals).not.toContain("hero-photo-settle");
+    const rules = globals.match(/[^{}]*\.hero-photo[^{}]*\{[^}]*\}/g) ?? [];
+    expect(rules.length).toBeGreaterThan(0);
+    for (const rule of rules) expect(rule).not.toMatch(/\banimation(-name)?\s*:/);
   });
 });
 

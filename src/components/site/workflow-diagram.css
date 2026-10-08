@@ -18,6 +18,16 @@
   position: relative;
   width: 100%;
 }
+/* The diagram and the 3D scene that takes its box break out of the 80rem content column to 95% of
+   the viewport width, centred: the content column is centred too, so pulling each side out by the
+   difference between half the column and 47.5vw lands the block in the middle of the viewport. */
+.wf-bleed {
+  /* Capped at 120rem: identical below ~2020px, while ultra-wide screens stop multiplying the 3D
+     canvas's per-frame pixel work. */
+  width: min(95vw, 120rem);
+  max-width: min(95vw, 120rem);
+  margin-inline: calc(50% - min(47.5vw, 60rem));
+}
 .wf-svg {
   display: block;
   width: 100%;
@@ -33,7 +43,7 @@
    scrolls. 7.5rem is the wrapped two-row header height, written out as in globals.css (see the comment there). */
 @media (max-width: 27.5rem) {
   .wf-scroll {
-    max-height: calc(100dvh - 7.5rem - var(--space-4));
+    max-height: calc(100dvh - var(--header-h, 7.5rem) - var(--space-4));
   }
 }
 
