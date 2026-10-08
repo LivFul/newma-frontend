@@ -468,6 +468,20 @@ describe("service worker", () => {
     expect(PRECACHE_LIST).toContain(lockup);
   });
 
+  // Value: protects=an upgrade that only adds precache entries keeps the build chunks visitors already cached, so the offline page keeps its CSS and JS;
+  //   fails_when=CACHE is bumped for an addition, and activate deletes the cache that holds the chunks the precached /offline HTML needs;
+  //   why_new=the newma-v3 bump in this branch was reproduced to leave the offline page unstyled right after the worker upgraded; seam=none
+  it("keeps the cached build chunks across an upgrade that adds precache entries", async () => {
+    const worker = loadWorker(() => Promise.resolve(reply("net")));
+    const chunk = new URL("/_next/static/chunks/app.js", ORIGIN).href;
+    // newma-v2 is the cache name main ships; this branch only adds entries to its precache list.
+    worker.stores.set("newma-v2", new Map([[chunk, reply("chunk")]]));
+    await worker.fire("install").result;
+    await worker.fire("activate").result;
+    const kept = [...worker.stores.values()].some((store) => store.has(chunk));
+    expect(kept).toBe(true);
+  });
+
   // Value: protects=every precache entry resolves to a real file or route, because cache.addAll rejects on one miss and the worker then never installs; fails_when=a precached icon is renamed or the offline route is removed; why_new=the vm fake always resolves addAll; seam=none
   it("precaches only files and routes that exist", () => {
     expect(PRECACHE_LIST).toContain("/offline");

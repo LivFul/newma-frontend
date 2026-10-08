@@ -1,8 +1,7 @@
-// Bump CACHE whenever the precache list changes: activate drops every other cache name, so clients
-// rebuild their cache from the new list. Changed files under the same paths need no bump: a new worker
-// re-runs install, which fetches the precache list again into this cache, and bumping would drop the
-// build chunks the precached offline page depends on.
-const CACHE = "newma-v3";
+// Bump CACHE only when a precache path is removed or renamed: activate drops every other cache name,
+// which also drops the build chunks the precached offline page depends on. Added paths and changed
+// files need no bump: a new worker re-runs install, which fetches the precache list into this cache.
+const CACHE = "newma-v2";
 const PRECACHE = [
   "/offline",
   "/brand/icon-192.png",
