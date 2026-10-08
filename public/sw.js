@@ -2,8 +2,14 @@
 // rebuild their cache from the new list. Changed files under the same paths need no bump: a new worker
 // re-runs install, which fetches the precache list again into this cache, and bumping would drop the
 // build chunks the precached offline page depends on.
-const CACHE = "newma-v2";
-const PRECACHE = ["/offline", "/brand/icon-192.png", "/brand/icon-512.png", "/brand/favicon.svg"];
+const CACHE = "newma-v3";
+const PRECACHE = [
+  "/offline",
+  "/brand/icon-192.png",
+  "/brand/icon-512.png",
+  "/brand/favicon.svg",
+  "/brand/newma-wordmark.svg",
+];
 // Pages, images and the rest share one budget; hashed build chunks get a larger one of their own so a
 // burst of images can never evict the CSS and JS that the cached pages depend on.
 const MAX_ENTRIES = 120;

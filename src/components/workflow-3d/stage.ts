@@ -100,8 +100,8 @@ export function pixelRatioFor(width: number, height: number, deviceRatio: number
 
 export function createStage(container: HTMLElement, options: StageOptions): Stage {
   // Throws when WebGL is unavailable; the caller turns that into a fallback to the static diagram.
+  // The pixel ratio and size come from the first resize() below, within the drawing budget.
   const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   container.appendChild(renderer.domElement);
 
@@ -187,11 +187,13 @@ export function createStage(container: HTMLElement, options: StageOptions): Stag
     const resize = () => {
       const { clientWidth, clientHeight } = container;
       if (clientWidth === 0 || clientHeight === 0) return;
-      // setPixelRatio reallocates the drawing buffer at the old size, so it runs only when the ratio
-      // actually changes; setSize then allocates once at the new size.
+      // setDrawingBufferSize sets the size and the budgeted ratio together, so the buffer is allocated
+      // once per resize (setPixelRatio would first reallocate it at the old size, then setSize again).
+      // It leaves the canvas's CSS size alone, which setSize would otherwise have set.
       const ratio = pixelRatioFor(clientWidth, clientHeight, window.devicePixelRatio);
-      if (ratio !== renderer.getPixelRatio()) renderer.setPixelRatio(ratio);
-      renderer.setSize(clientWidth, clientHeight);
+      renderer.setDrawingBufferSize(clientWidth, clientHeight, ratio);
+      renderer.domElement.style.width = `${clientWidth}px`;
+      renderer.domElement.style.height = `${clientHeight}px`;
       camera.aspect = clientWidth / clientHeight;
       camera.updateProjectionMatrix();
       // Resizing clears the drawing buffer, so the frame must be drawn again.

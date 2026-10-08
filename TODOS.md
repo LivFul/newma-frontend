@@ -93,58 +93,6 @@
 **Priority:** P4
 **Depends on:** None
 
-## PWA
-
-### Precache the offline page's wordmark
-
-**What:** Add `/brand/newma-wordmark.svg` to `PRECACHE` in `public/sw.js`, and bump `CACHE`, because the precache list changes.
-
-**Why:** The offline fallback renders the SVG wordmark. A visitor who goes offline before any online page under the worker has loaded it sees the page without the logo.
-
-**Context:** next/image serves SVG as is, so the browser requests the plain `/brand/` path. Add a case to `tests/unit/pwa/service-worker.test.ts`. Bumping `CACHE` drops old build chunks; see the comment above `CACHE`.
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** None
-
-### Watch the `immutable` header that chunk caching depends on
-
-**What:** Add a production smoke check that `/_next/static/*` responses carry `Cache-Control: ... immutable`.
-
-**Why:** `public/sw.js` caches build chunks only for immutable responses. A CDN or hosting change that rewrites the header would silently turn off chunk caching and the offline page's CSS and JS.
-
-**Context:** next start and Vercel send it today (`next/dist/server/lib/router-server.js`). A check in the preview e2e job would catch a regression.
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** None
-
-### Dev worker comment wording
-
-**What:** Re-wrap the reworded dev-cleanup comment in `src/components/pwa/pwa-mount.tsx` to the file's width, without the "now".
-
-**Why:** One line runs to 150 characters, and "now" goes stale.
-
-**Context:** Comment-only change.
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** None
-
-## Workflow 3D
-
-### One drawing-buffer allocation per resize
-
-**What:** In `src/components/workflow-3d/stage.ts`, size the buffer and the ratio together (for example `setDrawingBufferSize` plus the canvas CSS size) instead of `setPixelRatio` followed by `setSize`.
-
-**Why:** On canvases over the 4M-pixel budget the ratio changes with every resize, so dragging the window edge reallocates the WebGL buffers twice per resize callback.
-
-**Context:** Only while resizing large canvases. Also fix the comment, which claims a single allocation.
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** None
-
 ## Completed
 
 ### Pre-existing e2e failures against `next dev` and macOS WebKit
@@ -194,3 +142,59 @@ Start by deciding whether the CSP and SEO specs should run only against a produc
 **Depends on:** None
 
 **Completed:** Done on `test/e2e-baseline` (2026-10-08). The kept body is the /ship one, which has the id-suffix selector and `.toLowerCase()`, under the original title.
+
+### Precache the offline page's wordmark
+
+**What:** Add `/brand/newma-wordmark.svg` to `PRECACHE` in `public/sw.js`, and bump `CACHE`, because the precache list changes.
+
+**Why:** The offline fallback renders the SVG wordmark. A visitor who goes offline before any online page under the worker has loaded it sees the page without the logo.
+
+**Context:** next/image serves SVG as is, so the browser requests the plain `/brand/` path. Add a case to `tests/unit/pwa/service-worker.test.ts`. Bumping `CACHE` drops old build chunks; see the comment above `CACHE`.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** None
+
+**Completed:** Done on `fix/pwa-3d-tidy` (2026-10-08). `/brand/newma-wordmark.svg` is precached and `CACHE` is now `newma-v3`. The unit test reads the lockup from `wordmark.tsx`, so a renamed asset fails it.
+
+### Watch the `immutable` header that chunk caching depends on
+
+**What:** Add a production smoke check that `/_next/static/*` responses carry `Cache-Control: ... immutable`.
+
+**Why:** `public/sw.js` caches build chunks only for immutable responses. A CDN or hosting change that rewrites the header would silently turn off chunk caching and the offline page's CSS and JS.
+
+**Context:** next start and Vercel send it today (`next/dist/server/lib/router-server.js`). A check in the preview e2e job would catch a regression.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** None
+
+**Completed:** Done on `fix/pwa-3d-tidy` (2026-10-08): `tests/e2e/caching.spec.ts`, which runs in preview-e2e and is skipped against `next dev`.
+
+### Dev worker comment wording
+
+**What:** Re-wrap the reworded dev-cleanup comment in `src/components/pwa/pwa-mount.tsx` to the file's width, without the "now".
+
+**Why:** One line runs to 150 characters, and "now" goes stale.
+
+**Context:** Comment-only change.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** None
+
+**Completed:** Done on `fix/pwa-3d-tidy` (2026-10-08).
+
+### One drawing-buffer allocation per resize
+
+**What:** In `src/components/workflow-3d/stage.ts`, size the buffer and the ratio together (for example `setDrawingBufferSize` plus the canvas CSS size) instead of `setPixelRatio` followed by `setSize`.
+
+**Why:** On canvases over the 4M-pixel budget the ratio changes with every resize, so dragging the window edge reallocates the WebGL buffers twice per resize callback.
+
+**Context:** Only while resizing large canvases. Also fix the comment, which claims a single allocation.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** None
+
+**Completed:** Done on `fix/pwa-3d-tidy` (2026-10-08). Resize now calls `setDrawingBufferSize(w, h, ratio)` and sets the canvas CSS size itself, and start-up no longer sets an unbudgeted ratio.
