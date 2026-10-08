@@ -184,7 +184,9 @@ describe("SiteHeader", () => {
   it("closes the open menu when the viewport widens to lg", async () => {
     const listeners = new Map<string, (event: MediaQueryListEvent) => void>();
     const removed: string[] = [];
-    onTestFinished(() => vi.restoreAllMocks());
+    onTestFinished(() => {
+      vi.restoreAllMocks();
+    });
     vi.spyOn(window, "matchMedia").mockImplementation(
       (query: string) =>
         ({
