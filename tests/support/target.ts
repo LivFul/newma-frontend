@@ -30,8 +30,15 @@ let nextDev: Promise<boolean> | undefined;
 export function servesNextDev(request: APIRequestContext): Promise<boolean> {
   nextDev ??= request
     .get("/")
-    .then((response) => response.text())
-    .then((html) => html.includes("next-devtools"));
+    .then(async (response) => {
+      // A failed probe must not read as "a build": the spec would then assert production behaviour.
+      if (!response.ok()) throw new Error(`servesNextDev: GET / answered ${response.status()}`);
+      return (await response.text()).includes("next-devtools");
+    })
+    .catch((error: unknown) => {
+      nextDev = undefined; // Let the next spec probe again instead of reusing the failure.
+      throw error;
+    });
   return nextDev;
 }
 
