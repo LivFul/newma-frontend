@@ -1,9 +1,19 @@
-// Bump CACHE whenever the precache list changes: activate drops every other cache name, so clients
-// rebuild their cache from the new list. Changed files under the same paths need no bump: a new worker
-// re-runs install, which fetches the precache list again into this cache, and bumping would drop the
-// build chunks the precached offline page depends on.
+// Bump CACHE only when a precache path is removed or renamed: activate drops every other cache name,
+// which also drops the build chunks the precached offline page depends on. Added paths and changed
+// files need no bump: a new worker re-runs install, which fetches the precache list into this cache.
 const CACHE = "newma-v2";
-const PRECACHE = ["/offline", "/brand/icon-192.png", "/brand/icon-512.png", "/brand/favicon.svg"];
+const PRECACHE = [
+  "/offline",
+  "/brand/icon-192.png",
+  "/brand/icon-512.png",
+  "/brand/favicon.svg",
+  // Every lockup the (site) layout around /offline renders: the header wordmark and the footer logo,
+  // each in both colourways (the reversed one on screen over dark, the other in print and forced colours).
+  "/brand/newma-wordmark.svg",
+  "/brand/newma-wordmark-reversed.svg",
+  "/brand/newma-logo.svg",
+  "/brand/newma-logo-reversed.svg",
+];
 // Pages, images and the rest share one budget; hashed build chunks get a larger one of their own so a
 // burst of images can never evict the CSS and JS that the cached pages depend on.
 const MAX_ENTRIES = 120;
