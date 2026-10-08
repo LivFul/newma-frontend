@@ -9,20 +9,22 @@ import {
   THEME_SYSTEM,
 } from "@/content/home/chrome";
 import { cn } from "@/lib/cn";
-import { useTheme, type UseTheme } from "@/lib/theme/use-theme";
+import { useTheme } from "@/lib/theme/use-theme";
 import type { ThemePreference } from "@/lib/theme/state";
 
 const segment = cva(
-  "inline-flex min-h-11 flex-1 items-center justify-center rounded-full px-2 text-sm transition-colors " +
-    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
+  "inline-flex min-h-11 items-center justify-center rounded-full transition-colors " +
+    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus " +
+    "text-fg-muted hover:bg-fg/[0.06] hover:text-fg " +
+    "data-[state=checked]:bg-fg/10 data-[state=checked]:text-fg",
   {
     variants: {
-      checked: {
-        true: "bg-fg/10 text-fg",
-        false: "text-fg-muted hover:bg-fg/[0.06] hover:text-fg",
+      layout: {
+        bar: "min-w-11 px-2.5 text-sm",
+        sheet: "w-full flex-1 justify-start gap-2 px-2 -mx-2 text-base text-fg active:bg-fg/[0.1]",
       },
     },
-    defaultVariants: { checked: false },
+    defaultVariants: { layout: "sheet" },
   },
 );
 
@@ -67,17 +69,19 @@ const OPTIONS: readonly { value: ThemePreference; label: string }[] = [
 
 type ThemeToggleProps = {
   className?: string;
-  /** Layout: row in the mobile sheet, compact cluster in the desktop bar. */
+  /** Compact icon row in the header bar (lg+), or full-width rows in the mobile sheet. */
   layout?: "bar" | "sheet";
 };
 
 export function ThemeToggle({ className, layout = "sheet" }: ThemeToggleProps) {
   const { preference, setPreference } = useTheme();
+  const isBar = layout === "bar";
+
   return (
     <RadixRadio.Root
       className={cn(
-        layout === "bar"
-          ? "inline-flex items-center gap-0.5 rounded-full border border-fg/10 p-0.5"
+        isBar
+          ? "glass-control inline-flex items-center gap-0.5 rounded-full p-0.5"
           : "flex flex-col gap-1",
         className,
       )}
@@ -87,25 +91,22 @@ export function ThemeToggle({ className, layout = "sheet" }: ThemeToggleProps) {
         if (value === "light" || value === "dark" || value === "system") setPreference(value);
       }}
     >
-      {layout === "sheet" ? (
-        <span className="px-2 pt-1 text-xs font-medium tracking-wide text-fg-muted uppercase">
+      {!isBar ? (
+        <span className="font-mono px-2 pt-1 text-xs font-bold tracking-[0.14em] text-fg-muted uppercase">
           {THEME_GROUP_LABEL.text}
         </span>
       ) : null}
-      <div
-        className={cn(
-          layout === "bar" ? "inline-flex gap-0.5" : "flex flex-col gap-1 px-2 pb-1",
-        )}
-      >
+      <div className={cn(isBar ? "inline-flex gap-0.5" : "flex flex-col gap-1 px-2 pb-1")}>
         {OPTIONS.map(({ value, label }) => (
           <RadixRadio.Item
             key={value}
             value={value}
-            className={cn(segment({ checked: preference === value }), layout === "sheet" && "-mx-1")}
+            aria-label={label}
+            className={segment({ layout })}
           >
-            <span className="inline-flex items-center gap-2">
+            <span className={cn("inline-flex shrink-0 items-center", isBar ? "" : "gap-2")}>
               <ThemeIcon mode={value} />
-              <span>{label}</span>
+              <span className={isBar ? "sr-only" : undefined}>{label}</span>
             </span>
           </RadixRadio.Item>
         ))}
@@ -113,5 +114,3 @@ export function ThemeToggle({ className, layout = "sheet" }: ThemeToggleProps) {
     </RadixRadio.Root>
   );
 }
-
-export type { UseTheme };

@@ -254,7 +254,6 @@ export function SiteHeader() {
           className="mobile-sections border-t border-fg/10 lg:hidden"
         >
           <div className="flex flex-col gap-1 px-4 py-3 md:px-6">
-            <ThemeToggle layout="sheet" />
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
@@ -265,6 +264,9 @@ export function SiteHeader() {
                 {link.block.text}
               </a>
             ))}
+            <div className="mt-2 border-t border-fg/10 pt-3">
+              <ThemeToggle layout="sheet" />
+            </div>
           </div>
         </nav>
       </div>

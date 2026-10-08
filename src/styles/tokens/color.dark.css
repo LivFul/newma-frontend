@@ -35,6 +35,10 @@
       linear-gradient(170deg, #041b21 0%, #06242b 45%, #0b3f4b 100%);
     --background-image-peach: linear-gradient(180deg, #06242b 0%, #041b21 100%);
   }
+  :root:not(.light) ::selection {
+    background: var(--color-leaf-bright);
+    color: var(--color-capsule-deep);
+  }
 }
 
 .dark {
@@ -70,4 +74,9 @@
     radial-gradient(70% 60% at 70% 92%, rgb(6 36 43 / 0.92), transparent 60%),
     linear-gradient(170deg, #041b21 0%, #06242b 45%, #0b3f4b 100%);
   --background-image-peach: linear-gradient(180deg, #06242b 0%, #041b21 100%);
+}
+
+.dark ::selection {
+  background: var(--color-leaf-bright);
+  color: var(--color-capsule-deep);
 }

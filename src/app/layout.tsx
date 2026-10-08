@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import { HOME_META } from "@/content/home/copy";
 import { BACKGROUND_HEX, BRAND_HEX } from "@/lib/brand";
+import { ThemeSync } from "@/components/site/theme-sync";
 import { THEME_INIT_SCRIPT } from "@/lib/theme/init-script";
 import { siteUrl } from "@/lib/site";
 
@@ -68,6 +69,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       {/* Extensions such as Grammarly stamp attributes on <body> before hydration; this silences only
           that element's attribute check, never its children. */}
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
+        <ThemeSync />
         <a
           href="#main"
           className="sr-only top-0 left-0 focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-fg focus:px-4 focus:py-2 focus:text-bg"

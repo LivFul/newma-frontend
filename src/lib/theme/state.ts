@@ -18,3 +18,12 @@ export function resolveTheme(
   if (preference === "light") return "light";
   return prefersDark ? "dark" : "light";
 }
+
+export function bootstrapFromStorage(
+  raw: string | null,
+  prefersDark: boolean,
+): { preference: ThemePreference; resolved: ResolvedTheme } {
+  const preference = parsePreference(raw);
+  const resolved = resolveTheme(preference, prefersDark);
+  return { preference, resolved };
+}
