@@ -48,6 +48,16 @@ body {
   background: var(--color-leaf-bright);
   color: var(--color-capsule-deep);
 }
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) ::selection {
+    background: var(--color-leaf-bright);
+    color: var(--color-capsule-deep);
+  }
+}
+.dark ::selection {
+  background: var(--color-leaf-bright);
+  color: var(--color-capsule-deep);
+}
 a {
   text-underline-offset: 0.22em;
   text-decoration-thickness: 1px;

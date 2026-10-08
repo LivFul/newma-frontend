@@ -198,7 +198,7 @@ export function SiteHeader() {
             imageClassName="h-[1.0625rem] w-auto min-[25rem]:h-5 sm:h-7"
           />
           <div className="flex min-w-0 flex-wrap items-center justify-end gap-1 min-[25rem]:gap-2 sm:gap-4">
-            <ThemeToggle layout="bar" className="hidden lg:inline-flex" />
+            <ThemeToggle className="shrink-0" />
             <nav
               aria-label={HEADER_NAV_LABEL.text}
               className="hidden items-center gap-1 lg:flex xl:gap-2"
@@ -264,9 +264,6 @@ export function SiteHeader() {
                 {link.block.text}
               </a>
             ))}
-            <div className="mt-2 border-t border-fg/10 pt-3">
-              <ThemeToggle layout="sheet" />
-            </div>
           </div>
         </nav>
       </div>

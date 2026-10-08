@@ -9,23 +9,14 @@ import {
   THEME_SYSTEM,
 } from "@/content/home/chrome";
 import { cn } from "@/lib/cn";
-import { useTheme } from "@/lib/theme/use-theme";
+import { useThemePreference } from "@/lib/theme/use-theme-preference";
 import type { ThemePreference } from "@/lib/theme/state";
 
 const segment = cva(
-  "inline-flex min-h-11 items-center justify-center rounded-full transition-colors " +
+  "inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-2.5 text-sm transition-colors " +
     "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus " +
     "text-fg-muted hover:bg-fg/[0.06] hover:text-fg " +
     "data-[state=checked]:bg-fg/10 data-[state=checked]:text-fg",
-  {
-    variants: {
-      layout: {
-        bar: "min-w-11 px-2.5 text-sm",
-        sheet: "w-full flex-1 justify-start gap-2 px-2 -mx-2 text-base text-fg active:bg-fg/[0.1]",
-      },
-    },
-    defaultVariants: { layout: "sheet" },
-  },
 );
 
 function ThemeIcon({ mode }: { mode: ThemePreference }) {
@@ -69,48 +60,32 @@ const OPTIONS: readonly { value: ThemePreference; label: string }[] = [
 
 type ThemeToggleProps = {
   className?: string;
-  /** Compact icon row in the header bar (lg+), or full-width rows in the mobile sheet. */
-  layout?: "bar" | "sheet";
 };
 
-export function ThemeToggle({ className, layout = "sheet" }: ThemeToggleProps) {
-  const { preference, setPreference } = useTheme();
-  const isBar = layout === "bar";
+/** Icon-only three-way theme control for the Liquid Glass header bar. */
+export function ThemeToggle({ className }: ThemeToggleProps) {
+  const { preference, setPreference } = useThemePreference();
 
   return (
     <RadixRadio.Root
-      className={cn(
-        isBar
-          ? "glass-control inline-flex items-center gap-0.5 rounded-full p-0.5"
-          : "flex flex-col gap-1",
-        className,
-      )}
+      className={cn("glass-control inline-flex items-center gap-0.5 rounded-full p-0.5", className)}
       aria-label={THEME_GROUP_LABEL.text}
       value={preference}
       onValueChange={(value) => {
         if (value === "light" || value === "dark" || value === "system") setPreference(value);
       }}
     >
-      {!isBar ? (
-        <span className="font-mono px-2 pt-1 text-xs font-bold tracking-[0.14em] text-fg-muted uppercase">
-          {THEME_GROUP_LABEL.text}
-        </span>
-      ) : null}
-      <div className={cn(isBar ? "inline-flex gap-0.5" : "flex flex-col gap-1 px-2 pb-1")}>
-        {OPTIONS.map(({ value, label }) => (
-          <RadixRadio.Item
-            key={value}
-            value={value}
-            aria-label={label}
-            className={segment({ layout })}
-          >
-            <span className={cn("inline-flex shrink-0 items-center", isBar ? "" : "gap-2")}>
-              <ThemeIcon mode={value} />
-              <span className={isBar ? "sr-only" : undefined}>{label}</span>
-            </span>
-          </RadixRadio.Item>
-        ))}
-      </div>
+      {OPTIONS.map(({ value, label }) => (
+        <RadixRadio.Item
+          key={value}
+          value={value}
+          aria-label={label}
+          className={segment()}
+        >
+          <ThemeIcon mode={value} />
+          <span className="sr-only">{label}</span>
+        </RadixRadio.Item>
+      ))}
     </RadixRadio.Root>
   );
 }

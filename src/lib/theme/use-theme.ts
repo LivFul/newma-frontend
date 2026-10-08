@@ -1,39 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useSyncExternalStore } from "react";
-import { applyTheme } from "./dom";
-import type { ResolvedTheme, ThemePreference } from "./state";
-import { resolveTheme } from "./state";
-import {
-  prefersDark,
-  readPreference,
-  readResolved,
-  subscribe,
-  writePreference,
-} from "./storage";
+import type { UseThemePreference } from "./use-theme-preference";
+import { useThemePreference } from "./use-theme-preference";
 
-const serverPreference = (): ThemePreference => "system";
-const serverResolved = (): ResolvedTheme => "light";
+export type UseTheme = UseThemePreference;
 
-export type UseTheme = Readonly<{
-  preference: ThemePreference;
-  resolved: ResolvedTheme;
-  setPreference: (value: ThemePreference) => void;
-}>;
-
-/** Colour-scheme preference from localStorage, resolved against OS when set to system. */
+/** @deprecated Prefer `useThemePreference` in UI and `useThemeApplicator` in ThemeSync. */
 export function useTheme(): UseTheme {
-  const preference = useSyncExternalStore(subscribe, readPreference, serverPreference);
-  const resolved = useSyncExternalStore(subscribe, readResolved, serverResolved);
-
-  useEffect(() => {
-    applyTheme(preference, resolved);
-  }, [preference, resolved]);
-
-  const setPreference = useCallback((value: ThemePreference) => writePreference(value), []);
-
-  return { preference, resolved, setPreference };
+  return useThemePreference();
 }
 
-/** For tests and the inline bootstrap script: resolve without subscribing. */
-export { resolveTheme, prefersDark, readPreference };
+export { useThemeApplicator } from "./use-theme-applicator";
+export { useThemePreference } from "./use-theme-preference";
+export { resolveTheme, type ThemePreference, type ResolvedTheme } from "./state";
+export { prefersDark, readPreference } from "./storage";

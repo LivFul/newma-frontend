@@ -11,16 +11,16 @@ Mode: Persuade. Audience: investors, biopharma partners, communities/custodians,
 
 ## Direction contract
 
-THESIS: NEWMA is a LivFul ethnobotanical instrument. Greens fade into capsule teals. The leaf and the pill are the recurring glyphs. The public site is scientific and botanical, not a printed survey sheet.
+THESIS: NEWMA is a LivFul ethnobotanical platform in an Apple WWDC26 **Liquid Glass** shell. Brand pack v1.0: Mist survey paper, Ink type, Night plates, Emerald / Lime / Teal accents. Work Sans for UI and display; Geist Mono for labels, grid refs and measured values only.
 
-OWN-WORLD: Mint wash, leaf lime-to-emerald, capsule teal-to-cyan, ink-teal type, apricot as a rare warm band. Geologica for display and UI; Martian Mono for hashes and measured values. Glass panels, pill buttons, pipeline cards, aurora fields. Status is never hue alone.
+OWN-WORLD: Mist `#f1f6f1`, Ink `#082b33`, Night `#06242b`, Deep Teal `#0b3f4b`, Emerald, Lime, Teal capsule gradients. A floating glass header capsule; `.plate-surface` Night bands for workflow, closing and component sections — not a printed survey sheet. Status is never hue alone. User **Light / Dark / System** theme remaps survey-paper tokens only; plates stay Night.
 
 STORY: The visitor sees the six-component pipeline, understands the farm-to-patient loop, then enters the demo or a component page.
 
-FIRST VIEWPORT: Full-bleed hero. Left 6/12 is the title, lede, CTAs and disclaimer. Right 6/12 is the pipeline diagram in a glass panel over botanical photography.
+FIRST VIEWPORT: Full-bleed hero. Left column: title, lede, CTAs, disclaimer. Right: pipeline diagram on a feathered scrim over botanical photography (not a glass card).
 
-SIGNATURE: Chevrons flow Input to Validation and the core loop turns. Hover or focus explodes the pipeline. Reduced motion shows the exploded view at rest.
+SIGNATURE: Chevrons flow Input to Validation; the core loop turns. Hover or focus explodes the pipeline. Reduced motion shows the exploded view at rest.
 
-FORM: Ethnobotanical instrument. Staytec-like photography and peach bands. LivFul greens and blues.
+FORM: Scientific and botanical, calm, LivFul-aligned. Photography and aurora washes; no neatlines, map keys or survey ticks.
 
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+FINISH: Contrast pairs in `contrast-pairs.json`; DESIGN.md is the visual source of truth; shipping rasters carry provenance.
