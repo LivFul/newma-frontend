@@ -34,6 +34,27 @@ export const contrastRatio = (fgHex: string, bgHex: string): number => {
   return (l1 + CONTRAST_OFFSET) / (l2 + CONTRAST_OFFSET);
 };
 
+const HEX_COLOUR = /^#?(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
+
+const channels = (hex: string): number[] => {
+  if (!HEX_COLOUR.test(hex.trim())) throw new Error(`blend: not a #rgb or #rrggbb colour: ${hex}`);
+  const h = expandHex(hex);
+  return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
+};
+const toHex = (rgb: number[]): string =>
+  `#${rgb.map((c) => Math.round(c).toString(16).padStart(2, "0")).join("")}`;
+
+/**
+ * `top` at `alpha` over an opaque `below`. Browsers composite alpha in gamma-encoded sRGB, so the
+ * channels are blended as they are.
+ */
+export const blend = (top: string, alpha: number, below: string): string => {
+  if (!(alpha >= 0 && alpha <= 1))
+    throw new Error(`blend: alpha must be within 0..1, got ${alpha}`);
+  const [t, b] = [channels(top), channels(below)];
+  return toHex(t.map((c, i) => c * alpha + b[i]! * (1 - alpha)));
+};
+
 // Generic `--name: value;` parser; callers decide which values are colours.
 export const parseCssVars = (css: string): Record<string, string> =>
   Object.fromEntries(

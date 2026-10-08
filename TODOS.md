@@ -28,71 +28,6 @@
 **Priority:** P2
 **Depends on:** None
 
-### Footer reversed logo under forced colours and print
-
-**What:** Show a legible footer lockup in Windows High Contrast and in print.
-
-**Why:** The footer uses the reversed (light) logo, which can vanish on a forced light canvas or on paper.
-
-**Context:** `src/components/site/site-footer.tsx` renders `<Wordmark lockup="logo" tone="dark">`. The forced-colours and print rules in `src/app/globals.css` only handle the header's adaptive wordmark. Deferred as decision D10.
-
-**Effort:** S
-**Priority:** P2
-**Depends on:** None
-
-### Hero diagram: describe its touch and keyboard controls
-
-**What:** Tell visitors how to use the ecosystem diagram, now that Keyboard help has been removed.
-
-**Why:** The diagram still answers arrow keys, Home/End and Escape (which merges the layers), and taps on touch screens, but nothing on the page says so.
-
-**Context:** Keyboard help was removed at the user's request (D12). Options: a short visible hint, or an `aria-describedby` summary on the svg in `src/components/ecosystem-graphic/ecosystem-svg.tsx`. Also update `docs/A11Y_MANUAL_PASS.md` and the stale "Hero hint, toggle, key help" row in `docs/CONTENT_MATRIX.md`, and remove the old Keyboard help key names from the allowlist in `scripts/claims/policy.mjs`.
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** None
-
-### Header muted-label contrast over dark hero content
-
-**What:** Measure the header's muted nav labels (`text-fg-muted` on the light glass) over the darkest hero content.
-
-**Why:** At `--glass-tint: 0.58`, Slate over blurred dense ink may sit near 4.3:1, just under AA for 16px text.
-
-**Context:** Add a bound like the caption-scrim proof in `tests/unit/site/hero-stage.test.ts`, or raise the light glass tint.
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** None
-
-### Header tone probe and menu tidy-ups
-
-**What:** Do the following in `src/components/site/site-header.tsx`:
-
-- Find the label row with a `data-header-row` attribute instead of `.glass > div`.
-- Put the `mobile-sections` id in one constant.
-- Re-probe the tone on client-side navigation.
-- Close the menu when the viewport crosses the `lg` breakpoint (1024px), where the menu switches, so the Escape listener does not stay attached.
-
-**Why:** Small fragilities from review: a wrapper div would silently break the probe, and an open menu survives a phone rotating to landscape.
-
-**Context:** All low impact. The per-frame `elementsFromPoint` cost was judged acceptable.
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** None
-
-### Simplify duplicated CSS and JSX
-
-**What:** Let the build add the `-webkit-mask-*` prefixes for the hero scrim, build CapsuleIcon's two gradients from a table, and drop the unused `HeroStep` 0.
-
-**Why:** About 30 lines of repetition that can drift.
-
-**Context:** Check that `.next/static` CSS still contains `-webkit-mask-image` before removing the hand-written copies in `src/app/globals.css`. `src/components/brand/capsule-icon.tsx`; `src/components/site/type.ts`.
-
-**Effort:** S
-**Priority:** P4
-**Depends on:** None
-
 ## Completed
 
 ### Pre-existing e2e failures against `next dev` and macOS WebKit
@@ -155,7 +90,7 @@ Start by deciding whether the CSP and SEO specs should run only against a produc
 **Priority:** P3
 **Depends on:** None
 
-**Completed:** Done on `fix/pwa-3d-tidy` (2026-10-08). `/brand/newma-wordmark.svg` is precached and `CACHE` stays `newma-v2`: an addition needs no bump, and a bump would drop the build chunks the offline page needs. The unit test reads the lockup from `wordmark.tsx`, so a renamed asset fails it.
+**Completed:** Done on `fix/pwa-3d-tidy` (2026-10-08). Every lockup the `(site)` layout around `/offline` renders is precached (the wordmark and the logo, both colourways), and `CACHE` stays `newma-v2`: an addition needs no bump, and a bump would drop the build chunks the offline page needs. The unit test reads the lockup from `wordmark.tsx`, so a renamed asset fails it.
 
 ### Watch the `immutable` header that chunk caching depends on
 
@@ -198,3 +133,78 @@ Start by deciding whether the CSP and SEO specs should run only against a produc
 **Depends on:** None
 
 **Completed:** Done on `fix/pwa-3d-tidy` (2026-10-08). Resize now calls `setDrawingBufferSize(w, h, ratio)` and sets the canvas CSS size itself, and start-up no longer sets an unbudgeted ratio.
+
+### Footer reversed logo under forced colours and print
+
+**What:** Show a legible footer lockup in Windows High Contrast and in print.
+
+**Why:** The footer uses the reversed (light) logo, which can vanish on a forced light canvas or on paper.
+
+**Context:** `src/components/site/site-footer.tsx` renders `<Wordmark lockup="logo" tone="dark">`. The forced-colours and print rules in `src/app/globals.css` only handle the header's adaptive wordmark. Deferred as decision D10.
+
+**Effort:** S
+**Priority:** P2
+**Depends on:** None
+
+**Completed:** Done on `fix/site-a11y-tidy` (2026-10-08). The footer is now `tone="adaptive"` under `data-tone="dark"`, so the reversed logo shows only on screen, and the forced-colours dark rule covers `[data-site-footer]`. `tests/a11y/emulation.spec.ts` checks screen, print, and light and dark forced colours.
+
+### Hero diagram: describe its touch and keyboard controls
+
+**What:** Tell visitors how to use the ecosystem diagram, now that Keyboard help has been removed.
+
+**Why:** The diagram still answers arrow keys, Home/End and Escape (which merges the layers), and taps on touch screens, but nothing on the page says so.
+
+**Context:** Keyboard help was removed at the user's request (D12). Options: a short visible hint, or an `aria-describedby` summary on the svg in `src/components/ecosystem-graphic/ecosystem-svg.tsx`. Also update `docs/A11Y_MANUAL_PASS.md` and the stale "Hero hint, toggle, key help" row in `docs/CONTENT_MATRIX.md`, and remove the old Keyboard help key names from the allowlist in `scripts/claims/policy.mjs`.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** None
+
+**Completed:** Done on `fix/site-a11y-tidy` (2026-10-08). `HERO_CONTROLS` is appended to the svg `<desc>` on the interactive layer only. The A11Y pass and CONTENT_MATRIX are updated, and the allowlist drops Tab, Shift, Enter and Explore.
+
+### Header muted-label contrast over dark hero content
+
+**What:** Measure the header's muted nav labels (`text-fg-muted` on the light glass) over the darkest hero content.
+
+**Why:** At `--glass-tint: 0.58`, Slate over blurred dense ink may sit near 4.3:1, just under AA for 16px text.
+
+**Context:** Add a bound like the caption-scrim proof in `tests/unit/site/hero-stage.test.ts`, or raise the light glass tint.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** None
+
+**Completed:** Done on `fix/site-a11y-tidy` (2026-10-08). The rendered backdrop behind the muted labels is at worst 5.05:1, measured at 1024 to 1920 px across the hero; the 22px blur averages the photo, and a single black pixel would give 3.31:1. `--glass-tint` stays at 0.58. Guarded by `tests/a11y/header-contrast.spec.ts` (rendered, at 1024 and 1440 px) and `tests/unit/site/header-glass.test.ts` (sage wash, 4.60:1).
+
+### Header tone probe and menu tidy-ups
+
+**What:** Do the following in `src/components/site/site-header.tsx`:
+
+- Find the label row with a `data-header-row` attribute instead of `.glass > div`.
+- Put the `mobile-sections` id in one constant.
+- Re-probe the tone on client-side navigation.
+- Close the menu when the viewport crosses the `lg` breakpoint (1024px), where the menu switches, so the Escape listener does not stay attached.
+
+**Why:** Small fragilities from review: a wrapper div would silently break the probe, and an open menu survives a phone rotating to landscape.
+
+**Context:** All low impact. The per-frame `elementsFromPoint` cost was judged acceptable.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** None
+
+**Completed:** Done on `fix/site-a11y-tidy` (2026-10-08): the `data-header-row` probe, the `MOBILE_SECTIONS_ID` constant, a tone re-probe and menu close on `usePathname` change, and the menu closing on a `(min-width: 64rem)` change.
+
+### Simplify duplicated CSS and JSX
+
+**What:** Let the build add the `-webkit-mask-*` prefixes for the hero scrim, build CapsuleIcon's two gradients from a table, and drop the unused `HeroStep` 0.
+
+**Why:** About 30 lines of repetition that can drift.
+
+**Context:** Check that `.next/static` CSS still contains `-webkit-mask-image` before removing the hand-written copies in `src/app/globals.css`. `src/components/brand/capsule-icon.tsx`; `src/components/site/type.ts`.
+
+**Effort:** S
+**Priority:** P4
+**Depends on:** None
+
+**Completed:** Done on `fix/site-a11y-tidy` (2026-10-08). The build emits `-webkit-mask-image` and `-webkit-mask-composite: source-in` for both hero rules (checked in `.next/static` CSS), so the hand-written copies are gone. CapsuleIcon's gradients come from a `HALVES` table, and `HeroStep` is 1 to 4.

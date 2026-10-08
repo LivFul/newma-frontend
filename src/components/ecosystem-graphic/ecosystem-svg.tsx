@@ -1,6 +1,7 @@
 import type { CSSProperties, SVGProps } from "react";
 import { HERO_SVG_DESC, HERO_SVG_TITLE } from "@/content/ecosystem/hero-text";
 import { ecosystemHref, HERO_LABELS, heroAriaLabel } from "@/content/ecosystem/registry";
+import { HERO_CONTROLS } from "@/content/home/hero-help";
 import {
   EDGES,
   LABEL_BOX,
@@ -127,7 +128,11 @@ export function EcosystemSvg({
       data-view={view}
     >
       <title id={titleId}>{HERO_SVG_TITLE.text}</title>
-      <desc id={descId}>{HERO_SVG_DESC.text}</desc>
+      <desc id={descId}>
+        {layer === "interactive"
+          ? `${HERO_SVG_DESC.text} ${HERO_CONTROLS.text}`
+          : HERO_SVG_DESC.text}
+      </desc>
       <defs>
         <marker
           id={arrowId}

@@ -147,3 +147,38 @@ test("the clipping, overlap and animation detectors flag a broken fixture @emula
   expect(await overlappingText(page)).toHaveLength(1);
   expect(await runningAnimations(page)).toHaveLength(1);
 });
+
+// docs/A11Y_MANUAL_PASS.md item 3: the reversed footer logo is white, so it shows only on the dark screen
+// footer. Print (no backgrounds) and a light forced-colours canvas get the dark-ink lockup.
+async function visibleFooterLogo(page: Page): Promise<string | null> {
+  return page
+    .locator("footer[data-site-footer] img")
+    .evaluateAll(
+      (imgs) =>
+        imgs
+          .filter((img) => getComputedStyle(img).display !== "none")
+          .map((img) => (img as HTMLImageElement).currentSrc || img.getAttribute("src"))[0] ?? null,
+    );
+}
+
+for (const [mode, media, expected] of [
+  ["on screen", {}, /newma-logo-reversed\.svg/],
+  ["in print", { media: "print" }, /newma-logo\.svg/],
+  [
+    "under light forced colours",
+    { forcedColors: "active", colorScheme: "light" },
+    /newma-logo\.svg/,
+  ],
+  [
+    "under dark forced colours",
+    { forcedColors: "active", colorScheme: "dark" },
+    /newma-logo-reversed\.svg/,
+  ],
+] as const) {
+  test(`the footer shows a legible logo ${mode} @emulation`, async ({ page }) => {
+    await page.emulateMedia(media);
+    await load(page, "/");
+    const src = decodeURIComponent((await visibleFooterLogo(page)) ?? "");
+    expect(src).toMatch(expected);
+  });
+}

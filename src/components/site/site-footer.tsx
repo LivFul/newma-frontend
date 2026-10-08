@@ -9,11 +9,18 @@ import { Wordmark } from "./wordmark";
 
 export function SiteFooter() {
   return (
-    <footer data-surface="dark" className="mt-auto bg-deep text-plate-fg px-5 md:px-12">
+    // data-tone picks the reversed lockup on screen only; print and a light forced-colours canvas keep
+    // the dark-ink one, which the reversed (white) lockup would vanish against (globals.css).
+    <footer
+      data-site-footer
+      data-surface="dark"
+      data-tone="dark"
+      className="mt-auto bg-deep text-plate-fg px-5 md:px-12"
+    >
       <div className="grid w-full gap-10 py-12 md:grid-cols-[1fr_auto]">
         <div className="space-y-4">
           <div className="pb-4">
-            <Wordmark lockup="logo" tone="dark" imageClassName="h-14 w-auto" />
+            <Wordmark lockup="logo" tone="adaptive" imageClassName="h-14 w-auto" />
           </div>
           <p className="max-w-[68ch] text-sm leading-relaxed text-plate-muted">
             {FOOTER_DESCRIPTOR.text}

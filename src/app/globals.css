@@ -469,13 +469,9 @@ main[tabindex="-1"]:focus-visible {
      caption text from it over a black photo pixel, so the check does not depend on viewport width. */
   .hero-photo,
   .hero-stage {
-    -webkit-mask-image:
-      linear-gradient(to right, transparent 0%, var(--color-fg) 38%),
-      linear-gradient(to bottom, var(--color-fg) 72%, transparent 100%);
     mask-image:
       linear-gradient(to right, transparent 0%, var(--color-fg) 38%),
       linear-gradient(to bottom, var(--color-fg) 72%, transparent 100%);
-    -webkit-mask-composite: source-in;
     mask-composite: intersect;
   }
   .hero-stage {
@@ -488,21 +484,6 @@ main[tabindex="-1"]:focus-visible {
       var(--color-bg-elevated) var(--hero-scrim-text),
       transparent
     );
-    -webkit-mask-image:
-      linear-gradient(
-        to right,
-        transparent 0,
-        var(--color-fg) 4rem,
-        var(--color-fg) calc(100% - 3rem),
-        transparent 100%
-      ),
-      linear-gradient(
-        to bottom,
-        transparent 0,
-        var(--color-fg) 6rem,
-        var(--color-fg) calc(100% - 2rem),
-        transparent 100%
-      );
     mask-image:
       linear-gradient(
         to right,
@@ -518,7 +499,6 @@ main[tabindex="-1"]:focus-visible {
         var(--color-fg) calc(100% - 2rem),
         transparent 100%
       );
-    -webkit-mask-composite: source-in;
     mask-composite: intersect;
   }
 
@@ -717,12 +697,13 @@ main[tabindex="-1"]:focus-visible {
     display: block;
   }
 }
-/* A dark forced-colours theme paints the header Canvas near-black; the reversed lockup reads there. */
+/* A dark forced-colours theme paints the header and footer Canvas near-black; the reversed lockup
+   reads there. */
 @media (forced-colors: active) and (prefers-color-scheme: dark) {
-  [data-site-header] .wordmark-light {
+  :is([data-site-header], [data-site-footer]) .wordmark-light {
     display: none;
   }
-  [data-site-header] .wordmark-dark {
+  :is([data-site-header], [data-site-footer]) .wordmark-dark {
     display: block;
   }
 }

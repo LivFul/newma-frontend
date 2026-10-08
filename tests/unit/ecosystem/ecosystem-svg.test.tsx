@@ -4,6 +4,8 @@ import { EcosystemSvg } from "@/components/ecosystem-graphic/ecosystem-svg";
 import { StaticPart } from "@/components/ecosystem-graphic/static-part";
 import { LABEL_FONT, VIEWBOX } from "@/components/ecosystem-graphic/geometry";
 import { ECOSYSTEM_SLUGS, HERO_LABELS } from "@/content/ecosystem/registry";
+import { HERO_SVG_DESC } from "@/content/ecosystem/hero-text";
+import { HERO_CONTROLS } from "@/content/home/hero-help";
 import { expectNoAxeViolations } from "../ui/axe";
 
 function renderSvg() {
@@ -32,6 +34,22 @@ describe("EcosystemSvg", () => {
       expect(label).toBe(`${title}. ${descriptor}. Opens the ${title} page.`);
       expect(link.textContent).toContain(title);
     }
+  });
+
+  // Value: protects=screen-reader users learn the diagram's arrow, Home/End, Escape and tap controls now that the visible Keyboard help is gone (D12), and only where those controls work;
+  //   fails_when=the controls sentence is dropped from the interactive layer's description, or is announced on the static layer that does not answer the keys;
+  //   why_new=nothing on the page described the controls after Keyboard help was removed; seam=none
+  it("describes the controls on the interactive layer only", () => {
+    const desc = (layer: "static" | "interactive") =>
+      render(
+        <EcosystemSvg Part={StaticPart} svgId={`eco-${layer}`} layer={layer} />,
+      ).container.querySelector("desc")?.textContent;
+    expect(desc("interactive")).toBe(`${HERO_SVG_DESC.text} ${HERO_CONTROLS.text}`);
+    expect(desc("static")).toBe(HERO_SVG_DESC.text);
+    expect(HERO_CONTROLS.text).toMatch(/arrow keys/i);
+    expect(HERO_CONTROLS.text).toMatch(/Home and End/);
+    expect(HERO_CONTROLS.text).toMatch(/Escape/);
+    expect(HERO_CONTROLS.text).toMatch(/tap/i);
   });
 
   it("is one svg group with a title and a description, never role=img", () => {

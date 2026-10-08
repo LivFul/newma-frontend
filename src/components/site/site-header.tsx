@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import {
@@ -15,6 +16,10 @@ import { Button } from "@/components/ui/button";
 import { AccessLink } from "./access-link";
 import { Wordmark } from "./wordmark";
 
+const MOBILE_SECTIONS_ID = "mobile-sections";
+// Tailwind's lg breakpoint, where the section links move into the bar and the menu sheet is hidden.
+const LG_UP = "(min-width: 64rem)";
+
 function navCloseDelay(): number {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return 0;
   const raw = getComputedStyle(document.documentElement)
@@ -29,7 +34,7 @@ function navCloseDelay(): number {
 function toneBeneath(header: HTMLElement): "light" | "dark" | null {
   try {
     // The label row, not the whole capsule: the open menu sheet grows the capsule downwards.
-    const row = (header.querySelector(".glass > div") ?? header).getBoundingClientRect();
+    const row = (header.querySelector("[data-header-row]") ?? header).getBoundingClientRect();
     const probeY = row.top + row.height / 2;
     const under = document
       .elementsFromPoint(window.innerWidth / 2, probeY)
@@ -46,6 +51,17 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [present, setPresent] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
+  // Re-runs the scroll/tone sync on the next frame; set once the sync effect has mounted.
+  const resyncRef = useRef<() => void>(() => undefined);
+  const pathname = usePathname();
+  // A navigation closes the sheet at once. The header persists across routes, and a link inside it
+  // (the wordmark) keeps focus in the header, so neither a section choice nor focusout would close it.
+  const [shownPath, setShownPath] = useState(pathname);
+  if (pathname !== shownPath) {
+    setShownPath(pathname);
+    setOpen(false);
+    setPresent(false);
+  }
 
   useEffect(() => {
     const header = headerRef.current;
@@ -62,6 +78,7 @@ export function SiteHeader() {
       window.cancelAnimationFrame(frame);
       frame = window.requestAnimationFrame(sync);
     };
+    resyncRef.current = onScroll;
     sync();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
@@ -76,7 +93,7 @@ export function SiteHeader() {
       typeof ResizeObserver === "function"
         ? new ResizeObserver(([entry]) => {
             const box = entry?.borderBoxSize?.[0]?.blockSize ?? header.offsetHeight;
-            const sheet = header.querySelector<HTMLElement>("#mobile-sections");
+            const sheet = header.querySelector<HTMLElement>(`#${MOBILE_SECTIONS_ID}`);
             const sheetHeight = sheet && !sheet.hidden ? sheet.getBoundingClientRect().height : 0;
             const value = `${Math.ceil(box - sheetHeight)}px`;
             if (value !== published) {
@@ -88,6 +105,7 @@ export function SiteHeader() {
         : null;
     sizes?.observe(header);
     return () => {
+      resyncRef.current = () => undefined;
       window.cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
@@ -96,25 +114,37 @@ export function SiteHeader() {
     };
   }, []);
 
+  // A client-side navigation swaps the content beneath the capsule without a scroll or resize.
+  useEffect(() => {
+    resyncRef.current();
+  }, [pathname]);
+
   // The open sheet covers the top of the page, so it closes before focus can move under it (Tab past
-  // its last link) and on Escape, which hands focus back to the Menu button.
+  // its last link) and on Escape, which hands focus back to the Menu button. It also closes when the
+  // viewport widens to lg, where the sheet is hidden, so its listeners do not stay attached.
   useEffect(() => {
     const header = headerRef.current;
     if (!open || !header) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       setOpen(false);
-      header.querySelector<HTMLElement>('[aria-controls="mobile-sections"]')?.focus();
+      header.querySelector<HTMLElement>(`[aria-controls="${MOBILE_SECTIONS_ID}"]`)?.focus();
     };
     const onFocusOut = (event: FocusEvent) => {
       const next = event.relatedTarget;
       if (next instanceof Node && !header.contains(next)) setOpen(false);
     };
+    const onWiden = (event: MediaQueryListEvent) => {
+      if (event.matches) setOpen(false);
+    };
+    const lgUp = window.matchMedia(LG_UP);
     document.addEventListener("keydown", onKey);
     header.addEventListener("focusout", onFocusOut);
+    lgUp.addEventListener("change", onWiden);
     return () => {
       document.removeEventListener("keydown", onKey);
       header.removeEventListener("focusout", onFocusOut);
+      lgUp.removeEventListener("change", onWiden);
     };
   }, [open]);
 
@@ -154,7 +184,10 @@ export function SiteHeader() {
           the same corner, and the pill controls inside sit concentric with it. Only the capsule takes
           pointer input: the clear gutters around it pass clicks through to the content they show. */}
       <div className="glass pointer-events-auto mx-auto max-w-[83rem] rounded-[1.75rem]">
-        <div className="flex min-h-[calc(var(--size-header)-0.5rem-2px)] w-full flex-wrap items-center justify-between gap-x-2 gap-y-1 py-1 pr-1.5 pl-3.5 sm:gap-x-3 sm:pl-4 md:pl-6">
+        <div
+          data-header-row
+          className="flex min-h-[calc(var(--size-header)-0.5rem-2px)] w-full flex-wrap items-center justify-between gap-x-2 gap-y-1 py-1 pr-1.5 pl-3.5 sm:gap-x-3 sm:pl-4 md:pl-6"
+        >
           {/* The bar stays one row from 360px up: phones step the lockup down, tablets keep the Menu
               button and the short Demo label until lg, and the full labels return at xl. */}
           <Wordmark
@@ -183,7 +216,7 @@ export function SiteHeader() {
               variant="ghost"
               className="min-h-11 min-w-11 px-2 text-sm min-[25rem]:text-base lg:hidden"
               aria-expanded={open}
-              aria-controls="mobile-sections"
+              aria-controls={MOBILE_SECTIONS_ID}
               onClick={toggle}
             >
               {HEADER_MENU.text}
@@ -198,8 +231,8 @@ export function SiteHeader() {
                 <span className="sr-only xl:not-sr-only">{AVELOZ_LINK.suffix.text}</span>
               </a>
             </Button>
-            {/* The one call to action in the bar: a brand-gradient ring orbits it briefly on arrival. Phones
-                show the short label; its accessible name still starts with the full one. */}
+            {/* The one call to action in the bar: a brand-gradient ring orbits it briefly on arrival. Below xl
+                it shows the short label; its accessible name still starts with the full one. */}
             <AccessLink
               variant="secondary"
               className="cta-attention min-h-11 px-3 text-sm sm:px-4 sm:text-base"
@@ -210,7 +243,7 @@ export function SiteHeader() {
           </div>
         </div>
         <nav
-          id="mobile-sections"
+          id={MOBILE_SECTIONS_ID}
           aria-label={HEADER_MOBILE_NAV.text}
           hidden={!present}
           // While it fades out the closing sheet is invisible, so it takes no taps and no focus.
