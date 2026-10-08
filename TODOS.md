@@ -2,6 +2,18 @@
 
 ## Site
 
+### Make the mobile Lighthouse check required on main
+
+**What:** Add the mobile Lighthouse job from `.github/workflows/preview-e2e.yml` to the required status checks on `main`.
+
+**Why:** It now passes against its budgets (performance 0.90 or higher, LCP 3500 ms or less), but nothing blocks a merge when it fails, which is how it stayed red from PR #24 onwards.
+
+**Context:** Wait until the preview runs on the four stacked PRs pass. It is a branch-protection change (`gh api repos/LivFul/newma-frontend/branches/main/protection`), so confirm the exact command before running it.
+
+**Effort:** S
+**Priority:** P1
+**Depends on:** Preview Lighthouse passing on `perf/mobile-lcp`
+
 ### Bring PRODUCT.md and the /impeccable home brief up to brand pack v1.0
 
 **What:** Rewrite PRODUCT.md "Brand commitments" and "Open decisions", and the direction contract in `.impeccable/surfaces/src-app-site-page-tsx.md`, to match the shipped NEWMA brand pack v1.0.
@@ -215,4 +227,4 @@ Findings on `perf/mobile-lcp` (2026-10-08, local production build, 3 runs per pa
 **Priority:** P1
 **Depends on:** None
 
-**Completed:** On `perf/mobile-lcp` (2026-10-08) the hero copy paints at once (performance about 0.92). The mobile LCP budget moved to 3500 ms by decision, because the remaining gap is lantern counting framework JS before first paint. Making the mobile Lighthouse check required on `main` follows once preview runs pass.
+**Completed:** On `perf/mobile-lcp` (2026-10-08) the hero copy paints at once (performance about 0.92). The mobile LCP budget moved to 3500 ms by decision, because the remaining gap is lantern counting framework JS before first paint. Making the check required is the open P1 "Make the mobile Lighthouse check required on main".
