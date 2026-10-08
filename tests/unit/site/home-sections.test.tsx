@@ -101,13 +101,23 @@ describe("HeroSection", () => {
     expect(screen.getByText(HERO.disclaimer.text)).toBeInTheDocument();
   });
 
-  it("keeps the headline still and staggers the rest of the hero", () => {
+  // Value: protects=mobile LCP: the hero copy (headline, tagline, lede) paints with the first frame, and only the actions rise in after it;
+  //   fails_when=an entrance class returns to the copy: an item starts at opacity 0, so on phones the lede (the largest text there) became LCP only after its fade, and Lighthouse's throttling charged every script before it (LCP 3.9 s against a 3 s budget);
+  //   why_new=the copy was staggered too, and the old test required it; seam=none
+  it("paints the hero copy at once and staggers only the actions", () => {
     const { container } = render(<HeroSection />);
-    const heading = screen.getByRole("heading", { level: 1 });
-    expect(heading.className).not.toMatch(/hero-entrance-item/);
-    expect(screen.getByText(HERO.tagline.text).className).toMatch(/hero-entrance-item/);
-    expect(screen.getByText(HERO.lede.text).className).toMatch(/hero-entrance-item/);
-    expect(container.querySelectorAll("#hero .hero-entrance-item")).toHaveLength(4);
+    for (const copy of [
+      screen.getByRole("heading", { level: 1 }),
+      screen.getByText(HERO.tagline.text),
+      screen.getByText(HERO.lede.text),
+    ]) {
+      expect(copy.className).not.toMatch(/hero-entrance-item/);
+    }
+    expect(screen.getByText(HERO.disclaimer.text).className).toMatch(/hero-entrance-item/);
+    const items = container.querySelectorAll("#hero .hero-entrance-item");
+    expect(items).toHaveLength(2);
+    // The first animated item starts at once: nothing above it animates any more.
+    expect(items[0]!.className).toContain("[--hero-i:0]");
   });
 
   it("exposes the ecosystem diagram with its accessible name inside the hero", () => {

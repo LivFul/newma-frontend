@@ -14,15 +14,17 @@ export const STATEMENT =
  * stylesheet and every item starts at once. The index is a union, so a step outside the table is a
  * compile error and not a silent clamp.
  */
-export type HeroStep = 1 | 2 | 3 | 4;
+export type HeroStep = 0 | 1;
 const HERO_STEP: Record<HeroStep, string> = {
+  0: "[--hero-i:0]",
   1: "[--hero-i:1]",
-  2: "[--hero-i:2]",
-  3: "[--hero-i:3]",
-  4: "[--hero-i:4]",
 };
 
-/** Base class for the CSS-only hero load sequence. Never put this on the h1 (it is the LCP node). */
+/**
+ * Base class for the CSS-only hero load sequence, for the actions only. Never put it on the copy (h1,
+ * tagline, lede): an item starts at opacity 0, and on phones the lede is the LCP node, so a fade there
+ * moved LCP past every script that ran before it.
+ */
 export const HERO_ENTRANCE_ITEM = "hero-entrance-item";
 export const heroEntrance = (step: HeroStep) => `${HERO_ENTRANCE_ITEM} ${HERO_STEP[step]}`;
 

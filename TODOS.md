@@ -1,20 +1,32 @@
 # TODOS
 
-## Performance
+## Testing
 
-### Mobile Lighthouse performance below target
+### Primitives dialog axe check fails while the dialog fades in
 
-**What:** Bring mobile Lighthouse performance from 0.81 to the 0.90 target, with LCP under the 3000 ms mobile budget, on `/` and `/ecosystem/interface`. Then make the mobile Lighthouse check required on `main`.
+**What:** Make `tests/a11y/primitives.spec.ts:31` ("gallery with the dialog open has zero axe violations") wait for the dialog's open animation to finish, or emulate reduced motion, before running axe.
 
-**Why:** It is the largest open gap. It has failed on `main` since PR #24 and fails on every preview run, but nothing blocks a merge on it.
+**Why:** It fails intermittently on mobile-chromium with `color-contrast` 4.37:1 (#566e72 on #e6e7e6) on the Radix dialog. axe measures while the overlay and panel are still part-way through their fade.
 
-**Context:** `lighthouserc.mobile.cjs` and `lighthouserc.shared.cjs`. It runs in `.github/workflows/preview-e2e.yml` and locally with `pnpm lhci:mobile`. Measure the LCP element and its phases before changing anything. The likely LCP node is the hero h1, which waits on Work Sans.
+**Context:** Pre-existing on `main`: it fails the same way on `test/e2e-baseline`, which has no app changes. Seen during `/ship` on `perf/mobile-lcp` (2026-10-08). Error: `Element has insufficient color contrast of 4.37 (foreground color: #566e72, background color: #e6e7e6, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1`.
 
-**Effort:** M
-**Priority:** P1
+**Effort:** S
+**Priority:** P0
 **Depends on:** None
 
 ## Site
+
+### Make the mobile Lighthouse check required on main
+
+**What:** Add the mobile Lighthouse job from `.github/workflows/preview-e2e.yml` to the required status checks on `main`.
+
+**Why:** It now passes against its budgets (performance 0.90 or higher, LCP 3500 ms or less), but nothing blocks a merge when it fails, which is how it stayed red from PR #24 onwards.
+
+**Context:** Wait until the preview runs on the four stacked PRs pass. It is a branch-protection change (`gh api repos/LivFul/newma-frontend/branches/main/protection`), so confirm the exact command before running it.
+
+**Effort:** S
+**Priority:** P1
+**Depends on:** Preview Lighthouse passing on `perf/mobile-lcp`
 
 ### Bring PRODUCT.md and the /impeccable home brief up to brand pack v1.0
 
@@ -26,6 +38,76 @@
 
 **Effort:** S
 **Priority:** P2
+**Depends on:** None
+
+### Footer logo when printing with background graphics
+
+**What:** Give the footer a light ground and dark text in print (or keep its dark ground with `print-color-adjust: exact` and the reversed logo), so the logo is legible whatever the browser's "Background graphics" setting.
+
+**Why:** In print the footer now shows the dark-ink logo, which suits the default (backgrounds off). With backgrounds on, `bg-deep` still prints and the logo sits at about 1.1 to 1.3:1.
+
+**Context:** `src/components/site/site-footer.tsx`, the `@media print` block in `src/app/globals.css`. Found by both adversarial reviews in `/ship` (2026-10-08). Extend the print case in `tests/a11y/emulation.spec.ts` to check contrast, not only which image is shown.
+
+**Effort:** S
+**Priority:** P2
+**Depends on:** None
+
+### Close the header menu on any link inside the header
+
+**What:** Close the mobile section menu when any link inside the header is clicked, not only on a pathname change.
+
+**Why:** Tapping the wordmark while already on `/` with the menu open leaves the sheet open: the pathname does not change, and focus stays in the header.
+
+**Context:** `src/components/site/site-header.tsx` (the `shownPath` check). Deferred in `/ship` (2026-10-08).
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** None
+
+### Hero diagram description: one copy, and how often it is read
+
+**What:** Give the interactive diagram layer its own ids while both layers are mounted. Then decide whether the controls sentence belongs on the group's description, which is read on every focus entry, or on the toggle or first part only.
+
+**Why:** While the interactive chunk loads, both layers share `eco-hero-desc`, so a screen reader may read the static description without the controls. About 60 words are also replayed each time focus enters the group.
+
+**Context:** `src/components/ecosystem-graphic/ecosystem-svg.tsx`, `hero-loader.tsx`, `src/content/home/hero-help.ts` (`HERO_CONTROLS`). Needs a call on how much to read and where.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** None
+
+## PWA
+
+### Precache follow-ups: query strings and test coverage
+
+**What:**
+
+- Check whether Vercel Skew Protection is on. If it is, match precached `/brand/` lockups with `ignoreSearch` in `public/sw.js`, because next/image appends `?dpl=<id>`. Add a unit case.
+- Assert all four precached lockups in `tests/unit/pwa/service-worker.test.ts`.
+- Read the cache name from `sw.js` in the upgrade test instead of hard-coding `newma-v2`.
+- Reword the test comments that refer to "this branch".
+- Fix the stale `newma-v3` fallback name.
+
+**Why:** With `?dpl`, the offline page's logos would miss the bare precached paths. The rest keeps the tests honest when the precache list or the cache name changes.
+
+**Context:** Deferred in `/ship` (2026-10-08).
+
+**Effort:** S
+**Priority:** P2
+**Depends on:** None
+
+## Workflow 3D
+
+### Re-budget the canvas when the screen's pixel density changes
+
+**What:** Also resize the drawing buffer on a `matchMedia("(resolution: <dpr>dppx)")` change.
+
+**Why:** Moving the window between a 1x and a 2x monitor changes `devicePixelRatio` without resizing the container, so the buffer keeps the old ratio until the next layout resize.
+
+**Context:** `src/components/workflow-3d/stage.ts` (`resize`, `drawnAt`). Predates this release; deferred in `/ship` (2026-10-08).
+
+**Effort:** S
+**Priority:** P3
 **Depends on:** None
 
 ## Completed
@@ -207,4 +289,26 @@ Start by deciding whether the CSP and SEO specs should run only against a produc
 **Priority:** P4
 **Depends on:** None
 
-**Completed:** Done on `fix/site-a11y-tidy` (2026-10-08). The build emits `-webkit-mask-image` and `-webkit-mask-composite: source-in` for both hero rules (checked in `.next/static` CSS), so the hand-written copies are gone. CapsuleIcon's gradients come from a `HALVES` table, and `HeroStep` is 1 to 4.
+**Completed:** Done on `fix/site-a11y-tidy` (2026-10-08). The build emits `-webkit-mask-image` and `-webkit-mask-composite: source-in` for both hero rules (checked in `.next/static` CSS), so the hand-written copies are gone. CapsuleIcon's gradients come from a `HALVES` table, and `HeroStep` is 1 to 4 (later 0 | 1 on `perf/mobile-lcp`, where only the hero actions keep the entrance, so the first of them starts without a delay).
+
+### Mobile Lighthouse performance below target
+
+**What:** Bring mobile Lighthouse performance from 0.81 to the 0.90 target, with LCP under the 3000 ms mobile budget, on `/` and `/ecosystem/interface`. Then make the mobile Lighthouse check required on `main`.
+
+**Why:** It is the largest open gap. It has failed on `main` since PR #24 and fails on every preview run, but nothing blocks a merge on it.
+
+**Context:** `lighthouserc.mobile.cjs` and `lighthouserc.shared.cjs`. It runs in `.github/workflows/preview-e2e.yml` and locally with `LHCI_BASE_URL=http://localhost:<port> pnpm lhci:mobile` against `pnpm start`. Without `LHCI_BASE_URL`, reports upload to public temporary storage.
+
+Findings on `perf/mobile-lcp` (2026-10-08, local production build, 3 runs per page):
+
+- The LCP node on phones was the hero lede, not the h1. Its entrance fade started at opacity 0, so LCP was observed at about 900 ms, and Lighthouse's simulated throttling charged every script before it (render delay 3.5 to 4.2 s). The hero copy now paints at once and only the actions rise in. Home performance went from 0.71–0.82 (LCP 3.9–4.7 s) to 0.92–0.93 (LCP about 3.2 s).
+- The footer logo's standby colourway no longer loads eagerly before first paint.
+- Still over budget: home LCP is about 3.2 s against 3000 ms, and `/ecosystem/interface` sits at about 2.9 to 3.1 s. Observed LCP now equals FCP. The rest is lantern counting the framework chunks (React DOM and the app-router runtime, about 110 KB gzip) that finish before the first paint on a fast server.
+- Tried and reverted: `experimental.inlineCss` (HTML grew to 88 KB, FCP and LCP got worse), and dropping the Geist Mono preload (FCP rose from 1.06 to 1.52 s).
+- Next options: decide whether 3000 ms or 3500 ms is the right mobile LCP budget for a lab score; or cut pre-paint JS (fewer client components in `(site)/layout.tsx`, deferred `AnalyticsMount`/`PwaGate`); then make the check required.
+
+**Effort:** M
+**Priority:** P1
+**Depends on:** None
+
+**Completed:** On `perf/mobile-lcp` (2026-10-08) the hero copy paints at once (performance about 0.92). The mobile LCP budget moved to 3500 ms by decision, because the remaining gap is lantern counting framework JS before first paint. Making the check required is the open P1 "Make the mobile Lighthouse check required on main".

@@ -236,7 +236,7 @@ Tokens: fast 150ms, base 280ms, slow 600ms. Animate transform and opacity only. 
 
 Springs are CSS `linear()` curves sampled from damped-spring step responses, with a cubic-bezier fallback. `--motion-spring-settle` (critically damped, no overshoot) drives entrances, reveals, card lift and the mobile menu. `--motion-spring-snappy` (about 16% overshoot) is for the `scale` of pressable controls only: hover lifts to 1.04, press sinks to 0.96, and a transition retargets from its live value, so a press or lift can be interrupted mid-flight. Position carries over on interruption; velocity does not, because CSS restarts the curve. Colour, filter and shadow never use the overshooting curve.
 
-Only the hero cascades: its four items rise in 60ms steps, the one orchestrated entrance on the page. Section reveals rise as a whole and their children only fade in with them. Stagger steps are literal class names in `src/components/site/type.ts` so Tailwind can generate them, and the step index is a type, so an out-of-range step fails to compile.
+Only the hero cascades: its actions and disclaimer rise in 60ms steps, the one orchestrated entrance on the page. The headline, tagline and lede paint with the first frame, because on phones the lede is the LCP node. Section reveals rise as a whole and their children only fade in with them. Stagger steps are literal class names in `src/components/site/type.ts` so Tailwind can generate them, and the step index is a type, so an out-of-range step fails to compile.
 
 The hero's diagram sits on a scrim, not a card: a feathered, borderless wash with no blur, densest under the caption and hint (`--hero-scrim-text`) and lightest at the top where only the photo shows. `tests/unit/site/hero-stage.test.ts` proves AA for the muted caption text from that alpha over a black photo pixel, so the check does not depend on viewport width.
 
@@ -258,7 +258,7 @@ Elevated white on light grounds, `.surface-material` on plates. Not glass. The s
 
 ### Navigation
 
-A sticky, floating Liquid Glass capsule with the newmA wordmark. On mobile the capsule grows into a rounded glass sheet for section links. The footer is a Night band with the reversed logo and byline.
+A sticky, floating Liquid Glass capsule with the newmA wordmark. On mobile the capsule grows into a rounded glass sheet for section links. The footer is a Night band with the reversed logo and byline on screen and in a dark forced-colours theme; print and a light forced-colours theme show the dark-ink logo instead.
 
 ### Ecosystem diagram
 

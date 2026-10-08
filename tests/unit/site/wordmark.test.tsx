@@ -54,6 +54,17 @@ describe("Wordmark", () => {
     expect(dark).toHaveAttribute("fetchpriority", "low");
   });
 
+  // Value: protects=mobile LCP: a below-the-fold adaptive lockup (the footer logo) fetches neither colourway before first paint, where Lighthouse's simulation charges every early request to LCP;
+  //   fails_when=the standby colourway is made eager without priority again;
+  //   why_new=the footer became adaptive, and its eager standby added a reversed logo to the requests before LCP; seam=none
+  it("keeps both colourways lazy when the lockup is not a priority image", () => {
+    const { container } = render(<Wordmark lockup="logo" tone="adaptive" />);
+    for (const img of container.querySelectorAll("img")) {
+      expect(img).toHaveAttribute("loading", "lazy");
+      expect(img).not.toHaveAttribute("fetchpriority");
+    }
+  });
+
   // Value: protects=the adaptive header shows exactly one colourway: light by default, reversed only on screen over a dark tone, never under forced colours or print; fails_when=the globals.css swap rules are deleted, renamed away from the wordmark-light/wordmark-dark hooks, or escape the screen-and-no-forced-colours guard; why_new=the class-name test above never reads the CSS that acts on those classes; seam=none
   it("is swapped by globals.css only on screen and outside forced colours", () => {
     const css = readFileSync(path.resolve(__dirname, "../../../src/app/globals.css"), "utf8");
