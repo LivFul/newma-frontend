@@ -1,5 +1,19 @@
 # TODOS
 
+## Testing
+
+### Primitives dialog axe check fails while the dialog fades in
+
+**What:** Make `tests/a11y/primitives.spec.ts:31` ("gallery with the dialog open has zero axe violations") wait for the dialog's open animation to finish, or emulate reduced motion, before running axe.
+
+**Why:** It fails intermittently on mobile-chromium with `color-contrast` 4.37:1 (#566e72 on #e6e7e6) on the Radix dialog. axe measures while the overlay and panel are still part-way through their fade.
+
+**Context:** Pre-existing on `main`: it fails the same way on `test/e2e-baseline`, which has no app changes. Seen during `/ship` on `perf/mobile-lcp` (2026-10-08). Error: `Element has insufficient color contrast of 4.37 (foreground color: #566e72, background color: #e6e7e6, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1`.
+
+**Effort:** S
+**Priority:** P0
+**Depends on:** None
+
 ## Site
 
 ### Make the mobile Lighthouse check required on main
@@ -24,6 +38,76 @@
 
 **Effort:** S
 **Priority:** P2
+**Depends on:** None
+
+### Footer logo when printing with background graphics
+
+**What:** Give the footer a light ground and dark text in print (or keep its dark ground with `print-color-adjust: exact` and the reversed logo), so the logo is legible whatever the browser's "Background graphics" setting.
+
+**Why:** In print the footer now shows the dark-ink logo, which suits the default (backgrounds off). With backgrounds on, `bg-deep` still prints and the logo sits at about 1.1 to 1.3:1.
+
+**Context:** `src/components/site/site-footer.tsx`, the `@media print` block in `src/app/globals.css`. Found by both adversarial reviews in `/ship` (2026-10-08). Extend the print case in `tests/a11y/emulation.spec.ts` to check contrast, not only which image is shown.
+
+**Effort:** S
+**Priority:** P2
+**Depends on:** None
+
+### Close the header menu on any link inside the header
+
+**What:** Close the mobile section menu when any link inside the header is clicked, not only on a pathname change.
+
+**Why:** Tapping the wordmark while already on `/` with the menu open leaves the sheet open: the pathname does not change, and focus stays in the header.
+
+**Context:** `src/components/site/site-header.tsx` (the `shownPath` check). Deferred in `/ship` (2026-10-08).
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** None
+
+### Hero diagram description: one copy, and how often it is read
+
+**What:** Give the interactive diagram layer its own ids while both layers are mounted. Then decide whether the controls sentence belongs on the group's description, which is read on every focus entry, or on the toggle or first part only.
+
+**Why:** While the interactive chunk loads, both layers share `eco-hero-desc`, so a screen reader may read the static description without the controls. About 60 words are also replayed each time focus enters the group.
+
+**Context:** `src/components/ecosystem-graphic/ecosystem-svg.tsx`, `hero-loader.tsx`, `src/content/home/hero-help.ts` (`HERO_CONTROLS`). Needs a call on how much to read and where.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** None
+
+## PWA
+
+### Precache follow-ups: query strings and test coverage
+
+**What:**
+
+- Check whether Vercel Skew Protection is on. If it is, match precached `/brand/` lockups with `ignoreSearch` in `public/sw.js`, because next/image appends `?dpl=<id>`. Add a unit case.
+- Assert all four precached lockups in `tests/unit/pwa/service-worker.test.ts`.
+- Read the cache name from `sw.js` in the upgrade test instead of hard-coding `newma-v2`.
+- Reword the test comments that refer to "this branch".
+- Fix the stale `newma-v3` fallback name.
+
+**Why:** With `?dpl`, the offline page's logos would miss the bare precached paths. The rest keeps the tests honest when the precache list or the cache name changes.
+
+**Context:** Deferred in `/ship` (2026-10-08).
+
+**Effort:** S
+**Priority:** P2
+**Depends on:** None
+
+## Workflow 3D
+
+### Re-budget the canvas when the screen's pixel density changes
+
+**What:** Also resize the drawing buffer on a `matchMedia("(resolution: <dpr>dppx)")` change.
+
+**Why:** Moving the window between a 1x and a 2x monitor changes `devicePixelRatio` without resizing the container, so the buffer keeps the old ratio until the next layout resize.
+
+**Context:** `src/components/workflow-3d/stage.ts` (`resize`, `drawnAt`). Predates this release; deferred in `/ship` (2026-10-08).
+
+**Effort:** S
+**Priority:** P3
 **Depends on:** None
 
 ## Completed
