@@ -67,7 +67,11 @@ test("an open menu closes when the viewport widens past lg", async ({ page, isMo
   await expect(menu).toHaveAttribute("aria-expanded", "true");
   await page.setViewportSize({ width: 1100, height: 800 });
   // The media query's change event fires on a rendering update: wait for it before narrowing again.
-  await expect(menu).toHaveAttribute("aria-expanded", "false");
+  // The button is lg:hidden here, so it is out of the accessibility tree; find it by attribute.
+  await expect(page.locator('[aria-controls="mobile-sections"]')).toHaveAttribute(
+    "aria-expanded",
+    "false",
+  );
   await page.setViewportSize({ width: 900, height: 800 });
   await expect(menu).toHaveAttribute("aria-expanded", "false");
   await expect(page.locator("#mobile-sections")).toBeHidden();
