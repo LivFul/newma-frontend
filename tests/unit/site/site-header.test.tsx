@@ -5,6 +5,9 @@ import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { expectNoAxeViolations } from "../ui/axe";
 
+const nav = vi.hoisted(() => ({ pathname: "/" }));
+vi.mock("next/navigation", () => ({ usePathname: () => nav.pathname }));
+
 async function flush(ms: number) {
   await act(async () => {
     await vi.advanceTimersByTimeAsync(ms);
@@ -173,6 +176,74 @@ describe("SiteHeader", () => {
       expect(screen.queryByRole("navigation", { name: "Mobile sections" })).toBeNull();
     });
     expect(document.getElementById("mobile-sections")).not.toBeNull();
+  });
+
+  // Value: protects=an open menu closes when the viewport widens past lg (a phone or tablet rotating), so the hidden sheet does not keep its Escape and focusout listeners attached;
+  //   fails_when=the (min-width: 64rem) listener is dropped, reacts to narrowing instead, or outlives the open menu;
+  //   why_new=the sheet is lg:hidden, so a menu opened below lg stayed open and listening after the viewport crossed lg; seam=none
+  it("closes the open menu when the viewport widens to lg", async () => {
+    const listeners = new Map<string, (event: MediaQueryListEvent) => void>();
+    const removed: string[] = [];
+    vi.spyOn(window, "matchMedia").mockImplementation(
+      (query: string) =>
+        ({
+          matches: false,
+          media: query,
+          addEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => {
+            listeners.set(query, listener);
+          },
+          removeEventListener: () => {
+            removed.push(query);
+          },
+        }) as unknown as MediaQueryList,
+    );
+    const user = userEvent.setup();
+    render(<SiteHeader />);
+    const menu = screen.getByRole("button", { name: "Menu" });
+    await user.click(menu);
+    expect(menu).toHaveAttribute("aria-expanded", "true");
+    const wide = listeners.get("(min-width: 64rem)");
+    expect(wide).toBeDefined();
+
+    act(() => wide!({ matches: false } as MediaQueryListEvent));
+    expect(menu).toHaveAttribute("aria-expanded", "true");
+    act(() => wide!({ matches: true } as MediaQueryListEvent));
+    expect(menu).toHaveAttribute("aria-expanded", "false");
+    expect(removed).toContain("(min-width: 64rem)");
+  });
+
+  // Value: protects=the header takes the tone of the new page after a client-side navigation, which fires no scroll or resize;
+  //   fails_when=the pathname effect is dropped, so the capsule keeps the previous page's tone until the visitor scrolls;
+  //   why_new=the tone was only probed on mount, scroll, resize and header size changes; seam=none
+  it("re-probes the tone after a client-side navigation", async () => {
+    const paper = document.body.appendChild(document.createElement("p"));
+    const plate = document.body.appendChild(document.createElement("section"));
+    plate.className = "plate-surface";
+    let beneath: Element[] = [paper];
+    Object.defineProperty(document, "elementsFromPoint", {
+      configurable: true,
+      value: () => beneath,
+    });
+    try {
+      nav.pathname = "/";
+      const { rerender } = render(<SiteHeader />);
+      const header = screen.getByRole("banner");
+      expect(header).toHaveAttribute("data-tone", "light");
+      beneath = [plate];
+      nav.pathname = "/ecosystem/wet-lab";
+      await act(async () => {
+        rerender(<SiteHeader />);
+        await new Promise<void>((resolve) => {
+          requestAnimationFrame(() => resolve());
+        });
+      });
+      expect(header).toHaveAttribute("data-tone", "dark");
+    } finally {
+      nav.pathname = "/";
+      Reflect.deleteProperty(document, "elementsFromPoint");
+      paper.remove();
+      plate.remove();
+    }
   });
 
   it("marks the header once the page has scrolled", async () => {
@@ -383,9 +454,9 @@ describe("SiteHeader", () => {
       // The header's own glass is topmost at the probe point; it must be skipped, not read.
       const own = header.querySelector(".glass")!;
       // The probe reads behind the middle of the capsule's label row, not its lower edge or an open sheet.
-      vi.spyOn(own.firstElementChild!, "getBoundingClientRect").mockReturnValue(
-        new DOMRect(0, 8, 1200, 56),
-      );
+      const row = header.querySelector("[data-header-row]")!;
+      expect(row.parentElement).toBe(own);
+      vi.spyOn(row, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 8, 1200, 56));
       vi.spyOn(own, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 8, 1200, 230));
       vi.spyOn(header, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 0, 1280, 66));
       beneath = () => [own, plateText];

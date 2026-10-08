@@ -38,8 +38,9 @@ Start with the focus in the address bar and use only the keyboard.
       _automated: pass for Tab reaching the six components, Escape keeping focus, Enter opening the focused one and no trap; arrow keys, Home and End stay manual (`tests/a11y/keyboard.spec.ts › hero: Escape keeps focus on the component; Enter opens it`, 2026-10-04)_
 - [ ] "Explore components" works with Enter and Space.
       _manual: not automated_
-- [ ] The Product and About LivFul header links and the "How it works" button land with the section
-      heading fully visible below the header.
+- [ ] The Overview, How it works, Ecosystem and About Newma header links (in the bar from lg, in the
+      Menu sheet below it) and the hero's "How it works" button land with the section heading fully
+      visible below the header.
       _manual: not automated by keyboard (pointer coverage in `tests/e2e/sticky-header.spec.ts`)_
 - [ ] A component page: Sources list, "See it in the demo" link, the other-components links and the
       footer links are all reachable. There is no keyboard trap anywhere.
@@ -54,6 +55,9 @@ _Manual: every row in this section needs a person with a screen reader; none is 
 - [ ] Links list: each hero component is announced with its descriptor, for example "Interface. Where
       people sign in. Opens the Interface page." There is no bare "link, link".
 - [ ] The diagram is announced as a group named "NEWMA ecosystem diagram", with the description available.
+      Once the interactive diagram has loaded, the description ends with its controls: the arrow keys,
+      Home and End, Escape, and the two taps on a touch screen.
+      _automated: the description text per layer (`tests/unit/ecosystem/ecosystem-svg.test.tsx › describes the controls on the interactive layer only`); hearing it stays manual_
 - [ ] "Explore components" is announced as a toggle button with its pressed state.
 - [ ] On a touch device or with a pointer-driven first activation, the status "Components separated.
       Activate again to open ..." is announced once.

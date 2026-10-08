@@ -18,6 +18,13 @@ const STOPS: Record<
   reversed: { plant: ["#d2f57f", "#2bc08e"], pill: ["#1a8fa0", "#7fe3d2"] },
 };
 
+// Each half's gradient runs along the capsule's own axis: the plant half tip to seam, the pill half
+// seam to tip.
+const HALVES = [
+  { half: "plant", x1: -20, x2: -1 },
+  { half: "pill", x1: 1, x2: 20 },
+] as const;
+
 type CapsuleIconProps = {
   className?: string;
   title?: string;
@@ -39,29 +46,20 @@ export function CapsuleIcon({ className = "size-5", title, tone = "color" }: Cap
       {title ? <title>{title}</title> : null}
       {stops ? (
         <defs>
-          {/* Gradients run along the capsule's own axis, tip to seam and seam to tip. */}
-          <linearGradient
-            id={`${id}-plant`}
-            x1="-20"
-            x2="-1"
-            y1="0"
-            y2="0"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop stopColor={stops.plant[0]} />
-            <stop offset="1" stopColor={stops.plant[1]} />
-          </linearGradient>
-          <linearGradient
-            id={`${id}-pill`}
-            x1="1"
-            x2="20"
-            y1="0"
-            y2="0"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop stopColor={stops.pill[0]} />
-            <stop offset="1" stopColor={stops.pill[1]} />
-          </linearGradient>
+          {HALVES.map(({ half, x1, x2 }) => (
+            <linearGradient
+              key={half}
+              id={`${id}-${half}`}
+              x1={x1}
+              x2={x2}
+              y1="0"
+              y2="0"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop stopColor={stops[half][0]} />
+              <stop offset="1" stopColor={stops[half][1]} />
+            </linearGradient>
+          ))}
         </defs>
       ) : null}
       <g transform="rotate(-45)" fill="currentColor">

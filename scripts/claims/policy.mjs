@@ -145,14 +145,10 @@ export const ALLOWED_TERMS = {
     "Access",
     "Privacy",
     "Terms",
-    // Names of keys and controls in the keyboard help.
-    "Tab",
-    "Shift",
+    // Names of keys in the hero diagram's control description (HERO_CONTROLS).
     "Home",
     "End",
-    "Enter",
     "Escape",
-    "Explore",
     "Newma",
     "Therapeutics",
     "Discovery",

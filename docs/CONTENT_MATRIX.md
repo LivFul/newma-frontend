@@ -28,7 +28,7 @@ items not shown on the public site.
 | Closing section             | `src/content/home/copy.ts` (`CLOSING`)                    | consolidated Optional Closing  | C-50             | sourced          | CP-2 pending |
 | Hero labels and descriptors | `src/content/ecosystem/registry.ts` (`HERO_LABELS`)       | consolidated §5                | C-48             | sourced          | CP-2 pending |
 | Hero accessible text        | `src/content/ecosystem/hero-text.ts`, `hero-caption.ts`   | consolidated §2, §5            | C-48, C-49       | sourced          | CP-2 pending |
-| Hero hint, toggle, key help | `src/content/home/hero-help.ts`                           | IP §6.4 interaction model      | C-48             | [Recommendation] | CP-2 pending |
+| Hero hint, toggle, controls | `src/content/home/hero-help.ts`                           | IP §6.4 interaction model      | C-48             | [Recommendation] | CP-2 pending |
 | Header, footer, wordmark    | `src/content/home/chrome.ts`                              | consolidated §1, §7            | C-21, C-29, C-30 | sourced          | CP-2 pending |
 | App install and offline     | `chrome.ts` (`PWA_COPY`), `copy.ts` (`OFFLINE`)           | structural; A-P4-01            | C-56             | [Recommendation] | CP-2 pending |
 

@@ -6,7 +6,7 @@ test("the mobile section menu opens on Menu and closes when a link is chosen", a
   page,
   isMobile,
 }) => {
-  test.skip(!isMobile, "the Menu button only shows below the md breakpoint");
+  test.skip(!isMobile, "the Menu button only shows below the lg breakpoint");
   // The Menu button is server-rendered and only works once hydrated: wait for the page's ready hook.
   await gotoHeroReady(page);
   const menu = page.getByRole("button", { name: "Menu" });
@@ -32,7 +32,7 @@ test("the mobile section menu opens on Menu and closes when a link is chosen", a
 //   fails_when=the closing sheet stays in flow during the anchor scroll, so the section ends up the sheet's height past the header (QA run 3: -103 px vs 110 px);
 //   why_new=the test above only checks that the sheet closes, never where the page lands; seam=none
 test("a section chosen from the mobile menu lands below the header", async ({ page, isMobile }) => {
-  test.skip(!isMobile, "the Menu button only shows below the md breakpoint");
+  test.skip(!isMobile, "the Menu button only shows below the lg breakpoint");
   await gotoHeroReady(page);
   await page.getByRole("button", { name: "Menu" }).click();
   await page.locator("#mobile-sections").getByRole("link", { name: "How it works" }).click();
@@ -53,4 +53,20 @@ test("a section chosen from the mobile menu lands below the header", async ({ pa
   });
   expect(gap).toBeGreaterThanOrEqual(-1);
   expect(gap).toBeLessThanOrEqual(24);
+});
+
+// Value: protects=a menu opened below lg closes when the viewport widens past it (a tablet rotating), so it does not reopen as a stale sheet or keep its listeners;
+//   fails_when=the (min-width: 64rem) listener is dropped, so the sheet is still open when the viewport narrows again;
+//   why_new=the sheet is lg:hidden, so a menu left open above lg was invisible but still open; seam=none
+test("an open menu closes when the viewport widens past lg", async ({ page, isMobile }) => {
+  test.skip(isMobile, "resizes a desktop viewport across the lg breakpoint");
+  await page.setViewportSize({ width: 900, height: 800 });
+  await gotoHeroReady(page);
+  const menu = page.getByRole("button", { name: "Menu" });
+  await menu.click();
+  await expect(menu).toHaveAttribute("aria-expanded", "true");
+  await page.setViewportSize({ width: 1100, height: 800 });
+  await page.setViewportSize({ width: 900, height: 800 });
+  await expect(menu).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator("#mobile-sections")).toBeHidden();
 });
