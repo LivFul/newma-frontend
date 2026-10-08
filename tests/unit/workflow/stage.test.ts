@@ -144,7 +144,7 @@ describe("pixelRatioFor", () => {
   // Value: protects=the drawing buffer is sized once per resize, at the budgeted ratio, and the canvas keeps its CSS size;
   //   fails_when=resize goes back to setPixelRatio plus setSize (two buffer allocations when the ratio changes), ignores the budget, or leaves the canvas unstyled;
   //   why_new=setPixelRatio reallocated the buffer at the old size before setSize allocated it again; seam=none
-  it("sizes the drawing buffer once per resize, at the budgeted ratio", () => {
+  it("sizes the drawing buffer once per real resize, at the budgeted ratio", () => {
     vi.stubGlobal("devicePixelRatio", 2);
     const element = container(1824, 900);
     const stage = createStage(element, { reducedMotion: true });
@@ -155,8 +155,17 @@ describe("pixelRatioFor", () => {
     expect(renderer.domElement.style.width).toBe("1824px");
     expect(renderer.domElement.style.height).toBe("900px");
     const calls = renderer.setDrawingBufferSize.mock.calls.length;
+    // A callback at the same size and ratio would only clear and reallocate the same buffer.
+    resizeObserved();
+    expect(renderer.setDrawingBufferSize).toHaveBeenCalledTimes(calls);
+    Object.defineProperty(element, "clientWidth", { configurable: true, value: 1200 });
     resizeObserved();
     expect(renderer.setDrawingBufferSize).toHaveBeenCalledTimes(calls + 1);
+    expect(renderer.setDrawingBufferSize).toHaveBeenLastCalledWith(
+      1200,
+      900,
+      pixelRatioFor(1200, 900, 2),
+    );
     expect(renderer.setPixelRatio).not.toHaveBeenCalled();
     expect(renderer.setSize).not.toHaveBeenCalled();
     stage.dispose();

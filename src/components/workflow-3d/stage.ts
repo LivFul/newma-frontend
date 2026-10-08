@@ -184,6 +184,8 @@ export function createStage(container: HTMLElement, options: StageOptions): Stag
     controls.addEventListener("change", invalidate);
     cleanups.push(() => controls.removeEventListener("change", invalidate));
 
+    // The size the drawing buffer was last allocated at, so a callback that changes nothing is skipped.
+    let drawnAt = "";
     const resize = () => {
       const { clientWidth, clientHeight } = container;
       if (clientWidth === 0 || clientHeight === 0) return;
@@ -191,6 +193,9 @@ export function createStage(container: HTMLElement, options: StageOptions): Stag
       // once per resize (setPixelRatio would first reallocate it at the old size, then setSize again).
       // It leaves the canvas's CSS size alone, which setSize would otherwise have set.
       const ratio = pixelRatioFor(clientWidth, clientHeight, window.devicePixelRatio);
+      const size = `${clientWidth}x${clientHeight}@${ratio}`;
+      if (size === drawnAt) return;
+      drawnAt = size;
       renderer.setDrawingBufferSize(clientWidth, clientHeight, ratio);
       renderer.domElement.style.width = `${clientWidth}px`;
       renderer.domElement.style.height = `${clientHeight}px`;
