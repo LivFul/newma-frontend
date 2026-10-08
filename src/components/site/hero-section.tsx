@@ -31,17 +31,13 @@ export function HeroSection() {
             {HERO.title.text}
           </h1>
           <div className="flex flex-col gap-4">
-            <p
-              className={`${heroEntrance(1)} max-w-[46ch] text-xl font-medium leading-snug tracking-[-0.01em]`}
-            >
+            <p className="max-w-[46ch] text-xl font-medium leading-snug tracking-[-0.01em]">
               {HERO.tagline.text}
             </p>
-            <p className={`${heroEntrance(2)} max-w-[46ch] text-lg leading-relaxed text-fg-muted`}>
-              {HERO.lede.text}
-            </p>
+            <p className="max-w-[46ch] text-lg leading-relaxed text-fg-muted">{HERO.lede.text}</p>
           </div>
           <div className="flex flex-col gap-5">
-            <div className={`${heroEntrance(3)} flex flex-wrap items-center gap-3`}>
+            <div className={`${heroEntrance(1)} flex flex-wrap items-center gap-3`}>
               <AccessLink variant="primary" size="lg" className="min-h-12">
                 {HERO.demoCta.text}
               </AccessLink>
@@ -50,7 +46,7 @@ export function HeroSection() {
               </Button>
             </div>
             <p
-              className={`${heroEntrance(4)} max-w-[52ch] text-base leading-relaxed text-fg-muted`}
+              className={`${heroEntrance(2)} max-w-[52ch] text-base leading-relaxed text-fg-muted`}
             >
               {HERO.disclaimer.text}
             </p>

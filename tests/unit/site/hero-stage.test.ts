@@ -89,7 +89,7 @@ describe("hero stage scrim", () => {
 describe("stagger class names", () => {
   // Value: protects=every stagger step is a literal class string Tailwind can find; fails_when=an index is interpolated into the class name again, so the step is never generated and the items start together; why_new=the interpolated version passed every existing test while the stagger silently never applied; seam=none
   it("spells every hero step out literally in the source", () => {
-    for (const step of [1, 2, 3, 4] as const) {
+    for (const step of [1, 2] as const) {
       expect(typeSource).toContain(`"[--hero-i:${step}]"`);
       expect(heroEntrance(step)).toContain(`[--hero-i:${step}]`);
     }

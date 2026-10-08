@@ -57,10 +57,12 @@ export function Wordmark({
       width={art.width}
       height={art.height}
       priority={standby ? false : priority}
-      // The hidden colourway of an adaptive lockup loads eagerly at low priority: a lazy image under
-      // display:none is not fetched until shown, which would leave a blank slot on the first swap.
-      loading={standby ? "eager" : undefined}
-      fetchPriority={standby ? "low" : undefined}
+      // The hidden colourway of a priority (above-the-fold) adaptive lockup loads eagerly at low
+      // priority: a lazy image under display:none is not fetched until shown, which would leave a blank
+      // slot on the first swap. A lockup below the fold stays lazy in both colourways, so neither is
+      // fetched before first paint.
+      loading={standby && priority ? "eager" : undefined}
+      fetchPriority={standby && priority ? "low" : undefined}
       className={className}
     />
   );

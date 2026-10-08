@@ -8,7 +8,15 @@
 
 **Why:** It is the largest open gap. It has failed on `main` since PR #24 and fails on every preview run, but nothing blocks a merge on it.
 
-**Context:** `lighthouserc.mobile.cjs` and `lighthouserc.shared.cjs`. It runs in `.github/workflows/preview-e2e.yml` and locally with `pnpm lhci:mobile`. Measure the LCP element and its phases before changing anything. The likely LCP node is the hero h1, which waits on Work Sans.
+**Context:** `lighthouserc.mobile.cjs` and `lighthouserc.shared.cjs`. It runs in `.github/workflows/preview-e2e.yml` and locally with `LHCI_BASE_URL=http://localhost:<port> pnpm lhci:mobile` against `pnpm start`. Without `LHCI_BASE_URL`, reports upload to public temporary storage.
+
+Findings on `perf/mobile-lcp` (2026-10-08, local production build, 3 runs per page):
+
+- The LCP node on phones was the hero lede, not the h1. Its entrance fade started at opacity 0, so LCP was observed at about 900 ms, and Lighthouse's simulated throttling charged every script before it (render delay 3.5 to 4.2 s). The hero copy now paints at once and only the actions rise in. Home performance went from 0.71–0.82 (LCP 3.9–4.7 s) to 0.92–0.93 (LCP about 3.2 s).
+- The footer logo's standby colourway no longer loads eagerly before first paint.
+- Still over budget: home LCP is about 3.2 s against 3000 ms, and `/ecosystem/interface` sits at about 2.9 to 3.1 s. Observed LCP now equals FCP. The rest is lantern counting the framework chunks (React DOM and the app-router runtime, about 110 KB gzip) that finish before the first paint on a fast server.
+- Tried and reverted: `experimental.inlineCss` (HTML grew to 88 KB, FCP and LCP got worse), and dropping the Geist Mono preload (FCP rose from 1.06 to 1.52 s).
+- Next options: decide whether 3000 ms or 3500 ms is the right mobile LCP budget for a lab score; or cut pre-paint JS (fewer client components in `(site)/layout.tsx`, deferred `AnalyticsMount`/`PwaGate`); then make the check required.
 
 **Effort:** M
 **Priority:** P1
