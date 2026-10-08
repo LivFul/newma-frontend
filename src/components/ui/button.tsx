@@ -4,18 +4,21 @@ import { forwardRef, type ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
 
 export const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-full border font-medium " +
-    "transition-[color,background-color,border-color,transform,box-shadow] disabled:opacity-50 disabled:pointer-events-none " +
+  "btn-spring inline-flex items-center justify-center gap-2 rounded-full border font-medium " +
+    "disabled:opacity-50 disabled:pointer-events-none " +
     "aria-disabled:opacity-50 aria-disabled:pointer-events-none",
   {
     variants: {
       variant: {
+        // Tinted Liquid Glass: the one prominent action per view (HIG, Buttons). Ink on the Plant gradient.
         primary:
-          "border-transparent bg-brand text-accent-fg shadow-glow hover:brightness-110 active:translate-y-px forced-colors:border-[ButtonText] forced-colors:bg-none",
+          "glass-prominent btn-lift border-transparent bg-brand font-semibold text-prominent-fg hover:brightness-110 forced-colors:border-[ButtonText] forced-colors:bg-none",
+        // Glass control: translucent with the glass rim, no blur layer (only the header blurs); firms up
+        // on hover, never below what reduce-transparency or increased contrast require.
         secondary:
-          "bg-transparent text-fg border-fg/40 hover:bg-fg hover:text-bg active:translate-y-px",
+          "glass-control btn-lift text-fg hover:[--glass-control-tint:var(--glass-hover-tint)] forced-colors:border-[ButtonText]",
         ghost: "border-transparent text-fg underline-offset-4 hover:bg-bg-deep/80 hover:underline",
-        danger: "border-transparent bg-danger text-danger-fg hover:bg-fg active:translate-y-px",
+        danger: "border-transparent bg-danger text-danger-fg hover:bg-fg",
       },
       size: {
         sm: "min-h-8 px-3 py-1 text-sm",

@@ -13,6 +13,13 @@
   max-width: 34rem;
   margin-inline: auto;
 }
+/* Homepage hero: on wide screens the diagram, its controls and caption start at the column's
+   edge, beside the copy, sharing one left edge. */
+@media (min-width: 64rem) {
+  .hero-eco :is(.eco-frame, .eco-controls, figcaption) {
+    margin-inline-start: 0;
+  }
+}
 .eco-svg {
   touch-action: manipulation;
   display: block;

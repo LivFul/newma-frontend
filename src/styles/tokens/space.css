@@ -16,8 +16,7 @@
   --radius-lg: 1.25rem;
   --radius-2xl: 2.5rem;
   --radius-full: 9999px;
-  --shadow-sm: 0 1px 2px rgb(9 25 31 / 0.06);
-  --shadow-md: 0 10px 30px rgb(9 25 31 / 0.08);
+  --shadow-sm: 0 1px 2px rgb(8 43 51 / 0.06);
+  --shadow-md: 0 10px 30px rgb(8 43 51 / 0.08);
   --shadow-lg: 0 24px 60px rgb(6 36 43 / 0.16);
-  --shadow-glow: 0 0 28px rgb(27 136 150 / 0.28);
 }

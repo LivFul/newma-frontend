@@ -1,13 +1,17 @@
 import * as THREE from "three";
 import { createWorkflowModel, type SceneCopy } from "./model";
+import { WORKFLOW_LANES } from "@/lib/workflow/graph";
+import { contentBounds, fitDistance } from "./framing";
 import { createStage, type CameraPose, type NavCommand, type Stage } from "./stage";
 
-/** Distance at which the model's width (about 54 units with margin) fills a view of aspect 1. */
+/** Fallback fit when the model has nothing to measure: distance at which its width fills aspect 1. */
 const HORIZONTAL_FIT = 64;
-/** Minimum distance so the model's depth always fits vertically. */
+/** Fallback minimum distance so the model's depth fits vertically. */
 const VERTICAL_FIT = 44;
-/** Extra distance for the view that also spans the lane heights. */
+/** Fallback extra distance for the raised view when there are no bounds to lift. */
 const RAISED_SCALE = 1.15;
+/** How far the highest lane rises when the lanes separate. */
+const MAX_LANE_LIFT = Math.max(...WORKFLOW_LANES.map((lane) => lane.elevation));
 const CLICK_DRAG_TOLERANCE_PX = 5;
 /** The main mouse button, and what touch contact and a pen tip report. */
 const PRIMARY_BUTTON = 0;
@@ -33,9 +37,31 @@ export interface SceneController {
   dispose(): void;
 }
 
-function poseFor(separated: boolean, aspect: number): CameraPose {
+/**
+ * The opening view for a lane arrangement. The camera backs off along the view direction until the
+ * diagram's measured bounds sit inside the frame at this canvas aspect, so every step stays in view
+ * whatever shape the canvas takes. The raised view adds room for the lifted lanes.
+ */
+function poseFor(
+  separated: boolean,
+  aspect: number,
+  fov: number,
+  bounds: THREE.Box3 | null,
+): CameraPose {
   const target = separated ? RAISED_TARGET : FLAT_TARGET;
   const direction = separated ? RAISED_DIRECTION : FLAT_DIRECTION;
+  if (bounds) {
+    // The raised view frames the diagram as it stands with every lane lifted.
+    const framed = separated
+      ? new THREE.Box3(bounds.min.clone(), bounds.max.clone().setY(bounds.max.y + MAX_LANE_LIFT))
+      : bounds;
+    return {
+      target: target.clone(),
+      position: target
+        .clone()
+        .addScaledVector(direction, fitDistance(fov, aspect, framed, target, direction)),
+    };
+  }
   const fit = Math.max(VERTICAL_FIT, HORIZONTAL_FIT / aspect) * (separated ? RAISED_SCALE : 1);
   return {
     target: target.clone(),
@@ -74,7 +100,10 @@ function assembleScene(stage: Stage, options: SceneOptions): SceneController {
     model.setActive(hovered, selected);
     stage.invalidate();
   };
-  stage.setPose(poseFor(false, stage.aspect()));
+  // Measured once with the lanes flat; the raised view re-fits these bounds lifted by the highest lane.
+  const bounds = contentBounds(model.group);
+  const pose = (raised: boolean) => poseFor(raised, stage.aspect(), stage.camera.fov, bounds);
+  stage.setPose(pose(false));
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -128,13 +157,13 @@ function assembleScene(stage: Stage, options: SceneOptions): SceneController {
 
   return {
     setNavigation: (command) => stage.setNavigation(command),
-    resetView: () => stage.flyTo(poseFor(separated, stage.aspect())),
+    resetView: () => stage.flyTo(pose(separated)),
     setSeparated: (next) => {
       separated = next;
       model.setSpread(next ? 1 : 0);
       // The model reports its easing from update(), which only runs once a frame is asked for.
       stage.invalidate();
-      stage.flyTo(poseFor(next, stage.aspect()));
+      stage.flyTo(pose(next));
     },
     dispose: () => {
       stage.canvas.removeEventListener("pointermove", onMove);

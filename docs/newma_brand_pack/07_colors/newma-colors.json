@@ -1,0 +1,122 @@
+{
+  "Ink": {
+    "hex": "#082B33",
+    "rgb": [
+      8,
+      43,
+      51
+    ],
+    "cmyk_approx": [
+      84,
+      16,
+      0,
+      80
+    ],
+    "role": "Primary text, wordmark on light"
+  },
+  "Night": {
+    "hex": "#06242B",
+    "rgb": [
+      6,
+      36,
+      43
+    ],
+    "cmyk_approx": [
+      86,
+      16,
+      0,
+      83
+    ],
+    "role": "Primary dark background"
+  },
+  "Deep Teal": {
+    "hex": "#0B3F4B",
+    "rgb": [
+      11,
+      63,
+      75
+    ],
+    "cmyk_approx": [
+      85,
+      16,
+      0,
+      71
+    ],
+    "role": "Pill half, gradients, dark accents"
+  },
+  "Teal": {
+    "hex": "#1C8A99",
+    "rgb": [
+      28,
+      138,
+      153
+    ],
+    "cmyk_approx": [
+      82,
+      10,
+      0,
+      40
+    ],
+    "role": "Pill highlight, links on light"
+  },
+  "Emerald": {
+    "hex": "#0FA36B",
+    "rgb": [
+      15,
+      163,
+      107
+    ],
+    "cmyk_approx": [
+      91,
+      0,
+      34,
+      36
+    ],
+    "role": "Plant half, accents, buttons"
+  },
+  "Lime": {
+    "hex": "#A6E04A",
+    "rgb": [
+      166,
+      224,
+      74
+    ],
+    "cmyk_approx": [
+      26,
+      0,
+      67,
+      12
+    ],
+    "role": "Plant highlight, small accents"
+  },
+  "Mist": {
+    "hex": "#F1F6F1",
+    "rgb": [
+      241,
+      246,
+      241
+    ],
+    "cmyk_approx": [
+      2,
+      0,
+      2,
+      4
+    ],
+    "role": "Light background, wordmark on dark"
+  },
+  "Slate": {
+    "hex": "#4F6B70",
+    "rgb": [
+      79,
+      107,
+      112
+    ],
+    "cmyk_approx": [
+      29,
+      4,
+      0,
+      56
+    ],
+    "role": "Secondary text, byline on light"
+  }
+}

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { FRAMING_IGNORE } from "./framing";
 import {
   WORKFLOW_EDGES,
   WORKFLOW_LANES,
@@ -101,7 +102,10 @@ function disposeObject(root: THREE.Object3D): void {
 
 export function createWorkflowModel(copy: SceneCopy, options: ModelOptions): WorkflowModel {
   const group = new THREE.Group();
-  group.add(createGrid());
+  const grid = createGrid();
+  // The ground runs far past the diagram; camera framing fits the diagram, not the floor.
+  grid.userData[FRAMING_IGNORE] = true;
+  group.add(grid);
 
   const elevations = new Map(WORKFLOW_LANES.map((lane) => [lane.id, lane.elevation]));
   const nodes = new Map<string, NodeVisual>();

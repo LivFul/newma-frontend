@@ -1,5 +1,7 @@
 // Bump CACHE whenever the precache list changes: activate drops every other cache name, so clients
-// rebuild their cache from the new list.
+// rebuild their cache from the new list. Changed files under the same paths need no bump: a new worker
+// re-runs install, which fetches the precache list again into this cache, and bumping would drop the
+// build chunks the precached offline page depends on.
 const CACHE = "newma-v2";
 const PRECACHE = ["/offline", "/brand/icon-192.png", "/brand/icon-512.png", "/brand/favicon.svg"];
 // Pages, images and the rest share one budget; hashed build chunks get a larger one of their own so a
@@ -15,7 +17,8 @@ const PAGE_PREFIXES = ["/ecosystem/", "/legal/"];
 const STATIC_PREFIX = "/_next/static/";
 // Matched with startsWith: three directories plus the favicon, whose exact path has no longer variant.
 const ASSET_PATH_STARTS = [STATIC_PREFIX, "/brand/", "/images/", "/favicon.ico"];
-// The wordmark goes through next/image, so the browser asks the optimizer for it.
+// Raster /brand/ images rendered through next/image reach the browser from the optimizer. The SVG
+// lockups skip it (next/image serves SVG as is), so they are cached under their own /brand/ paths.
 const IMAGE_ENDPOINT = "/_next/image";
 const IMAGE_SOURCE_PREFIX = "/brand/";
 
@@ -141,11 +144,30 @@ function networkFirstPage(event, url) {
     .catch(async () => (await caches.match(key)) || (await caches.match("/offline")));
 }
 
+// Hashed build output is served `immutable`: it never changes at its URL. next dev serves unhashed
+// chunks at stable URLs without that promise, so only an immutable response may answer from cache.
+function isImmutable(response) {
+  return /\bimmutable\b/i.test(response.headers.get("Cache-Control") || "");
+}
+
+// Build output not marked immutable (a development server's chunks) is never stored and goes to the
+// network first; replaying a cached copy would run stale client code against fresh HTML.
+function staticAsset(event, request, cached) {
+  if (cached && isImmutable(cached)) return cached;
+  return fetch(request)
+    .then((response) => {
+      if (isCacheableAsset(response) && isImmutable(response)) {
+        event.waitUntil(store(request, response.clone()));
+      }
+      return response;
+    })
+    .catch(() => cached);
+}
+
 function cachedAsset(event, url) {
   const request = event.request;
   return caches.match(request).then((cached) => {
-    // Hashed build output never changes at its URL, so a hit needs no revalidation.
-    if (cached && url.pathname.startsWith(STATIC_PREFIX)) return cached;
+    if (url.pathname.startsWith(STATIC_PREFIX)) return staticAsset(event, request, cached);
     const fetched = fetch(request)
       .then((response) => {
         if (isCacheableAsset(response)) event.waitUntil(store(request, response.clone()));

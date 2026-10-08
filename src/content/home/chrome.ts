@@ -21,6 +21,8 @@ export const NAV_LINKS = Object.freeze([
 ]);
 
 export const ACCESS_LABEL = block("chrome.access", "Access NEWMA", ["C-21"]);
+// The header's phone-width label for the same link; "Access NEWMA" stays in its accessible name.
+export const ACCESS_SHORT = block("chrome.access.short", "Demo", ["C-21"]);
 export const DEMO_CTA = block("chrome.demo", "Explore the demo", ["C-21"]);
 
 // Staff-only tool on its own origin behind Cloudflare Access; a navigation label, so no claim.

@@ -3,6 +3,21 @@
 
 :root {
   color-scheme: light;
+  /* Liquid Glass tint, 0 (clear) to 1 (fully tinted). One knob so a reduce-transparency or
+     increase-contrast preference can push every glass surface to opaque at once. */
+  --glass-tint: 0.58;
+  /* Hover firms a glass control up; never below what reduce-transparency/contrast require. */
+  --glass-hover-tint: 0.9;
+  --glass-control-tint: 0.82;
+  --glass-blur: 22px;
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  :root {
+    --glass-tint: 1;
+    --glass-hover-tint: 1;
+    --glass-control-tint: 1;
+    --glass-blur: 0px;
+  }
 }
 html {
   caret-color: var(--color-focus);
@@ -27,13 +42,11 @@ body {
   min-height: 100dvh;
   overscroll-behavior: none;
 }
-.font-display {
-  font-variation-settings: "SHRP" 40;
-}
 
+/* Lime is the brand's small-highlight colour; Deep Teal on it holds AA on light and dark grounds alike. */
 ::selection {
-  background: var(--color-route);
-  color: var(--color-fg);
+  background: var(--color-leaf-bright);
+  color: var(--color-capsule-deep);
 }
 a {
   text-underline-offset: 0.22em;
@@ -50,15 +63,17 @@ table,
   box-shadow: 0 0 0 2px var(--color-bg);
 }
 
+/* --header-h is the sticky header's live height, published by SiteHeader (ResizeObserver), so anchors
+   and focus clear it at every width however its rows wrap, safe-area padding included. The literals are
+   the pre-hydration fallbacks: one 4rem row, or two rows (about 7.5rem) below 27.5rem. A media
+   condition cannot read a custom property, so the installed-app block below and workflow-diagram.css
+   repeat them. */
 html:has([data-site-header]) {
-  scroll-padding-top: calc(var(--size-header) + var(--space-4));
+  scroll-padding-top: calc(var(--header-h, var(--size-header)) + var(--space-4));
 }
-/* Below 27.5rem the header wraps to two rows, about 7.5rem tall. Both numbers are literals because a
-   media condition cannot read a custom property and there is no wrapped-header token; the installed-app
-   block below and workflow-diagram.css repeat them for the same reason. */
 @media (max-width: 27.5rem) {
   html:has([data-site-header]) {
-    scroll-padding-top: calc(7.5rem + var(--space-4));
+    scroll-padding-top: calc(var(--header-h, 7.5rem) + var(--space-4));
   }
 }
 main[tabindex="-1"]:focus-visible {
@@ -68,6 +83,11 @@ main[tabindex="-1"]:focus-visible {
 @media (max-height: 32rem) {
   [data-site-header] {
     position: static;
+  }
+  /* A static header is no containing block, so its absolute scroll-edge fade would spread over the
+     page; it only matters while the header floats over scrolling content anyway. */
+  [data-site-header]::before {
+    display: none;
   }
   html:has([data-site-header]) {
     scroll-padding-top: var(--space-4);
@@ -87,11 +107,13 @@ main[tabindex="-1"]:focus-visible {
       padding-top: 0;
     }
     [data-site-header] {
-      padding-top: env(safe-area-inset-top);
+      padding-top: calc(env(safe-area-inset-top) + var(--space-2));
       min-height: calc(var(--size-header) + env(safe-area-inset-top));
     }
     html:has([data-site-header]) {
-      scroll-padding-top: calc(var(--size-header) + env(safe-area-inset-top) + var(--space-4));
+      scroll-padding-top: calc(
+        var(--header-h, calc(var(--size-header) + env(safe-area-inset-top))) + var(--space-4)
+      );
     }
   }
 }
@@ -99,7 +121,9 @@ main[tabindex="-1"]:focus-visible {
    the general standalone rule above has the same specificity and would otherwise win. */
 @media (display-mode: standalone) and (max-width: 27.5rem) {
   html:has([data-site-header]) {
-    scroll-padding-top: calc(7.5rem + env(safe-area-inset-top) + var(--space-4));
+    scroll-padding-top: calc(
+      var(--header-h, calc(7.5rem + env(safe-area-inset-top))) + var(--space-4)
+    );
   }
 }
 @media (display-mode: standalone) and (max-height: 32rem) {
@@ -109,9 +133,11 @@ main[tabindex="-1"]:focus-visible {
 }
 
 @layer components {
+  /* Brand label: Geist Mono Bold, uppercase, tracked. */
   .place {
+    font-family: var(--font-mono);
     font-size: var(--text-xs);
-    font-weight: 500;
+    font-weight: 700;
     letter-spacing: var(--tracking-place);
     text-transform: uppercase;
   }
@@ -134,16 +160,138 @@ main[tabindex="-1"]:focus-visible {
     border: 1px solid color-mix(in srgb, var(--color-leaf) 22%, var(--color-border));
     box-shadow: var(--shadow-md);
   }
-  .glass {
-    background-color: color-mix(in srgb, var(--color-bg-elevated) 78%, transparent);
-    border: 1px solid color-mix(in srgb, white 55%, var(--color-border));
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
+  /* Liquid Glass (WWDC26 HIG, Materials). It belongs to the functional layer only: the header, its menu
+     and pressable controls float above content; content cards stay on .surface. The regular variant
+     blurs and lifts what is behind it so labels stay legible. A specular rim lights the top edge and a
+     faint ink rim grounds the bottom. Inside .plate-surface the elevated token is Deep Teal, so the same
+     class turns into dark glass. Without backdrop-filter, and under reduce-transparency or
+     increase-contrast, the fill goes opaque. */
+  .glass,
+  .glass-control {
+    background-color: var(--color-bg-elevated);
+    border: 1px solid color-mix(in srgb, var(--color-fg) 10%, transparent);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.7),
+      inset 0 -1px 0 color-mix(in srgb, var(--color-fg) 6%, transparent),
+      0 1px 2px rgb(8 43 51 / 0.06),
+      0 12px 32px -8px rgb(8 43 51 / 0.16);
   }
-  @supports (backdrop-filter: blur(16px)) {
+  @supports (backdrop-filter: blur(1px)) {
     .glass {
-      background-color: color-mix(in srgb, var(--color-bg-elevated) 62%, transparent);
-      backdrop-filter: blur(16px);
+      background-color: color-mix(
+        in srgb,
+        var(--color-bg-elevated) calc(var(--glass-tint) * 100%),
+        transparent
+      );
+      border-color: color-mix(in srgb, white 55%, transparent);
+      backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    }
+  }
+  /* Glass controls (secondary buttons): the same rim and translucent fill without backdrop-filter, so
+     many of them in scrolling panels cost no blur layer each; only the header is blurred glass. The
+     fill is firmer than the header's to stay legible without blur, and the rim is the strong border ink
+     so it reads as a control boundary (3:1, WCAG 1.4.11) on light grounds and on plates. The header
+     capsule keeps its soft rim. */
+  .glass-control {
+    background-color: color-mix(
+      in srgb,
+      var(--color-bg-elevated) calc(var(--glass-control-tint) * 100%),
+      transparent
+    );
+    border-color: var(--color-border-strong);
+  }
+  .plate-surface .glass,
+  .plate-surface .glass-control,
+  [data-site-header][data-tone="dark"] .glass,
+  [data-site-header][data-tone="dark"] .glass-control {
+    border-color: color-mix(in srgb, var(--color-plate-fg) 16%, transparent);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.14),
+      inset 0 -1px 0 rgb(0 0 0 / 0.2),
+      0 12px 32px -8px rgb(0 0 0 / 0.4);
+  }
+  .plate-surface .glass-control,
+  [data-site-header][data-tone="dark"] .glass-control {
+    border-color: var(--color-plate-border-strong);
+  }
+  /* Hover firms the rim toward the label ink as well as the fill, so the state reads on Mist and white,
+     where the fill alone barely moves. --color-fg is the plate ink on plates and the dark header. */
+  @media (prefers-contrast: no-preference) {
+    .glass-control:hover,
+    [data-site-header][data-tone="dark"] .glass-control:hover {
+      border-color: color-mix(in srgb, var(--color-fg) 60%, transparent);
+    }
+  }
+  /* The header's call to action: an opaque glass-control fill inside a Plant-gradient ring (Lime,
+     Emerald, Teal). On arrival the ring orbits twice and settles, under five seconds so it never needs a
+     pause control (WCAG 2.2.2); hovering replays one turn. Reduced motion keeps the still ring. */
+  .cta-attention {
+    border: 2px solid transparent;
+    background:
+      linear-gradient(var(--color-bg-elevated), var(--color-bg-elevated)) padding-box,
+      conic-gradient(
+          from var(--cta-angle),
+          var(--color-leaf-bright),
+          var(--color-leaf),
+          var(--color-capsule),
+          var(--color-leaf-bright)
+        )
+        border-box;
+    box-shadow: 0 0 18px -6px color-mix(in srgb, var(--color-leaf) 55%, transparent);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .cta-attention {
+      animation:
+        cta-orbit 2.4s linear 2,
+        cta-glow 2.4s var(--motion-ease-standard) 2;
+    }
+    .cta-attention:hover {
+      animation: cta-orbit-again 1.2s linear;
+    }
+  }
+  @media (prefers-contrast: more) {
+    .cta-attention {
+      background: var(--color-bg-elevated);
+      border-color: var(--color-fg);
+      box-shadow: none;
+    }
+  }
+  /* Controls inside the header capsule share its material (HIG: no glass on glass): they keep the
+     specular rim but drop the floating shadow of their own. */
+  [data-site-header] .glass .glass-control {
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7);
+  }
+  [data-site-header][data-tone="dark"] .glass .glass-control {
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.14);
+  }
+  /* Tinted (prominent) glass: the one primary action per view. Colour sits on the background, never on
+     the label, and the rim keeps the glass read on the brand gradient. */
+  .glass-prominent {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.55),
+      inset 0 -1px 0 rgb(8 43 51 / 0.16),
+      0 1px 2px rgb(8 43 51 / 0.1),
+      0 8px 24px -6px rgb(15 163 107 / 0.45);
+  }
+  /* Standard material for the content layer (HIG: not glass). */
+  .surface-material {
+    background-color: color-mix(in srgb, var(--color-bg-elevated) 72%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-fg) 9%, transparent);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6);
+  }
+  .plate-surface .surface-material {
+    background-color: color-mix(in srgb, var(--color-plate-fg) 5%, transparent);
+    border-color: color-mix(in srgb, var(--color-plate-fg) 12%, transparent);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  }
+  /* Listed with the plate and dark-header selectors so the ink border outranks their softer rims. */
+  @media (prefers-contrast: more) {
+    .glass,
+    .glass-control,
+    .surface-material,
+    .plate-surface :is(.glass, .glass-control, .surface-material),
+    [data-site-header][data-tone="dark"] :is(.glass, .glass-control) {
+      border-color: var(--color-fg);
     }
   }
   .aurora {
@@ -197,8 +345,8 @@ main[tabindex="-1"]:focus-visible {
     width: 0.85rem;
     height: 0.85rem;
     background-image: var(--background-image-leaf);
-    mask: url("/brand/leaf-bullet.svg") center / contain no-repeat;
-    -webkit-mask: url("/brand/leaf-bullet.svg") center / contain no-repeat;
+    mask: url("/brand/capsule-bullet.svg") center / contain no-repeat;
+    -webkit-mask: url("/brand/capsule-bullet.svg") center / contain no-repeat;
   }
   .reveal-pending {
     opacity: 0;
@@ -207,38 +355,37 @@ main[tabindex="-1"]:focus-visible {
   /* backwards, not both: the finished animation must not leave a transform on the section, which would
      make it the containing block of its fixed and sticky descendants. */
   .reveal-in {
-    animation: reveal-up var(--motion-duration-reveal) var(--motion-ease-emphasized) backwards;
+    animation: reveal-up var(--motion-duration-reveal) var(--motion-spring-settle) backwards;
   }
   @media (prefers-reduced-motion: no-preference) {
+    /* The hero is the one authored moment: it rises further and settles slower than the reveals below. */
     .hero-entrance-item {
-      animation: hero-fade-up var(--motion-duration-reveal) var(--motion-ease-emphasized) backwards;
+      animation: hero-rise var(--motion-duration-slow) var(--motion-spring-settle) backwards;
       animation-delay: calc(var(--hero-i, 0) * var(--motion-stagger-tight));
     }
+    /* The section already rises as one; its children only fade in behind it, together. The cascade is
+       reserved for the hero, so the page has one orchestrated entrance and not one per section. */
     .reveal-in .reveal-child {
-      animation: hero-fade-up var(--motion-duration-reveal) var(--motion-ease-emphasized) backwards;
-      animation-delay: calc(var(--reveal-i, 0) * var(--motion-stagger-base));
+      animation: dialog-fade-in var(--motion-duration-reveal) var(--motion-ease-standard) backwards;
     }
+    /* The menu sheet settles in by transform and opacity only (no height animation): the glass grows
+       to its open size at once and the links fade down into it. */
     .mobile-sections:not([hidden]) {
-      display: grid;
-      grid-template-rows: 1fr;
       opacity: 1;
+      transform: translateY(0);
       transition:
-        grid-template-rows var(--motion-duration-base) var(--motion-ease-standard),
+        transform var(--motion-duration-base) var(--motion-spring-settle),
         opacity var(--motion-duration-base) var(--motion-ease-standard);
     }
     .mobile-sections:not([hidden])[data-open="false"] {
-      grid-template-rows: 0fr;
       opacity: 0;
+      transform: translateY(calc(var(--motion-distance-sm) * -1));
       transition-duration: calc(var(--motion-duration-base) * 0.8);
-    }
-    .mobile-sections:not([hidden]) > .mobile-sections-clip {
-      min-height: 0;
-      overflow: hidden;
     }
     @starting-style {
       .mobile-sections:not([hidden])[data-open="true"] {
-        grid-template-rows: 0fr;
         opacity: 0;
+        transform: translateY(calc(var(--motion-distance-sm) * -1));
       }
     }
     .dialog-overlay[data-state="open"] {
@@ -271,13 +418,108 @@ main[tabindex="-1"]:focus-visible {
   }
   .hover-lift {
     transition:
-      background-color var(--motion-duration-fast) var(--motion-ease-standard),
-      border-color var(--motion-duration-fast) var(--motion-ease-standard),
-      box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
+      background-color var(--motion-duration-base) var(--motion-spring-settle),
+      border-color var(--motion-duration-base) var(--motion-spring-settle),
+      box-shadow var(--motion-duration-base) var(--motion-spring-settle);
   }
   .hover-lift:hover,
   .hover-lift:focus-visible {
     box-shadow: var(--shadow-md);
+  }
+  /* The ink shadow vanishes on Night, so a plate card keeps (and brightens) its specular rim and lifts
+     on a dark shadow instead of losing the highlight on hover. */
+  .plate-surface .surface-material.hover-lift:hover,
+  .plate-surface .surface-material.hover-lift:focus-visible {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.12),
+      0 12px 32px -8px rgb(0 0 0 / 0.4);
+  }
+
+  /* Pressable controls. Scale sits on the individual `scale` property so it never fights a
+     `transform` set elsewhere, and its spring is the only part that overshoots: colour, filter and
+     shadow ride the plain standard ease. A transition retargets from the live value, so a press
+     released mid-lift (or a lift started mid-press) continues from where it is, not from the end.
+     Position carries over; velocity does not, because CSS restarts the curve. */
+  .btn-spring {
+    transition:
+      scale var(--motion-duration-base) var(--motion-spring-snappy),
+      color var(--motion-duration-fast) var(--motion-ease-standard),
+      background-color var(--motion-duration-fast) var(--motion-ease-standard),
+      border-color var(--motion-duration-fast) var(--motion-ease-standard),
+      box-shadow var(--motion-duration-base) var(--motion-ease-standard),
+      filter var(--motion-duration-fast) var(--motion-ease-standard);
+  }
+  @media (hover: hover) {
+    .btn-lift:where(:not(:disabled, [aria-disabled="true"])):hover {
+      scale: 1.04;
+    }
+  }
+  .btn-spring:where(:not(:disabled, [aria-disabled="true"])):active {
+    scale: 0.96;
+  }
+
+  /* Hero stage. Two decorative layers, no card, no blur, so nothing is re-rendered while the page moves.
+     The wash takes the photo's exact box and mask, so it is flush with the hero's top, right and bottom
+     and can never drift from the photo; it only lifts the forest toward the page colour. The caption
+     scrim is anchored to the figure's own bottom, where the only small text is, and is the dense one. It
+     stays inside the hero's padding (right and bottom gutters, 2rem bottom feather) and reaches left only
+     to the copy column's text edge (4rem, with a matching 4rem feather), so it never veils the copy and never adds
+     scrollable overflow, which WCAG 1.4.12 text spacing would otherwise flag as clipping:
+     --hero-scrim-text is its alpha, and tests/unit/site/hero-stage.test.ts proves AA for the muted
+     caption text from it over a black photo pixel, so the check does not depend on viewport width. */
+  .hero-photo,
+  .hero-stage {
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0%, var(--color-fg) 38%),
+      linear-gradient(to bottom, var(--color-fg) 72%, transparent 100%);
+    mask-image:
+      linear-gradient(to right, transparent 0%, var(--color-fg) 38%),
+      linear-gradient(to bottom, var(--color-fg) 72%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+  .hero-stage {
+    background-color: color-mix(in srgb, var(--color-bg-elevated) 44%, transparent);
+  }
+  .hero-caption-scrim {
+    --hero-scrim-text: 86%;
+    background-color: color-mix(
+      in srgb,
+      var(--color-bg-elevated) var(--hero-scrim-text),
+      transparent
+    );
+    -webkit-mask-image:
+      linear-gradient(
+        to right,
+        transparent 0,
+        var(--color-fg) 4rem,
+        var(--color-fg) calc(100% - 3rem),
+        transparent 100%
+      ),
+      linear-gradient(
+        to bottom,
+        transparent 0,
+        var(--color-fg) 6rem,
+        var(--color-fg) calc(100% - 2rem),
+        transparent 100%
+      );
+    mask-image:
+      linear-gradient(
+        to right,
+        transparent 0,
+        var(--color-fg) 4rem,
+        var(--color-fg) calc(100% - 3rem),
+        transparent 100%
+      ),
+      linear-gradient(
+        to bottom,
+        transparent 0,
+        var(--color-fg) 6rem,
+        var(--color-fg) calc(100% - 2rem),
+        transparent 100%
+      );
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
   }
 
   .plate-surface {
@@ -307,9 +549,33 @@ main[tabindex="-1"]:focus-visible {
   }
   .plate-surface ::selection {
     color: var(--color-plate);
+    background: var(--color-plate-accent);
   }
 }
 
+/* Registered so the conic ring's start angle can animate (an unregistered custom property would jump). */
+@property --cta-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes cta-orbit {
+  to {
+    --cta-angle: 360deg;
+  }
+}
+/* The glow swells once per turn, so the ring reads from across the bar, then settles to its rest. */
+@keyframes cta-glow {
+  50% {
+    box-shadow: 0 0 22px -2px color-mix(in srgb, var(--color-leaf) 70%, transparent);
+  }
+}
+/* The same turn under a second name, so hovering restarts it after the arrival orbits have ended. */
+@keyframes cta-orbit-again {
+  to {
+    --cta-angle: 360deg;
+  }
+}
 @keyframes botanical-drift {
   to {
     transform: translate3d(var(--tile), var(--tile), 0);
@@ -325,10 +591,10 @@ main[tabindex="-1"]:focus-visible {
     transform: translateY(0);
   }
 }
-@keyframes hero-fade-up {
+@keyframes hero-rise {
   from {
     opacity: 0;
-    transform: translateY(var(--motion-distance-sm));
+    transform: translateY(var(--motion-distance-lg));
   }
   to {
     opacity: 1;
@@ -405,15 +671,60 @@ main[tabindex="-1"]:focus-visible {
   }
 }
 
-/* Unlayered so these beat the header's Tailwind background utility. */
-[data-site-header] {
-  transition:
-    background-color var(--motion-duration-fast) var(--motion-ease-standard),
-    border-color var(--motion-duration-fast) var(--motion-ease-standard);
+/* Scroll edge effect (HIG, Layout): no solid bar under the floating glass header. Once content scrolls
+   beneath it, a soft fade of the page colour rises behind the capsule so labels never sit on busy
+   content. Opacity only, so it composites. Unlayered so it beats the header's utilities. */
+[data-site-header]::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 -1.25rem;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-bg) 92%, transparent) 0%,
+    color-mix(in srgb, var(--color-bg) 70%, transparent) 55%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity var(--motion-duration-base) var(--motion-ease-standard);
 }
-[data-site-header][data-scrolled] {
-  background-color: color-mix(in srgb, var(--color-bg) 95%, transparent);
-  border-bottom-color: color-mix(in srgb, var(--color-fg) 18%, transparent);
+[data-site-header][data-scrolled]::before {
+  opacity: 1;
+}
+/* Dark tone: the plate's tokens, so the glass, labels, hovers, focus ring and edge fade all follow.
+   Screen only, and not under forced colours: those repaint the glass as the system Canvas whatever the
+   tone, and print never shows the scrolled state, so both keep the light tokens and light colourway
+   (a reversed logo there would be white on white). The glass switches tone at the same instant as the
+   logo, without a fade, so the lockup never sits on the other tone's glass mid-transition. */
+.wordmark-dark {
+  display: none;
+}
+@media screen and (forced-colors: none) {
+  [data-site-header][data-tone="dark"] {
+    --color-bg: var(--color-plate);
+    --color-bg-elevated: var(--color-plate-elevated);
+    --color-bg-deep: var(--color-plate-deep);
+    --color-fg: var(--color-plate-fg);
+    --color-fg-muted: var(--color-plate-muted);
+    --color-focus: var(--color-plate-focus);
+    color-scheme: dark;
+  }
+  [data-tone="dark"] .wordmark-light {
+    display: none;
+  }
+  [data-tone="dark"] .wordmark-dark {
+    display: block;
+  }
+}
+/* A dark forced-colours theme paints the header Canvas near-black; the reversed lockup reads there. */
+@media (forced-colors: active) and (prefers-color-scheme: dark) {
+  [data-site-header] .wordmark-light {
+    display: none;
+  }
+  [data-site-header] .wordmark-dark {
+    display: block;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

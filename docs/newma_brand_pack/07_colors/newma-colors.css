@@ -1,0 +1,18 @@
+:root {
+  --newma-ink: #082B33;
+  --newma-night: #06242B;
+  --newma-teal-deep: #0B3F4B;
+  --newma-teal: #1C8A99;
+  --newma-emerald: #0FA36B;
+  --newma-lime: #A6E04A;
+  --newma-mist: #F1F6F1;
+  --newma-slate: #4F6B70;
+  --newma-lime-l: #D2F57F;
+  --newma-emerald-l: #2BC08E;
+  --newma-teal-m: #1A8FA0;
+  --newma-teal-l: #7FE3D2;
+  --newma-slate-l: #8FB3B0;
+  --newma-gradient-plant: linear-gradient(135deg, #A6E04A, #0FA36B);
+  --newma-gradient-pill: linear-gradient(135deg, #0B3F4B, #1C8A99);
+  --newma-gradient-brand: linear-gradient(90deg, #A6E04A, #0FA36B, #0B3F4B);
+}

@@ -1,10 +1,8 @@
 import { ECOSYSTEM, ECOSYSTEM_MAP_KEY, ECOSYSTEM_SLUGS } from "@/content/ecosystem/registry";
 import { COMPONENTS_INDEX } from "@/content/home/copy";
-import { LeafIcon } from "@/components/brand/leaf-icon";
-import { PillIcon } from "@/components/brand/pill-icon";
 import { ComponentLink } from "./component-link";
 import { PlateSwatch } from "./plate-swatch";
-import { CONTAINER, H2, H3_TITLE, revealChild, SECTION } from "./type";
+import { CONTAINER, H2, H3_TITLE, REVEAL_CHILD, SECTION } from "./type";
 export function ComponentIndex() {
   return (
     <section
@@ -27,18 +25,13 @@ export function ComponentIndex() {
           aria-label={COMPONENTS_INDEX.listLabel.text}
           className="grid min-w-0 gap-4 [counter-reset:key] md:grid-cols-2 lg:grid-cols-3"
         >
-          {ECOSYSTEM_SLUGS.map((slug, index) => (
-            <li key={slug} className={`relative [counter-increment:key] ${revealChild(index)}`}>
+          {ECOSYSTEM_SLUGS.map((slug) => (
+            <li key={slug} className={`relative [counter-increment:key] ${REVEAL_CHILD}`}>
               <ComponentLink
                 slug={slug}
-                className="hover-lift group grid min-h-11 min-w-0 gap-2 overflow-hidden rounded-lg border border-plate-border/50 bg-plate-elevated/50 p-6 hover:border-plate-fg/40 hover:bg-plate-fg/[0.08] focus-visible:bg-plate-fg/[0.08]"
+                className="surface-material hover-lift group grid h-full min-h-11 min-w-0 content-start gap-2 overflow-hidden rounded-lg p-6 hover:border-plate-fg/30 contrast-more:hover:border-plate-fg hover:bg-plate-fg/[0.09] focus-visible:bg-plate-fg/[0.09]"
               >
-                <span className="flex min-w-0 flex-wrap items-center gap-3 text-2xl font-medium tracking-[-0.015em] [overflow-wrap:anywhere]">
-                  {index % 2 === 0 ? (
-                    <LeafIcon className="h-7 w-auto" />
-                  ) : (
-                    <PillIcon className="h-7 w-auto" />
-                  )}
+                <span className="flex min-w-0 flex-wrap items-center gap-3 text-2xl font-semibold tracking-[-0.015em] [overflow-wrap:anywhere]">
                   <PlateSwatch slug={slug} outline="var(--color-plate-fg)" />
                   {ECOSYSTEM[slug].title}
                 </span>

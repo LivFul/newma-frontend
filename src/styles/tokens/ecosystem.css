@@ -4,20 +4,21 @@
   --color-eco-compute: #b69cff; /* Agentic Compute (violet, aligned with the workflow learning loop) */
   --color-eco-compute-ink: #553d99; /* Agentic Compute strokes on survey paper */
   --color-eco-optional: #a8442a; /* Provenance & DLT */
-  --font-display: var(--font-geologica), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-work-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --text-display: clamp(2.5rem, 1.4rem + 3.6vw, 4.75rem);
   --tracking-display: -0.04em;
   --size-header: 4rem;
-  /* Carries the primary button label (--color-accent-fg): every stop stays at 4.5:1 or better against it,
-     also at hover brightness. tests/unit/contrast.test.ts enforces that. */
-  --background-image-brand: linear-gradient(115deg, #0c7552 0%, #1d5c52 46%, #12707d 100%);
-  --background-image-leaf: linear-gradient(90deg, #b3e570 0%, #15a676 100%);
-  --background-image-capsule: linear-gradient(90deg, #0b404d 0%, #1b8896 100%);
+  /* The Plant gradient carries the primary button label (--color-prominent-fg, Ink): every stop stays at
+     4.5:1 or better against it, also at hover brightness. tests/unit/contrast.test.ts enforces that. */
+  --background-image-brand: linear-gradient(135deg, #a6e04a 0%, #5ac15a 50%, #0fa36b 100%);
+  --background-image-leaf: linear-gradient(135deg, #a6e04a 0%, #0fa36b 100%);
+  --background-image-capsule: linear-gradient(135deg, #0b3f4b 0%, #1c8a99 100%);
   --background-image-aurora:
-    radial-gradient(120% 80% at 12% 18%, rgb(179 229 112 / 0.45), transparent 55%),
-    radial-gradient(90% 70% at 88% 8%, rgb(27 136 150 / 0.38), transparent 50%),
-    radial-gradient(70% 60% at 70% 90%, rgb(232 242 239 / 0.8), transparent 60%),
-    linear-gradient(165deg, #e8f2ef 0%, #d7ebe6 42%, #c5e4de 100%);
-  --background-image-deep: linear-gradient(165deg, #06242b 0%, #0b404d 48%, #09191f 100%);
-  --background-image-peach: linear-gradient(180deg, #f7efe4 0%, #e8f2ef 100%);
+    radial-gradient(110% 75% at 10% 14%, rgb(166 224 74 / 0.26), transparent 55%),
+    radial-gradient(90% 70% at 90% 6%, rgb(28 138 153 / 0.2), transparent 52%),
+    radial-gradient(70% 60% at 70% 92%, rgb(255 255 255 / 0.85), transparent 60%),
+    linear-gradient(170deg, #f1f6f1 0%, #e8f1eb 45%, #dcebe4 100%);
+  /* Night to Deep Teal, the banner field from the brand pack. */
+  --background-image-deep: linear-gradient(160deg, #0b3f4b 0%, #06242b 52%, #041b21 100%);
+  --background-image-peach: linear-gradient(180deg, #f5f9ee 0%, #f1f6f1 100%);
 }

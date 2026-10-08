@@ -27,7 +27,12 @@ export default defineConfig({
     { name: "mobile-chromium", use: { ...devices["Pixel 7"] } },
     {
       name: "iphone",
-      testMatch: ["e2e/favicon.spec.ts", "e2e/sticky-header.spec.ts", "e2e/home.spec.ts"],
+      testMatch: [
+        "e2e/favicon.spec.ts",
+        "e2e/sticky-header.spec.ts",
+        "e2e/home.spec.ts",
+        "e2e/mobile-menu.spec.ts",
+      ],
       use: { ...devices["iPhone 13"] },
     },
     {

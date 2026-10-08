@@ -29,19 +29,21 @@ export function WorkflowSection() {
           </p>
         </div>
         <figure className="space-y-4">
-          <WorkflowViewer
-            aspect={WORKFLOW_SVG_LAYOUT.aspect}
-            labels={{
-              explore: WORKFLOW_CONTROLS.explore.text,
-              close: WORKFLOW_CONTROLS.close.text,
-              loading: WORKFLOW_CONTROLS.loading.text,
-              ready: WORKFLOW_CONTROLS.ready.text,
-              failed: WORKFLOW_CONTROLS.failed.text,
-              unavailable: WORKFLOW_CONTROLS.unavailable.text,
-            }}
-          >
-            <WorkflowDiagram />
-          </WorkflowViewer>
+          <div className="wf-bleed">
+            <WorkflowViewer
+              aspect={WORKFLOW_SVG_LAYOUT.aspect}
+              labels={{
+                explore: WORKFLOW_CONTROLS.explore.text,
+                close: WORKFLOW_CONTROLS.close.text,
+                loading: WORKFLOW_CONTROLS.loading.text,
+                ready: WORKFLOW_CONTROLS.ready.text,
+                failed: WORKFLOW_CONTROLS.failed.text,
+                unavailable: WORKFLOW_CONTROLS.unavailable.text,
+              }}
+            >
+              <WorkflowDiagram />
+            </WorkflowViewer>
+          </div>
           <WorkflowLegend />
           <figcaption className="max-w-[70ch] text-sm leading-relaxed text-fg-muted">
             {WORKFLOW_SECTION.caption.text}

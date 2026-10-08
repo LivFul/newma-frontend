@@ -4,7 +4,7 @@ import { LeafIcon } from "@/components/brand/leaf-icon";
 import { PillIcon } from "@/components/brand/pill-icon";
 import { AccessLink } from "./access-link";
 import { PersonaGrid } from "./persona-grid";
-import { CONTAINER, H2, H3_TITLE, revealChild, SECTION, STATEMENT } from "./type";
+import { CONTAINER, H2, H3_TITLE, REVEAL_CHILD, SECTION, STATEMENT } from "./type";
 
 const WAYPOINT =
   "relative grid content-start gap-3 pl-16 lg:pl-0 lg:pt-16 " + "[counter-increment:step]";
@@ -64,7 +64,7 @@ export function ProductIntro() {
               className="relative grid gap-(--space-12) [counter-reset:step] lg:grid-cols-4 lg:gap-(--space-10)"
             >
               {HOW_IT_WORKS.map((step, index) => (
-                <li key={step.title.id} className={`${WAYPOINT} ${revealChild(index)}`}>
+                <li key={step.title.id} className={`${WAYPOINT} ${REVEAL_CHILD}`}>
                   <span
                     aria-hidden="true"
                     className="absolute top-0 left-0 grid h-9 place-items-center lg:left-1/2 lg:-translate-x-1/2"

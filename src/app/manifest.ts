@@ -5,7 +5,7 @@ import { BACKGROUND_HEX, BRAND_HEX } from "@/lib/brand";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "NEWMA",
+    name: "NEWMA by LivFul Therapeutics",
     short_name: "NEWMA",
     description: HOME_META.defaultDescription.text,
     start_url: "/",
@@ -13,7 +13,7 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "standalone",
     orientation: "any",
     background_color: BACKGROUND_HEX,
-    theme_color: BRAND_HEX.accent,
+    theme_color: BRAND_HEX.night,
     categories: ["productivity"],
     icons: [
       { src: "/brand/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },

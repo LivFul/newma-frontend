@@ -1,17 +1,31 @@
 export const SECTION = "px-5 py-(--space-20) md:px-12 md:py-(--space-28)";
 export const CONTAINER = "mx-auto w-full max-w-[80rem]";
 export const H2 =
-  "font-display text-4xl leading-[1.02] font-medium tracking-[-0.03em] text-balance md:text-5xl";
+  "font-display text-4xl leading-[1.04] font-bold tracking-[-0.03em] text-balance md:text-5xl";
 export const H2_SUB =
-  "font-display text-3xl leading-[1.02] font-medium tracking-[-0.03em] text-balance md:text-4xl";
-export const H3_TITLE = "font-display text-2xl font-medium tracking-[-0.015em]";
+  "font-display text-3xl leading-[1.04] font-bold tracking-[-0.03em] text-balance md:text-4xl";
+export const H3_TITLE = "font-display text-2xl font-semibold tracking-[-0.015em]";
 export const STATEMENT =
   "font-display text-2xl leading-snug font-normal tracking-[-0.02em] md:text-3xl";
 
+/**
+ * Hero stagger steps are literal class strings, not built from the index: Tailwind generates a class
+ * only when it can read the whole class name in source, so an interpolated name never reaches the
+ * stylesheet and every item starts at once. The index is a union, so a step outside the table is a
+ * compile error and not a silent clamp.
+ */
+export type HeroStep = 0 | 1 | 2 | 3 | 4;
+const HERO_STEP: Record<HeroStep, string> = {
+  0: "[--hero-i:0]",
+  1: "[--hero-i:1]",
+  2: "[--hero-i:2]",
+  3: "[--hero-i:3]",
+  4: "[--hero-i:4]",
+};
+
 /** Base class for the CSS-only hero load sequence. Never put this on the h1 (it is the LCP node). */
 export const HERO_ENTRANCE_ITEM = "hero-entrance-item";
-export const heroEntrance = (index: number) => `${HERO_ENTRANCE_ITEM} [--hero-i:${index}]`;
+export const heroEntrance = (step: HeroStep) => `${HERO_ENTRANCE_ITEM} ${HERO_STEP[step]}`;
 
-/** Staggered child inside a `[data-reveal]` section. Index is the delay step. */
+/** Child inside a `[data-reveal]` section. It fades in with its section; only the hero cascades. */
 export const REVEAL_CHILD = "reveal-child";
-export const revealChild = (index: number) => `${REVEAL_CHILD} [--reveal-i:${index}]`;

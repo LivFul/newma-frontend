@@ -1,49 +1,53 @@
-/* Ethnobotanical instrument palette: LivFul mint, leaf greens and capsule teals, blended as
-   fades rather than hard-stop survey inks. Every pair in contrast-pairs.json is verified by
+/* NEWMA brand palette v1.0 (docs/newma_brand_pack/07_colors). Neutrals carry the identity: Ink type on
+   Mist and white, Night plates. Emerald, Lime and Teal are accents for the pill, highlights and calls to
+   action, never body text on light grounds. Every pair in contrast-pairs.json is verified by
    tests/unit/tokens.test.ts. */
 @theme {
-  --color-bg: #e8f2ef; /* mint wash */
-  --color-bg-elevated: #f6faf8; /* glass-card fill */
-  --color-bg-deep: #d7ebe6; /* mint-to-teal band */
-  --color-fg: #09191f; /* ink-teal */
-  --color-fg-muted: #4a6467;
-  --color-accent: #1d5c52; /* field green: action and links */
-  --color-accent-fg: #f6faf8;
-  --color-border: #c3d5d0;
-  --color-border-strong: #6e8986;
+  --color-bg: #f1f6f1; /* Mist */
+  --color-bg-elevated: #ffffff;
+  --color-bg-deep: #e3ede6; /* Mist band */
+  --color-fg: #082b33; /* Ink */
+  --color-fg-muted: #4f6b70; /* Slate */
+  --color-accent: #0b3f4b; /* Deep Teal: links and outline actions */
+  --color-accent-fg: #f1f6f1;
+  /* The prominent (tinted) action: Ink on the Plant gradient, whose darkest stop is Emerald. */
+  --color-prominent: #0fa36b;
+  --color-prominent-fg: #082b33;
+  --color-border: #cfdcd5;
+  --color-border-strong: #6c8689;
   --color-danger: #a3352b;
-  --color-danger-fg: #f6faf8;
+  --color-danger-fg: #ffffff;
   --color-warning: #f2c46b;
-  --color-warning-fg: #09191f;
-  --color-success: #8dbab3;
-  --color-success-fg: #09191f;
-  --color-focus: #1b8896; /* capsule cyan-teal */
+  --color-warning-fg: #082b33;
+  --color-success: #8fd3b4;
+  --color-success-fg: #082b33;
+  --color-focus: #1c8a99; /* Teal */
   /* Stroke inks for light fills (WCAG 1.4.11). */
   --color-warning-ink: #8a5a00;
-  --color-success-ink: #3f7a70;
+  --color-success-ink: #0b7a52;
 
   --color-route: #fbd699; /* apricot, rare warm accent */
   --color-route-edge: #b8643a;
-  --color-contour: #8dbab3;
-  --color-plate: #06242b; /* deep capsule teal */
-  --color-plate-fg: #e8f2ef;
-  --color-plate-muted: #8dbab3;
-  --color-plate-elevated: #0b404d;
-  --color-plate-deep: #09191f;
-  --color-plate-border: #1b8896;
+  --color-contour: #8fb3b0;
+  --color-plate: #06242b; /* Night */
+  --color-plate-fg: #f1f6f1;
+  --color-plate-muted: #8fb3b0; /* Slate light */
+  --color-plate-elevated: #0b3f4b; /* Deep Teal */
+  --color-plate-deep: #041b21;
+  --color-plate-border: #1c8a99;
   --color-plate-border-strong: #6f9a94;
-  --color-plate-accent: #7cc9b0;
+  --color-plate-accent: #a6e04a; /* Lime: dark grounds and small highlights only */
   --color-plate-danger: #f08e7c;
   --color-plate-warning: #f2c46b;
-  --color-plate-success: #8dbab3;
+  --color-plate-success: #2bc08e;
   --color-plate-compute: #b69cff; /* Agentic Compute and workflow learning loop (violet) */
   --color-plate-optional: #ef8f86;
-  --color-plate-contour: #3a6660;
+  --color-plate-contour: #2e5c63;
   --color-plate-route-edge: #c97a4d;
-  --color-plate-focus: #7ec8d4;
+  --color-plate-focus: #7fe3d2;
 
-  --color-leaf: #15a676;
-  --color-leaf-bright: #b3e570;
-  --color-capsule: #1b8896;
-  --color-capsule-deep: #0b404d;
+  --color-leaf: #0fa36b; /* Emerald */
+  --color-leaf-bright: #a6e04a; /* Lime */
+  --color-capsule: #1c8a99; /* Teal */
+  --color-capsule-deep: #0b3f4b; /* Deep Teal */
 }

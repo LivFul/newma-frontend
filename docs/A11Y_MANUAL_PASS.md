@@ -36,7 +36,7 @@ Start with the focus in the address bar and use only the keyboard.
       arrow keys, Home and End move between components; Enter opens the focused one; Escape puts the
       layers back together and keeps focus; Tab leaves the figure without a trap.
       _automated: pass for Tab reaching the six components, Escape keeping focus, Enter opening the focused one and no trap; arrow keys, Home and End stay manual (`tests/a11y/keyboard.spec.ts › hero: Escape keeps focus on the component; Enter opens it`, 2026-10-04)_
-- [ ] "Explore components" works with Enter and Space; "Keyboard help" opens and closes with Enter and Space.
+- [ ] "Explore components" works with Enter and Space.
       _manual: not automated_
 - [ ] The Product and About LivFul header links and the "How it works" button land with the section
       heading fully visible below the header.

@@ -42,7 +42,7 @@ export function OgCard({ title, kicker, glyph, tone = "--color-accent", logoSrc 
       {logoSrc ? (
         // satori renders a raw img; next/image is not available inside ImageResponse.
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={logoSrc} width={460} height={82} alt="" />
+        <img src={logoSrc} width={400} height={93} alt="" />
       ) : (
         <div style={{ display: "flex", fontSize: 40, gap: 14 }}>
           <span>LivFul</span>

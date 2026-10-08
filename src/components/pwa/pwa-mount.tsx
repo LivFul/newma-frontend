@@ -40,6 +40,29 @@ export function PwaMount() {
 
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return undefined;
+    // Development runs without a worker: dev chunk URLs are not content-hashed, and a worker left from a
+    // production build would intercept them (sw.js now refuses to answer non-immutable build output from
+    // cache, but an older installed worker does not). A leftover registration of this origin's /sw.js
+    // plus the newma- caches are removed; other worker scripts and caches on the origin are left alone. (Another app served earlier on this same port
+    // with its own root /sw.js cannot be told apart from NEWMA's, so it is removed too.)
+    if (process.env.NODE_ENV === "development") {
+      const script = new URL("/sw.js", window.location.origin).href;
+      const ours = (registration: ServiceWorkerRegistration) =>
+        [registration.active, registration.waiting, registration.installing].some(
+          (worker) => worker?.scriptURL === script,
+        );
+      void navigator.serviceWorker
+        .getRegistrations()
+        .then((registrations) => Promise.all(registrations.filter(ours).map((r) => r.unregister())))
+        .then(() => caches.keys())
+        .then((keys) =>
+          Promise.all(
+            keys.filter((key) => key.startsWith("newma-")).map((key) => caches.delete(key)),
+          ),
+        )
+        .catch(() => undefined);
+      return undefined;
+    }
     const hadController = Boolean(navigator.serviceWorker.controller);
     // The worker is a progressive enhancement: a failed registration leaves the site fully usable.
     const register = () => {

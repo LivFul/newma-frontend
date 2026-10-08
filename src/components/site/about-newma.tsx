@@ -9,7 +9,7 @@ import {
   VISION,
   VISION_HEADING,
 } from "@/content/home/about";
-import { LeafIcon } from "@/components/brand/leaf-icon";
+import { CapsuleIcon } from "@/components/brand/capsule-icon";
 import { CONTAINER, H2, H2_SUB, H3_TITLE, SECTION } from "./type";
 
 export function AboutNewma() {
@@ -37,7 +37,8 @@ export function AboutNewma() {
           }}
           aria-hidden="true"
         />
-        <div className="max-w-[60ch] space-y-4">
+        {/* Same two-column grid as Mission and Vision below, so the columns align down the section. */}
+        <div className="grid items-start gap-x-16 gap-y-6 md:grid-cols-2">
           <p className="text-xl leading-snug text-fg-muted">{PURPOSE_LEDE.text}</p>
           <p className="text-lg leading-relaxed text-fg-muted">{PURPOSE.text}</p>
         </div>
@@ -56,7 +57,7 @@ export function AboutNewma() {
           <ul role="list" className="grid gap-x-10 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
             {APPROACH.map((item) => (
               <li key={item.title.id} className="flex gap-4 leading-relaxed text-fg-muted">
-                <LeafIcon className="h-6 w-auto shrink-0" />
+                <CapsuleIcon className="mt-0.5 size-6 shrink-0" />
                 <span>
                   <strong className="font-medium text-fg">{item.title.text}</strong>{" "}
                   {item.text.text}

@@ -1,9 +1,9 @@
-/* Geologica for display and UI; Martian Mono only for hashes, codes and measured values. Both are
-   self-hosted by next/font in the root layout. */
+/* Brand pack v1.0: Work Sans for headlines, UI and body; Geist Mono Bold for bylines, labels and data.
+   Both are self-hosted by next/font in the root layout. */
 @theme {
   --font-sans:
-    var(--font-geologica), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: var(--font-martian), ui-monospace, SFMono-Regular, Menlo, monospace;
+    var(--font-work-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
@@ -15,5 +15,5 @@
   --text-5xl: 3rem;
   --leading-tight: 1.2;
   --leading-normal: 1.5;
-  --tracking-place: 0.08em;
+  --tracking-place: 0.14em;
 }
