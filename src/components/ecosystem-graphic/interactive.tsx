@@ -7,7 +7,7 @@ import { VisuallyHidden } from "@/components/ui/visually-hidden";
 import type { EcosystemSlug } from "@/content/ecosystem/registry";
 import { HERO_TOGGLE_LABEL } from "@/content/home/hero-help";
 import { HERO_SVG_ID } from "./constants";
-import { ControlsRow, TOGGLE_CLASS } from "./controls-row";
+import { HeroDiagramFooter, TOGGLE_CLASS } from "./hero-diagram-footer";
 import { EcosystemSvg } from "./ecosystem-svg";
 import { HERO_CHUNK_MARKER } from "./hero-marker";
 import { MotionPart, MotionTokensContext } from "./motion-part";
@@ -77,19 +77,21 @@ export default function Interactive({
               onBlur={handlers.onBlur}
             />
           </div>
-          <ControlsRow>
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              className={`${TOGGLE_CLASS} relative z-10`}
-              aria-pressed={state.pinned || state.touchOpen}
-              aria-controls={HERO_SVG_ID}
-              onClick={() => dispatch({ type: "toggle" })}
-            >
-              {HERO_TOGGLE_LABEL.text}
-            </Button>
-          </ControlsRow>
+          <HeroDiagramFooter
+            toggle={
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className={`${TOGGLE_CLASS} relative z-10`}
+                aria-pressed={state.pinned || state.touchOpen}
+                aria-controls={HERO_SVG_ID}
+                onClick={() => dispatch({ type: "toggle" })}
+              >
+                {HERO_TOGGLE_LABEL.text}
+              </Button>
+            }
+          />
           <VisuallyHidden role="status">{status}</VisuallyHidden>
         </div>
       </LazyMotion>

@@ -396,16 +396,18 @@ describe("Interactive hero layer", () => {
     );
   });
 
-  it("keeps the controls row identical to the static layer so the swap moves nothing", () => {
+  it("keeps the diagram footer identical to the static layer so the swap moves nothing", () => {
     const stat = render(<HeroStatic />);
-    const staticRow = stat.container.querySelector(".eco-controls")!;
-    const staticClasses = staticRow.className;
-    const staticHint = staticRow.querySelector("p")!.textContent;
+    const staticFooter = stat.container.querySelector("figcaption")!;
+    const staticControls = stat.container.querySelector(".eco-controls")!;
+    const staticCopy = [...staticFooter.querySelectorAll("p")].map((p) => p.textContent);
     stat.unmount();
     const { container } = mount();
-    const row = container.querySelector(".eco-controls")!;
-    expect(row.className).toBe(staticClasses);
-    expect(row.querySelector("p")!.textContent).toBe(staticHint);
+    const footer = container.querySelector("figcaption")!;
+    const controls = container.querySelector(".eco-controls")!;
+    expect(footer.className).toBe(staticFooter.className);
+    expect(controls.className).toBe(staticControls.className);
+    expect([...footer.querySelectorAll("p")].map((p) => p.textContent)).toEqual(staticCopy);
   });
 
   it("is axe clean", async () => {
