@@ -36,13 +36,15 @@ for (const width of [320, 1280, 1920]) {
   }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
-    const { box, viewport } = await page.locator("#workflow .wf-bleed").evaluate((el) => ({
+    // vw includes a classic scrollbar; the content box the block centres in does not.
+    const { box, viewport, content } = await page.locator("#workflow .wf-bleed").evaluate((el) => ({
       box: el.getBoundingClientRect().toJSON() as DOMRect,
       viewport: window.innerWidth,
+      content: document.documentElement.clientWidth,
     }));
     const expected = Math.min(viewport * 0.95, BLEED_CAP_PX);
     expect(Math.abs(box.width - expected)).toBeLessThanOrEqual(TOLERANCE_PX);
-    expect(Math.abs(box.left - (viewport - box.width) / 2)).toBeLessThanOrEqual(TOLERANCE_PX);
+    expect(Math.abs(box.left - (content - box.width) / 2)).toBeLessThanOrEqual(TOLERANCE_PX);
     expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
   });
 }

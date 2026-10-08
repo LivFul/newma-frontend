@@ -3,7 +3,7 @@ import { SLUGS } from "../support/hero";
 import {
   imagesUseDeploymentHost,
   PRODUCTION_ORIGIN,
-  runsAgainstNextDev,
+  servesNextDev,
   targetKind,
   warmUp,
 } from "../support/target";
@@ -94,6 +94,7 @@ for (const page of ["privacy", "terms"]) {
 
 test("the home page has one canonical on the production origin and one JSON-LD per type", async ({
   page,
+  request,
   baseURL,
 }) => {
   await page.goto("/");
@@ -108,7 +109,7 @@ test("the home page has one canonical on the production origin and one JSON-LD p
   const imageUrl = new URL(ogImage!);
   expect(imageUrl.pathname).toMatch(/^\/opengraph-image/);
   // `next dev` resolves it against the local server instead of metadataBase.
-  if (runsAgainstNextDev()) expect(imageUrl.origin).toBe(new URL(baseURL!).origin);
+  if (await servesNextDev(request)) expect(imageUrl.origin).toBe(new URL(baseURL!).origin);
   else if (!imagesUseDeploymentHost(targetKind(baseURL))) expect(imageUrl.origin).toBe(ORIGIN);
   else expect(imageUrl.protocol).toBe("https:");
   await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(

@@ -17,13 +17,23 @@ export function targetKind(baseURL: string | undefined): TargetKind {
   return host === new URL(PRODUCTION_ORIGIN).hostname ? "production" : "preview";
 }
 
+// One answer per worker: the server under test does not change during a run.
+let nextDev: Promise<boolean> | undefined;
+
 /**
- * True when the suite runs against `next dev`: playwright.config.ts starts `pnpm dev` only when
- * PLAYWRIGHT_BASE_URL is unset. Dev differs from a build in ways some specs assert on (the CSP
- * allows 'unsafe-eval', static metadata images resolve against the local host, build chunks are
- * not immutable), so those specs skip or narrow here and the preview-e2e job covers the build.
+ * True when the server under test is `next dev`. Dev differs from a build in ways some specs assert
+ * on (the CSP allows 'unsafe-eval', static metadata images resolve against the local host, build
+ * chunks are not immutable), so those specs skip or narrow there and the preview-e2e job covers the
+ * build. Read from the server, not the environment: locally Playwright reuses whatever already
+ * listens on the port, which may be `pnpm start`. Only dev pages load Next's devtools chunk.
  */
-export const runsAgainstNextDev = (): boolean => !process.env.PLAYWRIGHT_BASE_URL;
+export function servesNextDev(request: APIRequestContext): Promise<boolean> {
+  nextDev ??= request
+    .get("/")
+    .then((response) => response.text())
+    .then((html) => html.includes("next-devtools"));
+  return nextDev;
+}
 
 /**
  * True when Next resolves static Open Graph images against the deployment's own host: on a Vercel
