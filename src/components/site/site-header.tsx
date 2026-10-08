@@ -198,7 +198,6 @@ export function SiteHeader() {
             imageClassName="h-[1.0625rem] w-auto min-[25rem]:h-5 sm:h-7"
           />
           <div className="flex min-w-0 flex-wrap items-center justify-end gap-1 min-[25rem]:gap-2 sm:gap-4">
-            <ThemeToggle className="shrink-0" />
             <nav
               aria-label={HEADER_NAV_LABEL.text}
               className="hidden items-center gap-1 lg:flex xl:gap-2"
@@ -242,6 +241,7 @@ export function SiteHeader() {
               <span className="sr-only xl:not-sr-only">{ACCESS_LABEL.text}</span>{" "}
               <span className="xl:hidden">{ACCESS_SHORT.text}</span>
             </AccessLink>
+            <ThemeToggle className="shrink-0" />
           </div>
         </div>
         <nav
