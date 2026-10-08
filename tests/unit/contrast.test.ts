@@ -172,4 +172,14 @@ describe("blend", () => {
     expect(blend("#ff0000", 0.25, "#0000ff")).toBe("#4000bf");
     expect(blend("#fff", 0.75, "#000")).toBe("#bfbfbf");
   });
+
+  // Value: protects=a contrast bound never compares against a garbage colour; fails_when=blend accepts 4/8-digit hex, rgb() or an alpha outside 0..1 and returns "#NaN..." or out-of-range channels that a negated assertion would let pass;
+  //   why_new=blend fed contrast tests silently on malformed tokens; seam=none
+  it("rejects colours that are not #rgb or #rrggbb, and alpha outside 0..1", () => {
+    expect(() => blend("#ffff", 0.5, "#000000")).toThrow(/colour/);
+    expect(() => blend("rgb(0 0 0)", 0.5, "#000000")).toThrow(/colour/);
+    expect(() => blend("#ffffff", 0.5, "#00000080")).toThrow(/colour/);
+    expect(() => blend("#ffffff", 1.2, "#000000")).toThrow(/alpha/);
+    expect(() => blend("#ffffff", Number.NaN, "#000000")).toThrow(/alpha/);
+  });
 });
