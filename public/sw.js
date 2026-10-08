@@ -8,7 +8,12 @@ const PRECACHE = [
   "/brand/icon-192.png",
   "/brand/icon-512.png",
   "/brand/favicon.svg",
+  // Every lockup the (site) layout around /offline renders: the header wordmark and the footer logo,
+  // each in both colourways (the reversed one on screen over dark, the other in print and forced colours).
   "/brand/newma-wordmark.svg",
+  "/brand/newma-wordmark-reversed.svg",
+  "/brand/newma-logo.svg",
+  "/brand/newma-logo-reversed.svg",
 ];
 // Pages, images and the rest share one budget; hashed build chunks get a larger one of their own so a
 // burst of images can never evict the CSS and JS that the cached pages depend on.
