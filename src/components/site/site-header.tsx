@@ -54,6 +54,14 @@ export function SiteHeader() {
   // Re-runs the scroll/tone sync on the next frame; set once the sync effect has mounted.
   const resyncRef = useRef<() => void>(() => undefined);
   const pathname = usePathname();
+  // A navigation closes the sheet at once. The header persists across routes, and a link inside it
+  // (the wordmark) keeps focus in the header, so neither a section choice nor focusout would close it.
+  const [shownPath, setShownPath] = useState(pathname);
+  if (pathname !== shownPath) {
+    setShownPath(pathname);
+    setOpen(false);
+    setPresent(false);
+  }
 
   useEffect(() => {
     const header = headerRef.current;

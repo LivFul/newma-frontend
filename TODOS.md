@@ -193,7 +193,7 @@ Start by deciding whether the CSP and SEO specs should run only against a produc
 **Priority:** P3
 **Depends on:** None
 
-**Completed:** Done on `fix/site-a11y-tidy` (2026-10-08): the `data-header-row` probe, the `MOBILE_SECTIONS_ID` constant, a tone re-probe on `usePathname` change, and the menu closing on a `(min-width: 64rem)` change.
+**Completed:** Done on `fix/site-a11y-tidy` (2026-10-08): the `data-header-row` probe, the `MOBILE_SECTIONS_ID` constant, a tone re-probe and menu close on `usePathname` change, and the menu closing on a `(min-width: 64rem)` change.
 
 ### Simplify duplicated CSS and JSX
 

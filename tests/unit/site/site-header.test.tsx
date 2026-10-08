@@ -212,6 +212,28 @@ describe("SiteHeader", () => {
     expect(removed).toContain("(min-width: 64rem)");
   });
 
+  // Value: protects=a menu left open across a client-side navigation (the wordmark home link sits in the header, so focus never leaves it) closes on the new page;
+  //   fails_when=the pathname check is dropped, so the sheet stays open over the next page's content;
+  //   why_new=only section links closed the sheet, and the focusout close never fires for a link inside the header; seam=none
+  it("closes the open menu after a client-side navigation", async () => {
+    const user = userEvent.setup();
+    nav.pathname = "/";
+    try {
+      const { rerender } = render(<SiteHeader />);
+      const menu = screen.getByRole("button", { name: "Menu" });
+      await user.click(menu);
+      expect(menu).toHaveAttribute("aria-expanded", "true");
+      nav.pathname = "/ecosystem/wet-lab";
+      rerender(<SiteHeader />);
+      expect(menu).toHaveAttribute("aria-expanded", "false");
+      await waitFor(() => {
+        expect(screen.queryByRole("navigation", { name: "Mobile sections" })).toBeNull();
+      });
+    } finally {
+      nav.pathname = "/";
+    }
+  });
+
   // Value: protects=the header takes the tone of the new page after a client-side navigation, which fires no scroll or resize;
   //   fails_when=the pathname effect is dropped, so the capsule keeps the previous page's tone until the visitor scrolls;
   //   why_new=the tone was only probed on mount, scroll, resize and header size changes; seam=none
