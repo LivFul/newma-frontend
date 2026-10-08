@@ -63,6 +63,8 @@ async function darkestBackdrop(page: Page, decoder: Page): Promise<string> {
 for (const width of [1024, 1440]) {
   test(`muted header labels stay AA over the hero at ${width}px`, async ({ page, context }) => {
     await page.setViewportSize({ width, height: 900 });
+    // The hero's drifting line pattern would make the darkest pixel depend on timing.
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     await page.waitForLoadState("networkidle");
     await page.addStyleTag({

@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, onTestFinished, vi } from "vitest";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { expectNoAxeViolations } from "../ui/axe";
@@ -184,6 +184,7 @@ describe("SiteHeader", () => {
   it("closes the open menu when the viewport widens to lg", async () => {
     const listeners = new Map<string, (event: MediaQueryListEvent) => void>();
     const removed: string[] = [];
+    onTestFinished(() => vi.restoreAllMocks());
     vi.spyOn(window, "matchMedia").mockImplementation(
       (query: string) =>
         ({

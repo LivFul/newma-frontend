@@ -90,7 +90,7 @@ Start by deciding whether the CSP and SEO specs should run only against a produc
 **Priority:** P3
 **Depends on:** None
 
-**Completed:** Done on `fix/pwa-3d-tidy` (2026-10-08). `/brand/newma-wordmark.svg` is precached and `CACHE` stays `newma-v2`: an addition needs no bump, and a bump would drop the build chunks the offline page needs. The unit test reads the lockup from `wordmark.tsx`, so a renamed asset fails it.
+**Completed:** Done on `fix/pwa-3d-tidy` (2026-10-08). Every lockup the `(site)` layout around `/offline` renders is precached (the wordmark and the logo, both colourways), and `CACHE` stays `newma-v2`: an addition needs no bump, and a bump would drop the build chunks the offline page needs. The unit test reads the lockup from `wordmark.tsx`, so a renamed asset fails it.
 
 ### Watch the `immutable` header that chunk caching depends on
 
