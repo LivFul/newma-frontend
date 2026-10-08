@@ -3,15 +3,16 @@ import { expect, test } from "../support/test";
 
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"];
 
-test("the headline stays visible and the rest of the hero is the entrance sequence", async ({
-  page,
-}) => {
+test("the hero copy stays visible and only the actions run the entrance", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   const heading = page.getByRole("heading", { level: 1 });
   await expect(heading).toBeVisible();
-  await expect(heading).toHaveCSS("opacity", "1");
-  await expect(page.locator("#hero .hero-entrance-item")).toHaveCount(4);
+  // The copy paints with the first frame: on phones the lede is the LCP node.
+  for (const copy of [heading, page.locator("#hero-heading + div p")]) {
+    for (const el of await copy.all()) await expect(el).toHaveCSS("opacity", "1");
+  }
+  await expect(page.locator("#hero .hero-entrance-item")).toHaveCount(2);
 });
 
 test("scrolling to the product section reveals it", async ({ page }) => {
