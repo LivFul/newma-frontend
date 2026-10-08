@@ -205,7 +205,7 @@ Start by deciding whether the CSP and SEO specs should run only against a produc
 **Priority:** P4
 **Depends on:** None
 
-**Completed:** Done on `fix/site-a11y-tidy` (2026-10-08). The build emits `-webkit-mask-image` and `-webkit-mask-composite: source-in` for both hero rules (checked in `.next/static` CSS), so the hand-written copies are gone. CapsuleIcon's gradients come from a `HALVES` table, and `HeroStep` is 1 to 4 (later 1 | 2 on `perf/mobile-lcp`, where only the hero actions keep the entrance).
+**Completed:** Done on `fix/site-a11y-tidy` (2026-10-08). The build emits `-webkit-mask-image` and `-webkit-mask-composite: source-in` for both hero rules (checked in `.next/static` CSS), so the hand-written copies are gone. CapsuleIcon's gradients come from a `HALVES` table, and `HeroStep` is 1 to 4 (later 0 | 1 on `perf/mobile-lcp`, where only the hero actions keep the entrance, so the first of them starts without a delay).
 
 ### Mobile Lighthouse performance below target
 

@@ -14,10 +14,10 @@ export const STATEMENT =
  * stylesheet and every item starts at once. The index is a union, so a step outside the table is a
  * compile error and not a silent clamp.
  */
-export type HeroStep = 1 | 2;
+export type HeroStep = 0 | 1;
 const HERO_STEP: Record<HeroStep, string> = {
+  0: "[--hero-i:0]",
   1: "[--hero-i:1]",
-  2: "[--hero-i:2]",
 };
 
 /**

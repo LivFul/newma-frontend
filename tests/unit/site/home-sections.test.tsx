@@ -114,7 +114,10 @@ describe("HeroSection", () => {
       expect(copy.className).not.toMatch(/hero-entrance-item/);
     }
     expect(screen.getByText(HERO.disclaimer.text).className).toMatch(/hero-entrance-item/);
-    expect(container.querySelectorAll("#hero .hero-entrance-item")).toHaveLength(2);
+    const items = container.querySelectorAll("#hero .hero-entrance-item");
+    expect(items).toHaveLength(2);
+    // The first animated item starts at once: nothing above it animates any more.
+    expect(items[0]!.className).toContain("[--hero-i:0]");
   });
 
   it("exposes the ecosystem diagram with its accessible name inside the hero", () => {
