@@ -73,10 +73,10 @@ describe("Wordmark", () => {
     expect(guarded).toMatch(/\[data-tone="dark"\] \.wordmark-light[\s\S]*?display:\s*none;/);
     expect(guarded).toMatch(/\[data-tone="dark"\] \.wordmark-dark[\s\S]*?display:\s*block;/);
     expect(guarded).toMatch(
-      /html\[data-theme="dark"\] \[data-site-header\] \.wordmark-light[\s\S]*?display:\s*none;/,
+      /html\[data-theme="dark"\] \.wordmark-light[\s\S]*?display:\s*none;/,
     );
     expect(guarded).toMatch(
-      /html\[data-theme="dark"\] \[data-site-header\] \.wordmark-dark[\s\S]*?display:\s*block;/,
+      /html\[data-theme="dark"\] \.wordmark-dark[\s\S]*?display:\s*block;/,
     );
     // No other dark-tone swap hooks (forced-colours dark themes pick by colour scheme).
     const elsewhere = css.replace(guarded, "");

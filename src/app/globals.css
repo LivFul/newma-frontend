@@ -701,11 +701,11 @@ main[tabindex="-1"]:focus-visible {
     color-scheme: dark;
   }
   [data-tone="dark"] .wordmark-light,
-  html[data-theme="dark"] [data-site-header] .wordmark-light {
+  html[data-theme="dark"] .wordmark-light {
     display: none;
   }
   [data-tone="dark"] .wordmark-dark,
-  html[data-theme="dark"] [data-site-header] .wordmark-dark {
+  html[data-theme="dark"] .wordmark-dark {
     display: block;
   }
 }

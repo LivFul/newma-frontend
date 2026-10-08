@@ -43,7 +43,7 @@ export default async function AccessPage({ searchParams }: { searchParams: Searc
     <main id="main" tabIndex={-1} className="flex min-h-full flex-1 flex-col aurora">
       <div className="grid w-full flex-1 lg:grid-cols-12">
         <header className="flex flex-col gap-8 px-6 py-10 md:px-12 md:py-14 lg:col-span-5">
-          <Wordmark lockup="logo" imageClassName="h-12 w-auto" />
+          <Wordmark lockup="logo" tone="adaptive" imageClassName="h-12 w-auto" />
           <div className="space-y-5">
             <h1 className="font-display text-5xl leading-none font-bold tracking-[-0.035em] md:text-6xl">
               Demo sign-in

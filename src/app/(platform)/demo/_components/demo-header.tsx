@@ -9,7 +9,7 @@ import { SignOutButton } from "./sign-out-button";
 export function DemoHeader({ session }: { session: DemoSession }) {
   return (
     <header className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-border px-5 py-3 md:px-6">
-      <Wordmark href="/demo" label="NEWMA demo" imageClassName="h-6 w-auto">
+      <Wordmark href="/demo" label="NEWMA demo" tone="adaptive" imageClassName="h-6 w-auto">
         <span className="place rounded-full border border-fg/30 px-1.5 py-0.5 text-[0.625rem]">
           Demo
         </span>

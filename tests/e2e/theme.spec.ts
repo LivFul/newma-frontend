@@ -54,4 +54,6 @@ test("access shell keeps a stored dark theme", async ({ page }) => {
     .poll(() => page.evaluate(() => document.documentElement.dataset.theme))
     .toBe("dark");
   await expect(page.getByRole("link", { name: /NEWMA/i })).toBeVisible();
+  await expect(page.locator("img.wordmark-light")).toBeHidden();
+  await expect(page.locator("img.wordmark-dark")).toBeVisible();
 });
