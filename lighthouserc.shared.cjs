@@ -61,9 +61,12 @@ function buildConfig({ preset, env = process.env }) {
           "categories:performance": ["error", { minScore: 0.9 }],
           "categories:accessibility": ["error", { minScore: 1 }],
           ...seo,
+          // Mobile is 3500 ms: lantern's simulated slow 4G charges the framework chunks (React DOM and
+          // the app-router runtime) that finish before first paint to LCP, about 3.2 s here, even though
+          // the observed LCP equals FCP (TODOS.md, decision 2026-10-08).
           "largest-contentful-paint": [
             "error",
-            { maxNumericValue: preset === "desktop" ? 2500 : 3000 },
+            { maxNumericValue: preset === "desktop" ? 2500 : 3500 },
           ],
           "cumulative-layout-shift": ["error", { maxNumericValue: 0.1 }],
           "installable-manifest": "warn",

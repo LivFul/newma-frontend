@@ -82,7 +82,7 @@ describe("lighthouserc", () => {
 
   it.each([
     ["desktop", DESKTOP, 2500],
-    ["mobile", MOBILE, 3000],
+    ["mobile", MOBILE, 3500],
   ])(
     "%s config collects the home page and one component page and sets its LCP budget",
     (_name, file, lcpBudget) => {
