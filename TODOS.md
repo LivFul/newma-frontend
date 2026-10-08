@@ -174,7 +174,7 @@ Start by deciding whether the CSP and SEO specs should run only against a produc
 **Priority:** P3
 **Depends on:** None
 
-**Completed:** Done on `fix/site-a11y-tidy` (2026-10-08). The rendered backdrop behind the muted labels is at worst 5.05:1, measured at 1024 to 1920 px across the hero; the 22px blur averages the photo, and a single black pixel would give 3.31:1. `--glass-tint` stays at 0.58. Guarded by `tests/a11y/header-contrast.spec.ts` (rendered) and `tests/unit/site/header-glass.test.ts` (sage wash, 4.60:1).
+**Completed:** Done on `fix/site-a11y-tidy` (2026-10-08). The rendered backdrop behind the muted labels is at worst 5.05:1, measured at 1024 to 1920 px across the hero; the 22px blur averages the photo, and a single black pixel would give 3.31:1. `--glass-tint` stays at 0.58. Guarded by `tests/a11y/header-contrast.spec.ts` (rendered, at 1024 and 1440 px) and `tests/unit/site/header-glass.test.ts` (sage wash, 4.60:1).
 
 ### Header tone probe and menu tidy-ups
 
