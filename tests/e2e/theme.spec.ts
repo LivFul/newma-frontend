@@ -6,6 +6,20 @@ const NIGHT_RGB = "rgb(4, 27, 33)";
 
 test.use({ viewport: { width: 1280, height: 900 } });
 
+test("defaults to dark when no preference is stored", async ({ page }) => {
+  await page.addInitScript((key) => {
+    window.localStorage.removeItem(key);
+  }, STORAGE_KEY);
+  await gotoHeroReady(page);
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.dataset.theme))
+    .toBe("dark");
+  await expect
+    .poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor))
+    .toBe(NIGHT_RGB);
+  await expect(page.getByRole("radio", { name: "Dark" })).toBeChecked();
+});
+
 test("applies stored dark tokens, updates theme-color, and scrolls with header tone", async ({
   page,
 }) => {

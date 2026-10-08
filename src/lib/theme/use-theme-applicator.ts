@@ -2,11 +2,17 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { applyTheme } from "./dom";
-import type { ResolvedTheme, ThemePreference } from "./state";
+import {
+  DEFAULT_THEME_PREFERENCE,
+  resolveTheme,
+  type ResolvedTheme,
+  type ThemePreference,
+} from "./state";
 import { readPreference, readResolved, subscribe } from "./storage";
 
-const serverPreference = (): ThemePreference => "system";
-const serverResolved = (): ResolvedTheme => "light";
+const serverPreference = (): ThemePreference => DEFAULT_THEME_PREFERENCE;
+const serverResolved = (): ResolvedTheme =>
+  resolveTheme(DEFAULT_THEME_PREFERENCE, false);
 
 /** Subscribes to preference storage and mirrors it onto `html` (mount once per document). */
 export function useThemeApplicator(): void {

@@ -35,10 +35,10 @@ describe("useThemePreference", () => {
     window.localStorage.clear();
   });
 
-  it("defaults to system on the server snapshot and light until storage is read", () => {
+  it("defaults to dark on the server snapshot until storage is read", () => {
     const { result } = renderHook(() => useThemePreference());
-    expect(result.current.preference).toBe("system");
-    expect(result.current.resolved).toBe("light");
+    expect(result.current.preference).toBe("dark");
+    expect(result.current.resolved).toBe("dark");
   });
 
   it("persists manual dark without applying dom when used alone", () => {
@@ -62,6 +62,15 @@ describe("useThemeApplicator", () => {
   afterEach(() => {
     vi.restoreAllMocks();
     window.localStorage.clear();
+  });
+
+  it("applies dark when storage is empty even on a light OS", () => {
+    renderHook(() => useThemeApplicator());
+    const { result } = renderHook(() => useThemePreference());
+    expect(result.current.preference).toBe("dark");
+    expect(result.current.resolved).toBe("dark");
+    expect(document.documentElement.classList.contains("dark")).toBe(true);
+    expect(document.documentElement.dataset.theme).toBe("dark");
   });
 
   it("persists manual dark and applies the dark class and theme-color meta", () => {

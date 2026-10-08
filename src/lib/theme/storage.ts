@@ -1,4 +1,10 @@
-import { THEME_STORAGE_KEY, parsePreference, resolveTheme, type ThemePreference } from "./state";
+import {
+  DEFAULT_THEME_PREFERENCE,
+  THEME_STORAGE_KEY,
+  parsePreference,
+  resolveTheme,
+  type ThemePreference,
+} from "./state";
 
 let memory: ThemePreference | null = null;
 let memoryAuthoritative = false;
@@ -18,7 +24,7 @@ export function readPreference(): ThemePreference {
   try {
     return parsePreference(window.localStorage.getItem(THEME_STORAGE_KEY));
   } catch {
-    return memory ?? "system";
+    return memory ?? DEFAULT_THEME_PREFERENCE;
   }
 }
 

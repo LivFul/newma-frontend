@@ -49,8 +49,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   colorScheme: "light dark",
   themeColor: [
+    { color: BRAND_HEX.night },
     { media: "(prefers-color-scheme: light)", color: BACKGROUND_HEX },
-    { media: "(prefers-color-scheme: dark)", color: BRAND_HEX.night },
   ],
   viewportFit: "cover",
 };
@@ -60,7 +60,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`h-full antialiased ${workSans.variable} ${geistMono.variable}`}
+      className={`dark h-full antialiased ${workSans.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
       <Script id="theme-init" strategy="beforeInteractive">
