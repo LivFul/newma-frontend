@@ -60,3 +60,15 @@ export const parseCssVars = (css: string): Record<string, string> =>
   Object.fromEntries(
     Array.from(css.matchAll(/(--[a-z0-9-]+)\s*:\s*([^;]+);/gi), (m) => [m[1], m[2].trim()]),
   );
+
+/** Variables declared inside a single `@theme { … }` block (light canonical tokens). */
+export const parseThemeBlock = (css: string): Record<string, string> => {
+  const block = /@theme\s*\{([\s\S]*?)\}/.exec(css)?.[1];
+  return parseCssVars(block ?? "");
+};
+
+/** Variables inside the `.dark { … }` block (explicit dark overrides). */
+export const parseDarkBlock = (css: string): Record<string, string> => {
+  const block = /\.dark\s*\{([\s\S]*)\}\s*$/.exec(css.trim())?.[1];
+  return parseCssVars(block ?? "");
+};

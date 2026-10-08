@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Work_Sans } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { HOME_META } from "@/content/home/copy";
 import { BACKGROUND_HEX, BRAND_HEX } from "@/lib/brand";
+import { THEME_INIT_SCRIPT } from "@/lib/theme/init-script";
 import { siteUrl } from "@/lib/site";
 
 // Brand pack v1.0 typefaces: Work Sans (headlines, UI, body) and Geist Mono (bylines, labels, data).
@@ -44,7 +46,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  colorScheme: "light",
+  colorScheme: "light dark",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: BACKGROUND_HEX },
     { media: "(prefers-color-scheme: dark)", color: BRAND_HEX.night },
@@ -58,7 +60,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       data-scroll-behavior="smooth"
       className={`h-full antialiased ${workSans.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
     >
+      <Script id="theme-init" strategy="beforeInteractive">
+        {THEME_INIT_SCRIPT}
+      </Script>
       {/* Extensions such as Grammarly stamp attributes on <body> before hydration; this silences only
           that element's attribute check, never its children. */}
       <body className="flex min-h-full flex-col" suppressHydrationWarning>

@@ -14,6 +14,7 @@ import {
 } from "@/content/home/chrome";
 import { Button } from "@/components/ui/button";
 import { AccessLink } from "./access-link";
+import { ThemeToggle } from "./theme-toggle";
 import { Wordmark } from "./wordmark";
 
 const MOBILE_SECTIONS_ID = "mobile-sections";
@@ -197,6 +198,7 @@ export function SiteHeader() {
             imageClassName="h-[1.0625rem] w-auto min-[25rem]:h-5 sm:h-7"
           />
           <div className="flex min-w-0 flex-wrap items-center justify-end gap-1 min-[25rem]:gap-2 sm:gap-4">
+            <ThemeToggle layout="bar" className="hidden lg:inline-flex" />
             <nav
               aria-label={HEADER_NAV_LABEL.text}
               className="hidden items-center gap-1 lg:flex xl:gap-2"
@@ -252,6 +254,7 @@ export function SiteHeader() {
           className="mobile-sections border-t border-fg/10 lg:hidden"
         >
           <div className="flex flex-col gap-1 px-4 py-3 md:px-6">
+            <ThemeToggle layout="sheet" />
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
