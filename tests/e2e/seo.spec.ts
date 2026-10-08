@@ -1,6 +1,12 @@
 import { expect, test } from "../support/test";
 import { SLUGS } from "../support/hero";
-import { imagesUseDeploymentHost, PRODUCTION_ORIGIN, targetKind, warmUp } from "../support/target";
+import {
+  imagesUseDeploymentHost,
+  PRODUCTION_ORIGIN,
+  runsAgainstNextDev,
+  targetKind,
+  warmUp,
+} from "../support/target";
 
 // The canonical origin is fixed at build time (A-P4-10); the build under test may set it explicitly.
 const ORIGIN = PRODUCTION_ORIGIN;
@@ -101,7 +107,9 @@ test("the home page has one canonical on the production origin and one JSON-LD p
   // image is fetchable there) and against metadataBase elsewhere; canonical and og:url stay canonical.
   const imageUrl = new URL(ogImage!);
   expect(imageUrl.pathname).toMatch(/^\/opengraph-image/);
-  if (!imagesUseDeploymentHost(targetKind(baseURL))) expect(imageUrl.origin).toBe(ORIGIN);
+  // `next dev` resolves it against the local server instead of metadataBase.
+  if (runsAgainstNextDev()) expect(imageUrl.origin).toBe(new URL(baseURL!).origin);
+  else if (!imagesUseDeploymentHost(targetKind(baseURL))) expect(imageUrl.origin).toBe(ORIGIN);
   else expect(imageUrl.protocol).toBe("https:");
   await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
     "content",

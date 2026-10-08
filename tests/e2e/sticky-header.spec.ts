@@ -1,5 +1,6 @@
 import type { Page } from "@playwright/test";
 import { gotoHeroReady } from "../support/hero";
+import { sequentialKey } from "../support/keyboard";
 import { expect, test } from "../support/test";
 
 const SCROLL_POSITIONS = [0, 0.25, 0.5, 0.75, 1] as const;
@@ -126,13 +127,13 @@ async function waitForScrollSettled(page: Page) {
   );
 }
 
-async function expectFocusNeverUnderHeader(page: Page, key: string, presses: number) {
+async function expectFocusNeverUnderHeader(page: Page, key: "Tab" | "Shift+Tab", presses: number) {
   const headerHeight = await page
     .locator("[data-site-header]")
     .evaluate((el) => el.getBoundingClientRect().height);
   let checked = 0;
   for (let i = 0; i < presses; i += 1) {
-    await page.keyboard.press(key);
+    await page.keyboard.press(sequentialKey(page, key));
     await waitForScrollSettled(page);
     const state = await focusedState(page);
     if (!state) break; // Tab left the page content (browser UI, or the dev overlay in `next dev`).
@@ -167,7 +168,7 @@ test("WCAG 2.4.11: no keyboard-focused element is hidden under the sticky header
 
 test("the skip link is the first tab stop and moves focus to main", async ({ page }) => {
   await page.goto("/");
-  await page.keyboard.press("Tab");
+  await page.keyboard.press(sequentialKey(page, "Tab"));
   const skip = page.getByRole("link", { name: "Skip to content" });
   await expect(skip).toBeFocused();
   // It sits above the sticky header (z-index), so it is actually visible and hit-testable.

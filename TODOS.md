@@ -1,47 +1,17 @@
 # TODOS
 
-## Testing
+## Performance
 
-### Pre-existing e2e failures against `next dev` and macOS WebKit
+### Mobile Lighthouse performance below target
 
-**What:** Make the nine e2e cases that fail on `main` as well as on this branch pass, or quarantine them with a reason.
+**What:** Bring mobile Lighthouse performance from 0.81 to the 0.90 target, with LCP under the 3000 ms mobile budget, on `/` and `/ecosystem/interface`. Then make the mobile Lighthouse check required on `main`.
 
-**Why:** They fail on every local full run, which hides new failures in the noise.
+**Why:** It is the largest open gap. It has failed on `main` since PR #24 and fails on every preview run, but nothing blocks a merge on it.
 
-**Context:** All nine fail on a fresh `origin/main` worktree too (`/ship` baseline, 2026-10-08):
-
-- `tests/e2e/csp.spec.ts:83`: "/access gets a fresh nonce policy without 'unsafe-inline' for scripts". Fails on desktop-chromium and mobile-chromium against `next dev`.
-- `tests/e2e/seo.spec.ts:89`: "the home page has one canonical on the production origin and one JSON-LD per type". Fails on both chromium projects against `next dev`.
-- `tests/e2e/sticky-header.spec.ts:162`, `:168`, `:228`, `:241` and `:247`: the keyboard and skip-link cases on the `iphone` project. macOS WebKit does not Tab onto links. They pass on the Linux CI runner.
-
-Start by deciding whether the CSP and SEO specs should run only against a production build (`PLAYWRIGHT_BASE_URL`).
+**Context:** `lighthouserc.mobile.cjs` and `lighthouserc.shared.cjs`. It runs in `.github/workflows/preview-e2e.yml` and locally with `pnpm lhci:mobile`. Measure the LCP element and its phases before changing anything. The likely LCP node is the hero h1, which waits on Work Sans.
 
 **Effort:** M
-**Priority:** P0
-**Depends on:** None
-
-### Layout regression tests for the About grid and the workflow breakout
-
-**What:** Add e2e checks that the About purpose text is two columns from `md`, and that `.wf-bleed` is `min(95vw, 120rem)` wide, centred, with no horizontal overflow at 320, 1280 and 1920 px.
-
-**Why:** Both layouts were user-requested fixes that unit tests cannot see (real layout only).
-
-**Context:** `src/components/site/about-newma.tsx` (`md:grid-cols-2`) and `src/components/site/workflow-diagram.css` (`.wf-bleed`). They were deferred from the rebrand ship (decision D4).
-
-**Effort:** S
 **Priority:** P1
-**Depends on:** None
-
-### Duplicate CapsuleIcon token test
-
-**What:** Merge "paints the colour capsule from the brand tokens" into "paints the colour tone from the brand colour tokens" in `tests/unit/brand/capsule-icon.test.tsx`.
-
-**Why:** Both protect the same thing, so a palette change has to be made in two places.
-
-**Context:** Keep the id-suffix selector and `.toLowerCase()` from the newer test, then delete it.
-
-**Effort:** S
-**Priority:** P3
 **Depends on:** None
 
 ## Site
@@ -101,7 +71,7 @@ Start by deciding whether the CSP and SEO specs should run only against a produc
 - Find the label row with a `data-header-row` attribute instead of `.glass > div`.
 - Put the `mobile-sections` id in one constant.
 - Re-probe the tone on client-side navigation.
-- Close the menu when the viewport crosses the `md` breakpoint, so the Escape listener does not stay attached.
+- Close the menu when the viewport crosses the `lg` breakpoint (1024px), where the menu switches, so the Escape listener does not stay attached.
 
 **Why:** Small fragilities from review: a wrapper div would silently break the probe, and an open menu survives a phone rotating to landscape.
 
@@ -176,3 +146,51 @@ Start by deciding whether the CSP and SEO specs should run only against a produc
 **Depends on:** None
 
 ## Completed
+
+### Pre-existing e2e failures against `next dev` and macOS WebKit
+
+**What:** Make the nine e2e cases that fail on `main` as well as on this branch pass, or quarantine them with a reason.
+
+**Why:** They fail on every local full run, which hides new failures in the noise.
+
+**Context:** All nine fail on a fresh `origin/main` worktree too (`/ship` baseline, 2026-10-08):
+
+- `tests/e2e/csp.spec.ts:83`: "/access gets a fresh nonce policy without 'unsafe-inline' for scripts". Fails on desktop-chromium and mobile-chromium against `next dev`.
+- `tests/e2e/seo.spec.ts:89`: "the home page has one canonical on the production origin and one JSON-LD per type". Fails on both chromium projects against `next dev`.
+- `tests/e2e/sticky-header.spec.ts:162`, `:168`, `:228`, `:241` and `:247`: the keyboard and skip-link cases on the `iphone` project. macOS WebKit does not Tab onto links. They pass on the Linux CI runner.
+
+Start by deciding whether the CSP and SEO specs should run only against a production build (`PLAYWRIGHT_BASE_URL`).
+
+**Effort:** M
+**Priority:** P0
+**Depends on:** None
+
+**Completed:** Fixed on `test/e2e-baseline` (2026-10-08). The CSP nonce case skips against `next dev`, which adds `'unsafe-eval'`. The SEO case failed because `next dev` resolves the static og:image against the local host; only that assertion is narrowed there, and preview-e2e still covers the build. The iPhone cases now press Alt+Tab on macOS WebKit (`sequentialKey` in `tests/support/keyboard.ts`); Linux CI is unchanged.
+
+### Layout regression tests for the About grid and the workflow breakout
+
+**What:** Add e2e checks that the About purpose text is two columns from `md`, and that `.wf-bleed` is `min(95vw, 120rem)` wide, centred, with no horizontal overflow at 320, 1280 and 1920 px.
+
+**Why:** Both layouts were user-requested fixes that unit tests cannot see (real layout only).
+
+**Context:** `src/components/site/about-newma.tsx` (`md:grid-cols-2`) and `src/components/site/workflow-diagram.css` (`.wf-bleed`). They were deferred from the rebrand ship (decision D4).
+
+**Effort:** S
+**Priority:** P1
+**Depends on:** None
+
+**Completed:** Done on `test/e2e-baseline` (2026-10-08): `tests/e2e/layout.spec.ts`, with a `data-about-purpose` hook on the About grid.
+
+### Duplicate CapsuleIcon token test
+
+**What:** Merge "paints the colour capsule from the brand tokens" into "paints the colour tone from the brand colour tokens" in `tests/unit/brand/capsule-icon.test.tsx`.
+
+**Why:** Both protect the same thing, so a palette change has to be made in two places.
+
+**Context:** Keep the id-suffix selector and `.toLowerCase()` from the newer test, then delete it.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** None
+
+**Completed:** Done on `test/e2e-baseline` (2026-10-08). The kept body is the /ship one, which has the id-suffix selector and `.toLowerCase()`, under the original title.

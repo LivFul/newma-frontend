@@ -153,6 +153,16 @@ export async function tabTo(
   throw new Error("tabTo: target not reached by keyboard");
 }
 
+/**
+ * The key that moves focus through links as `key` does elsewhere. WebKit on macOS follows Safari's
+ * default and puts only form controls in the Tab order; Alt+Tab includes links. Linux WebKit (CI)
+ * and every other engine take the plain key.
+ */
+export function sequentialKey(page: Page, key: "Tab" | "Shift+Tab"): string {
+  const engine = page.context().browser()?.browserType().name();
+  return engine === "webkit" && process.platform === "darwin" ? `Alt+${key}` : key;
+}
+
 /** True when the focused element sits inside `selector`. */
 export async function focusInside(page: Page, selector: string): Promise<boolean> {
   return page.evaluate((s) => document.activeElement?.closest(s) !== null, selector);

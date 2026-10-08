@@ -38,7 +38,7 @@ export function AboutNewma() {
           aria-hidden="true"
         />
         {/* Same two-column grid as Mission and Vision below, so the columns align down the section. */}
-        <div className="grid items-start gap-x-16 gap-y-6 md:grid-cols-2">
+        <div data-about-purpose className="grid items-start gap-x-16 gap-y-6 md:grid-cols-2">
           <p className="text-xl leading-snug text-fg-muted">{PURPOSE_LEDE.text}</p>
           <p className="text-lg leading-relaxed text-fg-muted">{PURPOSE.text}</p>
         </div>

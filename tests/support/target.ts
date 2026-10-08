@@ -18,6 +18,14 @@ export function targetKind(baseURL: string | undefined): TargetKind {
 }
 
 /**
+ * True when the suite runs against `next dev`: playwright.config.ts starts `pnpm dev` only when
+ * PLAYWRIGHT_BASE_URL is unset. Dev differs from a build in ways some specs assert on (the CSP
+ * allows 'unsafe-eval', static metadata images resolve against the local host, build chunks are
+ * not immutable), so those specs skip or narrow here and the preview-e2e job covers the build.
+ */
+export const runsAgainstNextDev = (): boolean => !process.env.PLAYWRIGHT_BASE_URL;
+
+/**
  * True when Next resolves static Open Graph images against the deployment's own host: on a Vercel
  * preview, or on a local build made with Vercel's system variables set to emulate one
  * (`PLAYWRIGHT_EMULATE_VERCEL_PREVIEW=1`, see the README).
