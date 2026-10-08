@@ -5,6 +5,10 @@ import { describe, expect, it, vi } from "vitest";
 
 const ROOT = path.resolve(__dirname, "../../..");
 const sw = readFileSync(path.join(ROOT, "public/sw.js"), "utf8");
+// The PRECACHE entries as written in sw.js, however Prettier wraps the array.
+const PRECACHE_LIST = [
+  .../const PRECACHE = \[([^\]]*)\];/.exec(sw)![1]!.matchAll(/"([^"]+)"/g),
+].map((m) => m[1]!);
 
 // The worker is a plain script, so it runs here in a vm against a fake `self`, `caches` and `fetch`.
 const ORIGIN = "https://newma.test";
@@ -456,12 +460,18 @@ describe("service worker", () => {
     expect(worker.self.clients.claim).toHaveBeenCalled();
   });
 
+  // Value: protects=the offline page shows the logo to a visitor who went offline before any page loaded it; fails_when=the default wordmark lockup is renamed or dropped from the precache; why_new=only the optimizer path was cached, and only after an online visit; seam=none
+  it("precaches the wordmark the offline page renders", () => {
+    const wordmark = readFileSync(path.join(ROOT, "src/components/site/wordmark.tsx"), "utf8");
+    // The offline page renders <Wordmark /> with its defaults: the `wordmark` lockup, light tone.
+    const lockup = /wordmark: \{\s*light: "([^"]+)"/.exec(wordmark)![1]!;
+    expect(PRECACHE_LIST).toContain(lockup);
+  });
+
   // Value: protects=every precache entry resolves to a real file or route, because cache.addAll rejects on one miss and the worker then never installs; fails_when=a precached icon is renamed or the offline route is removed; why_new=the vm fake always resolves addAll; seam=none
   it("precaches only files and routes that exist", () => {
-    const match = /const PRECACHE = (\[[^\]]*\]);/.exec(sw);
-    const precache = JSON.parse(match![1]!) as string[];
-    expect(precache).toContain("/offline");
-    for (const entry of precache) {
+    expect(PRECACHE_LIST).toContain("/offline");
+    for (const entry of PRECACHE_LIST) {
       const exists =
         entry === "/offline"
           ? existsSync(path.join(ROOT, "src/app/(site)/offline/page.tsx"))

@@ -67,6 +67,7 @@ describe("WorkflowScene teardown with the real stage and orbit controls", () => 
         toneMapping = 0;
         render() {}
         setSize() {}
+        setDrawingBufferSize() {}
         dispose() {}
         forceContextLoss() {}
         setPixelRatio() {}

@@ -41,10 +41,11 @@ export function PwaMount() {
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return undefined;
     // Development runs without a worker: dev chunk URLs are not content-hashed, and a worker left from a
-    // production build would intercept them (sw.js now refuses to answer non-immutable build output from
+    // production build would intercept them (sw.js refuses to answer non-immutable build output from
     // cache, but an older installed worker does not). A leftover registration of this origin's /sw.js
-    // plus the newma- caches are removed; other worker scripts and caches on the origin are left alone. (Another app served earlier on this same port
-    // with its own root /sw.js cannot be told apart from NEWMA's, so it is removed too.)
+    // plus the newma- caches are removed; other worker scripts and caches on the origin are left alone.
+    // (Another app served earlier on this same port with its own root /sw.js cannot be told apart from
+    // NEWMA's, so it is removed too.)
     if (process.env.NODE_ENV === "development") {
       const script = new URL("/sw.js", window.location.origin).href;
       const ours = (registration: ServiceWorkerRegistration) =>
