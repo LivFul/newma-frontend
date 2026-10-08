@@ -13,3 +13,6 @@ next-env.d.ts
 # Byte-identical copy of the backend canonical vectors (A-P3-20)
 tests/fixtures/canonical/
 .serena
+
+# Brand pack v1.0 as delivered; kept byte-identical to the designer's files
+docs/newma_brand_pack/
