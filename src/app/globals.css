@@ -222,6 +222,40 @@ main[tabindex="-1"]:focus-visible {
       border-color: color-mix(in srgb, var(--color-fg) 60%, transparent);
     }
   }
+  /* The header's call to action: an opaque glass-control fill inside a Plant-gradient ring (Lime,
+     Emerald, Teal). On arrival the ring orbits twice and settles, under five seconds so it never needs a
+     pause control (WCAG 2.2.2); hovering replays one turn. Reduced motion keeps the still ring. */
+  .cta-attention {
+    border: 2px solid transparent;
+    background:
+      linear-gradient(var(--color-bg-elevated), var(--color-bg-elevated)) padding-box,
+      conic-gradient(
+          from var(--cta-angle),
+          var(--color-leaf-bright),
+          var(--color-leaf),
+          var(--color-capsule),
+          var(--color-leaf-bright)
+        )
+        border-box;
+    box-shadow: 0 0 18px -6px color-mix(in srgb, var(--color-leaf) 55%, transparent);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .cta-attention {
+      animation:
+        cta-orbit 2.4s linear 2,
+        cta-glow 2.4s var(--motion-ease-standard) 2;
+    }
+    .cta-attention:hover {
+      animation: cta-orbit-again 1.2s linear;
+    }
+  }
+  @media (prefers-contrast: more) {
+    .cta-attention {
+      background: var(--color-bg-elevated);
+      border-color: var(--color-fg);
+      box-shadow: none;
+    }
+  }
   /* Controls inside the header capsule share its material (HIG: no glass on glass): they keep the
      specular rim but drop the floating shadow of their own. */
   [data-site-header] .glass .glass-control {
@@ -519,6 +553,29 @@ main[tabindex="-1"]:focus-visible {
   }
 }
 
+/* Registered so the conic ring's start angle can animate (an unregistered custom property would jump). */
+@property --cta-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes cta-orbit {
+  to {
+    --cta-angle: 360deg;
+  }
+}
+/* The glow swells once per turn, so the ring reads from across the bar, then settles to its rest. */
+@keyframes cta-glow {
+  50% {
+    box-shadow: 0 0 22px -2px color-mix(in srgb, var(--color-leaf) 70%, transparent);
+  }
+}
+/* The same turn under a second name, so hovering restarts it after the arrival orbits have ended. */
+@keyframes cta-orbit-again {
+  to {
+    --cta-angle: 360deg;
+  }
+}
 @keyframes botanical-drift {
   to {
     transform: translate3d(var(--tile), var(--tile), 0);

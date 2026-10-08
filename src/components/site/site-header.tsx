@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import {
   ACCESS_LABEL,
+  ACCESS_SHORT,
   AVELOZ_LINK,
   HEADER_MENU,
   HEADER_MOBILE_NAV,
@@ -153,12 +154,19 @@ export function SiteHeader() {
           the same corner, and the pill controls inside sit concentric with it. Only the capsule takes
           pointer input: the clear gutters around it pass clicks through to the content they show. */}
       <div className="glass pointer-events-auto mx-auto max-w-[83rem] rounded-[1.75rem]">
-        <div className="flex min-h-[calc(var(--size-header)-0.5rem-2px)] w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 py-1 pr-1.5 pl-4 md:pl-6">
-          <Wordmark tone="adaptive" priority viewTransition />
-          <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 sm:gap-4">
+        <div className="flex min-h-[calc(var(--size-header)-0.5rem-2px)] w-full flex-wrap items-center justify-between gap-x-2 gap-y-1 py-1 pr-1.5 pl-3.5 sm:gap-x-3 sm:pl-4 md:pl-6">
+          {/* The bar stays one row from 360px up: phones step the lockup down, tablets keep the Menu
+              button and the short Demo label until lg, and the full labels return at xl. */}
+          <Wordmark
+            tone="adaptive"
+            priority
+            viewTransition
+            imageClassName="h-[1.0625rem] w-auto min-[25rem]:h-5 sm:h-7"
+          />
+          <div className="flex min-w-0 flex-wrap items-center justify-end gap-1 min-[25rem]:gap-2 sm:gap-4">
             <nav
               aria-label={HEADER_NAV_LABEL.text}
-              className="hidden items-center gap-1 lg:gap-2 md:flex"
+              className="hidden items-center gap-1 lg:flex xl:gap-2"
             >
               {NAV_LINKS.map((link) => (
                 <a
@@ -173,7 +181,7 @@ export function SiteHeader() {
             <Button
               type="button"
               variant="ghost"
-              className="min-h-11 min-w-11 px-2 md:hidden"
+              className="min-h-11 min-w-11 px-2 text-sm min-[25rem]:text-base lg:hidden"
               aria-expanded={open}
               aria-controls="mobile-sections"
               onClick={toggle}
@@ -187,11 +195,17 @@ export function SiteHeader() {
             >
               <a href={AVELOZ_LINK.href} rel="noopener" aria-label={AVELOZ_LINK.block.text}>
                 {AVELOZ_LINK.short.text}
-                <span className="sr-only sm:not-sr-only">{AVELOZ_LINK.suffix.text}</span>
+                <span className="sr-only xl:not-sr-only">{AVELOZ_LINK.suffix.text}</span>
               </a>
             </Button>
-            <AccessLink variant="secondary" className="min-h-11 px-3 text-sm sm:px-4 sm:text-base">
-              {ACCESS_LABEL.text}
+            {/* The one call to action in the bar: a brand-gradient ring orbits it briefly on arrival. Phones
+                show the short label; its accessible name still starts with the full one. */}
+            <AccessLink
+              variant="secondary"
+              className="cta-attention min-h-11 px-3 text-sm sm:px-4 sm:text-base"
+            >
+              <span className="sr-only xl:not-sr-only">{ACCESS_LABEL.text}</span>{" "}
+              <span className="xl:hidden">{ACCESS_SHORT.text}</span>
             </AccessLink>
           </div>
         </div>
@@ -202,7 +216,7 @@ export function SiteHeader() {
           // While it fades out the closing sheet is invisible, so it takes no taps and no focus.
           inert={!open}
           data-open={open ? "true" : "false"}
-          className="mobile-sections border-t border-fg/10 md:hidden"
+          className="mobile-sections border-t border-fg/10 lg:hidden"
         >
           <div className="flex flex-col gap-1 px-4 py-3 md:px-6">
             {NAV_LINKS.map((link) => (

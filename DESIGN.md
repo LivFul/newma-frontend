@@ -246,6 +246,8 @@ The hero's diagram sits on a scrim, not a card: a feathered, borderless wash wit
 
 Capsule-shaped, 44px minimum on touch. Primary is tinted Liquid Glass: Ink on the Plant gradient with a specular rim and emerald glow. Secondary is a glass control (rim and translucent fill, no blur). Ghost is quiet. Danger is madder.
 
+The header's call to action reads "Demo" below 1280px and "Access NEWMA" from there. Its accessible name always starts with "Access NEWMA". It is a glass control inside a Plant-gradient ring (Lime, Emerald, Teal). On arrival the ring orbits twice with a soft emerald glow, in under five seconds (WCAG 2.2.2), and hovering replays one turn. Under reduced motion the ring stays still; under increased contrast it becomes a solid ink rim. The header keeps one row from 360px up: the wordmark steps down on phones (it never goes below 110px wide), and the section anchors appear from 1024px. Below that, Menu opens the sheet.
+
 ### Chips
 
 Rounded tags. Status vocabulary is the gate enum: PASS, HOLD, PENDING, FAIL, INVALIDATED, NOT_STARTED. Screen readers hear "Status: PASS".

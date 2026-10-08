@@ -52,17 +52,17 @@ describe("SiteHeader", () => {
       "href",
       "/#about",
     );
-    const access = within(header).getByRole("link", { name: "Access NEWMA" });
+    const access = within(header).getByRole("link", { name: /^Access NEWMA/ });
     expect(access).toHaveAttribute("href", "/access");
     expect(access.className).toMatch(/min-h-11/);
     expect(container.querySelector("header")?.className).toMatch(/sticky/);
   });
-  it("keeps Access NEWMA visible below md and hides the section anchors there", () => {
+  it("keeps Access NEWMA visible below lg and hides the section anchors there", () => {
     render(<SiteHeader />);
     const overview = screen.getByRole("link", { name: "Overview" });
     expect(overview.closest("nav")?.className).toMatch(/hidden/);
-    expect(overview.closest("nav")?.className).toMatch(/md:flex/);
-    expect(screen.getByRole("link", { name: "Access NEWMA" }).closest("nav")).toBeNull();
+    expect(overview.closest("nav")?.className).toMatch(/lg:flex/);
+    expect(screen.getByRole("link", { name: /^Access NEWMA/ }).closest("nav")).toBeNull();
   });
   it("links staff to Aveloz just before Access NEWMA, at every breakpoint", () => {
     render(<SiteHeader />);
@@ -73,8 +73,20 @@ describe("SiteHeader", () => {
     expect(aveloz).not.toHaveAttribute("target");
     expect(aveloz.className).toMatch(/min-h-11/);
     expect(aveloz.closest("nav")).toBeNull();
-    const access = within(header).getByRole("link", { name: "Access NEWMA" });
+    const access = within(header).getByRole("link", { name: /^Access NEWMA/ });
     expect(aveloz.compareDocumentPosition(access) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+  // Value: protects=below xl the call to action reads "Demo" so the logo, Menu, Aveloz and Demo share one row, while its accessible name still starts with "Access NEWMA" and contains the visible word (WCAG 2.5.3); it carries the attention ring;
+  //   fails_when=the short label shows at xl (both labels visible), the full label leaves the accessible name, the visible "Demo" drops out of the name, or the ring class is lost;
+  //   why_new=the header CTA had one label at every width; seam=none
+  it("labels the call to action Demo below xl and keeps Access NEWMA in its name", () => {
+    render(<SiteHeader />);
+    const access = within(screen.getByRole("banner")).getByRole("link", {
+      name: "Access NEWMA Demo",
+    });
+    expect(within(access).getByText("Access NEWMA").className).toBe("sr-only xl:not-sr-only");
+    expect(within(access).getByText("Demo").className).toBe("xl:hidden");
+    expect(access.className).toMatch(/(^|\s)cta-attention(\s|$)/);
   });
   it("shows short label 'Aveloz' on mobile with sr-only suffix", () => {
     render(<SiteHeader />);
@@ -84,7 +96,7 @@ describe("SiteHeader", () => {
     expect(aveloz.textContent).toMatch(/^Aveloz/);
     const suffix = within(aveloz).getByText("(LivFul staff)");
     expect(suffix.classList.contains("sr-only")).toBe(true);
-    expect(suffix.classList.contains("sm:not-sr-only")).toBe(true);
+    expect(suffix.classList.contains("xl:not-sr-only")).toBe(true);
   });
   // Value: protects=the open menu sheet closes on Escape (focus back on Menu) and when focus leaves the header, so a focused element never lands under the open sheet (WCAG 2.4.11);
   //   fails_when=the Escape or focusout handler is dropped, Escape strands focus, or focus moving between the header's own controls closes the sheet;
