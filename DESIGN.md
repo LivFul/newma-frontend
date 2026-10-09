@@ -262,7 +262,7 @@ A sticky, floating Liquid Glass capsule with the newmA wordmark. On mobile the c
 
 ### Appearance (user theme)
 
-Visitors choose **Light**, **Dark**, or **System** from an icon-only control in the header bar (`ThemeToggle`). With no stored preference, the site defaults to **Dark**. Choice persists in `localStorage` under `newma.theme.v1` and is applied with `useSyncExternalStore` (no React context): `ThemeSync` in the root layout mirrors storage onto `html` on every route.
+Visitors choose **Light**, **Dark**, or **System** from `ThemeToggle`. From the large layout breakpoint up, the control is icon-only in the header bar; below that it sits at the bottom of the mobile Menu sheet beside a **Theme** label. With no stored preference, the site defaults to **Dark**. Choice persists in `localStorage` under `newma.theme.v1` and is applied with `useSyncExternalStore` (no React context): `ThemeSync` in the root layout mirrors storage onto `html` on every route.
 
 - **Light:** `@theme` survey-paper tokens (`color.css`).
 - **Dark (default):** semantic remaps in `color.dark.css` on `.dark` or `@media (prefers-color-scheme: dark)` when `:root:not(.light)` — Night / Deep Teal stack; **plate tokens unchanged**.
