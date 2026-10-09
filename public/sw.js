@@ -3,6 +3,7 @@
 // files need no bump: a new worker re-runs install, which fetches the precache list into this cache.
 const CACHE = "newma-v2";
 const PRECACHE = [
+  "/theme-init.js",
   "/offline",
   "/brand/icon-192.png",
   "/brand/icon-512.png",

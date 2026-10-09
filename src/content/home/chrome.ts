@@ -59,6 +59,10 @@ export const FOOTER_NAV_LABEL = block("chrome.footer.nav", "Footer", ["C-30"]);
 export const HEADER_NAV_LABEL = block("chrome.header.nav", "Sections", []);
 export const HEADER_MENU = block("chrome.header.menu", "Menu", []);
 export const HEADER_MOBILE_NAV = block("chrome.header.mobile", "Mobile sections", []);
+export const THEME_GROUP_LABEL = block("chrome.header.theme", "Theme", []);
+export const THEME_LIGHT = block("chrome.header.theme.light", "Light", []);
+export const THEME_DARK = block("chrome.header.theme.dark", "Dark", []);
+export const THEME_SYSTEM = block("chrome.header.theme.system", "System", []);
 
 export const PWA_COPY = Object.freeze({
   region: block("chrome.pwa.region", "App install", []),

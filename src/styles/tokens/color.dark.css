@@ -1,0 +1,73 @@
+/* Dark survey-paper stack (Night / Deep Teal). Plate tokens in @theme are unchanged; .plate-surface
+   still remaps semantic tokens locally. System appearance uses the media block; explicit dark adds .dark. */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    color-scheme: dark;
+    --color-bg: #041b21;
+    --color-bg-elevated: #06242b;
+    --color-bg-deep: #0b3f4b;
+    --color-fg: #f1f6f1;
+    --color-fg-muted: #8fb3b0;
+    --color-accent: #7fe3d2;
+    --color-accent-fg: #041b21;
+    --color-prominent: #0fa36b;
+    --color-prominent-fg: #082b33;
+    --color-border: #0b3f4b;
+    --color-border-strong: #6f9a94;
+    --color-danger: #f08e7c;
+    --color-danger-fg: #06242b;
+    --color-warning: #8a5a00;
+    --color-warning-fg: #f1f6f1;
+    --color-success: #0b7a52;
+    --color-success-fg: #f1f6f1;
+    --color-focus: #7fe3d2;
+    --color-warning-ink: #f2c46b;
+    --color-success-ink: #2bc08e;
+    --color-route: #8a5a00;
+    --color-route-edge: #e8a67a;
+    --color-contour: #2e5c63;
+    --color-eco-compute-ink: #d4c4ff;
+    --color-eco-optional: #ef8f86;
+    --background-image-aurora:
+      radial-gradient(110% 75% at 10% 14%, rgb(15 163 107 / 0.18), transparent 55%),
+      radial-gradient(90% 70% at 90% 6%, rgb(28 138 153 / 0.22), transparent 52%),
+      radial-gradient(70% 60% at 70% 92%, rgb(6 36 43 / 0.92), transparent 60%),
+      linear-gradient(170deg, #041b21 0%, #06242b 45%, #0b3f4b 100%);
+    --background-image-peach: linear-gradient(180deg, #06242b 0%, #041b21 100%);
+  }
+}
+
+.dark {
+  color-scheme: dark;
+  --color-bg: #041b21;
+  --color-bg-elevated: #06242b;
+  --color-bg-deep: #0b3f4b;
+  --color-fg: #f1f6f1;
+  --color-fg-muted: #8fb3b0;
+  --color-accent: #7fe3d2;
+  --color-accent-fg: #041b21;
+  --color-prominent: #0fa36b;
+  --color-prominent-fg: #082b33;
+  --color-border: #0b3f4b;
+  --color-border-strong: #6f9a94;
+  --color-danger: #f08e7c;
+  --color-danger-fg: #06242b;
+  --color-warning: #8a5a00;
+  --color-warning-fg: #f1f6f1;
+  --color-success: #0b7a52;
+  --color-success-fg: #f1f6f1;
+  --color-focus: #7fe3d2;
+  --color-warning-ink: #f2c46b;
+  --color-success-ink: #2bc08e;
+  --color-route: #8a5a00;
+  --color-route-edge: #e8a67a;
+  --color-contour: #2e5c63;
+  --color-eco-compute-ink: #d4c4ff;
+  --color-eco-optional: #ef8f86;
+  --background-image-aurora:
+    radial-gradient(110% 75% at 10% 14%, rgb(15 163 107 / 0.18), transparent 55%),
+    radial-gradient(90% 70% at 90% 6%, rgb(28 138 153 / 0.22), transparent 52%),
+    radial-gradient(70% 60% at 70% 92%, rgb(6 36 43 / 0.92), transparent 60%),
+    linear-gradient(170deg, #041b21 0%, #06242b 45%, #0b3f4b 100%);
+  --background-image-peach: linear-gradient(180deg, #06242b 0%, #041b21 100%);
+}

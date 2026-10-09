@@ -70,9 +70,11 @@ describe("Wordmark", () => {
     const css = readFileSync(path.resolve(__dirname, "../../../src/app/globals.css"), "utf8");
     expect(css).toMatch(/\n\.wordmark-dark\s*\{\s*display:\s*none;/);
     const guarded = cssBlockAfter(css, "@media screen and (forced-colors: none)");
-    expect(guarded).toMatch(/\[data-tone="dark"\] \.wordmark-light\s*\{\s*display:\s*none;/);
-    expect(guarded).toMatch(/\[data-tone="dark"\] \.wordmark-dark\s*\{\s*display:\s*block;/);
-    // Nowhere else may a dark tone swap the lockup (forced-colours dark themes pick by colour scheme).
+    expect(guarded).toMatch(/\[data-tone="dark"\] \.wordmark-light[\s\S]*?display:\s*none;/);
+    expect(guarded).toMatch(/\[data-tone="dark"\] \.wordmark-dark[\s\S]*?display:\s*block;/);
+    expect(guarded).toMatch(/html\[data-theme="dark"\] \.wordmark-light[\s\S]*?display:\s*none;/);
+    expect(guarded).toMatch(/html\[data-theme="dark"\] \.wordmark-dark[\s\S]*?display:\s*block;/);
+    // No other dark-tone swap hooks (forced-colours dark themes pick by colour scheme).
     const elsewhere = css.replace(guarded, "");
     expect(elsewhere).not.toMatch(/\[data-tone="dark"\] \.wordmark-(light|dark)/);
   });

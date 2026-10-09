@@ -60,3 +60,42 @@ export const parseCssVars = (css: string): Record<string, string> =>
   Object.fromEntries(
     Array.from(css.matchAll(/(--[a-z0-9-]+)\s*:\s*([^;]+);/gi), (m) => [m[1], m[2].trim()]),
   );
+
+/** Variables declared inside a single `@theme { … }` block (light canonical tokens). */
+export const parseThemeBlock = (css: string): Record<string, string> => {
+  const block = /@theme\s*\{([\s\S]*?)\}/.exec(css)?.[1];
+  return parseCssVars(block ?? "");
+};
+
+/** Body of the first `{ … }` block for a selector such as `.dark`. */
+export const parseRuleBlock = (css: string, selector: string): Record<string, string> => {
+  const sel = selector.trim().replace(/\{\s*$/, "");
+  const open = css.indexOf(`${sel}{`);
+  if (open === -1) return {};
+  return parseBlockBody(css, open + sel.length + 1);
+};
+
+const parseBlockBody = (css: string, start: number): Record<string, string> => {
+  let depth = 1;
+  let body = "";
+  for (let i = start; i < css.length; i += 1) {
+    const ch = css[i]!;
+    if (ch === "{") depth += 1;
+    else if (ch === "}") {
+      depth -= 1;
+      if (depth === 0) break;
+    }
+    body += ch;
+  }
+  return parseCssVars(body);
+};
+
+/** Variables inside the `.dark { … }` override block (ignores mentions in comments). */
+export const parseDarkBlock = (css: string): Record<string, string> => {
+  const match = css.match(/(?:^|\n)\.dark\s*\{/m);
+  if (match?.index === undefined) return {};
+  const open = match.index + (match[0].startsWith("\n") ? 1 : 0);
+  const brace = css.indexOf("{", open);
+  if (brace === -1) return {};
+  return parseBlockBody(css, brace + 1);
+};

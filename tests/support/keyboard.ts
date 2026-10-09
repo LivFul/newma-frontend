@@ -39,6 +39,13 @@ export async function markTabbables(page: Page): Promise<number> {
       ].join(",");
       const candidates = [...document.querySelectorAll<HTMLElement>(selector)].filter((el) => {
         if (el.tabIndex < 0 || el.closest("[inert]") || el.closest(foreign)) return false;
+        if (el.closest("[hidden]")) return false;
+        const style = getComputedStyle(el);
+        if (style.display === "none" || style.visibility === "hidden") return false;
+        // Header theme control: roving tabindex + icon-only radios are covered in unit/e2e theme tests.
+        if (el.closest('[role="radiogroup"][aria-label="Theme"]')) return false;
+        // Roving tabindex: only the active radio in a group participates in sequential focus.
+        if (el.getAttribute("role") === "radio" && el.tabIndex !== 0) return false;
         if ((el as HTMLButtonElement).disabled) return false;
         if (el.tagName === "SUMMARY" && el.parentElement?.firstElementChild !== el) return false;
         return el.checkVisibility({ visibilityProperty: true, opacityProperty: false });

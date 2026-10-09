@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { contrastRatio, parseCssVars } from "@/lib/a11y/contrast";
+import { contrastRatio, parseCssVars, parseDarkBlock, parseThemeBlock } from "@/lib/a11y/contrast";
 
 const tokensDir = path.resolve(__dirname, "../../src/styles/tokens");
 const read = (f: string) => readFileSync(path.join(tokensDir, f), "utf8");
@@ -15,8 +15,11 @@ const cssFiles = (dir: string): string[] =>
   });
 
 describe("design tokens", () => {
-  it("every declared text/background pair meets 4.5:1", () => {
-    const vars = { ...parseCssVars(read("color.css")), ...parseCssVars(read("ecosystem.css")) };
+  it("every declared text/background pair meets 4.5:1 on the light theme", () => {
+    const vars = {
+      ...parseThemeBlock(read("color.css")),
+      ...parseThemeBlock(read("ecosystem.css")),
+    };
     const pairs = JSON.parse(read("contrast-pairs.json")) as {
       fg: string;
       bg: string;
@@ -31,6 +34,26 @@ describe("design tokens", () => {
         `${fg} needs a pair on ${base}`,
       ).toBe(true);
     }
+    for (const p of pairs) {
+      expect(vars[p.fg], p.fg).toBeDefined();
+      expect(vars[p.bg], p.bg).toBeDefined();
+      expect(contrastRatio(vars[p.fg], vars[p.bg]), `${p.fg} on ${p.bg}`).toBeGreaterThanOrEqual(
+        p.min,
+      );
+    }
+  });
+
+  it("every declared text/background pair meets its minimum on the dark survey-paper stack", () => {
+    const vars = {
+      ...parseThemeBlock(read("color.css")),
+      ...parseThemeBlock(read("ecosystem.css")),
+      ...parseDarkBlock(read("color.dark.css")),
+    };
+    const pairs = JSON.parse(read("contrast-pairs.json")) as {
+      fg: string;
+      bg: string;
+      min: number;
+    }[];
     for (const p of pairs) {
       expect(vars[p.fg], p.fg).toBeDefined();
       expect(vars[p.bg], p.bg).toBeDefined();

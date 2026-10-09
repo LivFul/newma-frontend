@@ -16,11 +16,17 @@ import {
 import { expect, test } from "../support/test";
 
 const PUBLIC_PAGES = ["/", "/ecosystem/wet-lab", "/access"] as const;
+const THEME_STORAGE_KEY = "newma.theme.v1";
 const W10 = "/demo/w10-custodian";
 
 test.skip(({ isMobile }) => isMobile, "keyboard walks run on the desktop project");
 
 async function ready(page: Page, path: string): Promise<void> {
+  if (path === "/" || path.startsWith("/ecosystem/")) {
+    await page.addInitScript((key) => {
+      window.localStorage.setItem(key, "light");
+    }, THEME_STORAGE_KEY);
+  }
   await page.goto(path);
   await page.waitForLoadState("networkidle");
   // The interactive hero replaces the static one on idle; walk the elements that stay.

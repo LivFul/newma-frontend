@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Work_Sans } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { HOME_META } from "@/content/home/copy";
 import { BACKGROUND_HEX, BRAND_HEX } from "@/lib/brand";
+import { ThemeSync } from "@/components/site/theme-sync";
+import { THEME_INIT_SRC } from "@/lib/theme/init-script";
 import { siteUrl } from "@/lib/site";
 
 // Brand pack v1.0 typefaces: Work Sans (headlines, UI, body) and Geist Mono (bylines, labels, data).
@@ -44,10 +47,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  colorScheme: "light",
+  colorScheme: "light dark",
   themeColor: [
+    { color: BRAND_HEX.night },
     { media: "(prefers-color-scheme: light)", color: BACKGROUND_HEX },
-    { media: "(prefers-color-scheme: dark)", color: BRAND_HEX.night },
   ],
   viewportFit: "cover",
 };
@@ -57,11 +60,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`h-full antialiased ${workSans.variable} ${geistMono.variable}`}
+      data-theme="dark"
+      className={`dark h-full antialiased ${workSans.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
     >
+      <Script id="theme-init" src={THEME_INIT_SRC} strategy="beforeInteractive" />
       {/* Extensions such as Grammarly stamp attributes on <body> before hydration; this silences only
           that element's attribute check, never its children. */}
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
+        <ThemeSync />
         <a
           href="#main"
           className="sr-only top-0 left-0 focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-fg focus:px-4 focus:py-2 focus:text-bg"

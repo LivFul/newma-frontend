@@ -48,6 +48,16 @@ body {
   background: var(--color-leaf-bright);
   color: var(--color-capsule-deep);
 }
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) ::selection {
+    background: var(--color-leaf-bright);
+    color: var(--color-capsule-deep);
+  }
+}
+.dark ::selection {
+  background: var(--color-leaf-bright);
+  color: var(--color-capsule-deep);
+}
 a {
   text-underline-offset: 0.22em;
   text-decoration-thickness: 1px;
@@ -690,10 +700,12 @@ main[tabindex="-1"]:focus-visible {
     --color-focus: var(--color-plate-focus);
     color-scheme: dark;
   }
-  [data-tone="dark"] .wordmark-light {
+  [data-tone="dark"] .wordmark-light,
+  html[data-theme="dark"] .wordmark-light {
     display: none;
   }
-  [data-tone="dark"] .wordmark-dark {
+  [data-tone="dark"] .wordmark-dark,
+  html[data-theme="dark"] .wordmark-dark {
     display: block;
   }
 }

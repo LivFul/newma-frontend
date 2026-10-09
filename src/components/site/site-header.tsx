@@ -14,6 +14,7 @@ import {
 } from "@/content/home/chrome";
 import { Button } from "@/components/ui/button";
 import { AccessLink } from "./access-link";
+import { ThemeToggle } from "./theme-toggle";
 import { Wordmark } from "./wordmark";
 
 const MOBILE_SECTIONS_ID = "mobile-sections";
@@ -240,6 +241,7 @@ export function SiteHeader() {
               <span className="sr-only xl:not-sr-only">{ACCESS_LABEL.text}</span>{" "}
               <span className="xl:hidden">{ACCESS_SHORT.text}</span>
             </AccessLink>
+            <ThemeToggle className="shrink-0" />
           </div>
         </div>
         <nav

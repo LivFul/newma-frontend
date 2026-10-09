@@ -260,6 +260,16 @@ Elevated white on light grounds, `.surface-material` on plates. Not glass. The s
 
 A sticky, floating Liquid Glass capsule with the newmA wordmark. On mobile the capsule grows into a rounded glass sheet for section links. The footer is a Night band with the reversed logo and byline on screen and in a dark forced-colours theme; print and a light forced-colours theme show the dark-ink logo instead.
 
+### Appearance (user theme)
+
+Visitors choose **Light**, **Dark**, or **System** from an icon-only control in the header bar (`ThemeToggle`). With no stored preference, the site defaults to **Dark**. Choice persists in `localStorage` under `newma.theme.v1` and is applied with `useSyncExternalStore` (no React context): `ThemeSync` in the root layout mirrors storage onto `html` on every route.
+
+- **Light:** `@theme` survey-paper tokens (`color.css`).
+- **Dark (default):** semantic remaps in `color.dark.css` on `.dark` or `@media (prefers-color-scheme: dark)` when `:root:not(.light)` — Night / Deep Teal stack; **plate tokens unchanged**.
+- **Classes:** `html.light` and `html.dark` are manual overrides; **System** follows the OS via media query when neither class is set.
+- **Independent of header tone:** scroll-based `[data-site-header][data-tone]` (content beneath the capsule) still drives glass and wordmark swaps; it is not the user theme preference.
+- **Browser chrome:** `#newma-theme-color` meta tracks the resolved stack (`#f1f6f1` / `#06242b`).
+
 ### Ecosystem diagram
 
 The homepage diagram is a three-column pipeline: Input (Interface as People plus API), AI core (Agentic Compute and Scientific Review in a refinement loop over a records server — Data on the lower rack, Provenance dashed on the upper rack), and Validation (Wet Lab). There is no Clinical column. Keyboard, no-JS static SVG and a lazy Motion twin are required. Hover or focus explodes the columns; reduced motion shows the exploded view at rest.

@@ -44,11 +44,10 @@ The demo platform (`/demo`, W1–W10 + guided tour) is used by those same visito
 
 ## Brand commitments
 
-- **Align with LivFul.** NEWMA is a LivFul product and should read as part of the LivFul family. Observed on livful.com (2026-10-04): display face "Fabio XM" (weight 500), deep ink-teal `#09191F` text, sage `#8DBAB3`, apricot `#FBD699`, slate-teal `#5D777A`, parchment `#EBE5DE`, mint wash `#E8F2EF`; light, calm, mission-driven tone; sage-to-apricot gradient surfaces. Fabio XM licensing for NEWMA is an **open decision**. Staytec (staytec.net) is the sibling product reference for full-bleed photography, peach bands and a scientific-but-human tone.
-- **Keep the concepts** of the interactive ecosystem graphic (six components; pipeline layout) and the 3D workflow scene; restyling is allowed.
-- **Mark language.** The official lockup's leaf and capsule are the site's recurring icons. The public site is ethnobotanical and pharma-inspired, not a printed survey sheet.
+- **Align with LivFul.** NEWMA is a LivFul product. Shipped identity follows brand pack v1.0: Work Sans and Geist Mono, Mist / Ink / Night / Teal / Emerald / Lime palette, NEWMA wordmark and capsule mark, Liquid Glass header and aurora hero — documented in `DESIGN.md` and `docs/newma_brand_pack/`.
+- **Keep the concepts** of the interactive ecosystem graphic (six components; pipeline layout) and the 3D workflow scene; restyling must stay within the token system.
+- **Mark language.** The capsule icon and Plant / Pill gradients are the recurring glyphs. The public site is ethnobotanical and pharma-inspired in a glass shell, not a printed survey sheet.
 
 ## Open decisions
 
-- Whether NEWMA uses LivFul's licensed display face or a compatible substitute.
-- Official LivFul logo usage on NEWMA surfaces.
+- Official LivFul parent-logo usage on NEWMA surfaces beyond the wordmark byline.

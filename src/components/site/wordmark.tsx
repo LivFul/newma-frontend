@@ -28,7 +28,7 @@ type WordmarkProps = {
   href?: string;
   label?: string;
   lockup?: keyof typeof LOCKUPS;
-  /** `adaptive` ships both colourways and lets the nearest `[data-tone]` ancestor pick one. */
+  /** `adaptive` ships both colourways; CSS swaps on `[data-tone="dark"]` or `html[data-theme="dark"]`. */
   tone?: "light" | "dark" | "adaptive";
   /** Size classes. Set a height; the width follows the lockup's ratio. */
   imageClassName?: string;
