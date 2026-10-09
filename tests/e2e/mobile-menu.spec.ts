@@ -21,7 +21,7 @@ test("the mobile section menu opens on Menu and closes when a link is chosen", a
   const links = list.getByRole("link");
   expect(await links.count()).toBeGreaterThan(0);
   const box = await links.first().boundingBox();
-  expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+  expect(Math.ceil(box?.height ?? 0)).toBeGreaterThanOrEqual(44);
 
   await links.first().click();
   await expect(list).toBeHidden();

@@ -39,6 +39,8 @@ export async function markTabbables(page: Page): Promise<number> {
       ].join(",");
       const candidates = [...document.querySelectorAll<HTMLElement>(selector)].filter((el) => {
         if (el.tabIndex < 0 || el.closest("[inert]") || el.closest(foreign)) return false;
+        // Roving tabindex: only the active radio in a group participates in sequential focus.
+        if (el.getAttribute("role") === "radio" && el.tabIndex !== 0) return false;
         if ((el as HTMLButtonElement).disabled) return false;
         if (el.tagName === "SUMMARY" && el.parentElement?.firstElementChild !== el) return false;
         return el.checkVisibility({ visibilityProperty: true, opacityProperty: false });
