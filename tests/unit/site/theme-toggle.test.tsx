@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SiteHeader } from "@/components/site/site-header";
@@ -13,7 +13,7 @@ describe("ThemeToggle in SiteHeader", () => {
     document.documentElement.classList.remove("dark", "light");
   });
 
-  it("stores dark when chosen from the single header theme control", async () => {
+  it("stores dark when chosen from the theme control in the mobile menu", async () => {
     const user = userEvent.setup();
     render(
       <>
@@ -21,8 +21,10 @@ describe("ThemeToggle in SiteHeader", () => {
         <SiteHeader />
       </>,
     );
-    const header = screen.getByRole("banner");
-    const group = within(header).getByRole("radiogroup", { name: "Theme" });
+    fireEvent.click(screen.getByRole("button", { name: "Menu" }));
+    const menu = document.getElementById("mobile-sections");
+    expect(menu).not.toBeNull();
+    const group = within(menu!).getByRole("radiogroup", { name: "Theme" });
     expect(within(group).getAllByRole("radio")).toHaveLength(3);
     await user.click(within(group).getByRole("radio", { name: "Light" }));
     expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe("light");

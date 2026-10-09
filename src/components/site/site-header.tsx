@@ -11,6 +11,7 @@ import {
   HEADER_MOBILE_NAV,
   HEADER_NAV_LABEL,
   NAV_LINKS,
+  THEME_GROUP_LABEL,
 } from "@/content/home/chrome";
 import { Button } from "@/components/ui/button";
 import { AccessLink } from "./access-link";
@@ -241,7 +242,7 @@ export function SiteHeader() {
               <span className="sr-only xl:not-sr-only">{ACCESS_LABEL.text}</span>{" "}
               <span className="xl:hidden">{ACCESS_SHORT.text}</span>
             </AccessLink>
-            <ThemeToggle className="shrink-0" />
+            <ThemeToggle className="hidden shrink-0 lg:inline-flex" />
           </div>
         </div>
         <nav
@@ -264,6 +265,10 @@ export function SiteHeader() {
                 {link.block.text}
               </a>
             ))}
+            <div className="-mx-2 flex min-h-11 items-center justify-between gap-3 rounded-full px-2">
+              <span className="text-fg">{THEME_GROUP_LABEL.text}</span>
+              <ThemeToggle />
+            </div>
           </div>
         </nav>
       </div>
