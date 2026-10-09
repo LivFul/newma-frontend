@@ -2,6 +2,12 @@
 
 All notable changes to the NEWMA frontend. Versions follow the `VERSION` file (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [0.2.0.1] - 2026-10-09
+
+### Fixed
+
+- On phones and narrow layouts, the appearance control (Light, Dark, System) lives in the Menu sheet with the section links instead of crowding the header bar; desktop keeps the icon control in the bar.
+
 ## [0.2.0.0] - 2026-10-09
 
 ### Added
