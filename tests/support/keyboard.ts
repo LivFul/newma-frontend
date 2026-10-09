@@ -60,7 +60,12 @@ export async function markTabbables(page: Page): Promise<number> {
 export async function describeFocus(page: Page): Promise<FocusStop | undefined> {
   return page.evaluate(
     ({ mark, foreign }) => {
-      const el = document.activeElement as HTMLElement | null;
+      let el = document.activeElement as HTMLElement | null;
+      if (!el || el === document.body || el === document.documentElement) return undefined;
+      // Focus may sit on a decorative child (SVG, span) while the tab stop is the ancestor.
+      while (el && !el.hasAttribute(mark) && el !== document.body && el !== document.documentElement) {
+        el = el.parentElement;
+      }
       if (!el || el === document.body || el === document.documentElement) return undefined;
       const style = getComputedStyle(el);
       const outline = style.outlineStyle !== "none" && parseFloat(style.outlineWidth) > 0;
