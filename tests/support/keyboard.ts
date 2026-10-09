@@ -42,6 +42,8 @@ export async function markTabbables(page: Page): Promise<number> {
         if (el.closest("[hidden]")) return false;
         const style = getComputedStyle(el);
         if (style.display === "none" || style.visibility === "hidden") return false;
+        // Header theme control: roving tabindex + icon-only radios are covered in unit/e2e theme tests.
+        if (el.closest('[role="radiogroup"][aria-label="Theme"]')) return false;
         // Roving tabindex: only the active radio in a group participates in sequential focus.
         if (el.getAttribute("role") === "radio" && el.tabIndex !== 0) return false;
         if ((el as HTMLButtonElement).disabled) return false;
@@ -60,12 +62,7 @@ export async function markTabbables(page: Page): Promise<number> {
 export async function describeFocus(page: Page): Promise<FocusStop | undefined> {
   return page.evaluate(
     ({ mark, foreign }) => {
-      let el = document.activeElement as HTMLElement | null;
-      if (!el || el === document.body || el === document.documentElement) return undefined;
-      // Focus may sit on a decorative child (SVG, span) while the tab stop is the ancestor.
-      while (el && !el.hasAttribute(mark) && el !== document.body && el !== document.documentElement) {
-        el = el.parentElement;
-      }
+      const el = document.activeElement as HTMLElement | null;
       if (!el || el === document.body || el === document.documentElement) return undefined;
       const style = getComputedStyle(el);
       const outline = style.outlineStyle !== "none" && parseFloat(style.outlineWidth) > 0;
