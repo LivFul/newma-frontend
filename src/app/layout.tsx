@@ -5,7 +5,7 @@ import "./globals.css";
 import { HOME_META } from "@/content/home/copy";
 import { BACKGROUND_HEX, BRAND_HEX } from "@/lib/brand";
 import { ThemeSync } from "@/components/site/theme-sync";
-import { THEME_INIT_SCRIPT } from "@/lib/theme/init-script";
+import { THEME_INIT_SRC } from "@/lib/theme/init-script";
 import { siteUrl } from "@/lib/site";
 
 // Brand pack v1.0 typefaces: Work Sans (headlines, UI, body) and Geist Mono (bylines, labels, data).
@@ -60,12 +60,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       data-scroll-behavior="smooth"
+      data-theme="dark"
       className={`dark h-full antialiased ${workSans.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
-      <Script id="theme-init" strategy="beforeInteractive">
-        {THEME_INIT_SCRIPT}
-      </Script>
+      <Script id="theme-init" src={THEME_INIT_SRC} strategy="beforeInteractive" />
       {/* Extensions such as Grammarly stamp attributes on <body> before hydration; this silences only
           that element's attribute check, never its children. */}
       <body className="flex min-h-full flex-col" suppressHydrationWarning>

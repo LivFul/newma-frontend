@@ -16,3 +16,6 @@ tests/fixtures/canonical/
 
 # Brand pack v1.0 as delivered; kept byte-identical to the designer's files
 docs/newma_brand_pack/
+
+# Minified, byte-synced with src/lib/theme/init-script.ts (tests/unit/theme/init-script.test.ts)
+public/theme-init.js

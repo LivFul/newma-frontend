@@ -11,8 +11,7 @@ import {
 import { readPreference, readResolved, subscribe } from "./storage";
 
 const serverPreference = (): ThemePreference => DEFAULT_THEME_PREFERENCE;
-const serverResolved = (): ResolvedTheme =>
-  resolveTheme(DEFAULT_THEME_PREFERENCE, false);
+const serverResolved = (): ResolvedTheme => resolveTheme(DEFAULT_THEME_PREFERENCE, false);
 
 /** Subscribes to preference storage and mirrors it onto `html` (mount once per document). */
 export function useThemeApplicator(): void {

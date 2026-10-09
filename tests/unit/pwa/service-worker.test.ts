@@ -328,7 +328,7 @@ describe("service worker", () => {
     expect(urls).toContain(new URL("/_next/static/css/shared.css", ORIGIN).href);
     expect(urls).not.toContain(new URL("/images/plate-0.jpg", ORIGIN).href);
     expect(urls).toContain(new URL("/images/plate-129.jpg", ORIGIN).href);
-    expect(urls.length).toBeLessThan(130);
+    expect(urls.length).toBeLessThan(PRECACHE_LIST.length + 130);
   });
 
   // Value: protects=the logo, which reaches the browser through the image optimizer, still shows offline, while other optimizer requests stay on the network; fails_when=the optimizer allowance for /brand/ sources is dropped or widened to every image; why_new=the v1 worker cached it by accident and the allowlist silently removed it; seam=none

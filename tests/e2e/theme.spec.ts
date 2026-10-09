@@ -11,9 +11,7 @@ test("defaults to dark when no preference is stored", async ({ page }) => {
     window.localStorage.removeItem(key);
   }, STORAGE_KEY);
   await gotoHeroReady(page);
-  await expect
-    .poll(() => page.evaluate(() => document.documentElement.dataset.theme))
-    .toBe("dark");
+  await expect.poll(() => page.evaluate(() => document.documentElement.dataset.theme)).toBe("dark");
   await expect
     .poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor))
     .toBe(NIGHT_RGB);
@@ -28,16 +26,12 @@ test("applies stored dark tokens, updates theme-color, and scrolls with header t
   }, STORAGE_KEY);
   await gotoHeroReady(page);
 
-  await expect
-    .poll(() => page.evaluate(() => document.documentElement.dataset.theme))
-    .toBe("dark");
+  await expect.poll(() => page.evaluate(() => document.documentElement.dataset.theme)).toBe("dark");
   await expect
     .poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor))
     .toBe(NIGHT_RGB);
   await expect(page.locator("#newma-theme-color")).toHaveAttribute("content", "#06242b");
-  await expect(
-    page.locator("[data-site-header] img.wordmark-light"),
-  ).toBeHidden();
+  await expect(page.locator("[data-site-header] img.wordmark-light")).toBeHidden();
   await expect(page.locator("[data-site-header] img.wordmark-dark")).toBeVisible();
 
   await page.getByRole("radio", { name: "Light" }).click();
@@ -47,10 +41,7 @@ test("applies stored dark tokens, updates theme-color, and scrolls with header t
   await expect(page.locator("#newma-theme-color")).toHaveAttribute("content", "#f1f6f1");
 
   await page.getByRole("radio", { name: "Dark" }).click();
-  await page
-    .locator("[data-site-header]")
-    .getByRole("link", { name: "How it works" })
-    .click();
+  await page.locator("[data-site-header]").getByRole("link", { name: "How it works" }).click();
   await expect(page).toHaveURL(/#workflow$/);
   await expect
     .poll(() =>
@@ -64,9 +55,7 @@ test("access shell keeps a stored dark theme", async ({ page }) => {
     window.localStorage.setItem(key, "dark");
   }, STORAGE_KEY);
   await page.goto("/access");
-  await expect
-    .poll(() => page.evaluate(() => document.documentElement.dataset.theme))
-    .toBe("dark");
+  await expect.poll(() => page.evaluate(() => document.documentElement.dataset.theme)).toBe("dark");
   await expect(page.getByRole("link", { name: /NEWMA/i })).toBeVisible();
   await expect(page.locator("img.wordmark-light")).toBeHidden();
   await expect(page.locator("img.wordmark-dark")).toBeVisible();

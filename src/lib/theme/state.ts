@@ -13,10 +13,7 @@ export function parsePreference(raw: string | null): ThemePreference {
   return DEFAULT_THEME_PREFERENCE;
 }
 
-export function resolveTheme(
-  preference: ThemePreference,
-  prefersDark: boolean,
-): ResolvedTheme {
+export function resolveTheme(preference: ThemePreference, prefersDark: boolean): ResolvedTheme {
   if (preference === "dark") return "dark";
   if (preference === "light") return "light";
   return prefersDark ? "dark" : "light";

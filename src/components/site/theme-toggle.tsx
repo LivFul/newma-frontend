@@ -2,12 +2,7 @@
 
 import * as RadixRadio from "radix-ui/radio-group";
 import { cva } from "class-variance-authority";
-import {
-  THEME_DARK,
-  THEME_GROUP_LABEL,
-  THEME_LIGHT,
-  THEME_SYSTEM,
-} from "@/content/home/chrome";
+import { THEME_DARK, THEME_GROUP_LABEL, THEME_LIGHT, THEME_SYSTEM } from "@/content/home/chrome";
 import { cn } from "@/lib/cn";
 import { useThemePreference } from "@/lib/theme/use-theme-preference";
 import type { ThemePreference } from "@/lib/theme/state";
@@ -37,10 +32,7 @@ function ThemeIcon({ mode }: { mode: ThemePreference }) {
   if (mode === "dark") {
     return (
       <svg {...common} viewBox="0 0 24 24" fill="none">
-        <path
-          fill="currentColor"
-          d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5Z"
-        />
+        <path fill="currentColor" d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5Z" />
       </svg>
     );
   }
@@ -76,12 +68,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       }}
     >
       {OPTIONS.map(({ value, label }) => (
-        <RadixRadio.Item
-          key={value}
-          value={value}
-          aria-label={label}
-          className={segment()}
-        >
+        <RadixRadio.Item key={value} value={value} aria-label={label} className={segment()}>
           <ThemeIcon mode={value} />
           <span className="sr-only">{label}</span>
         </RadixRadio.Item>

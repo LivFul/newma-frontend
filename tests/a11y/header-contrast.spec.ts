@@ -60,8 +60,13 @@ async function darkestBackdrop(page: Page, decoder: Page): Promise<string> {
   return darkest;
 }
 
+const THEME_STORAGE_KEY = "newma.theme.v1";
+
 for (const width of [1024, 1440]) {
   test(`muted header labels stay AA over the hero at ${width}px`, async ({ page, context }) => {
+    await page.addInitScript((key) => {
+      window.localStorage.setItem(key, "light");
+    }, THEME_STORAGE_KEY);
     await page.setViewportSize({ width, height: 900 });
     // The hero's drifting line pattern would make the darkest pixel depend on timing.
     await page.emulateMedia({ reducedMotion: "reduce" });

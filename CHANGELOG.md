@@ -2,6 +2,22 @@
 
 All notable changes to the NEWMA frontend. Versions follow the `VERSION` file (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [0.2.0.0] - 2026-10-09
+
+### Added
+
+- A three-way appearance control in the site header lets you choose Light, Dark, or System; your choice is remembered on every page.
+- Dark survey-paper colours apply across the marketing site when you pick Dark or when no choice is stored yet (Dark is the default).
+
+### Changed
+
+- The reversed NEWMA lockup shows in user Dark mode on access, demo, offline, and every adaptive wordmark, not only the home header.
+- Theme boot runs from a first-party script so strict content security on demo sign-in stays violation-free.
+
+### Fixed
+
+- Header contrast and keyboard checks run against the intended light hero by setting Light in storage for those tests only.
+
 ## [0.1.1.0] - 2026-10-08
 
 ### Changed

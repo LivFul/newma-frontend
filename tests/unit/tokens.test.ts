@@ -16,7 +16,10 @@ const cssFiles = (dir: string): string[] =>
 
 describe("design tokens", () => {
   it("every declared text/background pair meets 4.5:1 on the light theme", () => {
-    const vars = { ...parseThemeBlock(read("color.css")), ...parseThemeBlock(read("ecosystem.css")) };
+    const vars = {
+      ...parseThemeBlock(read("color.css")),
+      ...parseThemeBlock(read("ecosystem.css")),
+    };
     const pairs = JSON.parse(read("contrast-pairs.json")) as {
       fg: string;
       bg: string;

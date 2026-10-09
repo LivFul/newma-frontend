@@ -24,6 +24,8 @@ describe("ThemeToggle in SiteHeader", () => {
     const header = screen.getByRole("banner");
     const group = within(header).getByRole("radiogroup", { name: "Theme" });
     expect(within(group).getAllByRole("radio")).toHaveLength(3);
+    await user.click(within(group).getByRole("radio", { name: "Light" }));
+    expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe("light");
     await user.click(within(group).getByRole("radio", { name: "Dark" }));
     expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe("dark");
     expect(document.documentElement.classList.contains("dark")).toBe(true);

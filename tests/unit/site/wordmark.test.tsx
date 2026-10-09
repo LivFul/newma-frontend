@@ -72,12 +72,8 @@ describe("Wordmark", () => {
     const guarded = cssBlockAfter(css, "@media screen and (forced-colors: none)");
     expect(guarded).toMatch(/\[data-tone="dark"\] \.wordmark-light[\s\S]*?display:\s*none;/);
     expect(guarded).toMatch(/\[data-tone="dark"\] \.wordmark-dark[\s\S]*?display:\s*block;/);
-    expect(guarded).toMatch(
-      /html\[data-theme="dark"\] \.wordmark-light[\s\S]*?display:\s*none;/,
-    );
-    expect(guarded).toMatch(
-      /html\[data-theme="dark"\] \.wordmark-dark[\s\S]*?display:\s*block;/,
-    );
+    expect(guarded).toMatch(/html\[data-theme="dark"\] \.wordmark-light[\s\S]*?display:\s*none;/);
+    expect(guarded).toMatch(/html\[data-theme="dark"\] \.wordmark-dark[\s\S]*?display:\s*block;/);
     // No other dark-tone swap hooks (forced-colours dark themes pick by colour scheme).
     const elsewhere = css.replace(guarded, "");
     expect(elsewhere).not.toMatch(/\[data-tone="dark"\] \.wordmark-(light|dark)/);

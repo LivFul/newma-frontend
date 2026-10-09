@@ -10,8 +10,7 @@ import {
 import { readPreference, readResolved, subscribe, writePreference } from "./storage";
 
 const serverPreference = (): ThemePreference => DEFAULT_THEME_PREFERENCE;
-const serverResolved = (): ResolvedTheme =>
-  resolveTheme(DEFAULT_THEME_PREFERENCE, false);
+const serverResolved = (): ResolvedTheme => resolveTheme(DEFAULT_THEME_PREFERENCE, false);
 
 export type UseThemePreference = Readonly<{
   preference: ThemePreference;
