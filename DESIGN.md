@@ -238,7 +238,7 @@ Springs are CSS `linear()` curves sampled from damped-spring step responses, wit
 
 Only the hero cascades: its actions and disclaimer rise in 60ms steps, the one orchestrated entrance on the page. The headline, tagline and lede paint with the first frame, because on phones the lede is the LCP node. Section reveals rise as a whole and their children only fade in with them. Stagger steps are literal class names in `src/components/site/type.ts` so Tailwind can generate them, and the step index is a type, so an out-of-range step fails to compile.
 
-The hero's diagram sits on a scrim, not a card: a feathered, borderless wash with no blur, densest under the caption and hint (`--hero-scrim-text`) and lightest at the top where only the photo shows. `tests/unit/site/hero-stage.test.ts` proves AA for the muted caption text from that alpha over a black photo pixel, so the check does not depend on viewport width.
+The hero's diagram uses the stage wash only (no separate caption scrim): a feathered, borderless layer with no blur that lifts the forest photo toward the page colour. Caption and map legend use `text-fg-muted` on the page stack. `tests/unit/site/hero-stage.test.ts` asserts the caption scrim layer is absent so dark theme does not add an extra shade behind the diagram footer.
 
 ## Components
 

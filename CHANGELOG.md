@@ -2,6 +2,12 @@
 
 All notable changes to the NEWMA frontend. Versions follow the `VERSION` file (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [0.2.0.2] - 2026-10-10
+
+### Changed
+
+- The home hero no longer places a feathered scrim behind the ecosystem diagram caption and map legend; caption text sits on the page stack with muted ink only, including in dark theme.
+
 ## [0.2.0.1] - 2026-10-09
 
 ### Fixed
