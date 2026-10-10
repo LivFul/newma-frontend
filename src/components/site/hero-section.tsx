@@ -44,11 +44,7 @@ export function HeroSection() {
               data-hero-actions
             >
               <Button asChild variant="secondary" size="lg" className="min-h-12 max-w-full">
-                <a
-                  href={AVELOZ_LINK.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href={AVELOZ_LINK.href} target="_blank" rel="noopener noreferrer">
                   {HERO_MIRROR_LINKS.aveloz.text}
                 </a>
               </Button>

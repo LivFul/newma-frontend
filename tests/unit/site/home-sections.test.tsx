@@ -57,9 +57,10 @@ describe("home page composition", () => {
   it("offers the three hero action links with the platform link to /access", () => {
     renderHome();
     const hero = document.getElementById("hero")!;
-    expect(
-      within(hero).getByRole("link", { name: HERO_MIRROR_LINKS.aveloz.text }),
-    ).toHaveAttribute("href", "https://aveloz.livful.com");
+    expect(within(hero).getByRole("link", { name: HERO_MIRROR_LINKS.aveloz.text })).toHaveAttribute(
+      "href",
+      "https://aveloz.livful.com",
+    );
     expect(within(hero).getByRole("link", { name: PLATFORM_CTA.text })).toHaveAttribute(
       "href",
       "/access",
