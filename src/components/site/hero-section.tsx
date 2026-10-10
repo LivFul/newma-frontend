@@ -65,15 +65,7 @@ export function HeroSection() {
         {/* On wide screens the diagram hugs the copy column (hero-eco, ecosystem-graphic.css) instead of
             centring in its half, which left a wide empty gutter between the two. */}
         <div className="hero-eco relative px-5 py-8 md:px-12 lg:col-span-6 lg:pl-4">
-          <div className="relative">
-            <div
-              className="hero-caption-scrim pointer-events-none absolute -right-12 -bottom-8 -left-16 hidden h-96 lg:block"
-              aria-hidden="true"
-            />
-            <div className="relative">
-              <EcosystemGraphic />
-            </div>
-          </div>
+          <EcosystemGraphic />
         </div>
       </div>
     </section>
