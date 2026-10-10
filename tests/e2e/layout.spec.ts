@@ -11,7 +11,7 @@ const TOLERANCE_PX = 1;
 for (const width of [768, 1280]) {
   test(`the About purpose text sits in two columns at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("/");
+    await page.goto("/about");
     const [lede, body] = await page
       .locator("[data-about-purpose] > p")
       .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().toJSON() as DOMRect));
@@ -22,7 +22,7 @@ for (const width of [768, 1280]) {
 
 test("the About purpose text stacks below md", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 900 });
-  await page.goto("/");
+  await page.goto("/about");
   const [lede, body] = await page
     .locator("[data-about-purpose] > p")
     .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().toJSON() as DOMRect));
@@ -35,7 +35,7 @@ for (const width of [320, 1280, 1920]) {
     page,
   }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("/");
+    await page.goto("/how-it-works");
     // vw includes a classic scrollbar; the content box the block centres in does not.
     const { box, viewport, content } = await page.locator("#workflow .wf-bleed").evaluate((el) => ({
       box: el.getBoundingClientRect().toJSON() as DOMRect,

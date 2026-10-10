@@ -11,19 +11,25 @@ export const WORDMARK = Object.freeze({
 });
 
 export const NAV_LINKS = Object.freeze([
-  Object.freeze({ block: block("chrome.nav.overview", "Overview", []), href: "/#product" }),
+  Object.freeze({ block: block("chrome.nav.overview", "Overview", []), href: "/overview" }),
   Object.freeze({
     block: block("chrome.nav.how", "How it works", []),
-    href: "/#workflow",
+    href: "/how-it-works",
   }),
-  Object.freeze({ block: block("chrome.nav.ecosystem", "Ecosystem", []), href: "/#components" }),
-  Object.freeze({ block: block("chrome.nav.about", "About Newma", []), href: "/#about" }),
+  Object.freeze({ block: block("chrome.nav.ecosystem", "Ecosystem", []), href: "/ecosystem" }),
+  Object.freeze({ block: block("chrome.nav.about", "About Newma", []), href: "/about" }),
 ]);
 
 export const ACCESS_LABEL = block("chrome.access", "Access NEWMA", ["C-21"]);
 // The header's label for the same link below xl (1280px); "Access NEWMA" stays in its accessible name.
 export const ACCESS_SHORT = block("chrome.access.short", "Demo", ["C-21"]);
-export const DEMO_CTA = block("chrome.demo", "Explore the demo", ["C-21"]);
+export const PLATFORM_CTA = block("chrome.platform", "Explore the Platform", ["C-21"]);
+
+export const HERO_MIRROR_LINKS = Object.freeze({
+  aveloz: block("chrome.hero.aveloz", "Meet NEWMA's AI Research Assistant", ["C-50"]),
+  platform: PLATFORM_CTA,
+  how: block("chrome.hero.how", "How it works", []),
+});
 
 // Staff-only tool on its own origin behind Cloudflare Access; a navigation label, so no claim.
 export const AVELOZ_LINK = Object.freeze({
@@ -32,6 +38,12 @@ export const AVELOZ_LINK = Object.freeze({
   suffix: block("chrome.aveloz.suffix", " (LivFul staff)", []),
   href: "https://aveloz.livful.com",
 });
+
+export type FooterLink = Readonly<{
+  block: CopyBlock;
+  href: string;
+  external?: boolean;
+}>;
 
 export const FOOTER_DESCRIPTOR = block(
   "chrome.footer.descriptor",
@@ -45,9 +57,29 @@ export const FOOTER_DISCLAIMER = block(
   ["C-21"],
 );
 
-export const FOOTER_LINKS = Object.freeze([
-  Object.freeze({ block: DEMO_CTA, href: "/access" }),
-  Object.freeze({ block: block("chrome.footer.about", "About Newma", []), href: "/#about" }),
+export const FOOTER_LINKS: readonly FooterLink[] = Object.freeze([
+  Object.freeze({
+    block: block("chrome.footer.overview", "Overview", []),
+    href: "/overview",
+  }),
+  Object.freeze({
+    block: block("chrome.footer.how", "How it works", []),
+    href: "/how-it-works",
+  }),
+  Object.freeze({
+    block: block("chrome.footer.ecosystem", "Ecosystem", []),
+    href: "/ecosystem",
+  }),
+  Object.freeze({
+    block: block("chrome.footer.about", "About Newma", []),
+    href: "/about",
+  }),
+  Object.freeze({
+    block: HERO_MIRROR_LINKS.aveloz,
+    href: AVELOZ_LINK.href,
+    external: true,
+  }),
+  Object.freeze({ block: PLATFORM_CTA, href: "/access" }),
   Object.freeze({
     block: block("chrome.footer.privacy", "Privacy", ["C-30"]),
     href: "/legal/privacy",
@@ -81,3 +113,6 @@ export const PWA_COPY = Object.freeze({
   installAction: block("chrome.pwa.installAction", "Install", []),
   dismiss: block("chrome.pwa.dismiss", "Not now", []),
 });
+
+/** @deprecated Use PLATFORM_CTA */
+export const DEMO_CTA = PLATFORM_CTA;

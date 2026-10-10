@@ -4,7 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/analytics/events", () => ({ trackEvent: vi.fn() }));
 
-import HomePage from "@/app/(site)/page";
+import EcosystemPage from "@/app/(site)/ecosystem/page";
+import HowItWorksPage from "@/app/(site)/how-it-works/page";
 import { WORKFLOW_SVG_LAYOUT, WorkflowDiagram } from "@/components/site/workflow-diagram";
 import { WorkflowLegend } from "@/components/site/workflow-legend";
 import { WorkflowSection } from "@/components/site/workflow-section";
@@ -174,25 +175,24 @@ describe("WorkflowText", () => {
   });
 });
 
-describe("home page placement", () => {
-  const renderHome = () =>
-    render(
+describe("how-it-works page placement", () => {
+  it("puts the workflow section after the short steps section", () => {
+    const { container } = render(
       <main>
-        <HomePage />
+        <HowItWorksPage />
       </main>,
     );
-
-  it("puts the workflow directly above the six components and below the product introduction", () => {
-    const { container } = renderHome();
-    const product = container.querySelector("section#product")!;
+    const steps = container.querySelector("section#steps")!;
     const workflow = container.querySelector("section#workflow")!;
-    const components = container.querySelector("section#components")!;
-    expect(product.nextElementSibling).toBe(workflow);
-    expect(workflow.nextElementSibling).toBe(components);
+    expect(steps.nextElementSibling).toBe(workflow);
   });
 
-  it("keeps the six component links exactly as they were", () => {
-    const { container } = renderHome();
+  it("keeps the six component links on the ecosystem index", () => {
+    const { container } = render(
+      <main>
+        <EcosystemPage />
+      </main>,
+    );
     const links = within(container.querySelector<HTMLElement>("section#components")!).getAllByRole(
       "link",
     );

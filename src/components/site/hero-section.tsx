@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { EcosystemGraphic } from "@/components/ecosystem-graphic/ecosystem-graphic";
 import { HERO } from "@/content/home/copy";
+import { AVELOZ_LINK, HERO_MIRROR_LINKS } from "@/content/home/chrome";
 import { AccessLink } from "./access-link";
 import { heroEntrance } from "./type";
 
@@ -37,12 +39,24 @@ export function HeroSection() {
             <p className="max-w-[46ch] text-lg leading-relaxed text-fg-muted">{HERO.lede.text}</p>
           </div>
           <div className="flex flex-col gap-5">
-            <div className={`${heroEntrance(0)} flex flex-wrap items-center gap-3`}>
-              <AccessLink variant="primary" size="lg" className="min-h-12">
-                {HERO.demoCta.text}
+            <div
+              className={`${heroEntrance(0)} flex flex-wrap items-center gap-3`}
+              data-hero-actions
+            >
+              <Button asChild variant="secondary" size="lg" className="min-h-12 max-w-full">
+                <a
+                  href={AVELOZ_LINK.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {HERO_MIRROR_LINKS.aveloz.text}
+                </a>
+              </Button>
+              <AccessLink variant="primary" size="lg" className="min-h-12 max-w-full">
+                {HERO_MIRROR_LINKS.platform.text}
               </AccessLink>
-              <Button asChild variant="secondary" size="lg" className="min-h-12">
-                <a href="#workflow">{HERO.howCta.text}</a>
+              <Button asChild variant="secondary" size="lg" className="min-h-12 max-w-full">
+                <Link href="/how-it-works">{HERO_MIRROR_LINKS.how.text}</Link>
               </Button>
             </div>
             <p

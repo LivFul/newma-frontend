@@ -30,10 +30,6 @@ const NOINDEX_SOURCES = ["/demo/:path*", "/access/:path*", "/primitives/:path*",
 const NOINDEX_HEADERS = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
 
 const nextConfig: NextConfig = {
-  // /ecosystem has no index page: send a trimmed URL to the components list instead of a 404.
-  async redirects() {
-    return [{ source: "/ecosystem", destination: "/#components", permanent: false }];
-  },
   async headers() {
     return [
       { source: "/:path*", headers: SECURITY_HEADERS },

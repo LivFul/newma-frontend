@@ -30,7 +30,7 @@ test("robots.txt is plain text, lists the sitemap and disallows only /api/", asy
   }
 });
 
-test("sitemap.xml is XML and lists the home page and six component pages only", async ({
+test("sitemap.xml is XML and lists the marketing pages and six component pages", async ({
   request,
 }) => {
   const response = await request.get("/sitemap.xml");
@@ -38,7 +38,14 @@ test("sitemap.xml is XML and lists the home page and six component pages only", 
   expect(response.headers()["content-type"]).toMatch(/xml/);
   const body = await response.text();
   const locs = [...body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-  expect(locs).toEqual([`${ORIGIN}/`, ...SLUGS.map((s) => `${ORIGIN}/ecosystem/${s}`)]);
+  expect(locs).toEqual([
+    `${ORIGIN}/`,
+    `${ORIGIN}/overview`,
+    `${ORIGIN}/how-it-works`,
+    `${ORIGIN}/ecosystem`,
+    `${ORIGIN}/about`,
+    ...SLUGS.map((s) => `${ORIGIN}/ecosystem/${s}`),
+  ]);
   expect(body).not.toMatch(/lastmod/);
 });
 
@@ -139,11 +146,10 @@ test("a component page has its own canonical, title and a single TechArticle", a
   expect(scripts[0].url).toBe(`${ORIGIN}/ecosystem/wet-lab`);
 });
 
-test("a trimmed /ecosystem URL redirects to the components list instead of a 404", async ({
-  request,
-}) => {
+test("the /ecosystem index responds 200 with the components list", async ({ request }) => {
   await warmUp(request);
-  const response = await request.get("/ecosystem", { maxRedirects: 0 });
-  expect(response.status()).toBe(307);
-  expect(response.headers()["location"]).toMatch(/\/#components$/);
+  const response = await request.get("/ecosystem");
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain('id="components"');
 });

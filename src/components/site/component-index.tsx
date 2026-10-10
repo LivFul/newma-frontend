@@ -3,7 +3,10 @@ import { COMPONENTS_INDEX } from "@/content/home/copy";
 import { ComponentLink } from "./component-link";
 import { PlateSwatch } from "./plate-swatch";
 import { CONTAINER, H2, H3_TITLE, REVEAL_CHILD, SECTION } from "./type";
-export function ComponentIndex() {
+type Props = Readonly<{ pageTitle?: boolean }>;
+
+export function ComponentIndex({ pageTitle = false }: Props) {
+  const Heading = pageTitle ? "h1" : "h2";
   return (
     <section
       id="components"
@@ -13,9 +16,9 @@ export function ComponentIndex() {
     >
       <div className={`${CONTAINER} space-y-(--space-16)`}>
         <div className="grid gap-6 lg:grid-cols-12">
-          <h2 id="components-heading" className={`${H2} lg:col-span-7`}>
+          <Heading id="components-heading" className={`${H2} lg:col-span-7`}>
             {COMPONENTS_INDEX.heading.text}
-          </h2>
+          </Heading>
           <p className="max-w-[44ch] text-lg leading-relaxed text-plate-muted lg:col-span-5 lg:mt-3">
             {COMPONENTS_INDEX.intro.text}
           </p>

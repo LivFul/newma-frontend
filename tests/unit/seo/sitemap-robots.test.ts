@@ -14,6 +14,10 @@ describe("sitemap", () => {
     const entries = sitemap();
     expect(entries.map((e) => e.url)).toEqual([
       `${FALLBACK_SITE_URL}/`,
+      `${FALLBACK_SITE_URL}/overview`,
+      `${FALLBACK_SITE_URL}/how-it-works`,
+      `${FALLBACK_SITE_URL}/ecosystem`,
+      `${FALLBACK_SITE_URL}/about`,
       ...ECOSYSTEM_SLUGS.map((slug) => `${FALLBACK_SITE_URL}/ecosystem/${slug}`),
     ]);
     for (const entry of entries) expect(entry).not.toHaveProperty("lastModified");

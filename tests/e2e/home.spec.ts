@@ -1,6 +1,7 @@
 import { expect, test } from "../support/test";
 import { SLUGS } from "../support/hero";
 import { forceWideFont, horizontalOverflow, overflowingElements } from "../support/reflow";
+import { HERO_MIRROR_LINKS, PLATFORM_CTA } from "../../src/content/home/chrome";
 
 test("home responds 200 with one h1 and the page landmarks", async ({ page }) => {
   const response = await page.goto("/");
@@ -11,22 +12,16 @@ test("home responds 200 with one h1 and the page landmarks", async ({ page }) =>
   await expect(page.getByRole("contentinfo")).toHaveCount(1);
 });
 
-test("hero and product Explore the demo links land on /access", async ({ page }) => {
+test("hero Explore the Platform link lands on /access", async ({ page }) => {
   await page.goto("/");
-  const links = page.getByRole("link", { name: "Explore the demo" });
-  await expect(links).toHaveCount(4);
-  for (let i = 0; i < 2; i += 1) {
-    await page.goto("/");
-    await page.getByRole("link", { name: "Explore the demo" }).nth(i).click();
-    await expect(page).toHaveURL(/\/access$/);
-    // The destination really rendered (a 404 page would also match the URL).
-    await expect(page).toHaveTitle(/Demo sign-in/);
-    await expect(page.locator("main#main")).toBeVisible();
-  }
+  await page.locator("#hero").getByRole("link", { name: PLATFORM_CTA.text }).click();
+  await expect(page).toHaveURL(/\/access$/);
+  await expect(page).toHaveTitle(/Demo sign-in/);
+  await expect(page.locator("main#main")).toBeVisible();
 });
 
-test("the components index lists the six detail pages in order", async ({ page }) => {
-  await page.goto("/");
+test("the ecosystem index lists the six detail pages in order", async ({ page }) => {
+  await page.goto("/ecosystem");
   const links = page.locator("#components").getByRole("link");
   await expect(links).toHaveCount(6);
   const hrefs = await links.evaluateAll((els) => els.map((el) => el.getAttribute("href")));
@@ -50,12 +45,16 @@ test("the viewport never blocks zoom (no maximum-scale, no user-scalable=no)", a
   expect(content).not.toMatch(/user-scalable\s*=\s*(no|0)/i);
 });
 
-test("the in-page anchors resolve to sections", async ({ page }) => {
+test("header How it works navigates to the dedicated page", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator("section#product")).toHaveCount(1);
-  await expect(page.locator("section#about")).toHaveCount(1);
-  await page.getByRole("link", { name: "How it works" }).first().click();
-  await expect(page).toHaveURL(/#workflow$/);
+  await page.getByRole("banner").getByRole("link", { name: HERO_MIRROR_LINKS.how.text }).click();
+  await expect(page).toHaveURL(/\/how-it-works$/);
+  await expect(page.locator("section#workflow")).toBeVisible();
+});
+
+test("legacy homepage hash bookmarks redirect to dedicated routes", async ({ page }) => {
+  await page.goto("/#workflow");
+  await expect(page).toHaveURL(/\/how-it-works$/);
 });
 
 for (const path of ["/", "/ecosystem/provenance-dlt", "/legal/privacy"]) {

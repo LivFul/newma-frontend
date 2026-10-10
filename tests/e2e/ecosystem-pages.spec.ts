@@ -29,13 +29,13 @@ for (const slug of SLUGS) {
     const demo = page
       .locator("#demo-heading")
       .locator("..")
-      .getByRole("link", { name: "Explore the demo" });
+      .getByRole("link", { name: "Explore the Platform" });
     await expect(demo).toHaveAttribute("href", "/access");
     await expect(page.locator("#demo-heading").locator("..")).toContainText(DEMO_ROUTES[slug]);
   });
 
   test(`the home index link for ${slug} resolves with status 200`, async ({ page, request }) => {
-    await page.goto("/");
+    await page.goto("/ecosystem");
     const href = await page
       .locator(`#components a[href="/ecosystem/${slug}"]`)
       .getAttribute("href");

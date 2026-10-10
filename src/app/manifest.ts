@@ -33,7 +33,7 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     shortcuts: [
       { name: "Access NEWMA", short_name: "Access", url: "/access" },
-      { name: "Components", short_name: "Components", url: "/#components" },
+      { name: "Components", short_name: "Components", url: "/ecosystem" },
     ],
   };
 }

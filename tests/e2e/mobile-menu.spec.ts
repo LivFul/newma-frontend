@@ -36,7 +36,7 @@ test("a section chosen from the mobile menu lands below the header", async ({ pa
   await gotoHeroReady(page);
   await page.getByRole("button", { name: "Menu" }).click();
   await page.locator("#mobile-sections").getByRole("link", { name: "How it works" }).click();
-  await expect(page).toHaveURL(/#workflow$/);
+  await expect(page).toHaveURL(/\/how-it-works$/);
   // The page scrolls smoothly: measure once the scroll position has held still for a few frames.
   const gap = await page.evaluate(async () => {
     const frame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));

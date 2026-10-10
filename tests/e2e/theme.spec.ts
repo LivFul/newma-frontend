@@ -42,7 +42,7 @@ test("applies stored dark tokens, updates theme-color, and scrolls with header t
 
   await page.getByRole("radio", { name: "Dark" }).click();
   await page.locator("[data-site-header]").getByRole("link", { name: "How it works" }).click();
-  await expect(page).toHaveURL(/#workflow$/);
+  await expect(page).toHaveURL(/\/how-it-works$/);
   await expect
     .poll(() =>
       page.evaluate(() => document.querySelector("[data-site-header]")?.getAttribute("data-tone")),
