@@ -6,7 +6,10 @@ import { WorkflowSoftwareFlow } from "./workflow-software-flow";
 import { WorkflowViewer } from "./workflow-viewer";
 import { CONTAINER, H2, SECTION } from "./type";
 
-export function WorkflowSection() {
+type Props = Readonly<{ pageTitle?: boolean }>;
+
+export function WorkflowSection({ pageTitle = false }: Props) {
+  const Heading = pageTitle ? "h1" : "h2";
   return (
     <section
       id="workflow"
@@ -17,9 +20,9 @@ export function WorkflowSection() {
       <div className={`${CONTAINER} space-y-(--space-12)`}>
         <div className="grid gap-6 lg:grid-cols-12">
           <div className="space-y-4 lg:col-span-7">
-            <h2 id="workflow-heading" className={H2}>
+            <Heading id="workflow-heading" className={H2}>
               {WORKFLOW_SECTION.heading.text}
-            </h2>
+            </Heading>
             <p className="max-w-[48ch] text-lg leading-relaxed text-fg-muted">
               {WORKFLOW_SECTION.intro.text}
             </p>

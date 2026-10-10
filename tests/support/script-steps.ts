@@ -39,7 +39,7 @@ export async function homepage(page: Page): Promise<void> {
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/ecosystem\/wet-lab$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Wet Lab");
-  await page.getByRole("link", { name: "Explore the demo" }).first().click();
+  await page.getByRole("link", { name: "Explore the Platform" }).first().click();
   await expect(page).toHaveURL(/\/access$/);
   await page.getByRole("button", { name: PERSONA_LABELS.community_liaison }).click();
   await page.waitForURL("**/demo");

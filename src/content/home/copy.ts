@@ -19,7 +19,7 @@ export const HERO = Object.freeze({
     "NEWMA is in development. This demo uses synthetic data to illustrate the proposed workflow; it does not establish scientific performance, production readiness or regulatory compliance.",
     ["C-21"],
   ),
-  demoCta: block("home.hero.cta.demo", "Explore the demo", ["C-21"]),
+  demoCta: block("home.hero.cta.demo", "Explore the Platform", ["C-21"]),
   howCta: block("home.hero.cta.how", "How it works"),
 });
 
@@ -61,7 +61,7 @@ export const PRODUCT = Object.freeze({
     "Predictions guide experiments. Scientific evidence determines advancement.",
     ["C-24"],
   ),
-  demoCta: block("home.product.cta.demo", "Explore the demo", ["C-21"]),
+  demoCta: block("home.product.cta.demo", "Explore the Platform", ["C-21"]),
   personasHeading: block("home.product.personas.heading", "Who it is for"),
   supportingRoles: block(
     "home.product.personas.supporting",
@@ -103,7 +103,42 @@ export const CLOSING = Object.freeze({
     "See how the proposed platform connects source knowledge, computational hypotheses, laboratory results and scientific review.",
     ["C-50"],
   ),
-  demoCta: block("home.closing.cta.demo", "Explore the demo", ["C-21"]),
+  demoCta: block("home.closing.cta.demo", "Explore the Platform", ["C-21"]),
+});
+
+export const MARKETING_PAGES = Object.freeze({
+  overview: Object.freeze({
+    title: block("pages.overview.title", "Overview — NEWMA", ["C-50"]),
+    description: block(
+      "pages.overview.description",
+      "Learn what NEWMA connects, the problem it addresses, and who the platform is designed for in ethnobotanical drug discovery.",
+      ["C-50"],
+    ),
+  }),
+  howItWorks: Object.freeze({
+    title: block("pages.how.title", "How it works — NEWMA", ["C-50"]),
+    description: block(
+      "pages.how.description",
+      "Follow NEWMA from research question to reviewed evidence: a short workflow summary and the full scientific evidence diagram.",
+      ["C-50"],
+    ),
+  }),
+  ecosystem: Object.freeze({
+    title: block("pages.ecosystem.title", "Ecosystem — NEWMA", ["C-50"]),
+    description: block(
+      "pages.ecosystem.description",
+      "Explore the six connected NEWMA components that link research questions, computational work, laboratory evidence and accountable decisions.",
+      ["C-50"],
+    ),
+  }),
+  about: Object.freeze({
+    title: block("pages.about.title", "About Newma — NEWMA", ["C-50"]),
+    description: block(
+      "pages.about.description",
+      "NEWMA's purpose, mission, vision and approach to connecting authorized botanical knowledge with computational and laboratory evidence.",
+      ["C-50"],
+    ),
+  }),
 });
 
 export const ABOUT = Object.freeze({

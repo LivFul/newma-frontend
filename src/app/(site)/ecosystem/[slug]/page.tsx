@@ -58,7 +58,7 @@ export default async function EcosystemPage({ params }: Params) {
           <RelatedComponents current={slug} />
           <p className="mt-10">
             <Link
-              href="/#components"
+              href="/ecosystem"
               className="inline-flex min-h-11 items-center text-fg-muted underline hover:text-fg"
             >
               {DETAIL_COPY.backToEcosystem.text}

@@ -5,7 +5,7 @@ const MIN_ICON_GAP_PX = 8;
 
 // Value: protects=each "Who it is for" card shows its leaf inline, left of the role title on the same line; fails_when=the icon is stacked above the title or crowds it; why_new=the leaf was a block above the title and read as a separate row; seam=none
 test("each persona icon sits inline, left of its role title", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/overview");
   const cards = page.locator("#product ul[role='list'] > li").filter({ has: page.locator("svg") });
   await cards.first().scrollIntoViewIfNeeded();
   const count = await cards.count();

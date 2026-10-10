@@ -60,9 +60,9 @@ describe("ecosystem detail route", () => {
       it("ends with a demo block whose link is exactly /access and names the workflow and route", async () => {
         const entry = ECOSYSTEM[slug];
         const { container } = await renderSlug(slug);
-        const heading = screen.getByRole("heading", { level: 2, name: "Explore the demo" });
+        const heading = screen.getByRole("heading", { level: 2, name: "Explore the Platform" });
         const block = heading.parentElement!;
-        const link = within(block).getByRole("link", { name: "Explore the demo" });
+        const link = within(block).getByRole("link", { name: "Explore the Platform" });
         expect(link).toHaveAttribute("href", "/access");
         expect(block.textContent).toContain(entry.demo.href);
         expect(block.textContent).toContain("Opens Demo sign-in.");
@@ -115,11 +115,11 @@ describe("ecosystem detail route", () => {
     expect(screen.queryByRole("note")).toBeNull();
   });
 
-  it("links back to the homepage ecosystem section", async () => {
+  it("links back to the ecosystem index", async () => {
     await renderSlug("interface");
     expect(screen.getByRole("link", { name: "Back to ecosystem" })).toHaveAttribute(
       "href",
-      "/#components",
+      "/ecosystem",
     );
   });
 });

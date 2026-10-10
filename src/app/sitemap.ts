@@ -7,6 +7,10 @@ import { absoluteUrl, LEGAL_APPROVED } from "@/lib/site";
 export default function sitemap(): MetadataRoute.Sitemap {
   const paths = [
     "/",
+    "/overview",
+    "/how-it-works",
+    "/ecosystem",
+    "/about",
     ...ECOSYSTEM_SLUGS.map((slug) => `/ecosystem/${slug}`),
     ...(LEGAL_APPROVED ? ["/legal/privacy", "/legal/terms"] : []),
   ];

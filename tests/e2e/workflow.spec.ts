@@ -46,31 +46,27 @@ async function openScene(page: Page, how: "click" | "keyboard" = "click"): Promi
   await expect(page.locator("[data-workflow-scene] canvas")).toBeVisible();
 }
 
-test("the workflow sits between the product introduction and the six components", async ({
-  page,
-}) => {
-  await page.goto("/");
+test("the workflow section follows the short steps on how-it-works", async ({ page }) => {
+  await page.goto("/how-it-works");
   const ids = await page
     .locator("section[id]")
     .evaluateAll((sections) => sections.map((section) => section.id));
   const workflow = ids.indexOf("workflow");
   expect(workflow).toBeGreaterThan(-1);
-  expect(ids[workflow - 1]).toBe("product");
-  expect(ids[workflow + 1]).toBe("components");
+  expect(ids[workflow - 1]).toBe("steps");
   await expect(page.locator("#workflow h2")).toHaveText(WORKFLOW_SECTION.heading.text);
 });
 
-test("the six components index is unchanged by the new section", async ({ page }) => {
-  await page.goto("/");
+test("the six components index lives on /ecosystem", async ({ page }) => {
+  await page.goto("/ecosystem");
   await expect(page.locator("#components").getByRole("link")).toHaveCount(6);
-  await expect(page.getByRole("link", { name: "Explore the demo" })).toHaveCount(4);
 });
 
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
 
   test("the diagram and the text version work and no dead button appears", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/how-it-works");
     await expect(page.getByRole("img", { name: DIAGRAM })).toBeVisible();
     await expect(page.getByRole("button", { name: EXPLORE })).toHaveCount(0);
 
@@ -85,8 +81,8 @@ test("nothing of the three-dimensional view loads until it is asked for", async 
   page.on("response", (response) => {
     if (response.request().resourceType() === "script") loaded.push(response);
   });
-  await page.goto("/", { waitUntil: "networkidle" });
-  // Past the hero's own idle swap, so only what the section itself pulls in could appear.
+  await page.goto("/how-it-works", { waitUntil: "networkidle" });
+  // Past the hero's own idle swap on other routes, so only what the section itself pulls in could appear.
   await page.waitForTimeout(3_000);
   const sceneChunks = await Promise.all(
     loaded.map(async (response) => {
@@ -101,7 +97,7 @@ test("nothing of the three-dimensional view loads until it is asked for", async 
 test("explore opens the three-dimensional view and back returns to the diagram", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/how-it-works");
   test.skip(!(await hasWebGL(page)), "this browser has no WebGL");
 
   const scripts: string[] = [];
@@ -138,7 +134,7 @@ test("explore opens the three-dimensional view and back returns to the diagram",
 test("the three-dimensional view works from the keyboard and closes with Escape", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/how-it-works");
   test.skip(!(await hasWebGL(page)), "this browser has no WebGL");
 
   await openScene(page, "keyboard");
@@ -151,7 +147,7 @@ test.describe("with reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 
   test("the view still opens on request", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/how-it-works");
     test.skip(!(await hasWebGL(page)), "this browser has no WebGL");
     await openScene(page);
   });
@@ -161,7 +157,7 @@ test("the section never makes the page scroll sideways at 320 px, open or closed
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 640 });
-  await page.goto("/");
+  await page.goto("/how-it-works");
   expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
 
   // The diagram scrolls inside its own region instead.

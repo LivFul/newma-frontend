@@ -8,13 +8,17 @@ describe("SiteFooter", () => {
     const { container } = render(<SiteFooter />);
     const footer = screen.getByRole("contentinfo");
     expect(within(footer).getByText(/Connecting authorized botanical knowledge/i)).toBeVisible();
-    expect(within(footer).getByRole("link", { name: "Explore the demo" })).toHaveAttribute(
+    expect(within(footer).getByRole("link", { name: "Explore the Platform" })).toHaveAttribute(
       "href",
       "/access",
     );
     expect(within(footer).getByRole("link", { name: "About Newma" })).toHaveAttribute(
       "href",
-      "/#about",
+      "/about",
+    );
+    expect(within(footer).getByRole("link", { name: "Overview" })).toHaveAttribute(
+      "href",
+      "/overview",
     );
     expect(within(footer).getByRole("link", { name: "Privacy" })).toHaveAttribute(
       "href",

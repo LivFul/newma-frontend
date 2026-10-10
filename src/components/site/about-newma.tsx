@@ -12,7 +12,10 @@ import {
 import { CapsuleIcon } from "@/components/brand/capsule-icon";
 import { CONTAINER, H2, H2_SUB, H3_TITLE, SECTION } from "./type";
 
-export function AboutNewma() {
+type Props = Readonly<{ pageTitle?: boolean }>;
+
+export function AboutNewma({ pageTitle = false }: Props) {
+  const Heading = pageTitle ? "h1" : "h2";
   return (
     <section
       id="about"
@@ -22,9 +25,9 @@ export function AboutNewma() {
     >
       <div className={`${CONTAINER} space-y-(--space-16)`}>
         <div className="space-y-4">
-          <h2 id="about-heading" className={H2}>
+          <Heading id="about-heading" className={H2}>
             {ABOUT.heading.text}
-          </h2>
+          </Heading>
           <p className="max-w-[44ch] text-xl font-medium tracking-[-0.01em] text-fg-muted">
             {ABOUT.subheading.text}
           </p>

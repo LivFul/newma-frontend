@@ -74,7 +74,12 @@ export async function describeFocus(page: Page): Promise<FocusStop | undefined> 
       });
       const rect = el.getBoundingClientRect();
       const x = Math.min(Math.max(rect.left + rect.width / 2, 0), innerWidth - 1);
-      const y = Math.min(Math.max(rect.top + Math.min(rect.height / 2, 8), 0), innerHeight - 1);
+      const headerBottom =
+        document.querySelector("[data-site-header]")?.getBoundingClientRect().bottom ?? 0;
+      const y = Math.min(
+        Math.max(Math.max(rect.top + Math.min(rect.height / 2, 8), headerBottom + 1), 0),
+        innerHeight - 1,
+      );
       const hit = document.elementFromPoint(x, y);
       const obscured =
         rect.width > 1 &&

@@ -41,19 +41,19 @@ describe("SiteHeader", () => {
     expect(home).toHaveAttribute("href", "/");
     expect(within(header).getByRole("link", { name: "Overview" })).toHaveAttribute(
       "href",
-      "/#product",
+      "/overview",
     );
     expect(within(header).getByRole("link", { name: "How it works" })).toHaveAttribute(
       "href",
-      "/#workflow",
+      "/how-it-works",
     );
     expect(within(header).getByRole("link", { name: "Ecosystem" })).toHaveAttribute(
       "href",
-      "/#components",
+      "/ecosystem",
     );
     expect(within(header).getByRole("link", { name: "About Newma" })).toHaveAttribute(
       "href",
-      "/#about",
+      "/about",
     );
     const access = within(header).getByRole("link", { name: /^Access NEWMA/ });
     expect(access).toHaveAttribute("href", "/access");
@@ -167,7 +167,7 @@ describe("SiteHeader", () => {
       within(nav)
         .getAllByRole("link")
         .map((link) => link.getAttribute("href")),
-    ).toEqual(["/#product", "/#workflow", "/#components", "/#about"]);
+    ).toEqual(["/overview", "/how-it-works", "/ecosystem", "/about"]);
     await expectNoAxeViolations(container);
 
     await user.click(within(nav).getByRole("link", { name: "Overview" }));

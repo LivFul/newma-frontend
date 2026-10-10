@@ -30,14 +30,14 @@ test("the header Access NEWMA click emits one access_newma_click with no propert
 test("every other link to /access emits the same event", async ({ page }) => {
   await recordEvents(page);
   await page.goto("/ecosystem/wet-lab");
-  await page.getByRole("link", { name: "Explore the demo" }).first().click();
+  await page.getByRole("link", { name: "Explore the Platform" }).first().click();
   await expect(page).toHaveURL(/\/access$/);
   expect(await readEvents(page)).toEqual([{ name: "access_newma_click" }]);
 });
 
 test("an index link emits component_open with only the slug", async ({ page }) => {
   await recordEvents(page);
-  await page.goto("/");
+  await page.goto("/ecosystem");
   await page.locator('#components a[href="/ecosystem/data-knowledge"]').click();
   await expect(page).toHaveURL(/\/ecosystem\/data-knowledge$/);
   expect(await readEvents(page)).toEqual([{ name: "component_open", slug: "data-knowledge" }]);

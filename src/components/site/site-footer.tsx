@@ -35,13 +35,24 @@ export function SiteFooter() {
         >
           <ul role="list" className="flex max-w-full flex-wrap gap-x-6 gap-y-2">
             {FOOTER_LINKS.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="inline-flex min-h-11 items-center text-sm text-plate-muted underline hover:text-plate-fg"
-                >
-                  {link.block.text}
-                </Link>
+              <li key={`${link.href}-${link.block.id}`}>
+                {link.external ? (
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-11 max-w-full items-center text-sm text-plate-muted underline hover:text-plate-fg [overflow-wrap:anywhere]"
+                  >
+                    {link.block.text}
+                  </a>
+                ) : (
+                  <Link
+                    href={link.href}
+                    className="inline-flex min-h-11 max-w-full items-center text-sm text-plate-muted underline hover:text-plate-fg [overflow-wrap:anywhere]"
+                  >
+                    {link.block.text}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>

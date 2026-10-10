@@ -9,10 +9,12 @@ import { AboutNewma } from "@/components/site/about-newma";
 import { ComponentIndex } from "@/components/site/component-index";
 import { HeroSection } from "@/components/site/hero-section";
 import { PersonaGrid } from "@/components/site/persona-grid";
-import { ProductIntro } from "@/components/site/product-intro";
+import { ProductOverviewSection } from "@/components/site/product-overview-section";
+import { ProductStepsSection } from "@/components/site/product-steps-section";
 import { HERO_SVG_TITLE } from "@/content/ecosystem/hero-text";
 import { ECOSYSTEM, ECOSYSTEM_SLUGS } from "@/content/ecosystem/registry";
 import { ABOUT, COMPONENTS_INDEX, HERO, PRODUCT } from "@/content/home/copy";
+import { HERO_MIRROR_LINKS, PLATFORM_CTA } from "@/content/home/chrome";
 import { MISSION, VISION } from "@/content/home/about";
 import { expectNoAxeViolations } from "../ui/axe";
 import HomePage from "@/app/(site)/page";
@@ -42,41 +44,38 @@ describe("home page composition", () => {
     }
   });
 
-  it("labels every section with its heading", () => {
+  it("labels the hero section with its heading", () => {
     const { container } = renderHome();
     const sections = container.querySelectorAll("section");
-    expect(sections.length).toBeGreaterThanOrEqual(4);
-    for (const section of sections) {
-      const id = section.getAttribute("aria-labelledby");
-      expect(id, section.outerHTML.slice(0, 80)).toBeTruthy();
-      expect(container.querySelector(`#${id}`)).not.toBeNull();
-    }
+    expect(sections).toHaveLength(1);
+    const section = sections[0]!;
+    const id = section.getAttribute("aria-labelledby");
+    expect(id).toBeTruthy();
+    expect(container.querySelector(`#${id}`)).not.toBeNull();
   });
 
-  it("offers Explore the demo in the hero and in the product introduction, both to /access", () => {
+  it("offers the three hero action links with the platform link to /access", () => {
     renderHome();
-    const links = screen.getAllByRole("link", { name: "Explore the demo" });
-    expect(links.length).toBeGreaterThanOrEqual(2);
-    for (const link of links) expect(link).toHaveAttribute("href", "/access");
-    expect(
-      within(document.getElementById("hero")!).getAllByRole("link", { name: "Explore the demo" }),
-    ).toHaveLength(1);
-    expect(
-      within(document.getElementById("product")!).getAllByRole("link", {
-        name: "Explore the demo",
-      }),
-    ).toHaveLength(1);
+    const hero = document.getElementById("hero")!;
+    expect(within(hero).getByRole("link", { name: HERO_MIRROR_LINKS.aveloz.text })).toHaveAttribute(
+      "href",
+      "https://aveloz.livful.com",
+    );
+    expect(within(hero).getByRole("link", { name: PLATFORM_CTA.text })).toHaveAttribute(
+      "href",
+      "/access",
+    );
+    expect(within(hero).getByRole("link", { name: HERO_MIRROR_LINKS.how.text })).toHaveAttribute(
+      "href",
+      "/how-it-works",
+    );
   });
 
-  it("resolves the product, workflow and about anchors to section ids", () => {
+  it("does not render relocated homepage sections", () => {
     const { container } = renderHome();
-    expect(container.querySelector("section#product")).not.toBeNull();
-    expect(container.querySelector("section#workflow")).not.toBeNull();
-    expect(container.querySelector("section#about")).not.toBeNull();
-    expect(screen.getByRole("link", { name: HERO.howCta.text })).toHaveAttribute(
-      "href",
-      "#workflow",
-    );
+    expect(container.querySelector("section#product")).toBeNull();
+    expect(container.querySelector("section#workflow")).toBeNull();
+    expect(container.querySelector("section#about")).toBeNull();
   });
 
   it("renders the hero figure with its six links", () => {
@@ -118,6 +117,13 @@ describe("HeroSection", () => {
     expect(items).toHaveLength(2);
     // The first animated item starts at once: nothing above it animates any more.
     expect(items[0]!.className).toContain("[--hero-i:0]");
+  });
+
+  it("opens Aveloz in a new tab from the hero", () => {
+    render(<HeroSection />);
+    const aveloz = screen.getByRole("link", { name: HERO_MIRROR_LINKS.aveloz.text });
+    expect(aveloz).toHaveAttribute("target", "_blank");
+    expect(aveloz).toHaveAttribute("rel", "noopener noreferrer");
   });
 
   it("exposes the ecosystem diagram with its accessible name inside the hero", () => {
@@ -203,12 +209,17 @@ describe("PersonaGrid", () => {
 });
 
 describe("ProductIntro and AboutNewma", () => {
-  it("states the guardrail and four numbered steps", () => {
-    const { container } = render(<ProductIntro />);
+  it("states the guardrail and four numbered steps across overview and steps sections", () => {
+    const { container } = render(
+      <>
+        <ProductOverviewSection />
+        <ProductStepsSection />
+      </>,
+    );
     expect(screen.getByText(PRODUCT.guardrail.text)).toBeInTheDocument();
     expect(container.querySelectorAll("ol > li")).toHaveLength(4);
     expect(container.querySelector("#product > div")?.className).toMatch(/max-w-\[80rem\]/);
-    expect(container.querySelectorAll("#product ol .reveal-child")).toHaveLength(4);
+    expect(container.querySelectorAll("#steps ol .reveal-child")).toHaveLength(4);
   });
   it("About has mission, vision and approach", () => {
     render(<AboutNewma />);

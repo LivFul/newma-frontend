@@ -6,8 +6,8 @@ const MIN_TEXT_GAP_PX = 8;
 
 // Value: protects=every "How it works" step marker is the pill, each number sits on the middle of its pill, and on phones the step text clears the marker; fails_when=a step goes back to the leaf, the icons return to the whole logo's box (the shape drifts to one side of its svg), or the marker is wider than the text offset; why_new=the numbers were centred on the logo's box, so they landed on the edge of their shapes; seam=none
 test("each step number is centred on its icon and clear of the step text", async ({ page }) => {
-  await page.goto("/");
-  const steps = page.locator("#product ol > li");
+  await page.goto("/how-it-works");
+  const steps = page.locator("#steps ol > li");
   await steps.first().scrollIntoViewIfNeeded();
   const count = await steps.count();
   expect(count).toBe(4);
