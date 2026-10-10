@@ -182,29 +182,39 @@ test("the skip link is the first tab stop and moves focus to main", async ({ pag
   await expect(page.locator("main#main")).toBeFocused();
 });
 
-test("in-page anchors land below the sticky header", async ({ page, isMobile }) => {
+test("header section links open the dedicated marketing routes", async ({ page, isMobile }) => {
   test.skip(isMobile, "section anchors are shown from md upward (A-P4-18)");
-  await page.goto("/");
-  const headerHeight = await page
-    .locator("[data-site-header]")
-    .evaluate((el) => el.getBoundingClientRect().height);
-  for (const [name, id] of [
-    ["Overview", "product"],
-    ["How it works", "workflow"],
-    ["Ecosystem", "components"],
-    ["About Newma", "about"],
+  for (const [name, path] of [
+    ["Overview", "/overview"],
+    ["How it works", "/how-it-works"],
+    ["Ecosystem", "/ecosystem"],
+    ["About Newma", "/about"],
   ] as const) {
+    await page.goto("/");
     await page.locator("[data-site-header]").getByRole("link", { name }).click();
-    await expect(page).toHaveURL(new RegExp(`#${id}$`));
-    // Smooth scrolling takes a moment; measure only after the position has stopped moving.
+    await expect(page).toHaveURL(new RegExp(`${path.replace("/", "\\/")}$`));
+  }
+});
+
+test("in-page anchors on marketing pages land below the sticky header", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "section anchors are shown from md upward (A-P4-18)");
+  for (const [path, id] of [
+    ["/overview", "product"],
+    ["/how-it-works", "workflow"],
+    ["/ecosystem", "components"],
+    ["/about", "about"],
+  ] as const) {
+    await page.goto(`${path}#${id}`);
     await waitForScrollSettled(page);
+    const headerHeight = await page
+      .locator("[data-site-header]")
+      .evaluate((el) => el.getBoundingClientRect().height);
     const top = await page.locator(`#${id}`).evaluate((el) => el.getBoundingClientRect().top);
-    // Smooth scrolling can stop a fraction of a pixel short of the scroll-padding target.
     expect(Math.ceil(top)).toBeGreaterThanOrEqual(headerHeight - 1);
-    // ...and not pushed far below it: scroll-padding is the only offset (a second one would double it).
-    // The last section cannot reach the top of a short page, so only the product anchor is bounded.
     if (id === "product") {
-      const top = await page.locator(`#${id}`).evaluate((el) => el.getBoundingClientRect().top);
       expect(top).toBeLessThanOrEqual(headerHeight + 32);
     }
   }

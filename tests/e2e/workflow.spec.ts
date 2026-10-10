@@ -81,8 +81,8 @@ test("nothing of the three-dimensional view loads until it is asked for", async 
   page.on("response", (response) => {
     if (response.request().resourceType() === "script") loaded.push(response);
   });
-  await page.goto("/", { waitUntil: "networkidle" });
-  // Past the hero's own idle swap, so only what the section itself pulls in could appear.
+  await page.goto("/how-it-works", { waitUntil: "networkidle" });
+  // Past the hero's own idle swap on other routes, so only what the section itself pulls in could appear.
   await page.waitForTimeout(3_000);
   const sceneChunks = await Promise.all(
     loaded.map(async (response) => {

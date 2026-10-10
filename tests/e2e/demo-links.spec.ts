@@ -32,11 +32,11 @@ test("every demo and sign-in link on the home and component pages is plain and r
   }
 });
 
-test("the homepage links to /access from the header, hero, product section, footer and demo blocks", async ({
+test("the homepage links to /access from the header, hero, footer and demo blocks", async ({
   page,
 }) => {
   await page.goto("/");
-  expect(await page.locator('a[href="/access"]').count()).toBeGreaterThanOrEqual(4);
+  expect(await page.locator('a[href="/access"]').count()).toBeGreaterThanOrEqual(3);
   await page.goto("/ecosystem/wet-lab");
   expect(await page.locator('a[href="/access"]').count()).toBeGreaterThanOrEqual(3);
 });

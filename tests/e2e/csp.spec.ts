@@ -70,7 +70,7 @@ test("the hero's interactive view and motion run with zero CSP violations @csp",
 
 test("the three.js workflow view runs with zero CSP violations @csp", async ({ page }) => {
   const read = await collectViolations(page);
-  await visit(page, "/", read);
+  await visit(page, "/how-it-works", read);
   await page.getByRole("button", { name: WORKFLOW_CONTROLS.explore.text }).click();
   const viewer = page.locator("[data-workflow-viewer]");
   await expect(viewer).toHaveAttribute("data-phase", /^(ready|failed|unavailable)$/, {

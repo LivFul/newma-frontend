@@ -45,9 +45,9 @@ test("the viewport never blocks zoom (no maximum-scale, no user-scalable=no)", a
   expect(content).not.toMatch(/user-scalable\s*=\s*(no|0)/i);
 });
 
-test("header How it works navigates to the dedicated page", async ({ page }) => {
+test("How it works navigates to the dedicated page", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("banner").getByRole("link", { name: HERO_MIRROR_LINKS.how.text }).click();
+  await page.locator("#hero").getByRole("link", { name: HERO_MIRROR_LINKS.how.text }).click();
   await expect(page).toHaveURL(/\/how-it-works$/);
   await expect(page.locator("section#workflow")).toBeVisible();
 });
