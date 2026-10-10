@@ -58,11 +58,14 @@ test.describe("hero budget", () => {
     const home = await loadedScripts(await normal.newPage(), "/", IDLE_SETTLE_MS);
     const baseline = await loadedScripts(await normal.newPage(), "/legal/privacy", 500);
     await normal.close();
+    expect(heroOnly(home, baseline).size).toBeGreaterThan(0);
+
     const reduced = await browser.newContext({ baseURL, reducedMotion: "reduce" });
-    const reducedHome = await loadedScripts(await reduced.newPage(), "/", IDLE_SETTLE_MS);
+    const reducedPage = await reduced.newPage();
+    await reducedPage.goto("/", { waitUntil: "networkidle" });
+    await reducedPage.waitForTimeout(IDLE_SETTLE_MS);
+    await expect(reducedPage.locator('[data-hero-ready="true"]')).toHaveCount(0);
+    await expect(reducedPage.locator("[data-hero-chunk]")).toHaveCount(0);
     await reduced.close();
-    const delta = [...heroOnly(home, baseline).keys()];
-    expect(delta.length).toBeGreaterThan(0);
-    expect(delta.filter((url) => reducedHome.has(url))).toEqual([]);
   });
 });

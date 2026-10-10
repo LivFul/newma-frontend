@@ -15,11 +15,11 @@ test("the hero copy stays visible and only the actions run the entrance", async 
   await expect(page.locator("#hero .hero-entrance-item")).toHaveCount(2);
 });
 
-test("scrolling to the product section reveals it", async ({ page }) => {
+test("scrolling to a below-the-fold section reveals it", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/overview");
-  await page.locator("#product").scrollIntoViewIfNeeded();
-  await expect(page.locator("#product")).toHaveClass(/reveal-in/);
+  await page.locator("#closing").scrollIntoViewIfNeeded();
+  await expect(page.locator("#closing")).toHaveClass(/reveal-in/);
 });
 
 test("reduced motion reveals every section without scrolling", async ({ page }) => {
