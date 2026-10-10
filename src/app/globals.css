@@ -470,13 +470,8 @@ main[tabindex="-1"]:focus-visible {
 
   /* Hero stage. Two decorative layers, no card, no blur, so nothing is re-rendered while the page moves.
      The wash takes the photo's exact box and mask, so it is flush with the hero's top, right and bottom
-     and can never drift from the photo; it only lifts the forest toward the page colour. The caption
-     scrim is anchored to the figure's own bottom, where the only small text is, and is the dense one. It
-     stays inside the hero's padding (right and bottom gutters, 2rem bottom feather) and reaches left only
-     to the copy column's text edge (4rem, with a matching 4rem feather), so it never veils the copy and never adds
-     scrollable overflow, which WCAG 1.4.12 text spacing would otherwise flag as clipping:
-     --hero-scrim-text is its alpha, and tests/unit/site/hero-stage.test.ts proves AA for the muted
-     caption text from it over a black photo pixel, so the check does not depend on viewport width. */
+     and can never drift from the photo; it only lifts the forest toward the page colour. Diagram caption
+     copy uses text-fg-muted on the page stack and the stage wash only. */
   .hero-photo,
   .hero-stage {
     mask-image:
@@ -486,30 +481,6 @@ main[tabindex="-1"]:focus-visible {
   }
   .hero-stage {
     background-color: color-mix(in srgb, var(--color-bg-elevated) 44%, transparent);
-  }
-  .hero-caption-scrim {
-    --hero-scrim-text: 86%;
-    background-color: color-mix(
-      in srgb,
-      var(--color-bg-elevated) var(--hero-scrim-text),
-      transparent
-    );
-    mask-image:
-      linear-gradient(
-        to right,
-        transparent 0,
-        var(--color-fg) 4rem,
-        var(--color-fg) calc(100% - 3rem),
-        transparent 100%
-      ),
-      linear-gradient(
-        to bottom,
-        transparent 0,
-        var(--color-fg) 6rem,
-        var(--color-fg) calc(100% - 2rem),
-        transparent 100%
-      );
-    mask-composite: intersect;
   }
 
   .plate-surface {
