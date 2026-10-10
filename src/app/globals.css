@@ -511,6 +511,18 @@ main[tabindex="-1"]:focus-visible {
       );
     mask-composite: intersect;
   }
+  /* Night already uses deep teal paper and a muted photo wash; the caption scrim only adds a boxy veil. */
+  @media (min-width: 64rem) and (prefers-color-scheme: dark) {
+    :root:not(.light) .hero-caption-scrim {
+      display: none;
+    }
+  }
+  @media (min-width: 64rem) {
+    .dark .hero-caption-scrim,
+    html[data-theme="dark"] .hero-caption-scrim {
+      display: none;
+    }
+  }
 
   .plate-surface {
     --color-bg: var(--color-plate);

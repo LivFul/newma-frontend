@@ -84,6 +84,11 @@ describe("hero stage scrim", () => {
     expect(rules.length).toBeGreaterThan(0);
     for (const rule of rules) expect(rule).not.toMatch(/\banimation(-name)?\s*:/);
   });
+
+  it("hides the caption scrim in dark theme on large screens", () => {
+    expect(globals).toMatch(/\.dark \.hero-caption-scrim[\s\S]*display:\s*none/);
+    expect(globals).toMatch(/html\[data-theme="dark"\] \.hero-caption-scrim[\s\S]*display:\s*none/);
+  });
 });
 
 describe("stagger class names", () => {
