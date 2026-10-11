@@ -2,6 +2,13 @@
 
 All notable changes to the NEWMA frontend. Versions follow the `VERSION` file (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [0.2.0.3] - 2026-10-11
+
+### Fixed
+
+- Benign Next.js client navigation and view-transition abort errors no longer reach Sentry (NEWMA-FRONTEND-4), including rapid hero ecosystem diagram taps and cross-route wordmark transitions.
+- Hero ecosystem diagram link clicks route through the App Router instead of mixing full-page and soft navigation.
+
 ## [0.2.0.2] - 2026-10-10
 
 ### Changed
