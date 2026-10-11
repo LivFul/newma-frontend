@@ -18,8 +18,8 @@ describe("isBenignNavigationAbort", () => {
 
   it("ignores unrelated errors", () => {
     expect(isBenignNavigationAbort(new Error("boom"))).toBe(false);
-    expect(isBenignNavigationAbort(new DOMException("The operation was aborted", "AbortError"))).toBe(
-      false,
-    );
+    expect(
+      isBenignNavigationAbort(new DOMException("The operation was aborted", "AbortError")),
+    ).toBe(false);
   });
 });
