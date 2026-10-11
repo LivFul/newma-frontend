@@ -25,4 +25,19 @@ describe("sentryOptions", () => {
     expect(options.sendDefaultPii).toBe(false);
     expect(options.tracesSampleRate).toBe(0.1);
   });
+
+  it("drops benign Next.js navigation aborts before send", () => {
+    const options = sentryOptions({
+      NEXT_PUBLIC_SENTRY_DSN: "https://key@o0.ingest.sentry.io/1",
+    });
+    const abort = new Error("AbortError: Transition was skipped. Navigation aborted");
+    expect(
+      options.beforeSend?.(
+        {
+          exception: { values: [{ type: "Error", value: abort.message }] },
+        } as never,
+        { originalException: abort },
+      ),
+    ).toBeNull();
+  });
 });

@@ -77,6 +77,16 @@ describe("instrumentation-client", () => {
     await mod.sentryReady;
     expect(init).toHaveBeenCalledTimes(1);
   });
+  it("does not report benign navigation aborts buffered before init", async () => {
+    vi.resetModules();
+    vi.stubEnv("NEXT_PUBLIC_SENTRY_DSN", "https://k@o.ingest.sentry.io/1");
+    const mod = await import("@/instrumentation-client");
+    const abort = new Error("AbortError: Transition was skipped. Navigation aborted");
+    window.dispatchEvent(new ErrorEvent("error", { error: abort }));
+    runIdle();
+    await mod.sentryReady;
+    expect(captureException).not.toHaveBeenCalled();
+  });
   it("reports errors thrown before the SDK loaded once it has initialised", async () => {
     vi.resetModules();
     vi.stubEnv("NEXT_PUBLIC_SENTRY_DSN", "https://k@o.ingest.sentry.io/1");

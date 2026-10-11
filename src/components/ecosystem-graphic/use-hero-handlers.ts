@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   useRef,
   type Dispatch,
@@ -46,6 +47,7 @@ type Options = {
 // a click follows its link (the first touch tap only explodes the layers) and, for the second touch tap,
 // navigating on pointerup.
 export function useHeroHandlers({ state, dispatch, announce }: Options) {
+  const router = useRouter();
   // Set by a touch pointerdown and consumed by the pointerup or click it produces. Any other end of that
   // gesture (cancel, a later click with no pointerdown such as assistive technology or the keyboard) must
   // leave it empty, so a stale gesture can never swallow a link activation.
@@ -80,9 +82,9 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
     clearSwallow();
   };
 
-  const follow = (slug: NonNullable<HeroSlug>) => {
+  const navigateTo = (slug: NonNullable<HeroSlug>) => {
     trackEvent({ name: "component_open", slug });
-    window.location.assign(ecosystemHref(slug));
+    router.push(ecosystemHref(slug));
   };
 
   const onPointerDown = (event: PointerEvent) => {
@@ -120,7 +122,7 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
     if (heroReducer(state, tap).effect.type !== "navigate") return;
     dispatch(tap);
     armSwallow();
-    follow(pending.slug);
+    navigateTo(pending.slug);
   };
 
   const onLinkClick = (event: MouseEvent) => {
@@ -143,7 +145,8 @@ export function useHeroHandlers({ state, dispatch, announce }: Options) {
       event.preventDefault();
       if (slug) announce(heroTouchAnnouncement(slug));
     } else if (slug) {
-      trackEvent({ name: "component_open", slug });
+      event.preventDefault();
+      navigateTo(slug);
     }
     dispatch(tap);
   };
