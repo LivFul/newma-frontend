@@ -25,6 +25,7 @@ export function sentryOptions(env: SentryEnv) {
       "AbortError: Transition was skipped. Navigation aborted",
       /Transition was skipped/i,
       /Navigation aborted/i,
+      /Skipping view transition/i,
     ],
     beforeSend,
   };

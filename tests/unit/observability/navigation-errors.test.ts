@@ -8,6 +8,14 @@ describe("isBenignNavigationAbort", () => {
     expect(isBenignNavigationAbort(error.message)).toBe(true);
   });
 
+  it("matches React view transition skips", () => {
+    const error = new DOMException(
+      "Skipping view transition because skipTransition() was called.",
+      "AbortError",
+    );
+    expect(isBenignNavigationAbort(error)).toBe(true);
+  });
+
   it("ignores unrelated errors", () => {
     expect(isBenignNavigationAbort(new Error("boom"))).toBe(false);
     expect(isBenignNavigationAbort(new DOMException("The operation was aborted", "AbortError"))).toBe(
