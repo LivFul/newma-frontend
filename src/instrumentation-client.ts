@@ -5,6 +5,7 @@
 // hydration on a phone; errors raised before then are held and reported after init.
 import { afterLoadIdle } from "@/lib/observability/after-load";
 import { bufferEarlyErrors } from "@/lib/observability/early-errors";
+import { isBenignNavigationAbort } from "@/lib/observability/navigation-errors";
 import { sentryOptions } from "@/lib/observability/sentry-options";
 
 type SentryClient = typeof import("@/lib/observability/sentry-browser");
@@ -27,7 +28,9 @@ async function startSentry(sdkDsn: string): Promise<void> {
   const mod = await import("@/lib/observability/sentry-browser");
   mod.init(sentryOptions({ NEXT_PUBLIC_SENTRY_DSN: sdkDsn, VERCEL_ENV: vercelEnv }));
   sentry = mod;
-  early.flush((error) => mod.captureException(error));
+  early.flush((error) => {
+    if (!isBenignNavigationAbort(error)) mod.captureException(error);
+  });
 }
 
 /** Resolves once the SDK is loaded and initialised (immediately when there is no DSN). */
