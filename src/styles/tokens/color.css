@@ -1,53 +1,60 @@
-/* NEWMA brand palette v1.0 (docs/newma_brand_pack/07_colors). Neutrals carry the identity: Ink type on
-   Mist and white, Night plates. Emerald, Lime and Teal are accents for the pill, highlights and calls to
-   action, never body text on light grounds. Every pair in contrast-pairs.json is verified by
+/* NEWMA brand guide v1 palette (docs/newma_brand_pack/07_colors). The brand gradient runs Forest
+   #244322 → Sage #9ba77d → Lavender #86809c. Usage ratio in any space: 60% white, 15% Forest, 15% Sage,
+   10% Lavender. Forest carries type and the deep plates; Sage and Lavender are fills, gradients and
+   accents, never body text on white. Every pair in contrast-pairs.json is verified by
    tests/unit/tokens.test.ts. */
 @theme {
-  --color-bg: #f1f6f1; /* Mist */
+  --color-bg: #f7f8f4; /* Paper: warm white */
   --color-bg-elevated: #ffffff;
-  --color-bg-deep: #e3ede6; /* Mist band */
-  --color-fg: #082b33; /* Ink */
-  --color-fg-muted: #4f6b70; /* Slate */
-  --color-accent: #0b3f4b; /* Deep Teal: links and outline actions */
-  --color-accent-fg: #f1f6f1;
-  /* The prominent (tinted) action: Ink on the Plant gradient, whose darkest stop is Emerald. */
-  --color-prominent: #0fa36b;
-  --color-prominent-fg: #082b33;
-  --color-border: #cfdcd5;
-  --color-border-strong: #6c8689;
+  --color-bg-deep: #edf0e6; /* Sage mist band */
+  --color-fg: #1b2a1a; /* Forest ink */
+  --color-fg-muted: #535e4d;
+  --color-accent: #244322; /* Forest: links and outline actions */
+  --color-accent-fg: #ffffff;
+  /* The prominent action: white on the Lavender gradient (the "AI Research Assistant" pill). */
+  --color-prominent: #5f5986;
+  --color-prominent-fg: #ffffff;
+  /* The supporting pill: Forest ink on Sage. */
+  --color-sage: #9ba77d;
+  --color-sage-soft: #c9d0b3;
+  --color-sage-fg: #1b2a1a;
+  --color-lavender: #86809c;
+  --color-forest: #244322;
+  --color-border: #dde2d3;
+  --color-border-strong: #7a876f;
   --color-danger: #a3352b;
   --color-danger-fg: #ffffff;
   --color-warning: #f2c46b;
-  --color-warning-fg: #082b33;
-  --color-success: #8fd3b4;
-  --color-success-fg: #082b33;
-  --color-focus: #1c8a99; /* Teal */
+  --color-warning-fg: #1b2a1a;
+  --color-success: #b5d39a;
+  --color-success-fg: #1b2a1a;
+  --color-focus: #86809c; /* Lavender: 3:1 on paper and on Forest plates */
   /* Stroke inks for light fills (WCAG 1.4.11). */
   --color-warning-ink: #8a5a00;
-  --color-success-ink: #0b7a52;
+  --color-success-ink: #3f6b2b;
 
   --color-route: #fbd699; /* apricot, rare warm accent */
   --color-route-edge: #b8643a;
-  --color-contour: #8fb3b0;
-  --color-plate: #06242b; /* Night */
-  --color-plate-fg: #f1f6f1;
-  --color-plate-muted: #8fb3b0; /* Slate light */
-  --color-plate-elevated: #0b3f4b; /* Deep Teal */
-  --color-plate-deep: #041b21;
-  --color-plate-border: #1c8a99;
-  --color-plate-border-strong: #6f9a94;
-  --color-plate-accent: #a6e04a; /* Lime: dark grounds and small highlights only */
-  --color-plate-danger: #f08e7c;
+  --color-contour: #b9c2a5;
+  --color-plate: #1b3319; /* Deep Forest */
+  --color-plate-fg: #f4f6ef;
+  --color-plate-muted: #bcc5a8; /* Sage light */
+  --color-plate-elevated: #244322; /* Forest */
+  --color-plate-deep: #132511;
+  --color-plate-border: #5d7350;
+  --color-plate-border-strong: #8d9a7c;
+  --color-plate-accent: #c9d0b3; /* Sage light: dark grounds and small highlights only */
+  --color-plate-danger: #f2a093;
   --color-plate-warning: #f2c46b;
-  --color-plate-success: #2bc08e;
-  --color-plate-compute: #b69cff; /* Agentic Compute and workflow learning loop (violet) */
-  --color-plate-optional: #ef8f86;
-  --color-plate-contour: #2e5c63;
-  --color-plate-route-edge: #c97a4d;
-  --color-plate-focus: #7fe3d2;
+  --color-plate-success: #b5d39a;
+  --color-plate-compute: #c4b8f0; /* Agentic Compute and workflow learning loop (lavender-violet) */
+  --color-plate-optional: #f2a093;
+  --color-plate-contour: #3a5636;
+  --color-plate-route-edge: #e0a27a;
+  --color-plate-focus: #c4bedb;
 
-  --color-leaf: #0fa36b; /* Emerald */
-  --color-leaf-bright: #a6e04a; /* Lime */
-  --color-capsule: #1c8a99; /* Teal */
-  --color-capsule-deep: #0b3f4b; /* Deep Teal */
+  --color-leaf: #5d7350; /* Sage deep */
+  --color-leaf-bright: #9ba77d; /* Sage */
+  --color-capsule: #86809c; /* Lavender */
+  --color-capsule-deep: #5f5986; /* Lavender deep */
 }

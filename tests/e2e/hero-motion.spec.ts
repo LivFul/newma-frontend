@@ -2,9 +2,10 @@ import { expect, test } from "../support/test";
 import { gotoHeroReady } from "../support/hero";
 
 const WCAG_AUTO_MOTION_LIMIT_MS = 5000;
-// The hero background lines are an ambient, slow, deliberate loop that was asked for by name; every
+// The hero diagram panel's fog is an ambient, slow, deliberate loop (brand guide v1 hero); every
 // other animation on the page must stay finite and short.
-const AMBIENT_LOOP = "botanical-drift";
+const AMBIENT_LOOP = "fog-drift";
+const AMBIENT_HOST = ".fog-panel";
 
 type Running = { name: string; endMs: number; properties: string[] };
 
@@ -29,14 +30,14 @@ async function runningAnimations(page: import("@playwright/test").Page): Promise
   );
 }
 
-// Value: protects=the hero background lines drift on their own using transform only, and every other animation stays under five seconds (WCAG 2.2.2); fails_when=the drift stops, animates a paint property such as background-position, or another infinite or long animation is added; why_new=the drift had been removed for repainting the hero, and nothing checked that its replacement really moves or that nothing else loops; seam=none
-test("the hero lines drift by transform and nothing else loops", async ({ page }) => {
+// Value: protects=the hero panel fog drifts on its own using transform only, and every other animation stays under five seconds (WCAG 2.2.2); fails_when=the drift stops, animates a paint property such as background-position, or another infinite or long animation is added; why_new=the drift had been removed for repainting the hero, and nothing checked that its replacement really moves or that nothing else loops; seam=none
+test("the hero fog drifts by transform and nothing else loops", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await gotoHeroReady(page);
   const animations = await runningAnimations(page);
 
   const drift = animations.find((animation) => animation.name === AMBIENT_LOOP);
-  expect(drift, "the hero lines animation").toBeDefined();
+  expect(drift, "the hero fog animation").toBeDefined();
   expect(drift?.endMs, "an endless loop").toBeGreaterThan(1e9);
   expect(drift?.properties).toEqual(["transform"]);
 
@@ -47,19 +48,20 @@ test("the hero lines drift by transform and nothing else loops", async ({ page }
 
   const transformOf = () =>
     page.evaluate(
-      () => getComputedStyle(document.querySelector(".botanical-lines")!, "::before").transform,
+      (host) => getComputedStyle(document.querySelector(host)!, "::before").transform,
+      AMBIENT_HOST,
     );
   const before = await transformOf();
   await page.waitForTimeout(1500);
-  expect(await transformOf(), "the lines have moved").not.toBe(before);
+  expect(await transformOf(), "the fog has moved").not.toBe(before);
 });
 
 // Value: protects=nothing in the hero moves on its own for visitors who ask for reduced motion; fails_when=the drift is declared outside the no-preference media block; why_new=reduced motion was only checked for the diagram, not the background; seam=none
-test("the hero lines stay still under reduced motion", async ({ page }) => {
+test("the hero fog stays still under reduced motion", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   // The interactive hero layer never loads under reduced motion, so its ready hook never appears.
   await page.goto("/");
-  await expect(page.locator(".botanical-lines")).toBeAttached();
+  await expect(page.locator(AMBIENT_HOST)).toBeAttached();
   const names = (await runningAnimations(page)).map((animation) => animation.name);
   expect(names).not.toContain(AMBIENT_LOOP);
 });

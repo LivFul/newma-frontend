@@ -7,7 +7,7 @@ import { MotionPart, partVariants } from "@/components/ecosystem-graphic/motion-
 import { PARTS } from "@/components/ecosystem-graphic/geometry";
 import { HeroStatic } from "@/components/ecosystem-graphic/hero-static";
 import { StaticPart } from "@/components/ecosystem-graphic/static-part";
-import { ECOSYSTEM_SLUGS, HERO_LABELS } from "@/content/ecosystem/registry";
+import { ECOSYSTEM_SLUGS, heroRowCopy } from "@/content/ecosystem/registry";
 import { EVENT_NAME } from "@/lib/analytics/events";
 import { expectNoAxeViolations } from "../ui/axe";
 
@@ -59,16 +59,16 @@ describe("Interactive hero layer", () => {
     expect(container.querySelector('[data-hero-ready="true"]')).not.toBeNull();
   });
 
-  it("has a 44 px Explore components toggle with aria-pressed and a constant name", async () => {
+  it("has a 44 px Explore Components toggle with aria-pressed and a constant name", async () => {
     const user = userEvent.setup();
     const { svg } = mount();
-    const toggle = screen.getByRole("button", { name: "Explore components" });
+    const toggle = screen.getByRole("button", { name: "Explore Components" });
     expect(toggle).toHaveAttribute("aria-pressed", "false");
     expect(toggle).toHaveAttribute("aria-controls", svg.id);
     expect(toggle.className).toMatch(/min-h-11/);
     expect(toggle.className).toMatch(/min-w-11/);
     await user.click(toggle);
-    expect(screen.getByRole("button", { name: "Explore components" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Explore Components" })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
@@ -114,7 +114,7 @@ describe("Interactive hero layer", () => {
     // At the end of the list nothing moves, so the key is left to the page (no scroll trap).
     act(() => links[5]!.focus());
     expect(fireEvent.keyDown(links[5]!, { key: "ArrowDown" })).toBe(true);
-    const toggle = screen.getByRole("button", { name: "Explore components" });
+    const toggle = screen.getByRole("button", { name: "Explore Components" });
     expect(fireEvent.keyDown(toggle, { key: "ArrowDown" })).toBe(true);
   });
 
@@ -167,7 +167,7 @@ describe("Interactive hero layer", () => {
     await user.keyboard("{Escape}");
     expect(status).toHaveTextContent("");
     tap();
-    expect(status).toHaveTextContent("Components separated. Activate again to open Wet Lab.");
+    expect(status).toHaveTextContent("Components separated. Activate again to open Wet Labs.");
   });
 
   it("announces the intercepted first touch tap in a polite status region", () => {
@@ -176,7 +176,7 @@ describe("Interactive hero layer", () => {
     expect(status).toHaveTextContent("");
     fireEvent.pointerDown(links[3]!, { pointerType: "touch" });
     fireEvent.click(links[3]!);
-    expect(status).toHaveTextContent("Components separated. Activate again to open Wet Lab.");
+    expect(status).toHaveTextContent("Components separated. Activate again to open Wet Labs.");
   });
 
   it("reports a touch-opened view as pressed and lets the toggle close it", async () => {
@@ -184,7 +184,7 @@ describe("Interactive hero layer", () => {
     const { links, svg } = mount();
     fireEvent.pointerDown(links[0]!, { pointerType: "touch" });
     fireEvent.click(links[0]!);
-    const toggle = screen.getByRole("button", { name: "Explore components" });
+    const toggle = screen.getByRole("button", { name: "Explore Components" });
     expect(toggle).toHaveAttribute("aria-pressed", "true");
     await user.click(toggle);
     expect(toggle).toHaveAttribute("aria-pressed", "false");
@@ -194,7 +194,7 @@ describe("Interactive hero layer", () => {
   it("reassembles on Escape from anywhere on the page and removes its listeners", async () => {
     const user = userEvent.setup();
     const { svg, unmount } = mount();
-    await user.click(screen.getByRole("button", { name: "Explore components" }));
+    await user.click(screen.getByRole("button", { name: "Explore Components" }));
     expect(svg).toHaveAttribute("data-view", "exploded");
     const before = document.body.querySelectorAll("*").length;
     act(() => {
@@ -203,7 +203,7 @@ describe("Interactive hero layer", () => {
     expect(svg).toHaveAttribute("data-view", "assembled");
     expect(before).toBeGreaterThan(0);
     const remove = vi.spyOn(document, "removeEventListener");
-    await user.click(screen.getByRole("button", { name: "Explore components" }));
+    await user.click(screen.getByRole("button", { name: "Explore Components" }));
     unmount();
     expect(remove.mock.calls.map(([type]) => type)).toEqual(
       expect.arrayContaining(["pointerdown", "keydown"]),
@@ -390,7 +390,7 @@ describe("Interactive hero layer", () => {
   it("names every link with the same accessible name as the static layer", () => {
     const { links } = mount();
     expect(links.map((a) => a.getAttribute("aria-label")?.split(".")[0])).toEqual(
-      ECOSYSTEM_SLUGS.map((s) => HERO_LABELS[s].title),
+      ECOSYSTEM_SLUGS.map((s) => heroRowCopy(s).title),
     );
   });
 
@@ -406,6 +406,7 @@ describe("Interactive hero layer", () => {
     expect(footer.className).toBe(staticFooter.className);
     expect(controls.className).toBe(staticControls.className);
     expect([...footer.querySelectorAll("p")].map((p) => p.textContent)).toEqual(staticCopy);
+    expect(staticCopy).toContain("Discovery pathway | Evidence checkpoints | Restricted knowledge");
   });
 
   it("is axe clean", async () => {

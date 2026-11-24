@@ -162,17 +162,17 @@ async function visibleFooterLogo(page: Page): Promise<string | null> {
 }
 
 for (const [mode, media, expected] of [
-  ["on screen", {}, /newma-logo-reversed\.svg/],
-  ["in print", { media: "print" }, /newma-logo\.svg/],
+  ["on screen", {}, /newma-wordmark-reversed\.svg/],
+  ["in print", { media: "print" }, /newma-wordmark\.svg/],
   [
     "under light forced colours",
     { forcedColors: "active", colorScheme: "light" },
-    /newma-logo\.svg/,
+    /newma-wordmark\.svg/,
   ],
   [
     "under dark forced colours",
     { forcedColors: "active", colorScheme: "dark" },
-    /newma-logo-reversed\.svg/,
+    /newma-wordmark-reversed\.svg/,
   ],
 ] as const) {
   test(`the footer shows a legible logo ${mode} @emulation`, async ({ page }) => {

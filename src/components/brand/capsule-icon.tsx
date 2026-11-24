@@ -14,8 +14,10 @@ const STOPS: Record<
   Exclude<CapsuleTone, "mono">,
   { plant: [string, string]; pill: [string, string] }
 > = {
-  color: { plant: ["#a6e04a", "#0fa36b"], pill: ["#0b3f4b", "#1c8a99"] },
-  reversed: { plant: ["#d2f57f", "#2bc08e"], pill: ["#1a8fa0", "#7fe3d2"] },
+  // Brand guide v1: Sage for the plant half, Lavender for the pill half (leaf-bright → leaf,
+  // capsule-deep → capsule tokens).
+  color: { plant: ["#9ba77d", "#5d7350"], pill: ["#5f5986", "#86809c"] },
+  reversed: { plant: ["#c9d0b3", "#9ba77d"], pill: ["#86809c", "#c4bedb"] },
 };
 
 // Each half's gradient runs along the capsule's own axis: the plant half tip to seam, the pill half

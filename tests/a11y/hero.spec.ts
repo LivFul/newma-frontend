@@ -21,7 +21,7 @@ test("hero has zero axe violations assembled", async ({ page }) => {
 test("hero has zero axe violations exploded by hover or toggle", async ({ page, isMobile }) => {
   await gotoHeroReady(page);
   if (isMobile) {
-    await page.getByRole("button", { name: "Explore components" }).click();
+    await page.getByRole("button", { name: "Explore Components" }).click();
   } else {
     await heroFrame(page).hover();
   }
@@ -32,8 +32,8 @@ test("hero has zero axe violations exploded by hover or toggle", async ({ page, 
 
 test("hero has zero axe violations pinned", async ({ page }) => {
   await gotoHeroReady(page);
-  await page.getByRole("button", { name: "Explore components" }).click();
-  await expect(page.getByRole("button", { name: "Explore components" })).toHaveAttribute(
+  await page.getByRole("button", { name: "Explore Components" }).click();
+  await expect(page.getByRole("button", { name: "Explore Components" })).toHaveAttribute(
     "aria-pressed",
     "true",
   );

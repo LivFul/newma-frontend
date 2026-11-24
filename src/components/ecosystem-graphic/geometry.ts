@@ -38,29 +38,35 @@ export type Edge = Readonly<{
   d: string;
 }>;
 
-// About 480 x 560 portrait: label text stays at least 12 px rendered on a 360 px phone.
-export const VIEWBOX = Object.freeze({ width: 470, height: 560 });
+// About 470 x 420 portrait: label text stays at least 12 px rendered on a 360 px phone.
+export const VIEWBOX = Object.freeze({ width: 470, height: 420 });
+// The isometric plate drawn on the component pages (component-plate.tsx); the hero draws pills.
 export const PLATE = Object.freeze({ halfWidth: 76, halfHeight: 20, thickness: 8 });
+// The hero's capsule bar, centred on the part origin.
+export const PILL = Object.freeze({ halfWidth: 33, halfHeight: 5.5 });
 export const LABEL_FONT = Object.freeze({ title: 20, descriptor: 18 });
-// Label box relative to the part origin (the plate centre); width is a conservative text estimate.
+// Label box relative to the part origin (the pill centre); width is a conservative text estimate.
+// Titles sit level with the pill; the descriptor hangs below and shows only when the stack explodes.
 export const LABEL_BOX = Object.freeze({
-  offsetX: 128,
-  width: 198,
+  offsetX: PILL.halfWidth + 32,
+  width: 220,
   top: -24,
-  bottom: 26,
-  titleBaseline: -2,
-  descriptorBaseline: 20,
+  bottom: 36,
+  titleBaseline: 7,
+  descriptorBaseline: 29,
 });
-// The slab-to-label leader tick, relative to the part origin.
-export const LEADER = Object.freeze({ fromX: PLATE.halfWidth + 6, toX: LABEL_BOX.offsetX - 8 });
+// The bracket spine the row ticks hang from (static; it does not move with the parts).
+export const SPINE = Object.freeze({ x: 56, radius: 14 });
 export const RAIL_X = 16;
-const ASSEMBLED_X = 116;
-const ASSEMBLED_PITCH = 44;
-const ASSEMBLED_CENTRE_Y = 276;
-const EXPLODED_TOP = 64;
-const EXPLODED_PITCH = 88;
-const EXPLODED_DRIFT = 10;
-const EDGE_GAP = 4;
+const ASSEMBLED_X = 135;
+// All six rows rest at one even pitch, centred on the exploded stack, so exploding opens the stack
+// evenly up and down and every row, Interface included, collapses back the same way.
+const ASSEMBLED_TOP = 74;
+const ASSEMBLED_PITCH = 50;
+const EXPLODED_TOP = 24;
+// Wider than the resting pitch, and room for each row's descriptor.
+const EXPLODED_PITCH = 70;
+const EDGE_GAP = 6;
 
 const TONES: Readonly<Record<EcosystemSlug, ToneToken>> = {
   interface: "--color-accent",
@@ -85,15 +91,9 @@ export const PARTS: readonly PartGeometry[] = Object.freeze(
   ECOSYSTEM_SLUGS.map((slug, index) =>
     Object.freeze({
       slug,
-      assembled: point(
-        ASSEMBLED_X,
-        ASSEMBLED_CENTRE_Y + (index - (ECOSYSTEM_SLUGS.length - 1) / 2) * ASSEMBLED_PITCH,
-      ),
-      // Alternate sides drift outward a little when the stack explodes.
-      exploded: point(
-        ASSEMBLED_X + (index % 2 === 0 ? -EXPLODED_DRIFT : EXPLODED_DRIFT),
-        EXPLODED_TOP + index * EXPLODED_PITCH,
-      ),
+      assembled: point(ASSEMBLED_X, ASSEMBLED_TOP + index * ASSEMBLED_PITCH),
+      // The stack opens straight down one column, so the flow arrows between rows stay vertical.
+      exploded: point(ASSEMBLED_X, EXPLODED_TOP + index * EXPLODED_PITCH),
       tone: TONES[slug],
       glyph: GLYPHS[slug],
       dashed: false,
@@ -104,19 +104,19 @@ export const PARTS: readonly PartGeometry[] = Object.freeze(
 const part = (slug: EcosystemSlug): PartGeometry => PARTS[ECOSYSTEM_SLUGS.indexOf(slug)]!;
 const top = (slug: EcosystemSlug): Point => {
   const p = part(slug).exploded;
-  return point(p.x, p.y - PLATE.halfHeight - EDGE_GAP);
+  return point(p.x, p.y - PILL.halfHeight - EDGE_GAP);
 };
 const bottom = (slug: EcosystemSlug): Point => {
   const p = part(slug).exploded;
-  return point(p.x, p.y + PLATE.halfHeight + PLATE.thickness + EDGE_GAP);
+  return point(p.x, p.y + PILL.halfHeight + EDGE_GAP);
 };
 const left = (slug: EcosystemSlug): Point => {
   const p = part(slug).exploded;
-  return point(p.x - PLATE.halfWidth - EDGE_GAP, p.y);
+  return point(p.x - PILL.halfWidth - EDGE_GAP, p.y);
 };
 const right = (slug: EcosystemSlug): Point => {
   const p = part(slug).exploded;
-  return point(p.x + PLATE.halfWidth + EDGE_GAP, p.y);
+  return point(p.x + PILL.halfWidth + EDGE_GAP, p.y);
 };
 const edge = (
   from: EcosystemSlug,

@@ -1,60 +1,60 @@
 ---
 name: NEWMA
-description: NEWMA brand v1.0 (from plant to patient) in an Apple WWDC26 Liquid Glass shell.
+description: NEWMA brand guide v1 (Forest, Sage, Lavender; 60% white) in an Apple WWDC26 Liquid Glass shell.
 colors:
-  bg: "#f1f6f1"
+  bg: "#f7f8f4"
   bg-elevated: "#ffffff"
-  bg-deep: "#e3ede6"
-  fg: "#082b33"
-  fg-muted: "#4f6b70"
-  accent: "#0b3f4b"
-  accent-fg: "#f1f6f1"
-  prominent: "#0fa36b"
-  prominent-fg: "#082b33"
-  border: "#cfdcd5"
-  border-strong: "#6c8689"
+  bg-deep: "#edf0e6"
+  fg: "#1b2a1a"
+  fg-muted: "#535e4d"
+  accent: "#244322"
+  accent-fg: "#ffffff"
+  prominent: "#5f5986"
+  prominent-fg: "#1b2a1a"
+  border: "#dde2d3"
+  border-strong: "#7a876f"
   danger: "#a3352b"
   warning: "#f2c46b"
   warning-ink: "#8a5a00"
-  success: "#8fd3b4"
-  success-ink: "#0b7a52"
-  focus: "#1c8a99"
+  success: "#b5d39a"
+  success-ink: "#3f6b2b"
+  focus: "#86809c"
   route: "#fbd699"
   route-edge: "#b8643a"
-  contour: "#8fb3b0"
-  plate: "#06242b"
-  plate-fg: "#f1f6f1"
-  plate-muted: "#8fb3b0"
-  plate-accent: "#a6e04a"
+  contour: "#b9c2a5"
+  plate: "#1b3319"
+  plate-fg: "#f4f6ef"
+  plate-muted: "#bcc5a8"
+  plate-accent: "#c9d0b3"
   eco-compute: "#b69cff"
   eco-optional: "#a8442a"
 typography:
   display:
-    fontFamily: "Work Sans, ui-sans-serif, system-ui, -apple-system, sans-serif"
+    fontFamily: "Playfair Display, Georgia, serif"
     fontSize: "clamp(2.5rem, 1.4rem + 3.6vw, 4.75rem)"
     fontWeight: 700
     lineHeight: 0.98
     letterSpacing: "-0.04em"
   headline:
-    fontFamily: "Work Sans, ui-sans-serif, system-ui, -apple-system, sans-serif"
+    fontFamily: "Playfair Display, Georgia, serif"
     fontSize: "2.25rem"
     fontWeight: 700
     lineHeight: 1.02
     letterSpacing: "-0.03em"
   statement:
-    fontFamily: "Work Sans, ui-sans-serif, system-ui, -apple-system, sans-serif"
+    fontFamily: "Figtree, ui-sans-serif, system-ui, -apple-system, sans-serif"
     fontSize: "1.5rem"
     fontWeight: 400
     lineHeight: 1.375
     letterSpacing: "-0.02em"
   title:
-    fontFamily: "Work Sans, ui-sans-serif, system-ui, -apple-system, sans-serif"
+    fontFamily: "Figtree, ui-sans-serif, system-ui, -apple-system, sans-serif"
     fontSize: "1.5rem"
     fontWeight: 600
     lineHeight: 1.2
     letterSpacing: "-0.015em"
   body:
-    fontFamily: "Work Sans, ui-sans-serif, system-ui, -apple-system, sans-serif"
+    fontFamily: "Figtree, ui-sans-serif, system-ui, -apple-system, sans-serif"
     fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.625
@@ -159,40 +159,43 @@ components:
 
 ## Overview
 
-**Creative North Star: "From plant to patient, behind Liquid Glass."**
+**Creative North Star: "Discovery at the speed of AI, rooted in the plant."**
 
-NEWMA is a LivFul Therapeutics product. The identity (brand pack v1.0, `docs/newma_brand_pack`) carries one idea: the journey from a plant, the source, to a pill, the medicine. It lives in a single shape, a 2:1 capsule rotated 45° and split by a seam, plant half (Lime to Emerald) lower left and pill half (Deep Teal to Teal) upper right. The same capsule replaces the crossbar of the A in the newmA wordmark. Tone is precise, grounded and hopeful; every element should feel engineered, not decorated.
+NEWMA is a LivFul Therapeutics product. The identity follows brand guide v1 (`NEWMA_GUIDE_V1.pdf`, assets in `docs/newma_brand_pack`): a lowercase `newma™` wordmark whose `wʌʌa` runs a Forest → Sage → Lavender gradient, a tagline lockup ("AI-Powered Ethnobotanical Drug Discovery"), 60% white space, generous rounded white cards, a single-colour blur shadow, a pixel "bitmap wave" (the `wʌʌ` shape read as a DNA strand or data stream) and free-form gradient panels. Tone is precise, grounded and hopeful.
 
-The interface follows Apple's WWDC26 Human Interface Guidelines. Liquid Glass forms a separate functional layer for navigation and controls that floats above content; content stays on standard materials. Motion is restrained: the pipeline's flow, a short settle on the nodes, hover lift and scroll reveals, all transform and opacity, all off under reduced motion. Because the ambient loops run longer than five seconds, WCAG 2.2.2 would also want a visible pause control, which is not built yet.
+The interface follows Apple's WWDC26 Human Interface Guidelines. Liquid Glass forms a separate functional layer for navigation and controls that floats above content; content stays on standard materials. Motion is restrained: the pipeline's flow, a short settle on the nodes, the fog panel's slow drift, hover lift and scroll reveals, all transform and opacity, all off under reduced motion.
 
 The public site and the demo share one visual language. Layout (section order, 6/6 hero, 7/5 splits, four-step row, six-component index) is the thing that stays.
 
 **Key Characteristics:**
 
-- Neutrals carry the identity: Ink on Mist and white, Night plates. Emerald, Lime and Teal are accents only.
-- Work Sans Bold headlines, Work Sans Regular body, Geist Mono Bold for labels, bylines and data.
-- A floating Liquid Glass capsule header, tinted glass for the one primary action, glass controls (rim and translucent fill, no blur) for secondary actions.
+- 60% white, 15% Forest, 15% Sage, 10% Lavender in any space.
+- Playfair Display (regular) titles; Figtree body as the web stand-in for Fabio XM; Geist Mono for labels and data.
+- White rounded cards (2rem) lifted by the brand blur shadow; Forest plates; the fog gradient for feature panels.
+- Pill buttons: Lavender for the one prominent action, Sage for supporting actions.
 - Concentric corners: a control's radius is its container's radius minus the inset between them.
 
 ## Logos and icons
 
-Files live in `public/brand`, copied from the brand pack. Logo SVGs are cropped to their ink.
+Masters live in `docs/newma_brand_pack/00_source` (vector, extracted from the guide PDF with text outlined). `node scripts/build-brand-icons.mjs` regenerates every size: `public/brand/*`, `public/favicon.ico`, `public/images/bitmap-wave.svg` and the whole brand pack (logo PNGs at 600/1200/2800, icon PNGs at 128–1024, favicons, app icons, avatars, social banners, email-signature logo).
 
-- `newma-wordmark.svg` / `-reversed.svg`: newmA alone, for tight spaces (header, demo). Minimum 110px wide.
-- `newma-logo.svg` / `-reversed.svg`: with the BY LIVFUL THERAPEUTICS byline (footer, access, offline, OG). Minimum 160px wide.
-- Use the reversed file on Night; never recolour a lockup with filters, shadows or effects.
-- `CapsuleIcon` (`src/components/brand/capsule-icon.tsx`) draws the pill icon in `color`, `reversed` or `mono`. Never place it beside the wordmark: the capsule already lives inside the A.
-- The legacy `LeafIcon` and `PillIcon` remain only for the How it works step markers and guardrail line, which are deliberately unchanged.
+- `newma-wordmark.svg` / `-reversed.svg`: newma™ alone, for tight spaces (header, demo). Minimum 96px wide.
+- `newma-logo.svg` / `-reversed.svg`: with the tagline (footer, access, offline, OG). Minimum 180px wide.
+- The primary files carry the brand gradient; reversed files are white for Forest and photo grounds. Never recolour a lockup with filters, shadows or effects.
+- The app mark is the `wʌʌ` wave: brand gradient on a white tile (PWA, apple-touch, app icons), white on a Forest tile at favicon sizes for contrast.
+- `CapsuleIcon`, `LeafIcon` and `PillIcon` remain as UI glyphs, recoloured Sage/Forest and Lavender.
 
 ## Colors
 
-Brand palette v1.0, roughly 45% Ink/Night, 30% Mist, 12% Deep Teal, then small amounts of Emerald, Lime and Teal.
+Brand guide v1: linear gradient Forest `#244322` → Sage `#9BA77D` → Lavender `#86809C`.
 
-- **Ink** (fg) `#082B33`, **Slate** (fg-muted) `#4F6B70` on **Mist** (bg) `#F1F6F1` and white.
-- **Deep Teal** (accent) `#0B3F4B`: links and outline actions. Emerald and Teal never set body text on light grounds (3.24:1 and 4.08:1).
-- **Prominent** (Emerald, `#0FA36B`) with Ink: the Plant gradient (`#A6E04A` to `#0FA36B`) is the primary button fill. Every stop holds 4.5:1 against Ink, resting and at hover brightness; `tests/unit/contrast.test.ts` enforces it.
-- **Plates**: Night `#06242B` to Deep Teal, Mist text, Slate-light muted text, **Lime** `#A6E04A` as the plate accent. Lime is for dark grounds and small highlights only.
-- Status colours (madder, ochre, sage), apricot route and the ecosystem hues are functional and stay paired with glyphs.
+- **Forest ink** (fg) `#1B2A1A`, muted `#535E4D` on **Paper** (bg) `#F7F8F4` and white; **Sage mist** band `#EDF0E6`.
+- **Forest** (accent) `#244322`: links, headline ink and outline actions.
+- **Prominent** (Lavender, `#5F5986`) with white: the primary pill's gradient (`#57527C` → `#4F4A73`) holds 4.5:1 at rest and on hover; `tests/unit/contrast.test.ts` enforces it. Brand Lavender `#86809C` is the focus ring.
+- **Sage** `#9BA77D` / Sage soft `#C9D0B3` with Forest ink: supporting pills.
+- **Plates**: Deep Forest `#1B3319` to Forest, near-white text, Sage-light muted text and accent.
+- **Fog** (`--background-image-fog`): the free-form gradient. White text sits on it only inside `.fog-panel`, whose Forest scrim keeps 4.5:1.
+- Status colours, apricot route and the ecosystem hues are functional and stay paired with glyphs.
 
 ### Named Rules
 
@@ -206,10 +209,9 @@ Brand palette v1.0, roughly 45% Ink/Night, 30% Mist, 12% Deep Teal, then small a
 
 ## Typography
 
-**Display and body:** Work Sans (Bold for headlines, Semibold for titles, Regular for body at 16 to 18px, 162.5% line height).
+**Titles:** Playfair Display (the guide's title face; Georgia fallback), regular weight, slight negative tracking.
+**Body and UI:** Figtree, standing in for the guide's Fabio XM (no web licence in the repo). Swap `--font-figtree` for a `next/font/local` Fabio XM when licensed files are available.
 **Labels and data:** Geist Mono Bold, uppercase and tracked (`.place`), plus hashes, codes and measured values (`.gridref`).
-
-Don't set headings, buttons or body copy in Geist Mono.
 
 ## Layout
 
@@ -258,17 +260,17 @@ Elevated white on light grounds, `.surface-material` on plates. Not glass. The s
 
 ### Navigation
 
-A sticky, floating Liquid Glass capsule with the newmA wordmark. On mobile the capsule grows into a rounded glass sheet for section links. The footer is a Night band with the reversed logo and byline on screen and in a dark forced-colours theme; print and a light forced-colours theme show the dark-ink logo instead.
+A sticky, floating Liquid Glass capsule with the newma wordmark. On mobile the capsule grows into a rounded glass sheet for section links. The footer is a Forest band with the reversed logo and tagline on screen and in a dark forced-colours theme; print and a light forced-colours theme show the dark-ink logo instead.
 
 ### Appearance (user theme)
 
-Visitors choose **Light**, **Dark**, or **System** from `ThemeToggle`. From the large layout breakpoint up, the control is icon-only in the header bar; below that it sits at the bottom of the mobile Menu sheet beside a **Theme** label. With no stored preference, the site defaults to **Dark**. Choice persists in `localStorage` under `newma.theme.v1` and is applied with `useSyncExternalStore` (no React context): `ThemeSync` in the root layout mirrors storage onto `html` on every route.
+Visitors choose **Light**, **Dark**, or **System** from `ThemeToggle`. From the large layout breakpoint up, the control is icon-only in the header bar; below that it sits at the bottom of the mobile Menu sheet beside a **Theme** label. With no stored preference, the site defaults to **Light** (the guide's 60% white). Choice persists in `localStorage` under `newma.theme.v1` and is applied with `useSyncExternalStore` (no React context): `ThemeSync` in the root layout mirrors storage onto `html` on every route.
 
-- **Light:** `@theme` survey-paper tokens (`color.css`).
-- **Dark (default):** semantic remaps in `color.dark.css` on `.dark` or `@media (prefers-color-scheme: dark)` when `:root:not(.light)` — Night / Deep Teal stack; **plate tokens unchanged**.
+- **Light (default):** `@theme` tokens (`color.css`); the root ships with `.light`.
+- **Dark:** semantic remaps in `color.dark.css` on `.dark` or `@media (prefers-color-scheme: dark)` when `:root:not(.light)` — Deep Forest stack; **plate tokens unchanged**.
 - **Classes:** `html.light` and `html.dark` are manual overrides; **System** follows the OS via media query when neither class is set.
 - **Independent of header tone:** scroll-based `[data-site-header][data-tone]` (content beneath the capsule) still drives glass and wordmark swaps; it is not the user theme preference.
-- **Browser chrome:** `#newma-theme-color` meta tracks the resolved stack (`#f1f6f1` / `#06242b`).
+- **Browser chrome:** `#newma-theme-color` meta tracks the resolved stack (`#f7f8f4` / `#1b3319`).
 
 ### Ecosystem diagram
 

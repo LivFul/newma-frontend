@@ -26,10 +26,11 @@ describe("ThemeToggle in SiteHeader", () => {
     expect(menu).not.toBeNull();
     const group = within(menu!).getByRole("radiogroup", { name: "Theme" });
     expect(within(group).getAllByRole("radio")).toHaveLength(3);
-    await user.click(within(group).getByRole("radio", { name: "Light" }));
-    expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe("light");
+    // Light is the default, so choose Dark first (a write) and then Light again.
     await user.click(within(group).getByRole("radio", { name: "Dark" }));
     expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe("dark");
     expect(document.documentElement.classList.contains("dark")).toBe(true);
+    await user.click(within(group).getByRole("radio", { name: "Light" }));
+    expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe("light");
   });
 });

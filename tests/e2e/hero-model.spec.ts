@@ -9,6 +9,7 @@ import {
   heroSvg,
   partY,
   settled,
+  settledSpread,
   SLUGS,
   tabToFirstComponent,
 } from "../support/hero";
@@ -18,13 +19,13 @@ test.describe("mouse", () => {
 
   test("hover explodes the diagram and leaving puts it back", async ({ page }) => {
     await gotoHeroReady(page);
-    const assembled = await settled(page);
+    const assembled = await settledSpread(page);
     await heroFrame(page).hover();
     await expect(heroSvg(page)).toHaveAttribute("data-view", "exploded");
-    expect(await settled(page)).toBeGreaterThan(assembled + 20);
+    expect(await settledSpread(page)).toBeGreaterThan(assembled + 20);
     await page.mouse.move(2, 2);
     await expect(heroSvg(page)).toHaveAttribute("data-view", "assembled");
-    expect(await settled(page)).toBeCloseTo(assembled, 0);
+    expect(await settledSpread(page)).toBeCloseTo(assembled, 0);
   });
 
   for (const slug of SLUGS) {
@@ -94,7 +95,7 @@ test.describe("keyboard", () => {
     await tabToFirstComponent(page);
     for (let i = 0; i < 5; i += 1) await page.keyboard.press("ArrowDown");
     await page.keyboard.press("Tab");
-    const toggle = page.getByRole("button", { name: "Explore components" });
+    const toggle = page.getByRole("button", { name: "Explore Components" });
     await expect(toggle).toBeFocused();
     await expect(heroSvg(page)).toHaveAttribute("data-view", "assembled");
     await page.keyboard.press("Enter");
@@ -111,13 +112,13 @@ test.describe("touch", () => {
 
   test("the first tap explodes without navigating, the second tap opens", async ({ page }) => {
     await gotoHeroReady(page);
-    const assembled = await settled(page);
+    const assembled = await settledSpread(page);
     await page.touchscreen.tap(
       ...(Object.values(await center(heroLink(page, "provenance-dlt"))) as [number, number]),
     );
     await expect(heroSvg(page)).toHaveAttribute("data-view", "exploded");
     await expect(page).toHaveURL(/\/$/);
-    expect(await settled(page)).toBeGreaterThan(assembled + 20);
+    expect(await settledSpread(page)).toBeGreaterThan(assembled + 20);
     const target = await center(heroLink(page, "wet-lab"));
     await page.touchscreen.tap(target.x, target.y);
     await expect(page).toHaveURL(/\/ecosystem\/wet-lab$/);
@@ -135,11 +136,11 @@ test.describe("touch", () => {
     });
   }
 
-  test("Explore components explodes without tapping a part and a tap outside does not close it", async ({
+  test("Explore Components explodes without tapping a part and a tap outside does not close it", async ({
     page,
   }) => {
     await gotoHeroReady(page);
-    const toggle = page.getByRole("button", { name: "Explore components" });
+    const toggle = page.getByRole("button", { name: "Explore Components" });
     const box = await center(toggle);
     await page.touchscreen.tap(box.x, box.y);
     await expect(toggle).toHaveAttribute("aria-pressed", "true");
@@ -164,7 +165,7 @@ test.describe("touch", () => {
 
   test("the toggle is at least 44 by 44 CSS pixels", async ({ page }) => {
     await gotoHeroReady(page);
-    const box = await page.getByRole("button", { name: "Explore components" }).boundingBox();
+    const box = await page.getByRole("button", { name: "Explore Components" }).boundingBox();
     expect(box!.width).toBeGreaterThanOrEqual(44);
     expect(box!.height).toBeGreaterThanOrEqual(44);
   });

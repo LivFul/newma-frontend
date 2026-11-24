@@ -72,6 +72,7 @@ for (const width of [1024, 1440]) {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     await page.waitForLoadState("networkidle");
+    await page.getByRole("button", { name: "Menu" }).click();
     await page.addStyleTag({
       content: `${MUTED_LABELS} { color: transparent !important; }`,
     });

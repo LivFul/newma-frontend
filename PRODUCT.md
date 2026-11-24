@@ -44,9 +44,9 @@ The demo platform (`/demo`, W1–W10 + guided tour) is used by those same visito
 
 ## Brand commitments
 
-- **Align with LivFul.** NEWMA is a LivFul product. Shipped identity follows brand pack v1.0: Work Sans and Geist Mono, Mist / Ink / Night / Teal / Emerald / Lime palette, NEWMA wordmark and capsule mark, Liquid Glass header and aurora hero — documented in `DESIGN.md` and `docs/newma_brand_pack/`.
+- **Align with LivFul.** NEWMA is a LivFul product. Shipped identity follows brand guide v1 (`NEWMA_GUIDE_V1.pdf`): Playfair Display titles, Figtree body (stand-in for Fabio XM) and Geist Mono labels; Forest / Sage / Lavender on 60% white; the gradient newma™ wordmark and wʌʌ wave mark; Liquid Glass header and the white-card + fog-panel hero — documented in `DESIGN.md` and `docs/newma_brand_pack/`.
 - **Keep the concepts** of the interactive ecosystem graphic (six components; pipeline layout) and the 3D workflow scene; restyling must stay within the token system.
-- **Mark language.** The capsule icon and Plant / Pill gradients are the recurring glyphs. The public site is ethnobotanical and pharma-inspired in a glass shell, not a printed survey sheet.
+- **Mark language.** The wʌʌ wave (solid, or as the pixel bitmap wave) and the Forest → Sage → Lavender gradient are the recurring motifs; use the bitmap effect sparingly. The capsule icon stays as a UI glyph.
 
 ## Open decisions
 

@@ -83,7 +83,7 @@ export default function Interactive({
                 type="button"
                 variant="secondary"
                 size="sm"
-                className={`${TOGGLE_CLASS} relative z-10`}
+                className={`${TOGGLE_CLASS} eco-explore relative z-10`}
                 aria-pressed={state.pinned || state.touchOpen}
                 aria-controls={HERO_SVG_ID}
                 onClick={() => dispatch({ type: "toggle" })}

@@ -68,6 +68,17 @@ export async function settled(page: Page, slug: Slug = "wet-lab"): Promise<numbe
   return previous[SLUGS.indexOf(slug)]!;
 }
 
+/**
+ * Once every part has stopped moving, the distance from the first part to the last. Exploding opens
+ * this span (the rows separate); the resting stack is already spread, so a row's direction of travel
+ * is not the signal: the span growing is.
+ */
+export async function settledSpread(page: Page): Promise<number> {
+  await settled(page);
+  const ys = await allPartYs(page);
+  return ys.at(-1)! - ys[0]!;
+}
+
 export async function focusedHref(page: Page): Promise<string | null> {
   return page.evaluate(() => document.activeElement?.getAttribute("href") ?? null);
 }

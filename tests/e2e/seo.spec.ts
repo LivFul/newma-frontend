@@ -138,7 +138,7 @@ test("a component page has its own canonical, title and a single TechArticle", a
     "href",
     `${ORIGIN}/ecosystem/wet-lab`,
   );
-  await expect(page).toHaveTitle("Wet Lab — NEWMA ecosystem");
+  await expect(page).toHaveTitle("Wet Labs — NEWMA ecosystem");
   const scripts = await page
     .locator('script[type="application/ld+json"]')
     .evaluateAll((els) => els.map((el) => JSON.parse(el.textContent ?? "{}")));

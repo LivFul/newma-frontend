@@ -29,8 +29,8 @@ export function LeafIcon({
       {gradient ? (
         <defs>
           <linearGradient id={id} x1="30" y1="124" x2="379" y2="124" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#b3e570" />
-            <stop offset="1" stopColor="#15a676" />
+            <stop stopColor="#9ba77d" />
+            <stop offset="1" stopColor="#244322" />
           </linearGradient>
         </defs>
       ) : null}

@@ -7,7 +7,7 @@ const TITLES: Record<Slug, string> = {
   interface: "Interface",
   "agentic-compute": "Agentic Compute",
   "scientific-review": "Scientific Review",
-  "wet-lab": "Wet Lab",
+  "wet-lab": "Wet Labs",
   "data-knowledge": "Data & Knowledge",
   "provenance-dlt": "Provenance & DLT",
 };
