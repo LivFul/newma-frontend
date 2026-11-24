@@ -23,7 +23,10 @@ test("the header Access NEWMA click emits one access_newma_click with no propert
   await recordEvents(page);
   await page.goto("/");
   await page.getByRole("button", { name: "Menu" }).click();
-  await page.locator("[data-site-header]").getByRole("link", { name: "Explore the Platform" }).click();
+  await page
+    .locator("[data-site-header]")
+    .getByRole("link", { name: "Explore the Platform" })
+    .click();
   await expect(page).toHaveURL(/\/access$/);
   expect(await readEvents(page)).toEqual([{ name: "access_newma_click" }]);
 });
