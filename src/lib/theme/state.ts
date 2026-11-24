@@ -3,8 +3,8 @@ export const THEME_STORAGE_KEY = "newma.theme.v1";
 export type ThemePreference = "light" | "dark" | "system";
 export type ResolvedTheme = "light" | "dark";
 
-/** When storage is missing or invalid, visitors get Night survey-paper tokens until they choose otherwise. */
-export const DEFAULT_THEME_PREFERENCE: ThemePreference = "dark";
+/** When storage is missing or invalid, visitors get the light (60% white) brand stack until they choose otherwise. */
+export const DEFAULT_THEME_PREFERENCE: ThemePreference = "light";
 
 const PREFERENCES = new Set<ThemePreference>(["light", "dark", "system"]);
 

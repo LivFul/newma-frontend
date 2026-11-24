@@ -35,7 +35,7 @@ test("reduced motion shows the exploded labelled diagram with no motion running"
     () => document.querySelector(".eco-figure")!.getAnimations({ subtree: true }).length,
   );
   expect(running).toBe(0);
-  await expect(page.getByRole("button", { name: "Explore components" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Explore Components" })).toHaveCount(0);
 });
 
 test("reduced motion: Tab reaches all six components in order", async ({ page }) => {

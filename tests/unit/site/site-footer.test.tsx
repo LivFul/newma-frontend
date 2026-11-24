@@ -47,10 +47,10 @@ describe("SiteFooter", () => {
     expect(footer).toHaveAttribute("data-tone", "dark");
     expect(footer).toHaveAttribute("data-site-footer");
     expect(container.querySelector("img.wordmark-light")?.getAttribute("src")).toMatch(
-      /newma-logo\.svg/,
+      /newma-wordmark\.svg/,
     );
     expect(container.querySelector("img.wordmark-dark")?.getAttribute("src")).toMatch(
-      /newma-logo-reversed\.svg/,
+      /newma-wordmark-reversed\.svg/,
     );
   });
   it("is axe clean", async () => {

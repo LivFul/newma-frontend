@@ -8,7 +8,7 @@
 .eco-frame {
   /* Reserved box: the static SVG and its interactive twin share this aspect ratio, so the swap
      cannot shift layout. */
-  aspect-ratio: 470 / 560;
+  aspect-ratio: 470 / 420;
   width: 100%;
   max-width: 34rem;
   margin-inline: auto;
@@ -54,8 +54,93 @@
 .eco-link:focus-visible .eco-hit {
   stroke: var(--color-focus);
 }
-.eco-link:hover .eco-plate-top {
-  fill: var(--color-border);
+/* Every pill is outlined at rest and fills on hover. */
+.eco-link:hover .eco-bar {
+  fill: var(--color-fg);
+  stroke: none;
+}
+.eco-bar {
+  fill: none;
+  stroke: var(--color-fg);
+  stroke-width: 1.25px;
+}
+/* Hairline linework: spine and ticks share one weight and tone. */
+.eco-tick,
+.eco-spine {
+  fill: none;
+  stroke: var(--color-fg);
+  stroke-opacity: 0.6;
+  stroke-width: 1.15px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* The open-view spine waits for the explode; the resting spine clears away for it. */
+.eco-open {
+  opacity: 0;
+}
+/* Hero panel contrast layers. They hang off the content rather than the panel's proportions, so the
+   dark-to-pale turn always falls between the diagram and its caption, at every width. Both sit at
+   z-index -1 inside the panel's isolated stack: above the fog, under the grain and the content.
+   The scrim keeps the white labels at 4.5:1; the mist lets the caption read in dark Forest ink. */
+.hero-eco .eco-frame,
+.hero-eco .eco-caption {
+  position: relative;
+}
+.hero-eco .eco-frame::before,
+.hero-eco .eco-caption::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+.hero-eco .eco-frame::before {
+  inset: -4rem -4rem -2.5rem;
+  background: linear-gradient(
+    180deg,
+    rgb(11 30 13 / 0.38) 0%,
+    rgb(11 30 13 / 0.36) 50%,
+    rgb(11 30 13 / 0.56) calc(100% - 2.5rem),
+    rgb(11 30 13 / 0.24) calc(100% - 1.25rem),
+    rgb(11 30 13 / 0) 100%
+  );
+}
+.hero-eco .eco-caption::before {
+  inset: -1.5rem -4rem -4rem;
+  background: linear-gradient(
+    180deg,
+    rgb(236 236 231 / 0) 0%,
+    rgb(236 236 231 / 0.3) 1.5rem,
+    rgb(236 236 231 / 0.52) 3rem,
+    rgb(236 236 231 / 0.4) 100%
+  );
+}
+.eco-caption {
+  color: #263023;
+}
+/* Higher contrast drops the fog for the solid plate, so the caption returns to the plate's ink. */
+@media (prefers-contrast: more) {
+  .hero-eco .eco-frame::before,
+  .hero-eco .eco-caption::before {
+    display: none;
+  }
+  .eco-caption {
+    color: var(--color-fg);
+  }
+}
+/* The plate's glass-control fill would otherwise paint this pill translucent. Dark olive with a cream
+   label, read against the panel's pale lower corner. */
+.eco-explore {
+  border-color: transparent !important;
+  background-color: #2f321f !important;
+  color: #efecdc !important;
+  font-weight: 500 !important;
+  padding-inline: 1.5rem !important;
+  min-height: 2.75rem;
+}
+.eco-explore:hover {
+  border-color: transparent !important;
+  background-color: #3d4128 !important;
+  color: #fff !important;
 }
 .eco-plate-top {
   fill: var(--color-bg-elevated);
@@ -93,28 +178,26 @@
   fill: var(--eco-ink);
   stroke: none;
 }
-.eco-leader {
-  stroke: var(--eco-tone);
-  stroke-width: 1.5px;
-}
 .eco-title {
   fill: var(--color-fg);
-  font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: -0.005em;
 }
+/* A pale sage, lighter than the plate's muted token: descriptors are small and sit on the fog. */
 .eco-desc {
-  fill: var(--color-fg-muted);
+  fill: #e3e8d9;
   opacity: 0;
 }
 .eco-edges {
   opacity: 0;
 }
-/* Edges, rail included, are 3:1 against the background (WCAG 1.4.11). */
+/* Flow arrows share the hairline's weight and tone, still well over 3:1 on the scrim (WCAG 1.4.11). */
 .eco-edges path {
   fill: none;
-  stroke: var(--color-border-strong);
-  stroke-width: 1.75px;
+  stroke: var(--color-fg);
+  stroke-opacity: 0.7;
+  stroke-width: 1.25px;
   stroke-linecap: round;
 }
 .eco-edges path[data-dashed] {
@@ -122,16 +205,24 @@
   stroke-dasharray: 6 5;
 }
 .eco-arrowhead {
-  fill: var(--color-border-strong);
+  fill: var(--color-fg);
+  fill-opacity: 0.7;
 }
 
-/* Interactive layer: opacity follows the view state. */
+/* Interactive layer: opacity follows the view state. The resting spine gives way
+   to the open one when the stack explodes. */
 .eco-svg[data-view="exploded"] .eco-desc,
-.eco-svg[data-view="exploded"] .eco-edges {
+.eco-svg[data-view="exploded"] .eco-edges,
+.eco-svg[data-view="exploded"] .eco-open {
   opacity: 1;
 }
+.eco-svg[data-view="exploded"] .eco-rest {
+  opacity: 0;
+}
 .eco-svg[data-layer="interactive"] .eco-desc,
-.eco-svg[data-layer="interactive"] .eco-edges {
+.eco-svg[data-layer="interactive"] .eco-edges,
+.eco-svg[data-layer="interactive"] .eco-rest,
+.eco-svg[data-layer="interactive"] .eco-open {
   transition: opacity var(--motion-duration-base) var(--motion-ease-standard);
 }
 
@@ -142,15 +233,21 @@
       calc(var(--i) * 60ms);
   }
   .eco-svg[data-layer="static"] .eco-desc,
-  .eco-svg[data-layer="static"] .eco-edges {
+  .eco-svg[data-layer="static"] .eco-edges,
+  .eco-svg[data-layer="static"] .eco-rest,
+  .eco-svg[data-layer="static"] .eco-open {
     transition: opacity var(--motion-duration-base) var(--motion-ease-standard) 180ms;
   }
   .eco-svg[data-layer="static"]:focus-within .eco-part {
     transform: translate(var(--ex), var(--ey));
   }
   .eco-svg[data-layer="static"]:focus-within .eco-desc,
-  .eco-svg[data-layer="static"]:focus-within .eco-edges {
+  .eco-svg[data-layer="static"]:focus-within .eco-edges,
+  .eco-svg[data-layer="static"]:focus-within .eco-open {
     opacity: 1;
+  }
+  .eco-svg[data-layer="static"]:focus-within .eco-rest {
+    opacity: 0;
   }
 }
 /* The svg ignores the pointer (only its parts take it), so the frame carries the hover, as it does in
@@ -160,8 +257,12 @@
     transform: translate(var(--ex), var(--ey));
   }
   .eco-frame:hover .eco-svg[data-layer="static"] .eco-desc,
-  .eco-frame:hover .eco-svg[data-layer="static"] .eco-edges {
+  .eco-frame:hover .eco-svg[data-layer="static"] .eco-edges,
+  .eco-frame:hover .eco-svg[data-layer="static"] .eco-open {
     opacity: 1;
+  }
+  .eco-frame:hover .eco-svg[data-layer="static"] .eco-rest {
+    opacity: 0;
   }
 }
 
@@ -174,16 +275,21 @@
     transition: none !important;
   }
   .eco-svg .eco-desc,
-  .eco-svg .eco-edges {
+  .eco-svg .eco-edges,
+  .eco-svg .eco-open {
     opacity: 1 !important;
     transition: none !important;
+  }
+  .eco-svg .eco-rest {
+    opacity: 0 !important;
   }
 }
 
 @media (forced-colors: active) {
   .eco-plate-top,
   .eco-plate-side,
-  .eco-leader,
+  .eco-tick,
+  .eco-spine,
   .eco-edges path {
     stroke: CanvasText;
   }
@@ -202,6 +308,10 @@
   .eco-desc,
   .eco-arrowhead {
     fill: CanvasText;
+  }
+  .eco-bar {
+    stroke: CanvasText;
+    fill: none;
   }
   .eco-link:focus-visible .eco-hit {
     stroke: Highlight;

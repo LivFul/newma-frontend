@@ -2,11 +2,7 @@ import { gotoHeroReady } from "../support/hero";
 import { expect, test } from "../support/test";
 
 // Value: protects=the mobile section menu is really closed until Menu is pressed, opens with tappable links, and closes when one is chosen; fails_when=the hidden attribute stops hiding the list under the page's CSS, aria-expanded drifts, or a link is smaller than 44 px; why_new=the unit test runs without any CSS and no e2e pressed Menu, so a flex class overriding hidden would pass; seam=none
-test("the mobile section menu opens on Menu and closes when a link is chosen", async ({
-  page,
-  isMobile,
-}) => {
-  test.skip(!isMobile, "the Menu button only shows below the lg breakpoint");
+test("the section menu opens on Menu and closes when a link is chosen", async ({ page }) => {
   // The Menu button is server-rendered and only works once hydrated: wait for the page's ready hook.
   await gotoHeroReady(page);
   const menu = page.getByRole("button", { name: "Menu" });
@@ -31,8 +27,7 @@ test("the mobile section menu opens on Menu and closes when a link is chosen", a
 // Value: protects=a section chosen from the mobile menu lands just below the sticky header, like any in-page anchor;
 //   fails_when=the closing sheet stays in flow during the anchor scroll, so the section ends up the sheet's height past the header (QA run 3: -103 px vs 110 px);
 //   why_new=the test above only checks that the sheet closes, never where the page lands; seam=none
-test("a section chosen from the mobile menu lands below the header", async ({ page, isMobile }) => {
-  test.skip(!isMobile, "the Menu button only shows below the lg breakpoint");
+test("a section chosen from the mobile menu lands below the header", async ({ page }) => {
   await gotoHeroReady(page);
   await page.getByRole("button", { name: "Menu" }).click();
   await page.locator("#mobile-sections").getByRole("link", { name: "How it works" }).click();
@@ -59,24 +54,16 @@ test("a section chosen from the mobile menu lands below the header", async ({ pa
   expect(gap).toBeLessThanOrEqual(96);
 });
 
-// Value: protects=a menu opened below lg closes when the viewport widens past it (a tablet rotating), so it does not reopen as a stale sheet or keep its listeners;
-//   fails_when=the (min-width: 64rem) listener is dropped, so the sheet is still open when the viewport narrows again;
-//   why_new=the sheet is lg:hidden, so a menu left open above lg was invisible but still open; seam=none
-test("an open menu closes when the viewport widens past lg", async ({ page, isMobile }) => {
-  test.skip(isMobile, "resizes a desktop viewport across the lg breakpoint");
+// Value: protects=the round menu is the only navigation at every width, so a menu opened on a narrow viewport stays open and visible when it widens (a tablet rotating);
+//   fails_when=a (min-width: 64rem) listener or an lg:hidden class comes back and closes or hides the sheet when the viewport widens;
+//   why_new=the header bar with its own links was retired, so widening no longer has another navigation to fall back to; seam=none
+test("an open menu stays open when the viewport widens", async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 800 });
   await gotoHeroReady(page);
   const menu = page.getByRole("button", { name: "Menu" });
   await menu.click();
   await expect(menu).toHaveAttribute("aria-expanded", "true");
   await page.setViewportSize({ width: 1100, height: 800 });
-  // The media query's change event fires on a rendering update: wait for it before narrowing again.
-  // The button is lg:hidden here, so it is out of the accessibility tree; find it by attribute.
-  await expect(page.locator('[aria-controls="mobile-sections"]')).toHaveAttribute(
-    "aria-expanded",
-    "false",
-  );
-  await page.setViewportSize({ width: 900, height: 800 });
-  await expect(menu).toHaveAttribute("aria-expanded", "false");
-  await expect(page.locator("#mobile-sections")).toBeHidden();
+  await expect(menu).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator("#mobile-sections")).toBeVisible();
 });

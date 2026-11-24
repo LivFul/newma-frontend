@@ -118,7 +118,9 @@ describe("ecosystem geometry", () => {
   it("separates parts vertically when exploded and keeps assembled parts stacked", () => {
     const assembledSpan = PARTS.at(-1)!.assembled.y - PARTS[0]!.assembled.y;
     const explodedSpan = PARTS.at(-1)!.exploded.y - PARTS[0]!.exploded.y;
-    expect(explodedSpan).toBeGreaterThan(assembledSpan * 1.5);
+    // At rest the six rows already sit at an even pitch, so exploding opens the stack further rather
+    // than from a tight pile.
+    expect(explodedSpan).toBeGreaterThan(assembledSpan * 1.15);
     for (let i = 1; i < PARTS.length; i += 1) {
       expect(PARTS[i]!.exploded.y).toBeGreaterThan(PARTS[i - 1]!.exploded.y);
       expect(PARTS[i]!.assembled.y).toBeGreaterThan(PARTS[i - 1]!.assembled.y);

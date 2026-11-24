@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, onTestFinished, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { expectNoAxeViolations } from "../ui/axe";
@@ -31,7 +31,8 @@ function mockReducedMotion(reduced: boolean) {
 }
 
 describe("SiteHeader", () => {
-  it("renders a banner with the wordmark home link, four in-page anchors and Access NEWMA", () => {
+  it("renders a banner with the wordmark and a round menu that holds the routes", async () => {
+    const user = userEvent.setup();
     const { container } = render(<SiteHeader />);
     const header = screen.getByRole("banner");
     expect(header).toHaveAttribute("data-site-header");
@@ -39,67 +40,38 @@ describe("SiteHeader", () => {
       name: "NEWMA by LivFul Therapeutics",
     });
     expect(home).toHaveAttribute("href", "/");
-    expect(within(header).getByRole("link", { name: "Overview" })).toHaveAttribute(
+    const menu = within(header).getByRole("button", { name: "Menu" });
+    expect(menu.className).toMatch(/rounded-full/);
+    expect(menu.className).toMatch(/size-12/);
+    expect(within(header).queryByRole("link", { name: "Overview" })).toBeNull();
+    expect(container.querySelector("header")?.className).toMatch(/sticky/);
+
+    await user.click(menu);
+    const nav = within(header).getByRole("navigation", { name: "Mobile sections" });
+    expect(within(nav).getByRole("link", { name: "Overview" })).toHaveAttribute(
       "href",
       "/overview",
     );
-    expect(within(header).getByRole("link", { name: "How it works" })).toHaveAttribute(
+    expect(within(nav).getByRole("link", { name: "How it works" })).toHaveAttribute(
       "href",
       "/how-it-works",
     );
-    expect(within(header).getByRole("link", { name: "Ecosystem" })).toHaveAttribute(
+    expect(within(nav).getByRole("link", { name: "Ecosystem" })).toHaveAttribute(
       "href",
       "/ecosystem",
     );
-    expect(within(header).getByRole("link", { name: "About Newma" })).toHaveAttribute(
+    expect(within(nav).getByRole("link", { name: "About Newma" })).toHaveAttribute(
       "href",
       "/about",
     );
-    const access = within(header).getByRole("link", { name: /^Access NEWMA/ });
-    expect(access).toHaveAttribute("href", "/access");
-    expect(access.className).toMatch(/min-h-11/);
-    expect(container.querySelector("header")?.className).toMatch(/sticky/);
-  });
-  it("keeps Access NEWMA visible below lg and hides the section anchors there", () => {
-    render(<SiteHeader />);
-    const overview = screen.getByRole("link", { name: "Overview" });
-    expect(overview.closest("nav")?.className).toMatch(/hidden/);
-    expect(overview.closest("nav")?.className).toMatch(/lg:flex/);
-    expect(screen.getByRole("link", { name: /^Access NEWMA/ }).closest("nav")).toBeNull();
-  });
-  it("links staff to Aveloz just before Access NEWMA, at every breakpoint", () => {
-    render(<SiteHeader />);
-    const header = screen.getByRole("banner");
-    const aveloz = within(header).getByRole("link", { name: "Aveloz (LivFul staff)" });
+    const aveloz = within(nav).getByRole("link", { name: "AI Research Assistant" });
     expect(aveloz).toHaveAttribute("href", "https://aveloz.livful.com");
     expect(aveloz).toHaveAttribute("rel", "noopener");
-    expect(aveloz).not.toHaveAttribute("target");
     expect(aveloz.className).toMatch(/min-h-11/);
-    expect(aveloz.closest("nav")).toBeNull();
-    const access = within(header).getByRole("link", { name: /^Access NEWMA/ });
+    const access = within(nav).getByRole("link", { name: "Explore the Platform" });
+    expect(access).toHaveAttribute("href", "/access");
+    expect(access.className).toMatch(/min-h-11/);
     expect(aveloz.compareDocumentPosition(access) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  });
-  // Value: protects=below xl the call to action reads "Demo" so the logo, Menu, Aveloz and Demo share one row, while its accessible name still starts with "Access NEWMA" and contains the visible word (WCAG 2.5.3); it carries the attention ring;
-  //   fails_when=the short label shows at xl (both labels visible), the full label leaves the accessible name, the visible "Demo" drops out of the name, or the ring class is lost;
-  //   why_new=the header CTA had one label at every width; seam=none
-  it("labels the call to action Demo below xl and keeps Access NEWMA in its name", () => {
-    render(<SiteHeader />);
-    const access = within(screen.getByRole("banner")).getByRole("link", {
-      name: "Access NEWMA Demo",
-    });
-    expect(within(access).getByText("Access NEWMA").className).toBe("sr-only xl:not-sr-only");
-    expect(within(access).getByText("Demo").className).toBe("xl:hidden");
-    expect(access.className).toMatch(/(^|\s)cta-attention(\s|$)/);
-  });
-  it("shows short label 'Aveloz' on mobile with sr-only suffix", () => {
-    render(<SiteHeader />);
-    const header = screen.getByRole("banner");
-    const aveloz = within(header).getByRole("link", { name: "Aveloz (LivFul staff)" });
-    expect(aveloz).toHaveAttribute("aria-label", "Aveloz (LivFul staff)");
-    expect(aveloz.textContent).toMatch(/^Aveloz/);
-    const suffix = within(aveloz).getByText("(LivFul staff)");
-    expect(suffix.classList.contains("sr-only")).toBe(true);
-    expect(suffix.classList.contains("xl:not-sr-only")).toBe(true);
   });
   // Value: protects=the open menu sheet closes on Escape (focus back on Menu) and when focus leaves the header, so a focused element never lands under the open sheet (WCAG 2.4.11);
   //   fails_when=the Escape or focusout handler is dropped, Escape strands focus, or focus moving between the header's own controls closes the sheet;
@@ -140,14 +112,14 @@ describe("SiteHeader", () => {
     }
   });
 
-  // Value: protects=only the glass capsule takes pointer input; the clear gutters of the full-width sticky header pass clicks through to the content beneath;
-  //   fails_when=pointer-events-none leaves the header or pointer-events-auto leaves the capsule, so links beside or above the capsule cannot be clicked (or the header itself goes dead);
-  //   why_new=the header lost its own background in the Liquid Glass rework, which made its padding an invisible click shield; seam=none
-  it("lets clicks through the clear gutters and keeps the capsule interactive", () => {
+  // Value: protects=only the wordmark and the round menu take pointer input; the clear gutters of the full-width sticky header pass clicks through to the content beneath;
+  //   fails_when=pointer-events-none leaves the header or pointer-events-auto leaves the wordmark or menu cluster, so the chrome cannot be clicked (or the header itself goes dead);
+  //   why_new=the issued frame dropped the glass bar, and the header's padding would otherwise be an invisible click shield; seam=none
+  it("lets clicks through the clear gutters and keeps the wordmark and menu interactive", () => {
     render(<SiteHeader />);
     const header = screen.getByRole("banner");
     expect(header.className).toMatch(/(^|\s)pointer-events-none(\s|$)/);
-    expect(header.querySelector(".glass")?.className).toMatch(/(^|\s)pointer-events-auto(\s|$)/);
+    expect(header.querySelectorAll("[data-header-row] > .pointer-events-auto")).toHaveLength(2);
   });
 
   it("opens the section menu from the Menu button and closes it when a link is chosen", async () => {
@@ -167,7 +139,14 @@ describe("SiteHeader", () => {
       within(nav)
         .getAllByRole("link")
         .map((link) => link.getAttribute("href")),
-    ).toEqual(["/overview", "/how-it-works", "/ecosystem", "/about"]);
+    ).toEqual([
+      "/overview",
+      "/how-it-works",
+      "/ecosystem",
+      "/about",
+      "https://aveloz.livful.com",
+      "/access",
+    ]);
     await expectNoAxeViolations(container);
 
     await user.click(within(nav).getByRole("link", { name: "Overview" }));
@@ -176,43 +155,6 @@ describe("SiteHeader", () => {
       expect(screen.queryByRole("navigation", { name: "Mobile sections" })).toBeNull();
     });
     expect(document.getElementById("mobile-sections")).not.toBeNull();
-  });
-
-  // Value: protects=an open menu closes when the viewport widens past lg (a phone or tablet rotating), so the hidden sheet does not keep its Escape and focusout listeners attached;
-  //   fails_when=the (min-width: 64rem) listener is dropped, reacts to narrowing instead, or outlives the open menu;
-  //   why_new=the sheet is lg:hidden, so a menu opened below lg stayed open and listening after the viewport crossed lg; seam=none
-  it("closes the open menu when the viewport widens to lg", async () => {
-    const listeners = new Map<string, (event: MediaQueryListEvent) => void>();
-    const removed: string[] = [];
-    onTestFinished(() => {
-      vi.restoreAllMocks();
-    });
-    vi.spyOn(window, "matchMedia").mockImplementation(
-      (query: string) =>
-        ({
-          matches: false,
-          media: query,
-          addEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => {
-            listeners.set(query, listener);
-          },
-          removeEventListener: () => {
-            removed.push(query);
-          },
-        }) as unknown as MediaQueryList,
-    );
-    const user = userEvent.setup();
-    render(<SiteHeader />);
-    const menu = screen.getByRole("button", { name: "Menu" });
-    await user.click(menu);
-    expect(menu).toHaveAttribute("aria-expanded", "true");
-    const wide = listeners.get("(min-width: 64rem)");
-    expect(wide).toBeDefined();
-
-    act(() => wide!({ matches: false } as MediaQueryListEvent));
-    expect(menu).toHaveAttribute("aria-expanded", "true");
-    act(() => wide!({ matches: true } as MediaQueryListEvent));
-    expect(menu).toHaveAttribute("aria-expanded", "false");
-    expect(removed).toContain("(min-width: 64rem)");
   });
 
   // Value: protects=a menu left open across a client-side navigation (the wordmark home link sits in the header, so focus never leaves it) closes on the new page;
@@ -359,7 +301,7 @@ describe("SiteHeader", () => {
       expect(screen.queryByRole("navigation", { name: "Mobile sections" })).toBeNull();
       // The chosen link stays mounted (hidden and inert), so engines that skip navigation for a
       // detached anchor still follow it.
-      expect(nav.querySelectorAll("a")).toHaveLength(4);
+      expect(nav.querySelectorAll("a")).toHaveLength(6);
     } finally {
       document.documentElement.style.removeProperty("--motion-duration-base");
       vi.useRealTimers();
@@ -477,20 +419,17 @@ describe("SiteHeader", () => {
       expect(header).toHaveAttribute("data-tone", "light");
 
       // The header's own glass is topmost at the probe point; it must be skipped, not read.
-      const own = header.querySelector(".glass")!;
-      // The probe reads behind the middle of the capsule's label row, not its lower edge or an open sheet.
       const row = header.querySelector("[data-header-row]")!;
-      expect(row.parentElement).toBe(own);
+      // The probe reads behind the middle of the label row, not its lower edge or an open sheet.
       vi.spyOn(row, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 8, 1200, 56));
-      vi.spyOn(own, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 8, 1200, 230));
       vi.spyOn(header, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 0, 1280, 66));
-      beneath = () => [own, plateText];
+      beneath = () => [row, plateText];
       await settle("scroll");
       expect(header).toHaveAttribute("data-tone", "dark");
       expect(probes.at(-1)).toBe(36);
 
       // Only the header's own elements at the probe point: the tone is unknown, so it stays as it was.
-      beneath = () => [own];
+      beneath = () => [row];
       await settle("scroll");
       expect(header).toHaveAttribute("data-tone", "dark");
 
@@ -498,11 +437,11 @@ describe("SiteHeader", () => {
       await settle("resize");
       expect(header).toHaveAttribute("data-tone", "light");
 
-      beneath = () => [own, cardFooterText];
+      beneath = () => [row, cardFooterText];
       await settle("scroll");
       expect(header).toHaveAttribute("data-tone", "light");
 
-      beneath = () => [own, footerText];
+      beneath = () => [row, footerText];
       await settle("scroll");
       expect(header).toHaveAttribute("data-tone", "dark");
 
@@ -624,17 +563,16 @@ describe("SiteHeader", () => {
       expect(root.style.getPropertyValue("--header-h")).toBe("64px");
 
       fireEvent.click(screen.getByRole("button", { name: "Menu" }));
-      const sheet = screen.getByRole("navigation", { name: "Mobile sections" });
-      vi.spyOn(sheet, "getBoundingClientRect").mockReturnValue({ height: 180.5 } as DOMRect);
       const writes = setProperty.mock.calls.length;
       const frames = frame.mock.calls.length;
-      resize(244.5);
+      // The sheet is out of flow, so a repeat of the bar's height writes nothing.
+      resize(64);
       expect(root.style.getPropertyValue("--header-h")).toBe("64px");
       expect(setProperty.mock.calls.length).toBe(writes);
       expect(frame.mock.calls.length).toBeGreaterThan(frames);
 
-      resize(300.5);
-      expect(root.style.getPropertyValue("--header-h")).toBe("120px");
+      resize(72.4);
+      expect(root.style.getPropertyValue("--header-h")).toBe("73px");
       unmount();
     } finally {
       vi.unstubAllGlobals();

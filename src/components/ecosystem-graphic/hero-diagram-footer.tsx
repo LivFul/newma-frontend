@@ -9,11 +9,11 @@ export const TOGGLE_CLASS = "min-h-11 min-w-11 text-center";
 /** Copy and toggle sit below the diagram in one figcaption so the stack reads top to bottom. */
 export function HeroDiagramFooter({ toggle }: { toggle: ReactNode }) {
   return (
-    <figcaption className="mx-auto max-w-[34rem] space-y-2 pb-2 text-sm text-fg-muted">
+    <figcaption className="eco-caption mx-auto max-w-[34rem] space-y-2 pt-6 pb-6 text-sm">
       <p>{HERO_HINT.text}</p>
       <p>{HERO_CAPTION.text}</p>
       <p className="text-xs">{HERO_MAP_LEGEND.text}</p>
-      <div className="eco-controls flex min-h-11 items-center justify-end pt-1">{toggle}</div>
+      <div className="eco-controls flex min-h-11 items-center justify-end pt-6">{toggle}</div>
     </figcaption>
   );
 }
@@ -25,7 +25,7 @@ export function TogglePlaceholder() {
       className={cn(
         buttonVariants({ variant: "secondary", size: "sm" }),
         TOGGLE_CLASS,
-        "invisible",
+        "eco-explore invisible",
       )}
     >
       {HERO_TOGGLE_LABEL.text}

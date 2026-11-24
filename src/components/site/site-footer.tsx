@@ -20,12 +20,12 @@ export function SiteFooter() {
       <div className="grid w-full gap-10 py-12 md:grid-cols-[1fr_auto]">
         <div className="space-y-4">
           <div className="pb-4">
-            <Wordmark lockup="logo" tone="adaptive" imageClassName="h-14 w-auto" />
+            <Wordmark lockup="wordmark" tone="adaptive" imageClassName="h-14 w-auto" />
           </div>
-          <p className="max-w-[68ch] text-sm leading-relaxed text-plate-muted">
+          <p className="max-w-[68ch] text-sm leading-relaxed text-balance text-plate-muted">
             {FOOTER_DESCRIPTOR.text}
           </p>
-          <p className="max-w-[68ch] text-sm leading-relaxed text-plate-muted">
+          <p className="max-w-[68ch] text-sm leading-relaxed text-balance text-plate-muted">
             {FOOTER_DISCLAIMER.text}
           </p>
         </div>

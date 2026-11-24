@@ -1,8 +1,9 @@
-/* Brand pack v1.0: Work Sans for headlines, UI and body; Geist Mono Bold for bylines, labels and data.
-   Both are self-hosted by next/font in the root layout. */
+/* Brand guide v1: Playfair Display (or Georgia) for titles, Fabio XM for body. Fabio XM has no web
+   licence here, so Figtree stands in (swap --font-body-face for a next/font/local Fabio XM later).
+   Geist Mono stays for labels and data. All are self-hosted by next/font in the root layout. */
 @theme {
-  --font-sans:
-    var(--font-work-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: var(--font-playfair), Georgia, "Times New Roman", ui-serif, serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;

@@ -4,21 +4,31 @@
   --color-eco-compute: #b69cff; /* Agentic Compute (violet, aligned with the workflow learning loop) */
   --color-eco-compute-ink: #553d99; /* Agentic Compute strokes on survey paper */
   --color-eco-optional: #a8442a; /* Provenance & DLT */
-  --font-display: var(--font-work-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --text-display: clamp(2.5rem, 1.4rem + 3.6vw, 4.75rem);
-  --tracking-display: -0.04em;
+  --font-display: var(--font-playfair), Georgia, "Times New Roman", ui-serif, serif;
+  --text-display: clamp(2.5rem, 1.5rem + 3.2vw, 4.25rem);
+  --tracking-display: -0.01em;
   --size-header: 4rem;
-  /* The Plant gradient carries the primary button label (--color-prominent-fg, Ink): every stop stays at
-     4.5:1 or better against it, also at hover brightness. tests/unit/contrast.test.ts enforces that. */
-  --background-image-brand: linear-gradient(135deg, #a6e04a 0%, #5ac15a 50%, #0fa36b 100%);
-  --background-image-leaf: linear-gradient(135deg, #a6e04a 0%, #0fa36b 100%);
-  --background-image-capsule: linear-gradient(135deg, #0b3f4b 0%, #1c8a99 100%);
+  /* The Lavender gradient carries the primary button label (--color-prominent-fg, white): every stop stays
+     at 4.5:1 or better against it, also at hover brightness. tests/unit/contrast.test.ts enforces that. */
+  --background-image-brand: linear-gradient(135deg, #57527c 0%, #5f5986 50%, #4f4a73 100%);
+  /* The brand guide's linear gradient: Forest → Sage → Lavender. Decorative only; never under text. */
+  --background-image-brand-line: linear-gradient(90deg, #244322 0%, #9ba77d 50%, #86809c 100%);
+  --background-image-leaf: linear-gradient(135deg, #9ba77d 0%, #244322 100%);
+  --background-image-capsule: linear-gradient(135deg, #244322 0%, #86809c 100%);
+  /* The free-form gradient: Forest pooled top-left, drifting through Sage into Lavender. White text sits on
+     it only inside .fog-panel, which adds a Forest scrim so every point stays at 4.5:1. */
+  --background-image-fog:
+    radial-gradient(80% 60% at 8% 0%, #132511 0%, transparent 70%),
+    radial-gradient(70% 70% at 15% 45%, rgb(36 67 34 / 0.9) 0%, transparent 75%),
+    radial-gradient(90% 80% at 95% 100%, #86809c 0%, transparent 70%),
+    linear-gradient(165deg, #244322 0%, #5d7350 45%, #8d9478 70%, #86809c 100%);
   --background-image-aurora:
-    radial-gradient(110% 75% at 10% 14%, rgb(166 224 74 / 0.26), transparent 55%),
-    radial-gradient(90% 70% at 90% 6%, rgb(28 138 153 / 0.2), transparent 52%),
-    radial-gradient(70% 60% at 70% 92%, rgb(255 255 255 / 0.85), transparent 60%),
-    linear-gradient(170deg, #f1f6f1 0%, #e8f1eb 45%, #dcebe4 100%);
-  /* Night to Deep Teal, the banner field from the brand pack. */
-  --background-image-deep: linear-gradient(160deg, #0b3f4b 0%, #06242b 52%, #041b21 100%);
-  --background-image-peach: linear-gradient(180deg, #f5f9ee 0%, #f1f6f1 100%);
+    radial-gradient(70% 60% at 0% 0%, rgb(155 167 125 / 0.22), transparent 60%),
+    radial-gradient(60% 55% at 100% 10%, rgb(134 128 156 / 0.16), transparent 55%),
+    linear-gradient(180deg, #ffffff 0%, #f7f8f4 100%);
+  /* Forest plate field. */
+  --background-image-deep: linear-gradient(160deg, #244322 0%, #1b3319 52%, #132511 100%);
+  --background-image-peach: linear-gradient(180deg, #ffffff 0%, #f7f8f4 100%);
+  /* Single-colour blur shadow from the guide: subtle and formless. */
+  --shadow-blur: 0 30px 80px -20px rgb(36 67 34 / 0.22), 0 8px 24px -12px rgb(36 67 34 / 0.12);
 }

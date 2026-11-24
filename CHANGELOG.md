@@ -2,6 +2,19 @@
 
 All notable changes to the NEWMA frontend. Versions follow the `VERSION` file (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [0.2.1.0] - 2026-11-24
+
+### Changed
+
+- The site follows brand guide v1: Forest, Sage and Lavender colours, a light theme by default, and the header reduced to the wordmark and one round menu at every width.
+- The home hero sets the serif headline on glass over the bitmap wave, and shows the ecosystem diagram on a fog panel that drifts slowly (still under reduced motion).
+- The ecosystem diagram is a bracket with six outlined capsules. Every row rests evenly and opens the same way, with descriptors and flow arrows only in the opened view.
+
+### Fixed
+
+- The hero diagram panel no longer clips its text at 400% zoom or with wider text spacing.
+- Menu links stay at 4.5:1 contrast when the menu opens over the hero photo and the diagram panel.
+
 ## [0.2.0.3] - 2026-10-11
 
 ### Fixed

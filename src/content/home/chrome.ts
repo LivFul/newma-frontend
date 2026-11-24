@@ -26,7 +26,7 @@ export const ACCESS_SHORT = block("chrome.access.short", "Demo", ["C-21"]);
 export const PLATFORM_CTA = block("chrome.platform", "Explore the Platform", ["C-21"]);
 
 export const HERO_MIRROR_LINKS = Object.freeze({
-  aveloz: block("chrome.hero.aveloz", "Meet NEWMA's AI Research Assistant", ["C-50"]),
+  aveloz: block("chrome.hero.aveloz", "AI Research Assistant", ["C-50"]),
   platform: PLATFORM_CTA,
   how: block("chrome.hero.how", "How it works", []),
 });
@@ -36,6 +36,8 @@ export const AVELOZ_LINK = Object.freeze({
   block: block("chrome.aveloz", "Aveloz (LivFul staff)", []),
   short: block("chrome.aveloz.short", "Aveloz", []),
   suffix: block("chrome.aveloz.suffix", " (LivFul staff)", []),
+  // Screen-reader note on links that open the Aveloz site in a new tab.
+  newTab: block("chrome.aveloz.new-tab", "Opens in new tab.", []),
   href: "https://aveloz.livful.com",
 });
 

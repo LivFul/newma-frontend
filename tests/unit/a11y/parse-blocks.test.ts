@@ -12,7 +12,7 @@ describe("parseRuleBlock", () => {
   it("reads the first .dark block even when other .dark rules follow", () => {
     const css = `.dark { --color-bg: #041b21; }\n.dark ::selection { color: red; }\n`;
     expect(parseRuleBlock(css, ".dark {")["--color-bg"]).toBe("#041b21");
-    expect(parseDarkBlock(colorDark)["--color-bg"]).toBe("#041b21");
+    expect(parseDarkBlock(colorDark)["--color-bg"]).toBe("#111c10");
     expect(Object.keys(parseDarkBlock(colorDark)).length).toBeGreaterThan(20);
   });
 });

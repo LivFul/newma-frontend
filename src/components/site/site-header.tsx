@@ -4,23 +4,42 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import {
-  ACCESS_LABEL,
-  ACCESS_SHORT,
   AVELOZ_LINK,
   HEADER_MENU,
+  HERO_MIRROR_LINKS,
   HEADER_MOBILE_NAV,
-  HEADER_NAV_LABEL,
   NAV_LINKS,
+  PLATFORM_CTA,
   THEME_GROUP_LABEL,
 } from "@/content/home/chrome";
-import { Button } from "@/components/ui/button";
 import { AccessLink } from "./access-link";
 import { ThemeToggle } from "./theme-toggle";
 import { Wordmark } from "./wordmark";
 
 const MOBILE_SECTIONS_ID = "mobile-sections";
-// Tailwind's lg breakpoint, where the section links move into the bar and the menu sheet is hidden.
-const LG_UP = "(min-width: 64rem)";
+
+function MenuMark({ open, onClick }: { open: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      className="inline-flex size-12 items-center justify-center rounded-full bg-[#1b2a1a] text-white shadow-[0_8px_24px_-12px_rgb(27_42_26_/_0.7)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus forced-colors:border forced-colors:border-[ButtonText] forced-colors:bg-[ButtonText] forced-colors:text-[ButtonFace]"
+      aria-expanded={open}
+      aria-controls={MOBILE_SECTIONS_ID}
+      onClick={onClick}
+    >
+      <span className="sr-only">{HEADER_MENU.text}</span>
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+        <path
+          d="M3 4.5h12M3 9h12M3 13.5h12"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+          strokeLinecap="round"
+        />
+      </svg>
+    </button>
+  );
+}
 
 function navCloseDelay(): number {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return 0;
@@ -95,9 +114,8 @@ export function SiteHeader() {
       typeof ResizeObserver === "function"
         ? new ResizeObserver(([entry]) => {
             const box = entry?.borderBoxSize?.[0]?.blockSize ?? header.offsetHeight;
-            const sheet = header.querySelector<HTMLElement>(`#${MOBILE_SECTIONS_ID}`);
-            const sheetHeight = sheet && !sheet.hidden ? sheet.getBoundingClientRect().height : 0;
-            const value = `${Math.ceil(box - sheetHeight)}px`;
+            // The menu sheet is position:absolute, so it never enters this border box.
+            const value = `${Math.ceil(box)}px`;
             if (value !== published) {
               published = value;
               root.style.setProperty("--header-h", value);
@@ -122,8 +140,7 @@ export function SiteHeader() {
   }, [pathname]);
 
   // The open sheet covers the top of the page, so it closes before focus can move under it (Tab past
-  // its last link) and on Escape, which hands focus back to the Menu button. It also closes when the
-  // viewport widens to lg, where the sheet is hidden, so its listeners do not stay attached.
+  // its last link) and on Escape, which hands focus back to the Menu button.
   useEffect(() => {
     const header = headerRef.current;
     if (!open || !header) return;
@@ -136,17 +153,11 @@ export function SiteHeader() {
       const next = event.relatedTarget;
       if (next instanceof Node && !header.contains(next)) setOpen(false);
     };
-    const onWiden = (event: MediaQueryListEvent) => {
-      if (event.matches) setOpen(false);
-    };
-    const lgUp = window.matchMedia(LG_UP);
     document.addEventListener("keydown", onKey);
     header.addEventListener("focusout", onFocusOut);
-    lgUp.addEventListener("change", onWiden);
     return () => {
       document.removeEventListener("keydown", onKey);
       header.removeEventListener("focusout", onFocusOut);
-      lgUp.removeEventListener("change", onWiden);
     };
   }, [open]);
 
@@ -179,98 +190,54 @@ export function SiteHeader() {
       ref={headerRef}
       data-site-header
       data-tone="light"
-      className="pointer-events-none sticky top-0 z-40 isolate min-h-[var(--size-header)] px-2 pt-2 md:px-6"
+      className="pointer-events-none sticky top-0 z-40 isolate min-h-[var(--size-header)] px-5 pt-4 md:px-12"
     >
-      {/* Liquid Glass navigation layer: one floating capsule. Its 1.75rem radius is half its single-row
-          height, so it reads as a capsule; when it wraps or opens the menu it becomes a rounded sheet with
-          the same corner, and the pill controls inside sit concentric with it. Only the capsule takes
-          pointer input: the clear gutters around it pass clicks through to the content they show. */}
-      <div className="glass pointer-events-auto mx-auto max-w-[83rem] rounded-[1.75rem]">
-        <div
-          data-header-row
-          className="flex min-h-[calc(var(--size-header)-0.5rem-2px)] w-full flex-wrap items-center justify-between gap-x-2 gap-y-1 py-1 pr-1.5 pl-3.5 sm:gap-x-3 sm:pl-4 md:pl-6"
-        >
-          {/* The bar stays one row from 360px up: phones step the lockup down, tablets keep the Menu
-              button and the short Demo label until lg, and the full labels return at xl. */}
-          <Wordmark
-            tone="adaptive"
-            priority
-            viewTransition
-            imageClassName="h-[1.0625rem] w-auto min-[25rem]:h-5 sm:h-7"
-          />
-          <div className="flex min-w-0 flex-wrap items-center justify-end gap-1 min-[25rem]:gap-2 sm:gap-4">
-            <nav
-              aria-label={HEADER_NAV_LABEL.text}
-              className="hidden items-center gap-1 lg:flex xl:gap-2"
-            >
-              {NAV_LINKS.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="inline-flex min-h-11 items-center rounded-full px-3 text-fg-muted transition-colors hover:bg-fg/[0.06] hover:text-fg"
-                >
-                  {link.block.text}
-                </a>
-              ))}
-            </nav>
-            <Button
-              type="button"
-              variant="ghost"
-              className="min-h-11 min-w-11 px-2 text-sm min-[25rem]:text-base lg:hidden"
-              aria-expanded={open}
-              aria-controls={MOBILE_SECTIONS_ID}
-              onClick={toggle}
-            >
-              {HEADER_MENU.text}
-            </Button>
-            <Button
-              asChild
-              variant="ghost"
-              className="min-h-11 px-2 text-sm font-normal text-fg-muted hover:bg-fg/[0.06] hover:text-fg hover:no-underline sm:px-3 sm:text-base"
-            >
-              <a href={AVELOZ_LINK.href} rel="noopener" aria-label={AVELOZ_LINK.block.text}>
-                {AVELOZ_LINK.short.text}
-                <span className="sr-only xl:not-sr-only">{AVELOZ_LINK.suffix.text}</span>
-              </a>
-            </Button>
-            {/* The one call to action in the bar: a brand-gradient ring orbits it briefly on arrival. Below xl
-                it shows the short label; its accessible name still starts with the full one. */}
-            <AccessLink
-              variant="secondary"
-              className="cta-attention min-h-11 px-3 text-sm sm:px-4 sm:text-base"
-            >
-              <span className="sr-only xl:not-sr-only">{ACCESS_LABEL.text}</span>{" "}
-              <span className="xl:hidden">{ACCESS_SHORT.text}</span>
-            </AccessLink>
-            <ThemeToggle className="hidden shrink-0 lg:inline-flex" />
-          </div>
+      {/* Issued frame: the wordmark and one round menu. The clear gutters pass clicks through. */}
+      <div
+        data-header-row
+        className="mx-auto flex w-full max-w-[86rem] items-center justify-between gap-4"
+      >
+        <div className="pointer-events-auto">
+          <Wordmark tone="adaptive" priority viewTransition imageClassName="h-5 w-auto sm:h-7" />
         </div>
-        <nav
-          id={MOBILE_SECTIONS_ID}
-          aria-label={HEADER_MOBILE_NAV.text}
-          hidden={!present}
-          // While it fades out the closing sheet is invisible, so it takes no taps and no focus.
-          inert={!open}
-          data-open={open ? "true" : "false"}
-          className="mobile-sections border-t border-fg/10 lg:hidden"
-        >
-          <div className="flex flex-col gap-1 px-4 py-3 md:px-6">
+        <div className="pointer-events-auto relative">
+          <MenuMark open={open} onClick={toggle} />
+          <nav
+            id={MOBILE_SECTIONS_ID}
+            aria-label={HEADER_MOBILE_NAV.text}
+            hidden={!present}
+            // While it fades out the closing sheet is invisible, so it takes no taps and no focus.
+            inert={!open}
+            data-open={open ? "true" : "false"}
+            className="mobile-sections glass absolute top-[calc(100%+0.75rem)] right-0 z-50 flex w-[min(18.5rem,calc(100vw-2.5rem))] flex-col gap-1 rounded-[1.5rem] p-3"
+          >
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="-mx-2 inline-flex min-h-11 items-center rounded-full px-2 text-fg transition-colors hover:bg-fg/[0.06] active:bg-fg/[0.1]"
+                className="inline-flex min-h-11 items-center rounded-full px-3 text-fg transition-colors hover:bg-fg/[0.06] active:bg-fg/[0.1]"
                 onClick={choose}
               >
                 {link.block.text}
               </a>
             ))}
-            <div className="-mx-2 flex min-h-11 items-center justify-between gap-3 rounded-full px-2">
+            <a
+              href={AVELOZ_LINK.href}
+              rel="noopener"
+              className="inline-flex min-h-11 items-center rounded-full px-3 text-fg-muted transition-colors hover:bg-fg/[0.06] hover:text-fg"
+              onClick={choose}
+            >
+              {HERO_MIRROR_LINKS.aveloz.text}
+            </a>
+            <AccessLink variant="secondary" className="min-h-11 justify-start px-3 text-base">
+              {PLATFORM_CTA.text}
+            </AccessLink>
+            <div className="flex min-h-11 flex-wrap items-center justify-between gap-2 rounded-full px-3">
               <span className="text-fg">{THEME_GROUP_LABEL.text}</span>
               <ThemeToggle />
             </div>
-          </div>
-        </nav>
+          </nav>
+        </div>
       </div>
     </header>
   );

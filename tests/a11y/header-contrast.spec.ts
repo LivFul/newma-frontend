@@ -15,7 +15,10 @@ const WCAG_AA_TEXT = 4.5;
 const SCROLL_STEP_PX = 100;
 // Text pixels are hidden; the inset keeps antialiased rim pixels of the pill hover ground out of the box.
 const INSET_PX = 6;
-const MUTED_LABELS = '[data-site-header] nav[aria-label] a, [data-site-header] a[rel="noopener"]';
+// Text links only. The menu's Explore the Platform button (/access) is a bordered pill: its rim curves
+// into the inset box and is a control boundary (3:1), not the backdrop behind a muted label.
+const MUTED_LABELS =
+  '[data-site-header] nav[aria-label] a:not([href="/access"]), [data-site-header] a[rel="noopener"]';
 
 test.skip(({ isMobile }) => isMobile, "the muted labels sit in the bar from lg up");
 
@@ -72,6 +75,7 @@ for (const width of [1024, 1440]) {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     await page.waitForLoadState("networkidle");
+    await page.getByRole("button", { name: "Menu" }).click();
     await page.addStyleTag({
       content: `${MUTED_LABELS} { color: transparent !important; }`,
     });

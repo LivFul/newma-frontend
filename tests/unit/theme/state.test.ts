@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { bootstrapFromStorage, parsePreference, resolveTheme } from "@/lib/theme/state";
 
 describe("theme state", () => {
-  it("parses invalid storage as the default dark preference", () => {
-    expect(parsePreference("nope")).toBe("dark");
-    expect(parsePreference(null)).toBe("dark");
+  it("parses invalid storage as the default light preference", () => {
+    expect(parsePreference("nope")).toBe("light");
+    expect(parsePreference(null)).toBe("light");
   });
 
   it("resolves explicit and system preferences", () => {
@@ -19,9 +19,9 @@ describe("theme state", () => {
       preference: "dark",
       resolved: "dark",
     });
-    expect(bootstrapFromStorage(null, false)).toEqual({
-      preference: "dark",
-      resolved: "dark",
+    expect(bootstrapFromStorage(null, true)).toEqual({
+      preference: "light",
+      resolved: "light",
     });
   });
 });

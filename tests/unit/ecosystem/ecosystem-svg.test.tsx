@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { EcosystemSvg } from "@/components/ecosystem-graphic/ecosystem-svg";
 import { StaticPart } from "@/components/ecosystem-graphic/static-part";
 import { LABEL_FONT, VIEWBOX } from "@/components/ecosystem-graphic/geometry";
-import { ECOSYSTEM_SLUGS, HERO_LABELS } from "@/content/ecosystem/registry";
+import { ECOSYSTEM_SLUGS, heroRowCopy } from "@/content/ecosystem/registry";
 import { HERO_SVG_DESC } from "@/content/ecosystem/hero-text";
 import { HERO_CONTROLS } from "@/content/home/hero-help";
 import { expectNoAxeViolations } from "../ui/axe";
@@ -29,7 +29,7 @@ describe("EcosystemSvg", () => {
     for (const slug of ECOSYSTEM_SLUGS) {
       const link = container.querySelector(`g[data-slug="${slug}"] > a`)!;
       const label = link.getAttribute("aria-label")!;
-      const { title, descriptor } = HERO_LABELS[slug];
+      const { title, descriptor } = heroRowCopy(slug);
       expect(label.startsWith(title)).toBe(true);
       expect(label).toBe(`${title}. ${descriptor}. Opens the ${title} page.`);
       expect(link.textContent).toContain(title);
@@ -70,13 +70,30 @@ describe("EcosystemSvg", () => {
     expect(svg.getAttribute("viewBox")).toBe(`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`);
   });
 
-  it("draws the vertical plate stack with leader ticks", () => {
+  it("draws a spine and six outlined bars, with no row expanded at rest", () => {
     const { container } = renderSvg();
-    expect(container.querySelector(".eco-orbit")).toBeNull();
-    expect(container.querySelector(".eco-stage")).toBeNull();
-    expect(container.querySelectorAll(".eco-plate-top")).toHaveLength(6);
-    expect(container.querySelectorAll(".eco-plate-side")).toHaveLength(6);
-    expect(container.querySelectorAll(".eco-leader")).toHaveLength(6);
+    expect(container.querySelector(".eco-spine")).not.toBeNull();
+    // No decorative source curves: the bracket and rows stand on their own.
+    expect(container.querySelector(".eco-curves")).toBeNull();
+    expect(container.querySelectorAll(".eco-bar")).toHaveLength(6);
+    expect(container.querySelectorAll(".eco-tick")).toHaveLength(6);
+    // The open view draws only the flow arrows; the rails would be a second bracket beside the spine.
+    const edges = Array.from(container.querySelectorAll(".eco-edges path"));
+    expect(edges).toHaveLength(5);
+    expect(edges.every((p) => p.getAttribute("data-kind") === "flow")).toBe(true);
+    // No resting arrow: Interface sits in the stack like every other row.
+    expect(container.querySelector(".eco-cue")).toBeNull();
+    // No row is expanded at rest: Interface's descriptor waits for the explode like the others.
+    expect(container.querySelector(".eco-desc[data-resting]")).toBeNull();
+    const titleY = (slug: string) =>
+      container.querySelector(`[data-slug="${slug}"] .eco-title`)?.getAttribute("y");
+    for (const slug of ECOSYSTEM_SLUGS) expect(titleY(slug), slug).toBe(titleY("wet-lab"));
+    expect(container.querySelector('[data-slug="interface"] .eco-desc')?.textContent).toBe(
+      "Research Workspace",
+    );
+    expect(container.querySelector('[data-slug="wet-lab"] .eco-title')?.textContent).toBe(
+      "Wet Labs",
+    );
   });
 
   it("keeps rendered label text at least 12 px on a 328 px wide content column", () => {
@@ -96,7 +113,7 @@ describe("EcosystemSvg", () => {
     const { container } = renderSvg();
     for (const slug of ECOSYSTEM_SLUGS) {
       const part = container.querySelector(`g[data-slug="${slug}"]`) as HTMLElement;
-      expect(within(part).getByText(HERO_LABELS[slug].descriptor)).toBeInTheDocument();
+      expect(within(part).getByText(heroRowCopy(slug).descriptor)).toBeInTheDocument();
     }
   });
 

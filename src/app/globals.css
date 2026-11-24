@@ -183,8 +183,8 @@ main[tabindex="-1"]:focus-visible {
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.7),
       inset 0 -1px 0 color-mix(in srgb, var(--color-fg) 6%, transparent),
-      0 1px 2px rgb(8 43 51 / 0.06),
-      0 12px 32px -8px rgb(8 43 51 / 0.16);
+      0 1px 2px rgb(36 67 34 / 0.06),
+      0 12px 32px -8px rgb(36 67 34 / 0.16);
   }
   @supports (backdrop-filter: blur(1px)) {
     .glass {
@@ -195,6 +195,15 @@ main[tabindex="-1"]:focus-visible {
       );
       border-color: color-mix(in srgb, white 55%, transparent);
       backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    }
+    /* The menu sheet opens over the hero photo and its dark fog panel, where the regular tint lets them
+       show through behind the labels; the firmer hover tint keeps muted labels at 4.5:1 there. */
+    .mobile-sections.glass {
+      background-color: color-mix(
+        in srgb,
+        var(--color-bg-elevated) calc(var(--glass-hover-tint) * 100%),
+        transparent
+      );
     }
   }
   /* Glass controls (secondary buttons): the same rim and translucent fill without backdrop-filter, so
@@ -279,9 +288,9 @@ main[tabindex="-1"]:focus-visible {
   .glass-prominent {
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.55),
-      inset 0 -1px 0 rgb(8 43 51 / 0.16),
-      0 1px 2px rgb(8 43 51 / 0.1),
-      0 8px 24px -6px rgb(15 163 107 / 0.45);
+      inset 0 -1px 0 rgb(36 67 34 / 0.16),
+      0 1px 2px rgb(36 67 34 / 0.1),
+      0 8px 24px -6px rgb(95 89 134 / 0.45);
   }
   /* Standard material for the content layer (HIG: not glass). */
   .surface-material {
@@ -470,17 +479,89 @@ main[tabindex="-1"]:focus-visible {
 
   /* Hero stage. Two decorative layers, no card, no blur, so nothing is re-rendered while the page moves.
      The wash takes the photo's exact box and mask, so it is flush with the hero's top, right and bottom
-     and can never drift from the photo; it only lifts the forest toward the page colour. Diagram caption
-     copy uses text-fg-muted on the page stack and the stage wash only. */
+     and can never drift from the photo; it only softens the forest's left edge into the paper. */
   .hero-photo,
   .hero-stage {
     mask-image:
-      linear-gradient(to right, transparent 0%, var(--color-fg) 38%),
-      linear-gradient(to bottom, var(--color-fg) 72%, transparent 100%);
+      linear-gradient(to right, transparent 0%, var(--color-fg) 6%),
+      linear-gradient(to bottom, var(--color-fg) 96%, transparent 100%);
     mask-composite: intersect;
   }
   .hero-stage {
-    background-color: color-mix(in srgb, var(--color-bg-elevated) 44%, transparent);
+    background-color: color-mix(in srgb, var(--color-bg-elevated) 8%, transparent);
+  }
+  /* Headline plate: the shared glass material, sized to the type rather than the column. */
+  .hero-title {
+    width: fit-content;
+    max-width: 100%;
+    padding: 0.7rem 1.05rem 0.85rem;
+    border-radius: 1.25rem;
+  }
+  /* Bitmap wave behind the headline (brand guide: used sparingly, decorative only). */
+  .bitmap-wave {
+    top: -1.5rem;
+    left: clamp(6rem, 24vw, 28rem);
+    width: clamp(22rem, 48vw, 44rem);
+    aspect-ratio: 504 / 186;
+    background: url("/images/bitmap-wave.svg") center / contain no-repeat;
+    opacity: 0.9;
+  }
+  @media (max-width: 63.99rem) {
+    .bitmap-wave {
+      left: auto;
+      right: 0;
+      width: min(18rem, 70%);
+      opacity: 0.5;
+    }
+  }
+  /* Free-form gradient card. The fog lives on an oversized ::before that drifts by transform only, so it
+     never repaints the diagram: deep Forest pooled top-left, through Sage, into a pale mist bottom-left
+     and Lavender bottom-right. The ::after carries the film grain. The contrast layers follow the
+     content, not the panel's proportions: a Forest scrim behind the diagram and a pale mist behind the
+     caption (ecosystem-graphic.css). Reduced motion keeps it still. */
+  .fog-panel {
+    background-image: none;
+    background-color: var(--color-plate-elevated);
+    box-shadow: var(--shadow-blur);
+  }
+  .fog-panel::before,
+  .fog-panel::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .fog-panel::before {
+    inset: -20%;
+    /* Stops are placed for the oversized box: the panel itself spans roughly 14%–86% of it. */
+    background-image:
+      radial-gradient(48% 40% at 14% 14%, #0b200d 0%, transparent 100%),
+      radial-gradient(44% 34% at 86% 16%, rgb(111 128 76 / 0.85) 0%, transparent 100%),
+      radial-gradient(46% 34% at 14% 88%, #e9e8e3 0%, rgb(233 232 227 / 0.6) 45%, transparent 100%),
+      radial-gradient(
+        52% 40% at 88% 88%,
+        #8c82ac 0%,
+        rgb(140 130 172 / 0.55) 50%,
+        transparent 100%
+      ),
+      linear-gradient(172deg, #17321a 14%, #3a5631 40%, #566b48 58%, #a3a794 73%, #b9b4c6 86%);
+  }
+  .fog-panel::after {
+    inset: 0;
+    background: url("/images/grain.svg") 0 0 / 220px 220px repeat;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fog-panel::before {
+      animation: fog-drift 28s var(--motion-ease-standard) infinite alternate;
+    }
+  }
+  @media (prefers-contrast: more) {
+    .fog-panel::before {
+      display: none;
+    }
+    .fog-panel::after {
+      background: var(--color-plate);
+    }
   }
 
   .plate-surface {
@@ -511,6 +592,15 @@ main[tabindex="-1"]:focus-visible {
   .plate-surface ::selection {
     color: var(--color-plate);
     background: var(--color-plate-accent);
+  }
+}
+
+@keyframes fog-drift {
+  from {
+    transform: translate3d(-4%, -3%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(4%, 3%, 0) scale(1.06);
   }
 }
 

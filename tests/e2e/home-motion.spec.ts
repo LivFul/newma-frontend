@@ -8,9 +8,10 @@ test("the hero copy stays visible and only the actions run the entrance", async 
   await page.goto("/");
   const heading = page.getByRole("heading", { level: 1 });
   await expect(heading).toBeVisible();
-  // The copy paints with the first frame: on phones the lede is the LCP node.
-  const copy = page.locator("#hero-heading + div p");
-  await expect(copy, "the tagline and lede follow the h1").toHaveCount(2);
+  // The copy paints with the first frame: on phones the lede is the LCP node. The tagline is the h1's
+  // visible text (brand guide v1), and the lede is the paragraph right after it.
+  const copy = page.locator("#hero-heading + p");
+  await expect(copy, "the lede follows the h1").toHaveCount(1);
   for (const el of [heading, ...(await copy.all())]) await expect(el).toHaveCSS("opacity", "1");
   await expect(page.locator("#hero .hero-entrance-item")).toHaveCount(2);
 });

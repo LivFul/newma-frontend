@@ -1,18 +1,17 @@
 import type { CSSProperties, SVGProps } from "react";
 import { HERO_SVG_DESC, HERO_SVG_TITLE } from "@/content/ecosystem/hero-text";
-import { ecosystemHref, HERO_LABELS, heroAriaLabel } from "@/content/ecosystem/registry";
+import { ecosystemHref, heroAriaLabel, heroRowCopy } from "@/content/ecosystem/registry";
 import { HERO_CONTROLS } from "@/content/home/hero-help";
 import {
   EDGES,
   LABEL_BOX,
   LABEL_FONT,
-  LEADER,
   PARTS,
-  PLATE,
+  PILL,
+  SPINE,
   VIEWBOX,
   type PartGeometry,
 } from "./geometry";
-import { Glyph } from "./glyphs";
 import type { HeroView, PartComponent } from "./part-props";
 
 export type EcosystemSvgProps = Omit<SVGProps<SVGSVGElement>, "viewBox" | "role"> & {
@@ -23,15 +22,14 @@ export type EcosystemSvgProps = Omit<SVGProps<SVGSVGElement>, "viewBox" | "role"
 };
 
 const HIT = Object.freeze({
-  x: -PLATE.halfWidth - 6,
-  y: -PLATE.halfHeight - 6,
-  width: LABEL_BOX.offsetX + LABEL_BOX.width + PLATE.halfWidth + 6,
-  height: PLATE.halfHeight * 2 + PLATE.thickness + 12,
+  x: -PILL.halfWidth - 6,
+  y: LABEL_BOX.top,
+  width: LABEL_BOX.offsetX + LABEL_BOX.width + PILL.halfWidth + 6,
+  height: LABEL_BOX.bottom - LABEL_BOX.top,
 });
-const PLATE_TOP = `M0 ${-PLATE.halfHeight}L${PLATE.halfWidth} 0L0 ${PLATE.halfHeight}L${-PLATE.halfWidth} 0Z`;
-const PLATE_SIDE =
-  `M${-PLATE.halfWidth} 0L0 ${PLATE.halfHeight}L${PLATE.halfWidth} 0` +
-  `V${PLATE.thickness}L0 ${PLATE.halfHeight + PLATE.thickness}L${-PLATE.halfWidth} ${PLATE.thickness}Z`;
+
+const FIRST = PARTS[0]!;
+const LAST = PARTS.at(-1)!;
 
 const STROKE_INK: Partial<Record<PartGeometry["tone"], string>> = {
   "--color-eco-compute": "--color-eco-compute-ink",
@@ -53,7 +51,10 @@ export function toneStyle(part: PartGeometry): CSSProperties {
 }
 
 function PartBody({ part }: { part: PartGeometry }) {
-  const label = HERO_LABELS[part.slug];
+  const label = heroRowCopy(part.slug);
+  // The first and last ticks are the bracket's own hooks, so they start where the curve ends.
+  const end = part.slug === FIRST.slug || part.slug === LAST.slug;
+  const tickFrom = SPINE.x - FIRST.assembled.x + (end ? SPINE.radius : 0);
   return (
     <a
       className="eco-link"
@@ -62,10 +63,15 @@ function PartBody({ part }: { part: PartGeometry }) {
       style={toneStyle(part)}
     >
       <rect className="eco-hit" {...HIT} rx={10} />
-      <path className="eco-plate-side" d={PLATE_SIDE} data-dashed={part.dashed || undefined} />
-      <path className="eco-plate-top" d={PLATE_TOP} data-dashed={part.dashed || undefined} />
-      <Glyph glyph={part.glyph} />
-      <path className="eco-leader" d={`M${LEADER.fromX} 0H${LEADER.toX}`} />
+      <path className="eco-tick" d={`M${tickFrom} 0H${-PILL.halfWidth}`} />
+      <rect
+        className="eco-bar"
+        x={-PILL.halfWidth}
+        y={-PILL.halfHeight}
+        width={PILL.halfWidth * 2}
+        height={PILL.halfHeight * 2}
+        rx={PILL.halfHeight}
+      />
       <text
         className="eco-title"
         x={LABEL_BOX.offsetX}
@@ -86,10 +92,30 @@ function PartBody({ part }: { part: PartGeometry }) {
   );
 }
 
+const bracket = (top: number, bottom: number): string => {
+  const { x, radius: r } = SPINE;
+  return `M${x + r} ${top}Q${x} ${top} ${x} ${top + r}V${bottom - r}Q${x} ${bottom} ${x + r} ${bottom}`;
+};
+
+/** A bracket that hooks into the first and last rows, with every tick hanging from it. There is one
+ *  for each view, crossfaded, so the bracket always reaches the rows wherever they sit. */
+function StageMarks() {
+  return (
+    <g aria-hidden="true">
+      <path className="eco-spine eco-rest" d={bracket(FIRST.assembled.y, LAST.assembled.y)} />
+      <path className="eco-spine eco-open" d={bracket(FIRST.exploded.y, LAST.exploded.y)} />
+    </g>
+  );
+}
+
+// Only the flow arrows are drawn. The Data & Knowledge rails stay in the geometry (the TA flow), but the
+// bracket spine already shows every row hanging from one record, and a second bracket beside it is noise.
+const DRAWN_EDGES = EDGES.filter((edge) => edge.kind === "flow");
+
 function Edges({ arrowId }: { arrowId: string }) {
   return (
     <g className="eco-edges" aria-hidden="true">
-      {EDGES.map((edge) => (
+      {DRAWN_EDGES.map((edge) => (
         <path
           key={edge.id}
           d={edge.d}
@@ -146,6 +172,7 @@ export function EcosystemSvg({
           <path d="M0 0L8 4L0 8Z" className="eco-arrowhead" />
         </marker>
       </defs>
+      <StageMarks />
       <Edges arrowId={arrowId} />
       {PARTS.map((part, index) => (
         <Part key={part.slug} geometry={part} index={index} view={view}>

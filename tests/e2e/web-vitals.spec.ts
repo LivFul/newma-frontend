@@ -19,7 +19,7 @@ test("hero interactions each stay within 200 ms", async ({ page, isMobile }) => 
     } as PerformanceObserverInit);
   });
   await gotoHeroReady(page);
-  const toggle = page.getByRole("button", { name: "Explore components" });
+  const toggle = page.getByRole("button", { name: "Explore Components" });
   const maxima: number[] = [];
   // Best of two rounds: Event Timing durations include input delay, which inflates when the CI or
   // laptop CPU is shared with parallel workers. A real regression is slow in both rounds.

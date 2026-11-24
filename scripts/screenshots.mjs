@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Review screenshots for CP-2 (Task 10): the homepage and two inner pages at desktop and mobile sizes,
-// the hero exploded through the Explore components toggle, and a reduced-motion variant.
+// the hero exploded through the Explore Components toggle, and a reduced-motion variant.
 // Usage: PORT=3100 pnpm screenshots   (dev server or production build on that port)
 //        node scripts/screenshots.mjs http://localhost:3100
 // Output goes to docs/screenshots/, which is git-ignored. Only the base origin is ever fetched.
@@ -62,7 +62,7 @@ async function takeShot(page, { url, file, state }) {
   if (state === "exploded") {
     // Wait for the interactive layer, press the toggle, and let the explode settle.
     await page.waitForSelector('[data-hero-ready="true"]', { timeout: 30_000 });
-    await page.getByRole("button", { name: "Explore components" }).click();
+    await page.getByRole("button", { name: "Explore Components" }).click();
     await page.waitForTimeout(1_500);
   }
   const animations = state === "exploded" ? "allow" : "disabled";

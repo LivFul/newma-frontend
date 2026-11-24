@@ -21,7 +21,7 @@ export const HERO_LABELS: Readonly<Record<EcosystemSlug, HeroLabel>> = Object.fr
   interface: { title: "Interface", descriptor: "Research workspace" },
   "agentic-compute": { title: "Agentic Compute", descriptor: "Computational prioritization" },
   "scientific-review": { title: "Scientific Review", descriptor: "Scientist-led decisions" },
-  "wet-lab": { title: "Wet Lab", descriptor: "Experimental validation" },
+  "wet-lab": { title: "Wet Labs", descriptor: "Experimental validation" },
   "data-knowledge": { title: "Data & Knowledge", descriptor: "Connected evidence" },
   "provenance-dlt": { title: "Provenance & DLT", descriptor: "Record history and verification" },
 });
@@ -191,7 +191,7 @@ export const ECOSYSTEM: Readonly<Record<EcosystemSlug, EcosystemEntry>> = Object
     ]),
     handoff: fn(
       "ecosystem.review.handoff",
-      "Approved assay requests pass to Wet Lab. Returned results come back for scientific assessment, and accepted observations pass to Data & Knowledge.",
+      "Approved assay requests pass to Wet Labs. Returned results come back for scientific assessment, and accepted observations pass to Data & Knowledge.",
       ["C-42"],
     ),
     demo: {
@@ -205,7 +205,7 @@ export const ECOSYSTEM: Readonly<Record<EcosystemSlug, EcosystemEntry>> = Object
     slug: "wet-lab",
     headline: "Experiments that answer the question.",
     summary:
-      "Wet Lab is designed to connect approved assay requests with laboratory scientists and partners using defined materials, protocols and controls.",
+      "Wet Labs is designed to connect approved assay requests with laboratory scientists and partners using defined materials, protocols and controls.",
     summaryDetail:
       "Requests specify the endpoints and deliverables needed to test a research hypothesis. Results should return with raw data, replicates and uncertainty, linked to the material and batch that produced them.",
     homeSummary:
@@ -344,8 +344,16 @@ export function metaDescription(summary: string): string {
 
 export const HERO_CLAIMS: readonly string[] = Object.freeze(["C-48"]);
 
+/** Hero-diagram wording from the issued frame. Page titles stay on HERO_LABELS. */
+export function heroRowCopy(slug: EcosystemSlug): HeroLabel {
+  const base = HERO_LABELS[slug];
+  if (slug === "interface") return { title: base.title, descriptor: "Research Workspace" };
+  if (slug === "wet-lab") return { title: "Wet Labs", descriptor: base.descriptor };
+  return base;
+}
+
 export function heroAriaLabel(slug: EcosystemSlug): string {
-  const { title, descriptor } = HERO_LABELS[slug];
+  const { title, descriptor } = heroRowCopy(slug);
   return `${title}. ${descriptor}. Opens the ${title} page.`;
 }
 

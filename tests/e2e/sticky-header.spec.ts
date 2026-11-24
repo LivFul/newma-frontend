@@ -25,30 +25,34 @@ async function scrollToFraction(page: Page, fraction: number): Promise<void> {
   );
 }
 
-const headerAccess = (page: Page) =>
-  page.locator("[data-site-header]").getByRole("link", { name: "Access NEWMA" });
+const headerMenu = (page: Page) =>
+  page.locator("[data-site-header]").getByRole("button", { name: "Menu" });
 
 for (const fraction of SCROLL_POSITIONS) {
-  test(`D-03: Access NEWMA is visible and clickable at ${fraction * 100}% scroll`, async ({
+  test(`D-03: Menu is visible and Explore the Platform opens from it at ${fraction * 100}% scroll`, async ({
     page,
   }) => {
     await page.goto("/");
     await scrollToFraction(page, fraction);
-    const link = headerAccess(page);
-    await expect(link).toBeVisible();
-    const box = (await link.boundingBox())!;
+    const menu = headerMenu(page);
+    await expect(menu).toBeVisible();
+    const box = (await menu.boundingBox())!;
     const viewport = page.viewportSize()!;
     expect(box.x).toBeGreaterThanOrEqual(0);
     expect(box.y).toBeGreaterThanOrEqual(0);
     expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
     expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
-    // Hit test, not only visibility: nothing may sit on top of the link at its centre.
-    const hit = await link.evaluate((el) => {
+    const hit = await menu.evaluate((el) => {
       const rect = el.getBoundingClientRect();
       const top = document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2);
       return top === el || el.contains(top);
     });
     expect(hit).toBe(true);
+    await menu.click();
+    const link = page
+      .locator("[data-site-header]")
+      .getByRole("link", { name: "Explore the Platform" });
+    await expect(link).toBeVisible();
     await link.click();
     await expect(page).toHaveURL(/\/access$/);
     await expect(page).toHaveTitle(/Demo sign-in/);
@@ -78,7 +82,7 @@ test("there is no horizontal scroll at 320 px width", async ({ page }) => {
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
   );
   expect(overflow).toBeLessThanOrEqual(0);
-  await expect(headerAccess(page)).toBeVisible();
+  await expect(headerMenu(page)).toBeVisible();
   await expect(
     page.getByRole("link", { name: "NEWMA by LivFul Therapeutics" }).first(),
   ).toBeVisible();
@@ -182,8 +186,7 @@ test("the skip link is the first tab stop and moves focus to main", async ({ pag
   await expect(page.locator("main#main")).toBeFocused();
 });
 
-test("header section links open the dedicated marketing routes", async ({ page, isMobile }) => {
-  test.skip(isMobile, "section anchors are shown from md upward (A-P4-18)");
+test("header section links open the dedicated marketing routes", async ({ page }) => {
   for (const [name, path] of [
     ["Overview", "/overview"],
     ["How it works", "/how-it-works"],
@@ -191,6 +194,7 @@ test("header section links open the dedicated marketing routes", async ({ page, 
     ["About Newma", "/about"],
   ] as const) {
     await page.goto("/");
+    await page.getByRole("button", { name: "Menu" }).click();
     await page.locator("[data-site-header]").getByRole("link", { name }).click();
     await expect(page).toHaveURL(new RegExp(`${path.replace("/", "\\/")}$`));
   }
@@ -225,7 +229,8 @@ test("on a very short viewport (400% zoom) the header scrolls away instead of ta
 }) => {
   await page.setViewportSize({ width: 320, height: 256 });
   await page.goto("/");
-  await page.evaluate(() => window.scrollTo(0, 400));
+  // Instant: the page scrolls smoothly, and the header is read straight after the call.
+  await page.evaluate(() => window.scrollTo({ top: 400, behavior: "instant" }));
   const position = await page
     .locator("[data-site-header]")
     .evaluate((el) => getComputedStyle(el).position);

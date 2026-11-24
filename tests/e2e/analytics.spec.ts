@@ -22,7 +22,11 @@ test("the header Access NEWMA click emits one access_newma_click with no propert
 }) => {
   await recordEvents(page);
   await page.goto("/");
-  await page.locator("[data-site-header]").getByRole("link", { name: "Access NEWMA" }).click();
+  await page.getByRole("button", { name: "Menu" }).click();
+  await page
+    .locator("[data-site-header]")
+    .getByRole("link", { name: "Explore the Platform" })
+    .click();
   await expect(page).toHaveURL(/\/access$/);
   expect(await readEvents(page)).toEqual([{ name: "access_newma_click" }]);
 });
@@ -63,7 +67,8 @@ test("no analytics request is made in the test run (the webdriver gate)", async 
     if (request.url().includes("/_vercel/insights")) insights.push(request.url());
   });
   await page.goto("/");
-  await page.getByRole("link", { name: "Access NEWMA" }).first().click();
+  await page.getByRole("button", { name: "Menu" }).click();
+  await page.getByRole("link", { name: "Explore the Platform" }).first().click();
   await page.waitForLoadState("networkidle");
   expect(insights).toEqual([]);
 });

@@ -51,9 +51,9 @@ test("forced colours keep a visible outline on the six components and the header
     expect(stroke.stroke, slug).not.toBe("rgba(0, 0, 0, 0)");
     expect(parseFloat(stroke.width), slug).toBeGreaterThanOrEqual(3);
   }
-  const access = page.locator("[data-site-header]").getByRole("link", { name: "Access NEWMA" });
-  await access.focus();
-  const outline = await access.evaluate((el) => ({
+  const menu = page.getByRole("button", { name: "Menu" });
+  await menu.focus();
+  const outline = await menu.evaluate((el) => ({
     style: getComputedStyle(el).outlineStyle,
     width: parseFloat(getComputedStyle(el).outlineWidth),
   }));

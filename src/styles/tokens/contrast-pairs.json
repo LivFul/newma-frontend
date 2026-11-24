@@ -278,5 +278,15 @@
     "fg": "--color-plate-optional",
     "bg": "--color-plate",
     "min": 4.5
+  },
+  {
+    "fg": "--color-sage-fg",
+    "bg": "--color-sage",
+    "min": 4.5
+  },
+  {
+    "fg": "--color-sage-fg",
+    "bg": "--color-sage-soft",
+    "min": 4.5
   }
 ]

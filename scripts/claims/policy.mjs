@@ -111,7 +111,10 @@ export const ALLOWED_TERMS = {
     "Mock ELN",
     "Demo sign-in",
     "Explore the Platform",
-    "Meet NEWMA's AI Research Assistant",
+    "AI Research Assistant",
+    "Research Workspace",
+    "Wet Labs",
+    "Explore Components",
     "Vercel Web Analytics",
     // Closed set of three cited documents (assumption A-P4-09); keep in step with SOURCE_TITLES.
     "NEWMA Technology Architecture and Workflows",

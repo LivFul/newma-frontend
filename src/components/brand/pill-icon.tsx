@@ -36,8 +36,8 @@ export function PillIcon({
             y2="124"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor="#0b404d" />
-            <stop offset="1" stopColor="#1b8896" />
+            <stop stopColor="#5f5986" />
+            <stop offset="1" stopColor="#86809c" />
           </linearGradient>
         </defs>
       ) : null}

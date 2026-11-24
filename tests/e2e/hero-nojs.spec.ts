@@ -25,15 +25,22 @@ test("without JavaScript every label is visible and each link navigates", async 
 test("without JavaScript hover explodes the diagram by CSS", async ({ page, isMobile }) => {
   test.skip(isMobile, "hover is a desktop input");
   await page.goto("/");
-  const y = () =>
-    heroPart(page, "wet-lab").evaluate((g) => g.getBoundingClientRect().y + window.scrollY);
-  const before = await y();
+  // The rows separate: the first-to-last span opens (the resting stack is already spread, so the
+  // direction any one row travels is not the signal).
+  const spread = async () => {
+    const top = await heroPart(page, "interface").evaluate((g) => g.getBoundingClientRect().y);
+    const bottom = await heroPart(page, "provenance-dlt").evaluate(
+      (g) => g.getBoundingClientRect().y,
+    );
+    return bottom - top;
+  };
+  const before = await spread();
   await heroFrame(page).hover();
-  await expect.poll(y, { timeout: 5_000 }).toBeGreaterThan(before + 20);
+  await expect.poll(spread, { timeout: 5_000 }).toBeGreaterThan(before + 20);
 });
 
 test("without JavaScript the interactive layer never mounts", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator('[data-hero-ready="true"]')).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Explore components" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Explore Components" })).toHaveCount(0);
 });

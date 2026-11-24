@@ -1,122 +1,83 @@
 {
-  "Ink": {
-    "hex": "#082B33",
+  "Forest": {
+    "hex": "#244322",
     "rgb": [
-      8,
-      43,
-      51
-    ],
-    "cmyk_approx": [
-      84,
-      16,
-      0,
-      80
-    ],
-    "role": "Primary text, wordmark on light"
-  },
-  "Night": {
-    "hex": "#06242B",
-    "rgb": [
-      6,
       36,
-      43
-    ],
-    "cmyk_approx": [
-      86,
-      16,
-      0,
-      83
-    ],
-    "role": "Primary dark background"
-  },
-  "Deep Teal": {
-    "hex": "#0B3F4B",
-    "rgb": [
-      11,
-      63,
-      75
-    ],
-    "cmyk_approx": [
-      85,
-      16,
-      0,
-      71
-    ],
-    "role": "Pill half, gradients, dark accents"
-  },
-  "Teal": {
-    "hex": "#1C8A99",
-    "rgb": [
-      28,
-      138,
-      153
-    ],
-    "cmyk_approx": [
-      82,
-      10,
-      0,
-      40
-    ],
-    "role": "Pill highlight, links on light"
-  },
-  "Emerald": {
-    "hex": "#0FA36B",
-    "rgb": [
-      15,
-      163,
-      107
-    ],
-    "cmyk_approx": [
-      91,
-      0,
-      34,
-      36
-    ],
-    "role": "Plant half, accents, buttons"
-  },
-  "Lime": {
-    "hex": "#A6E04A",
-    "rgb": [
-      166,
-      224,
-      74
-    ],
-    "cmyk_approx": [
-      26,
-      0,
       67,
-      12
+      34
     ],
-    "role": "Plant highlight, small accents"
+    "role": "Primary brand colour: wordmark n/e, headlines, plates (15%)"
   },
-  "Mist": {
-    "hex": "#F1F6F1",
+  "Sage": {
+    "hex": "#9BA77D",
     "rgb": [
-      241,
-      246,
-      241
+      155,
+      167,
+      125
     ],
-    "cmyk_approx": [
-      2,
-      0,
-      2,
-      4
-    ],
-    "role": "Light background, wordmark on dark"
+    "role": "Gradient midpoint, supporting pills, fills (15%)"
   },
-  "Slate": {
-    "hex": "#4F6B70",
+  "Lavender": {
+    "hex": "#86809C",
     "rgb": [
-      79,
-      107,
-      112
+      134,
+      128,
+      156
     ],
-    "cmyk_approx": [
-      29,
-      4,
-      0,
-      56
+    "role": "Gradient end, focus ring, accents (10%)"
+  },
+  "White": {
+    "hex": "#FFFFFF",
+    "rgb": [
+      255,
+      255,
+      255
     ],
-    "role": "Secondary text, byline on light"
+    "role": "Dominant ground (60%)"
+  },
+  "Paper": {
+    "hex": "#F7F8F4",
+    "rgb": [
+      247,
+      248,
+      244
+    ],
+    "role": "Web page background"
+  },
+  "Ink": {
+    "hex": "#1B2A1A",
+    "rgb": [
+      27,
+      42,
+      26
+    ],
+    "role": "Body text on light"
+  },
+  "Forest Deep": {
+    "hex": "#1B3319",
+    "rgb": [
+      27,
+      51,
+      25
+    ],
+    "role": "Dark plates and theme colour"
+  },
+  "Sage Soft": {
+    "hex": "#C9D0B3",
+    "rgb": [
+      201,
+      208,
+      179
+    ],
+    "role": "Light sage fills"
+  },
+  "Lavender Deep": {
+    "hex": "#5F5986",
+    "rgb": [
+      95,
+      89,
+      134
+    ],
+    "role": "Primary button fill (white text)"
   }
 }

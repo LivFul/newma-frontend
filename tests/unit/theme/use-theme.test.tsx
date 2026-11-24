@@ -35,10 +35,10 @@ describe("useThemePreference", () => {
     window.localStorage.clear();
   });
 
-  it("defaults to dark on the server snapshot until storage is read", () => {
+  it("defaults to light on the server snapshot until storage is read", () => {
     const { result } = renderHook(() => useThemePreference());
-    expect(result.current.preference).toBe("dark");
-    expect(result.current.resolved).toBe("dark");
+    expect(result.current.preference).toBe("light");
+    expect(result.current.resolved).toBe("light");
   });
 
   it("persists manual dark without applying dom when used alone", () => {
@@ -64,13 +64,14 @@ describe("useThemeApplicator", () => {
     window.localStorage.clear();
   });
 
-  it("applies dark when storage is empty even on a light OS", () => {
+  it("applies light when storage is empty even on a dark OS", () => {
+    mockColorScheme(true);
     renderHook(() => useThemeApplicator());
     const { result } = renderHook(() => useThemePreference());
-    expect(result.current.preference).toBe("dark");
-    expect(result.current.resolved).toBe("dark");
-    expect(document.documentElement.classList.contains("dark")).toBe(true);
-    expect(document.documentElement.dataset.theme).toBe("dark");
+    expect(result.current.preference).toBe("light");
+    expect(result.current.resolved).toBe("light");
+    expect(document.documentElement.classList.contains("light")).toBe(true);
+    expect(document.documentElement.dataset.theme).toBe("light");
   });
 
   it("persists manual dark and applies the dark class and theme-color meta", () => {
@@ -79,7 +80,7 @@ describe("useThemeApplicator", () => {
     act(() => result.current.setPreference("dark"));
     expect(document.documentElement.classList.contains("dark")).toBe(true);
     expect(document.documentElement.dataset.theme).toBe("dark");
-    expect(document.getElementById(THEME_COLOR_META_ID)?.getAttribute("content")).toBe("#06242b");
+    expect(document.getElementById(THEME_COLOR_META_ID)?.getAttribute("content")).toBe("#1b3319");
   });
 
   it("forces light over a dark OS preference", () => {

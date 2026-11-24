@@ -10,9 +10,13 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // Tinted Liquid Glass: the one prominent action per view (HIG, Buttons). Ink on the Plant gradient.
+        // The one prominent action per view: white on the Lavender gradient (brand guide v1).
         primary:
           "glass-prominent btn-lift border-transparent bg-brand font-semibold text-prominent-fg hover:brightness-110 forced-colors:border-[ButtonText] forced-colors:bg-none",
+        // Supporting pill: Forest ink on Sage (the guide's "Explore the Platform | How it works" pair).
+        sage: "btn-lift border-transparent bg-sage font-semibold text-sage-fg hover:bg-sage-soft forced-colors:border-[ButtonText]",
+        "sage-soft":
+          "btn-lift border-transparent bg-sage-soft font-semibold text-sage-fg hover:bg-sage forced-colors:border-[ButtonText]",
         // Glass control: translucent with the glass rim, no blur layer (only the header blurs); firms up
         // on hover, never below what reduce-transparency or increased contrast require.
         secondary:
