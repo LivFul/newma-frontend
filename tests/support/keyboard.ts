@@ -86,7 +86,8 @@ export async function describeFocus(page: Page): Promise<FocusStop | undefined> 
         !!hit &&
         !el.contains(hit) &&
         !hit.contains(el) &&
-        !!hit.closest("header");
+        // The sticky site header only: page articles carry their own <header>, which hides nothing.
+        !!hit.closest("[data-site-header]");
       const label = `${el.tagName.toLowerCase()} "${(el.getAttribute("aria-label") ?? el.textContent ?? "").trim().slice(0, 40)}"`;
       return {
         idx: Number(el.getAttribute(mark) ?? -1),

@@ -196,6 +196,15 @@ main[tabindex="-1"]:focus-visible {
       border-color: color-mix(in srgb, white 55%, transparent);
       backdrop-filter: blur(var(--glass-blur)) saturate(180%);
     }
+    /* The menu sheet opens over the hero photo and its dark fog panel, where the regular tint lets them
+       show through behind the labels; the firmer hover tint keeps muted labels at 4.5:1 there. */
+    .mobile-sections.glass {
+      background-color: color-mix(
+        in srgb,
+        var(--color-bg-elevated) calc(var(--glass-hover-tint) * 100%),
+        transparent
+      );
+    }
   }
   /* Glass controls (secondary buttons): the same rim and translucent fill without backdrop-filter, so
      many of them in scrolling panels cost no blur layer each; only the header is blurred glass. The

@@ -73,7 +73,10 @@ export function HeroSection() {
           </p>
         </div>
         <div className="hero-eco relative lg:col-span-6 lg:pl-6">
-          <div className="fog-panel plate-surface relative isolate overflow-clip rounded-[2rem] px-5 pt-6 sm:px-8">
+          {/* Paint containment clips the fog, scrim and mist to the rounded panel without making it an
+              overflow container: nothing inside can be scrolled out of view, and at 400% zoom or with
+              wider text spacing the panel grows with its text instead of reporting clipped content. */}
+          <div className="fog-panel plate-surface relative isolate rounded-[2rem] px-5 pt-6 [contain:paint] sm:px-8">
             <EcosystemGraphic />
           </div>
         </div>

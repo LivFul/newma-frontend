@@ -229,7 +229,8 @@ test("on a very short viewport (400% zoom) the header scrolls away instead of ta
 }) => {
   await page.setViewportSize({ width: 320, height: 256 });
   await page.goto("/");
-  await page.evaluate(() => window.scrollTo(0, 400));
+  // Instant: the page scrolls smoothly, and the header is read straight after the call.
+  await page.evaluate(() => window.scrollTo({ top: 400, behavior: "instant" }));
   const position = await page
     .locator("[data-site-header]")
     .evaluate((el) => getComputedStyle(el).position);
